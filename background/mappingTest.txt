@@ -1,0 +1,13 @@
+// this is the name
+map "http://nu.nl" = bla
+uses "http://bla.nl" as source
+uses "http://bla.uk" as target
+imports "http://bla.cn"
+input s1 : Patient as source
+
+rule1: 
+    for 
+        @Patient.id as pid1,
+        @Patient.name as nam1 where pid1.startsWith('a') 
+    make
+        
