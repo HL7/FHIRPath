@@ -155,7 +155,7 @@
 		<!-- test(patient(), "Patient.name.skip(3).given", 0); -->
 		<test name="testDollarOrderAllowedA"
 			inputfile="patient-example.xml">
-			<expression invalid="true">Patient.name.skip(3).given</expression>
+			<expression>Patient.name.skip(3).given</expression>
 		</test>
 
 		<!-- testWrong(patient(), "Patient.children().skip(1)"); -->
@@ -200,7 +200,7 @@
 		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &gt; 0.0</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &gt; 0</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &lt; 190</expression><output type="boolean">true</output></test>
-		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &lt; 'test'</expression><output type="boolean">false</output></test>
+		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &lt; 'test'</expression><!-- no output - empty set --></test>
 
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate = @1974-12-25</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00</expression><output type="boolean">true</output></test>
@@ -210,11 +210,16 @@
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @T12:14:15</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @T12:14</expression><output type="boolean">true</output></test>
 
-		<test name="testLiteralUnicode" inputfile="patient-example.xml"><expression>Patient.name.given.first() = 'P\\u0065ter'</expression><output type="boolean">true</output></test>
+		<test name="testLiteralUnicode" inputfile="patient-example.xml"><expression>Patient.name.given.first() = 'P\u0065ter'</expression><output type="boolean">true</output></test>
 
 		<test name="testLiteralEmptyCollection" inputfile="patient-example.xml"><expression>Patient.name.given != {}</expression><output type="boolean">true</output></test>
 
-		<test name="testExpressions" inputfile="patient-example.xml"><expression>Patient.name.select(given | family).distinct()</expression><output type="boolean">true</output></test>
+		<test name="testExpressions" inputfile="patient-example.xml"><expression>Patient.name.select(given | family).distinct()</expression>
+      <output type="string">Peter</output>
+      <output type="string">James</output>
+      <output type="string">Chalmers</output>
+      <output type="string">Jim</output>
+    </test>
 		<test name="testExpressions" inputfile="patient-example.xml"><expression>Patient.name.given.count() = 1 + 2</expression><output type="boolean">true</output></test>
 
 		<test name="testEmpty" inputfile="patient-example.xml"><expression>Patient.name.empty().not()</expression><output type="boolean">true</output></test>
@@ -229,7 +234,7 @@
 
 	<group name="testAll">
 		<test inputfile="patient-example.xml"><expression>Patient.name.select(given.exists()).all()</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression  invalid="true">Patient.name.select(family.exists()).all()</expression></test>
+		<test inputfile="patient-example.xml"><expression>Patient.name.select(family.exists()).all()</expression><output type="boolean">false</output></test>
 	</group>
 
 	<group name="testSubSetOf">
