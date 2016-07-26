@@ -188,7 +188,7 @@
 		</test>
 
 		<test name="testLiteralInteger" inputfile="patient-example.xml"><expression>-3 != 3</expression><output type="bool">true</output></test>
-		<test name="testLiteralInteger" inputfile="patient-example.xml"><expression>Patient.name.given.count() = 3"</expression><output type="bool">true</output></test>
+		<test name="testLiteralInteger" inputfile="patient-example.xml"><expression>Patient.name.given.count() = 3</expression><output type="bool">true</output></test>
 		<test name="testLiteralInteger" inputfile="patient-example.xml"><expression>Patient.name.given.count() &gt; -3</expression><output type="bool">true</output></test>
 		<test name="testLiteralInteger" inputfile="patient-example.xml"><expression>Patient.name.given.count() != 0</expression><output type="bool">true</output></test>
 		<test name="testLiteralInteger" inputfile="patient-example.xml"><expression>1 &lt; 2</expression><output type="bool">true</output></test>
