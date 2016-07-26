@@ -24,112 +24,6 @@
 	</group>
 
 	<!-- Tests ported from the Java Unit Tests -->
-	<group name="Basics">
-		<!-- test(patient(), "name.given", 3, "string"); -->
-		<test name="testSimple"
-			inputfile="patient-example.xml">
-			<expression>name.given</expression>
-			<output type="string">Peter</output>
-			<output type="string">James</output>
-			<output type="string">Jim</output>
-		</test>
-
-		<!-- test(patient(), "name.period", 0); -->
-		<test name="testSimpleNone"
-			inputfile="patient-example.xml">
-			<expression>name.period</expression>
-		</test>
-
-		<!-- test(patient(), "name.\"given\"", 3, "string"); -->
-		<test name="testSimpleDoubleQuotes"
-			inputfile="patient-example.xml">
-			<expression>name."given"</expression>
-			<output type="string">Peter</output>
-			<output type="string">James</output>
-			<output type="string">Jim</output>
-		</test>
-
-		<!-- testWrong(patient(), "name.given1"); -->
-		<test name="testSimpleFail"
-			inputfile="patient-example.xml">
-			<expression invalid="true">name.given1</expression>
-		</test>
-
-		<!-- test(patient(), "Patient.name.given", 3, "string"); -->
-		<test name="testSimpleWithContext"
-			inputfile="patient-example.xml">
-			<expression>Patient.name.given</expression>
-			<output type="string">Peter</output>
-			<output type="string">James</output>
-			<output type="string">Jim</output>
-		</test>
-
-		<!-- testWrong(patient(), "Encounter.name.given"); -->
-		<test name="testSimpleWithWrongContext"
-			inputfile="patient-example.xml">
-			<expression invalid="true">Encounter.name.given</expression>
-		</test>
-	</group>
-
-	<group name="Observations">
-		<!-- test(observation(), "Observation.value.unit", 1, "string"); -->
-		<test name="testPolymorphismA"
-			inputfile="observation-example.xml">
-			<expression>Observation.value.unit</expression>
-			<output type="string"></output>
-		</test>
-
-		<!-- testWrong(observation(), "Observation.valueQuantity.unit"); -->
-		<test name="testPolymorphismB"
-			inputfile="observation-example.xml">
-			<expression invalid="true">Observation.valueQuantity.unit</expression>
-		</test>
-
-		<!-- testBoolean(observation(), "Observation.value.is(Quantity)", true); -->
-		<test name="testPolymorphismIsA"
-			inputfile="observation-example.xml">
-			<expression>Observation.value.is(Quantity)</expression>
-			<output type="boolean">true</output>
-		</test>
-		<!-- testBoolean(observation(), "Observation.value is Quantity", true); -->
-		<test name="testPolymorphismIsA"
-			inputfile="observation-example.xml">
-			<expression>Observation.value is Quantity</expression>
-			<output type="boolean">true</output>
-		</test>
-
-		<!-- testBoolean(observation(), "Observation.value.is(Period).not()", true); -->
-		<test name="testPolymorphismIsB"
-			inputfile="observation-example.xml">
-			<expression>Observation.value.is(Period).not()</expression>
-			<output type="boolean">true</output>
-		</test>
-
-		<!-- testBoolean(observation(), "Observation.value.as(Quantity).unit", true); -->
-		<test name="testPolymorphismAsA"
-			inputfile="observation-example.xml">
-			<expression>Observation.value.as(Quantity).unit</expression>
-			<output type="string">lbs</output>
-		</test>
-		<!-- testBoolean(observation(), "(Observation.value as Quantity).unit", true); -->
-		<test name="testPolymorphismAsA"
-			inputfile="observation-example.xml">
-			<expression>(Observation.value as Quantity).unit</expression>
-			<output type="string">lbs</output>
-		</test>
-
-		<!-- testWrong(observation(), "(Observation.value as Period).unit"); -->
-		<test name="testPolymorphismAsB"
-			inputfile="observation-example.xml">
-			<expression invalid="true">(Observation.value as Period).unit</expression>
-		</test>
-
-		<!-- test(observation(), "Observation.value.as(Period).start", 0); -->
-		<test name="testPolymorphismAsC"
-			inputfile="observation-example.xml">
-			<expression>Observation.value.as(Period).start</expression>
-		</test>
-	</group>
 
 	<group name="Dollar">
 		<!-- test(patient(), "Patient.name.given.where(substring($this.length()-3) = 'out')", 0); -->
@@ -159,10 +53,12 @@
 		</test>
 
 		<!-- testWrong(patient(), "Patient.children().skip(1)"); -->
+		<!-- The spec warns against assuming order of things, but it's
+			certainly not invalid
 		<test name="testDollarOrderNotAllowed"
 			inputfile="patient-example.xml">
 			<expression invalid="true">Patient.children().skip(1)</expression>
-		</test>
+		</test> -->
 	</group>
 
 	<group name="Literals">
@@ -200,17 +96,23 @@
 		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &gt; 0.0</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &gt; 0</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &lt; 190</expression><output type="boolean">true</output></test>
-		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &lt; 'test'</expression><output type="boolean">false</output></test>
 
+		<!-- Invalid test: comparing a decimal (value.value) to a string
+		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression>Observation.value.value &lt; 'test'</expression><output type="boolean">false</output></test>
+		-->
+		
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate = @1974-12-25</expression><output type="boolean">true</output></test>
-		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00</expression><output type="boolean">true</output></test>
+		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00Z</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00-10:00</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00+10:00</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00Z</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @T12:14:15</expression><output type="boolean">true</output></test>
-		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @T12:14</expression><output type="boolean">true</output></test>
 
-		<test name="testLiteralUnicode" inputfile="patient-example.xml"><expression>Patient.name.given.first() = 'P\\u0065ter'</expression><output type="boolean">true</output></test>
+		<!-- Partial time?  How does ordering work?
+l		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @T12:14</expression><output type="boolean">true</output></test>
+		-->
+		
+		<test name="testLiteralUnicode" inputfile="patient-example.xml"><expression>Patient.name.given.first() = 'P\u0065ter'</expression><output type="boolean">true</output></test>
 
 		<test name="testLiteralEmptyCollection" inputfile="patient-example.xml"><expression>Patient.name.given != {}</expression><output type="boolean">true</output></test>
 
@@ -227,9 +129,12 @@
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>(1|2).not() = false</expression><output type="boolean">true</output></test>
 	</group>
 
+	<!-- all() now takes a condition as parameter, which then becomes a shortcut
+		for select(condition).all().  all() itself has been renamed allTrue(), though
+		we could just make the parameter to all() optional -->
 	<group name="testAll">
-		<test inputfile="patient-example.xml"><expression>Patient.name.select(given.exists()).all()</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression  invalid="true">Patient.name.select(family.exists()).all()</expression></test>
+		<test inputfile="patient-example.xml"><expression>Patient.name.all(given.exists())</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression  invalid="true">Patient.name.all(family.exists())</expression></test>
 	</group>
 
 	<group name="testSubSetOf">
