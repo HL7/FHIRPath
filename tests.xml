@@ -6,7 +6,7 @@
 			name="extract birthDate"
 			inputfile="patient-example.xml" predicate="false">
 			<expression>birthDate</expression>
-			<output type="string">1974-12-25</output>
+			<output type="date">1974-12-25</output>
 		</test>
 		<test
 			name="patient has a birthDate"
@@ -18,8 +18,8 @@
 			name="patient telecom types"
 			inputfile="patient-example.xml">
 			<expression>telecom.use</expression>
-			<output type="string">home</output>
-			<output type="string">work</output>
+			<output type="code">home</output>
+			<output type="code">work</output>
 		</test>
 	</group>
 
