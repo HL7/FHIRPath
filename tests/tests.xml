@@ -137,20 +137,23 @@ l		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Pati
 		<test inputfile="patient-example.xml"><expression  invalid="true">Patient.name.all(family.exists())</expression></test>
 	</group>
 
+	<!-- Both tests are incorrect, they used $this instead of %context -->
 	<group name="testSubSetOf">
-		<test inputfile="patient-example.xml"><expression>Patient.name.first().subsetOf($this.name)</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>Patient.name.subsetOf($this.name.first()).not()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>Patient.name.first().subsetOf(%context.name)</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>Patient.name.subsetOf(%context.name.first()).not()</expression><output type="boolean">true</output></test>
 	</group>
 
+	<!-- Both tests are incorrect, they used $this instead of %context -->
 	<group name="testSuperSetOf">
-		<test inputfile="patient-example.xml"><expression>Patient.name.first().supersetOf($this.name).not()</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>Patient.name.supersetOf($this.name.first())</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>Patient.name.first().supersetOf(%context.name).not()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>Patient.name.supersetOf(%context.name.first())</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testDistinct">
+		<!-- renamed descendents() to descendants() -->
 		<test inputfile="patient-example.xml"><expression>(1 | 2 | 3).isDistinct()</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().linkId.isDistinct()</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().linkId.select(substring(0,1)).isDistinct().not()</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendants().linkId.isDistinct()</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendants().linkId.select(substring(0,1)).isDistinct().not()</expression><output type="boolean">true</output></test>
 
 		<test inputfile="patient-example.xml">
 			<expression>(1 | 2 | 3).distinct()</expression>
@@ -160,7 +163,7 @@ l		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Pati
 		</test>
 		
 		<test inputfile="questionnaire-example.xml">
-			<expression>Questionnaire.descendents().linkId.distinct()</expression>
+			<expression>Questionnaire.descendants().linkId.distinct()</expression>
 			<output type="string"></output>
 			<output type="string"></output>
 			<output type="string"></output>
@@ -173,7 +176,7 @@ l		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Pati
 		</test>
 		
 		<test inputfile="questionnaire-example.xml">
-			<expression>Questionnaire.descendents().linkId.select(substring(0,1)).distinct()</expression>
+			<expression>Questionnaire.descendants().linkId.select(substring(0,1)).distinct()</expression>
 			<output type="string"></output>
 			<output type="string"></output>
 		</test>
@@ -201,7 +204,7 @@ l		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Pati
 	<group name="testRepeat">
 		<test inputfile="valueset-example-expansion.xml"><expression>ValueSet.expansion.repeat(contains).count() = 10</expression><output type="boolean">true</output></test>
 		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.repeat(item).concept.count() = 10</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().concept.count() = 10</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendants().concept.count() = 10</expression><output type="boolean">true</output></test>
 		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.children().concept.count() = 2</expression><output type="boolean">true</output></test>
 	</group>
 
