@@ -14,17 +14,17 @@ Data is represented as a tree of labelled nodes, where each node may optionally 
 
 ![Tree representation of a Patient](treestructure.png)
 
-The diagram shows a tree with a repeating `identifier` node, which represents repeating members of the FHIR object model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
+The diagram shows a tree with a repeating `name` node, which represents repeating members of the FHIR object model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
 
 2. Path selection
 -----------------
-FluentPath allows navigation in the tree by composing a path of concatenated labels, e.g.
+FluentPath allows navigation through the tree by composing a path of concatenated labels, e.g.
 
 	name.given
 
 This would result in a set of nodes, one with the value "Wouter" and one with the value "Gert". In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The focus at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step. 
 
-The underlying type of the entry point (here: Patient) can be represented, but is optional. To illustrate this point, the path `name.given` above can be evaluated as an expression on a set of data of any type. However, for natural human use, expressions may be prefixed with the name of the type:
+The path may start with the type of the root node (which otherwise does not have a name), but this is optional. To illustrate this point, the path `name.given` above can be evaluated as an expression on a set of data of any type. However the expression may be prefixed with the name of the type of the root:
 
 	Patient.name.given
   
@@ -47,7 +47,7 @@ The `is` function can be used to determine whether or not a given value is of a 
 The list of available types that can be passed as a parameter to the `as` and `is` functions is determined by the underlying data model.
 
 ### 3.2 Referring to the current item
-It is sometimes useful to refer to the current item under evaluation when writing an expression, especially within `where()` when the value of the current item needs to be passed as a function parameter. This can be done using the special path `$this`:
+It is sometimes useful to refer to the current item under evaluation when writing an expression, especially within operations like `where()` when the value of the current item needs to be passed as a function parameter. This can be done using the special path `$this`:
 
 	Patient.name.given.where(substring($this.length()-3)) = "out"
 
