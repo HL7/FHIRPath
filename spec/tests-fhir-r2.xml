@@ -270,11 +270,12 @@
 			<output type="string"></output>
 			<output type="string"></output>
 			<output type="string"></output>
+			<output type="string"></output>
+			<output type="string"></output>
 		</test>
-		
+    
 		<test inputfile="questionnaire-example.xml">
 			<expression>Questionnaire.descendents().linkId.select(substring(0,1)).distinct()</expression>
-			<output type="string"></output>
 			<output type="string"></output>
 		</test>
 	</group>
@@ -300,9 +301,9 @@
 
 	<group name="testRepeat">
 		<test inputfile="valueset-example-expansion.xml"><expression>ValueSet.expansion.repeat(contains).count() = 10</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.repeat(item).concept.count() = 10</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().concept.count() = 10</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.children().concept.count() = 2</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.repeat(group | question).concept.count() = 10</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().concept.count() = 13</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.children().concept.count() = 0</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testIndexer">
@@ -746,12 +747,12 @@
 		<test inputfile="patient-example.xml"><expression>%sct = 'http://snomed.info/sct'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>%loinc = 'http://loinc.org'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>%ucum = 'http://unitsofmeasure.org'</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>%\"vs-administrative-gender\" = 'http://hl7.org/fhir/ValueSet/administrative-gender'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>%"vs-administrative-gender" = 'http://hl7.org/fhir/ValueSet/administrative-gender'</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testExtension">
 		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime').exists()</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension(%\"ext-patient-birthTime\").exists()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension(%"ext-patient-birthTime").exists()</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime1').empty()</expression><output type="boolean">true</output></test>
 	</group>
 
