@@ -270,12 +270,11 @@
 			<output type="string"></output>
 			<output type="string"></output>
 			<output type="string"></output>
-			<output type="string"></output>
-			<output type="string"></output>
 		</test>
     
 		<test inputfile="questionnaire-example.xml">
 			<expression>Questionnaire.descendents().linkId.select(substring(0,1)).distinct()</expression>
+			<output type="string"></output>
 			<output type="string"></output>
 		</test>
 	</group>
@@ -301,9 +300,9 @@
 
 	<group name="testRepeat">
 		<test inputfile="valueset-example-expansion.xml"><expression>ValueSet.expansion.repeat(contains).count() = 10</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.repeat(group | question).concept.count() = 10</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().concept.count() = 13</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.children().concept.count() = 0</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.repeat(item).concept.count() = 10</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().concept.count() = 10</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.children().concept.count() = 2</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testIndexer">
@@ -893,6 +892,117 @@ return careplan;
 
 private org.hl7.fhir.dstu3.elementmodel.Element careplanE() throws FHIRFormatError, FileNotFoundException, IOException, DefinitionException, org.hl7.fhir.exceptions.FHIRException {
 return new org.hl7.fhir.dstu3.elementmodel.XmlParser(TestingUtilities.context).parse(new FileInputStream("careplan-example.xml"));
+
+  @Test
+  public void testPrecedence() throws FileNotFoundException, FHIRFormatError, IOException, FHIRException {
+    testBoolean(patient(), "1+2*3+4 = 11", true);
+  }
+  
+  @Test
+  public void testVariables() throws FileNotFoundException, FHIRFormatError, IOException, FHIRException {
+    testBoolean(patient(), "%sct = 'http://snomed.info/sct'", true);
+    testBoolean(patient(), "%loinc = 'http://loinc.org'", true);
+    testBoolean(patient(), "%ucum = 'http://unitsofmeasure.org'", true);
+    testBoolean(patient(), "%\"vs-administrative-gender\" = 'http://hl7.org/fhir/ValueSet/administrative-gender'", true);
+  }
+  
+  @Test
+  public void testExtension() throws FileNotFoundException, FHIRFormatError, IOException, FHIRException {
+    testBoolean(patient(), "Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime').exists()", true);
+    testBoolean(patient(), "Patient.birthDate.extension(%\"ext-patient-birthTime\").exists()", true);
+    testBoolean(patient(), "Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime1').empty()", true);
+  }
+  
+  @Test
+  public void testDollarResource() throws FileNotFoundException, FHIRFormatError, IOException, FHIRException {
+    testBoolean(patient(), patient().getManagingOrganization(), "Reference", "reference.startsWith('#').not() or (reference.substring(1).trace('url') in %resource.contained.id.trace('ids'))", true);
+    testBoolean(patient(), patient(), "Patient", "contained.select(('#'+id in %resource.descendents().reference).not()).empty()", true);
+    testWrong(patient(), "contained.select(('#'+id in %resource.descendents().reference).not()).empty()");
+  }
+  
+  @Test
+  public void testTyping() throws FileNotFoundException, IOException, FHIRException {
+    ElementDefinition ed = new ElementDefinition();
+    ed.getBinding().setValueSet(new UriType("http://test.org"));
+    testBoolean(null, ed.getBinding().getValueSet(), "ElementDefinition.binding.valueSetUri", "startsWith('http:') or startsWith('https') or startsWith('urn:')", true);
+  }
+  
+  @Test
+  public void testDecimalRA() throws FileNotFoundException, IOException, FHIRException {
+    RiskAssessment r = new RiskAssessment();
+    SimpleQuantity sq = new SimpleQuantity();
+    sq.setValue(0.2);
+    sq.setUnit("%");
+    sq.setCode("%");
+    sq.setSystem("http://unitsofmeasure.org");
+    SimpleQuantity sq1 = new SimpleQuantity();
+    sq1.setValue(0.4);
+    sq1.setUnit("%");
+    sq1.setCode("%");
+    sq1.setSystem("http://unitsofmeasure.org");
+    r.addPrediction().setProbability(new Range().setLow(sq).setHigh(sq1));
+    testBoolean(r, r.getPrediction().get(0).getProbability(), "RiskAssessment.prediction.probabilityRange", 
+        "(low.empty() or ((low.code = '%') and (low.system = %ucum))) and (high.empty() or ((high.code = '%') and (high.system = %ucum)))", true);
+    testBoolean(r, r.getPrediction().get(0), "RiskAssessment.prediction", "probability is decimal implies probability.as(decimal) <= 100", true);
+    r.getPrediction().get(0).setProbability(new DecimalType(80));
+    testBoolean(r, r.getPrediction().get(0), "RiskAssessment.prediction", "probability.as(decimal) <= 100", true);
+  }
+  
+  
+  @Test
+  public void testAppointment() throws FileNotFoundException, IOException, FHIRException {
+    testBoolean(appointment(), "(start and end) or status = 'proposed' or status = 'cancelled'", true);
+    testBoolean(appointment(), "start.empty() xor end.exists()", true);
+  }
+  
+  @Test
+  public void testQuestionnaire() throws FileNotFoundException, IOException, FHIRException {
+    Questionnaire q = (Questionnaire) new JsonParser().parse(new FileInputStream("C:/work/org.hl7.fhir/build/publish/questionnaire-example-gcs.json"));
+    for (QuestionnaireItemComponent qi : q.getItem()) {
+      testQItem(qi);
+    }
+  }
+
+  private void testQItem(QuestionnaireItemComponent qi) throws FileNotFoundException, IOException, FHIRException {
+    testBoolean(null, qi, "Questionnaire.item", "(type = 'choice' or type = 'open-choice') or (options.empty() and option.empty())", true);
+  }
+   
+  @Test
+  public void testExtensionDefinitions() throws FileNotFoundException, IOException, FHIRException {
+    Bundle b = (Bundle) new JsonParser().parse(new FileInputStream("C:/work/org.hl7.fhir/build/publish/extension-definitions.json"));
+    for (BundleEntryComponent be : b.getEntry()) {
+      testStructureDefinition((StructureDefinition) be.getResource());
+    }
+  }
+
+  private void testStructureDefinition(StructureDefinition sd) throws FileNotFoundException, IOException, FHIRException {
+    testBoolean(sd, sd, "StructureDefinition", "snapshot.element.tail().all(path.startsWith(%resource.snapshot.element.first().path&'.')) and differential.element.tail().all(path.startsWith(%resource.differential.element.first().path&'.'))", true); 
+  }
+
+  @Test
+  public void testDoubleEntryPoint() throws FileNotFoundException, IOException, FHIRException {
+    testBoolean(patient(), "(Patient.name | Patient.address).count() = 3", true);
+  }
+
+//  @Test
+//  public void testParameersConstraint() throws FileNotFoundException, IOException, FHIRException {
+//    Parameters p = parameters();
+//    Order o = (Order) parameters.getParameter().get(0).getResource();
+//    
+//    testBoolean(o, o.getSubject(), "Reference", "reference.startsWith('#').not() or (reference.substring(1).trace('url') in %resource.contained.id.trace('ids'))", true);
+//  }
+
+  @Test
+  public void testCareplan() throws FileNotFoundException, IOException, FHIRException, org.hl7.fhir.exceptions.FHIRException {
+    testBoolean(careplan(), "contained.where(('#'+id in %resource.descendents().reference).not()).empty()", true);
+    testBoolean(careplan(), "contained.where(('#'+id in %resource.descendents().reference)).empty().not()", true);
+    testBoolean(careplanE(), "contained.where(('#'+id in %resource.descendents().reference).not()).empty()", true);
+  }
+
+  public void testCodeSystem() throws FileNotFoundException, IOException, FHIRException, org.hl7.fhir.exceptions.FHIRException {
+    testBoolean(codesystem(), "descendents().code.isDistinct()", true);
+    testBoolean(codesystemE(), "descendents().code.isDistinct()", true);
+  }
 }
 -->
 </tests>
