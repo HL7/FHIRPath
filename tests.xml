@@ -109,13 +109,13 @@
 		<test name="testPolymorphismAsA"
 			inputfile="observation-example.xml">
 			<expression>Observation.value.as(Quantity).unit</expression>
-			<output type="boolean">true</output>
+			<output type="string">lbs</output>
 		</test>
 		<!-- testBoolean(observation(), "(Observation.value as Quantity).unit", true); -->
 		<test name="testPolymorphismAsA"
 			inputfile="observation-example.xml">
 			<expression>(Observation.value as Quantity).unit</expression>
-			<output type="boolean">true</output>
+			<output type="string">lbs</output>
 		</test>
 
 		<!-- testWrong(observation(), "(Observation.value as Period).unit"); -->
