@@ -359,8 +359,11 @@
 	</group>
 
 	<group name="testIif">
-		<test inputfile="patient-example.xml"><expression>iif(Patient.name.exists(), 'named', 'unnamed') = 'named'</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>iif(Patient.name.empty(), 'unnamed', 'named') = 'named'</expression><output type="boolean">true</output></test>
+		<!-- Note that as currently written, the iif() only works against single values, not collections -->
+		<test inputfile="patient-example.xml"><expression>Patient.name.iif(exists(), 'named', 'unnamed') = 'named'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>Patient.name.iif(empty(), 'unnamed', 'named') = 'named'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>Patient.name.iif({}, 'unnamed', 'named')</expression><output type="string">named</output></test>
+		<test inputfile="patient-example.xml"><expression>Patient.name[0].family.iif(length()-8 != 0, 5/(length()-8), 'no result')</expression><output type="string">no result</output></test>
 	</group>
 
 	<group name="testToInteger">
@@ -402,7 +405,7 @@
 		<test inputfile="patient-example.xml"><expression>'12345'.startsWith('13') = false</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'12345'.startsWith('12345') = true</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'12345'.startsWith('123456') = false</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>'12345'.startsWith('') = false</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>'12345'.startsWith('') = true</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testEndsWith">
@@ -412,7 +415,7 @@
 		<test inputfile="patient-example.xml"><expression>'12345'.endsWith('35') = false</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'12345'.endsWith('12345') = true</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'12345'.endsWith('012345') = false</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>'12345'.endsWith('') = false</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>'12345'.endsWith('') = true</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testContainsString">
@@ -422,7 +425,7 @@
 		<test inputfile="patient-example.xml"><expression>'12345'.contains('35') = false</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'12345'.contains('12345') = true</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'12345'.contains('012345') = false</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>'12345'.contains('') = false</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>'12345'.contains('') = true</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testLength">
@@ -449,7 +452,8 @@
 
 	<group name="testEquality">
 		<test inputfile="patient-example.xml"><expression>1 = 1</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>{} = {}</expression><output type="boolean">true</output></test>
+		<!-- This test is incorrect, as comparing with any empty operand will always return an empty operand -->
+		<test inputfile="patient-example.xml"><expression>{} = {}</expression></test>
 		<test inputfile="patient-example.xml"><expression>1 = 2</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>'a' = 'a'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'a' = 'A'</expression><output type="boolean">false</output></test>
@@ -469,7 +473,7 @@
 
 	<group name="testNEquality">
 		<test inputfile="patient-example.xml"><expression>1 != 1</expression><output type="boolean">false</output></test>
-		<test inputfile="patient-example.xml"><expression>{} != {}</expression><output type="boolean">false</output></test>
+		<test inputfile="patient-example.xml"><expression>{} != {}</expression></test>
 		<test inputfile="patient-example.xml"><expression>1 != 2</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'a' != 'a'</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>'a' != 'b'</expression><output type="boolean">true</output></test>
@@ -652,15 +656,15 @@
 	<group name="testBooleanLogicAnd">
 		<test inputfile="patient-example.xml"><expression>(true and true) = true</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>(true and false) = false</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>(true and {}) = {}</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(true and {}).empty()</expression><output type="boolean">true</output></test>
 
 		<test inputfile="patient-example.xml"><expression>(false and true) = false</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>(false and false) = false</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>(false and {}) = false</expression><output type="boolean">true</output></test>
 
-		<test inputfile="patient-example.xml"><expression>({} and true) = {}</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} and true).empty()</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>({} and false) = false</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>({} and {}) = {}</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} and {}).empty()</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testBooleanLogicOr">
@@ -670,39 +674,39 @@
 
 		<test inputfile="patient-example.xml"><expression>(false or true) = true</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>(false or false) = false</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>(false or {}) = {}</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(false or {}).empty()</expression><output type="boolean">true</output></test>
 
 		<test inputfile="patient-example.xml"><expression>({} or true) = true</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>({} or false) = {}</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>({} or {}) = {}</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} or false).empty()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} or {}).empty()</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testBooleanLogicXOr">
 		<test inputfile="patient-example.xml"><expression>(true xor true) = false</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>(true xor false) = true</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>(true xor {}) = {}</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(true xor {}).empty()</expression><output type="boolean">true</output></test>
 
 		<test inputfile="patient-example.xml"><expression>(false xor true) = true</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>(false xor false) = false</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>(false xor {}) = {}</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(false xor {}).empty()</expression><output type="boolean">true</output></test>
 
-		<test inputfile="patient-example.xml"><expression>({} xor true) = {}</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>({} xor false) = {}</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>({} xor {}) = {}</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} xor true).empty()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} xor false).empty()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} xor {}).empty()</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testBooleanImplies">
 		<test inputfile="patient-example.xml"><expression>(true implies true) = true</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>(true implies false) = false</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>(true implies {}) = {}</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(true implies {}).empty()</expression><output type="boolean">true</output></test>
 
 		<test inputfile="patient-example.xml"><expression>(false implies true) = true</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>(false implies false) = true</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>(false implies {}) = true</expression><output type="boolean">true</output></test>
 
 		<test inputfile="patient-example.xml"><expression>({} implies true) = true</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>({} implies false) = true</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>({} implies {}) = true</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} implies false).empty()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} implies {}).empty()</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testPlus">
@@ -713,10 +717,11 @@
 	</group>
 
 	<group name="testConcatenate">
-		<test inputfile="patient-example.xml"><expression>1 &amp; 1 = '11'</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>1 &amp; 'a' = '1a'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>'1' &amp; '1' = '11'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>'1' &amp; 'a' = '1a'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>{} &amp; 'b' = 'b'</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>(1 | 2 | 3) &amp; 'b' = '1,2,3b'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>'' &amp; 'b' = 'b'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression invalid="semantic">(1 | 2 | 3) &amp; 'b' = '1,2,3b'</expression></test>
 		<test inputfile="patient-example.xml"><expression>'a'&amp;'b' = 'ab'</expression><output type="boolean">true</output></test>
 	</group>
 

@@ -239,12 +239,10 @@ To use these functions over a collection with multiple items, one may use filter
 
 	Patient.name.given.select(substring(1))
 
-#### iif(criterium: expression, true-expression [, otherwise-expression]) : collection
-If the input collection contains a single item, this function evaluates the `criterium` expression. If this expression evaluates to true, the function evaluates the `true-expression` on the input and returns that as a result. 
+#### iif(criterium: boolean, true: collection [, otherwise: collection]) : collection
+If `criterium` is true, the function evaluates the `true-expression` on the input and returns that as a result. 
 
-If the evaluation resulted in `false` or an empty collection, the `otherwise-expression` is evaluated on the input and returned, unless the optional `otherwise-expression` is not given, in which case the function returns an empty collection.
-
-If the input has multiple items or is empty, the function will return an empty collection.
+If `criterium` is `false` or an empty collection, the `otherwise-expression` is evaluated on the input and returned, unless the optional `otherwise-expression` is not given, in which case the function returns an empty collection.
 
 #### toInteger() : integer
 If the input collection contains a single item, this function will return a single integer if:
@@ -268,7 +266,7 @@ In all other cases, the function will return an empty collection.
 If the input collection contains a single item, this function will return a single string if:
 
 * the item in the input collection is a string
-* the item in the input collection is a number, the output will contain its string representation
+* the item in the input collection is an integer, decimal, time or dateTime the output will contain its string representation
 * the item is a boolean, where `true` results in "true" and `false` in "false".
 
 In all other cases, the function will return an empty collection.
@@ -652,8 +650,8 @@ Note that FHIR primitives may contain extensions, so that the following expressi
 
 FHIR adds (backwards compatible) functionality to the common set of functions:
 
-#### extension(string : string) : collection
-Return any extension with the given URL. This is a syntactical shortcut for `.extension.where(url = string)`, but is simpler to write. 
+#### extension(url : string) : collection
+Will filter the focus for items named "extension" with the given url. This is a syntactical shortcut for `.extension.where(url = string)`, but is simpler to write. Will return an empty collection if the focus is empty or the url is empty.
 
 #### trace(name : string) : collection
 When FluentPath statements are used in an invariant, the log contents should be added to the 
