@@ -52,7 +52,7 @@ It is sometimes useful to refer to the current item under evaluation when writin
 	Patient.name.given.where(substring($this.length()-3)) = "out"
 
 ### 3.3 Order nodes and traversal
-Collections of nodes are inherently ordered, and implementations must retain the original order of a collection. There are two special cases: the outcome of operations like `children()` and `descendents()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the standard order, and some may not, and some may be different depending on the underlying source.
+Collections of nodes are inherently ordered, and implementations must retain the original order of a collection. There are two special cases: the outcome of operations like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the standard order, and some may not, and some may be different depending on the underlying source.
 
 4. Expressions
 --------------
@@ -64,6 +64,8 @@ In addition to paths, FluentPath expressions may contain _literals_ and _functio
 	decimal: 0.0, 3.141592653587793236
 	datetime: @2015-02-04T14:34:28Z - @ followed by ISO8601 compliant date/time
 	time: @T14:34:28Z @ followed by ISO8601 compliant time (beginning with T)
+
+For `datetime` and `time` a subset of ISO8601 is supported, consult the formal grammar for more details. Note that timezone indication need not be present (assuming the timezone of the evaluator). If a timezone is present, is MUST include both minutes and hours.  
 
 Unicode is supported in both string literals and quoted identifiers. String literals are surrounded by single quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
  
@@ -82,12 +84,12 @@ Expressions can also contain _operators_, like those for mathematical operations
 
 	Appointment.minutesDuration / 60 > 5
 	MedicationAdministration.wasNotGiven.exists() implies MedicationAdministration.reasonNotGiven.exists()
-	name.given | name.last
+	name.given | name.family
 	'sir ' + name.given
 	
 Finally, FluentPath supports the notion of functions, which all take a collection of values as input and produce another collection as output. For example:
 
-	(name.given | name.last).distinct()
+	(name.given | name.family).distinct()
 	identifier.where(use = 'official')
 
 Since all functions work on collections, constants will first be converted to a collection when functions are invoked on constants:
@@ -384,11 +386,13 @@ The inverse of the equals operator.
 The inverse of the equivalent operator.
 
 ### 6.2 Comparison
-* The comparison operators are defined for strings, numbers, datetimes, and times.
-* unless there is only one item in each collection (left and right) of the same type, the comparisons return false
-* string evaluation is strictly lexical, not based on any defined meaning of order
-* If one or both of the arguments are an empty collection, the comparisons return an empty collection.
- 
+* The comparison operators are defined for strings, integers, decimals, datetimes and times.
+* If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
+* Unless there is only one item in each collection (left and right), the comparisons return false
+* Both arguments must be of the same type, and the evaluator will throw an error if the types differ.
+* When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible. 
+* String evaluation is strictly lexical and is based on the Unicode value of the individual characters, not based on any defined meaning of order
+
 #### \> (Greater Than)
      
 #### < (Less Than)
@@ -402,7 +406,7 @@ The inverse of the equivalent operator.
 #### is
 If the left operand is a collection with a single item and the second operand is an identifier, this operator returns `true` if the type of the left operand is the type specified in the second operand, or a subclass thereof. In all other cases this function returns the empty collection.
 
-	Patient.contained.all($this is 'Patient' implies age > 10)
+	Patient.contained.all($this is Patient implies age > 10)
 
 #### as
 If the left operand is a collection with a single item and the second operand is an identifier, this function returns the value of the left operand, or a subclass thereof. Otherwise, this operator returns the empty collection.
