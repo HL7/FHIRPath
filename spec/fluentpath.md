@@ -182,11 +182,19 @@ Returns `true` if the input collection evaluates to `false`, and `false` if it e
 | `false` | `true` |
 | empty (`{ }`) | empty (`{ }`) |
 
-#### exists() : boolean
-Returns the opposite of `empty()`, and as such is a shorthand for `empty().not()`
+#### exists([criteria : expression]) : boolean
+Returns `true` if the collection has any elements, and `false` otherwise. This is the opposite of `empty()`, and as such is a shorthand for `empty().not()`.
 
-#### all() : boolean
-Returns `true` if every element in the input collection evaluates to `true`, and `false` if any element evaluates to `false`. Otherwise, the result is empty (`{ }`).
+The operator can also take an optional criteria to be applied to the collection prior to the determination of the exists. In this case, the operation is shorthand for `where(criteria).exists()`.
+
+#### all(criteria : expression) : boolean
+Returns `true` if for every element in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`.
+
+#### allTrue() : boolean
+Takes a collection of boolean values and returns `true` if all the items are `true`. If any items are `false`, the result is `false`. If the input is empty (`{ }`), the result is `true`.
+ 
+#### anyTrue() : boolean
+Takes a collection of boolean values and returns `true` if any of the items are `true`. If all the items are `false`, or if the input is empty (`{ }`), the result is `false`.
 
 #### subsetOf(other : collection) :  boolean
 Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the equals (`=`) operation (see below).
