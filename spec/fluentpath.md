@@ -56,17 +56,18 @@ Collections of nodes are inherently ordered, and implementations must retain the
 
 4. Expressions
 --------------
+
+### Literals
 In addition to paths, FluentPath expressions may contain _literals_ and _function invocations_. FluentPath supports the following types of literals:
 
 	boolean: true, false
 	string: 'test string', 'urn:oid:3.4.5.6.7.8'
 	integer: 0, 45
 	decimal: 0.0, 3.141592653587793236
-	datetime: @2015-02-04T14:34:28Z - @ followed by ISO8601 compliant date/time
-	time: @T14:34:28Z @ followed by ISO8601 compliant time (beginning with T)
+	datetime: @2015-02-04T14:34:28Z (`@` followed by ISO8601 compliant date/time)
+	time: @T14:34:28+09:00 (`@` followed by ISO8601 compliant time beginning with `T`)
 
-For `datetime` and `time` a subset of ISO8601 is supported, consult the formal grammar for more details. Note that timezone indication need not be present (assuming the timezone of the evaluator). If a timezone is present, is MUST include both minutes and hours.  
-
+#### string
 Unicode is supported in both string literals and quoted identifiers. String literals are surrounded by single quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
  
 * Unicode characters may be escaped using `\u` followed by four hex digits.
@@ -76,17 +77,48 @@ Unicode is supported in both string literals and quoted identifiers. String lite
 	* `\f` (form feed - \u000c),
 	* `\n` (newline - \u000a), 
 	* `\r` (carriage return - \u000d), 
-	* `\t` (tab - \u0009)  
+	* `\t` (tab - \u0009)
+	* `\"` (double quote)
+	* `\'` (single quote)   
 
-Numbers can be integers and may optionally have decimal parts. Numbers cannot use exponential notation.
+#### decimal
+Decimals cannot use exponential notation.
 
+#### datetime
+
+`datetime` uses a subset of ISO8601:
+
+* It used the YYYY-MM-DD format, though month and days may be left out
+* Week dates and ordinal dates are not allowed
+* Years must be present (--MM-DD is not used)
+* Months must be present if a day is present
+* The date may be followed by a `time` as described in the next section.
+* Consult the formal grammar for more details.   
+
+If a `datetime` has no indication of timezone, the timezone of the evaluating machine is assumed.
+
+#### time
+
+`time` uses a subset of ISO8601:
+
+* A time begins with a `T`
+* If a timezone is present, the notation "±hh:mm" is used (so must include both minutes and hours)
+* `Z` is allowed for the zero UTC offset.
+ 
+Consult the formal grammar for more details.   
+
+If a `time` has no indication of timezone, the timezone of the evaluating machine is assumed.
+
+
+### Operators
 Expressions can also contain _operators_, like those for mathematical operations and boolean logic:
 
 	Appointment.minutesDuration / 60 > 5
 	MedicationAdministration.wasNotGiven.exists() implies MedicationAdministration.reasonNotGiven.exists()
 	name.given | name.family
 	'sir ' + name.given
-	
+
+### Functions	
 Finally, FluentPath supports the notion of functions, which all take a collection of values as input and produce another collection as output. For example:
 
 	(name.given | name.family).distinct()
@@ -98,7 +130,10 @@ Since all functions work on collections, constants will first be converted to a 
 
 will return `1`, since this is implicitly a collection with one constant number `9`.
 
-> Note: There is no concept of `null` in FluentPath. This means that when, in an underlying instance a member is null, there will simply be no corresponding node for that member in the tree. This means that for example `Patient.children()` will contain only non-null members and `Patient.name` will return an empty collection if there are no name elements in the instance.
+### Null and empty 
+There is no concept of `null` in FluentPath. This means that when, in an underlying datamodel a member is null or missing, there will simply be no corresponding node for that member in the tree, e.g. `Patient.name` will return an empty collection (not null) if there are no name elements in the instance.
+
+In expressions, the empty collection is represented as `{}`.
 
 ### 4.1 Boolean evaluation of collections
 Collections can be evaluated as booleans in logical tests in criteria. When a collection is implicitly converted to a boolean then:
@@ -279,17 +314,20 @@ If the input collection contains a single item of type string, it returns a coll
 
 If `start` lies outside the length of the string, the function returns an empty collection. If there are less remaining characters in the string than indicated by `length`, the function returns just the remaining characters.
 
-#### startsWith(string : string) : boolean
-If the input collection contains a single item of type string, the function will return `true` when the  value starts with the specified content.
+#### startsWith(prefix : string) : boolean
+If the input collection contains a single item of type string, the function will return `true` when the input string starts with the given `prefix`. Also returns `true` when `prefix` is the empty string. 
 
-#### endsWith(string : string) : boolean
-If the input collection contains a single item of type string, the function will return `true` when the value ends with the specified content.
+#### endsWith(suffix : string) : boolean
+If the input collection contains a single item of type string, the function will return `true` when the input string ends with the given `suffix`. Also returns `true` when `suffix` is the empty string. 
+
+#### contains(substring : string) : boolean
+If the input collection contains a single item of type string, the function will return `true` when the given `substring` is a substring of the input string. Also returns `true` when `substring` is the empty string.
+
+### replace(pattern : string, substitution : string) : string
+If the input collection contains a single item of type string, the function will return the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string, the instances of the pattern are removed from the input string. If the pattern is the empty string, every character in the input string is surrounded by the substitution, e.g. `'abc'.replace('','x')` becomes `'xaxbxcx'`.
 
 #### matches(regex : string) : boolean
-If the input collection contains a single item of type string, the function will return true when the  value matches the given regular expression. Regular expressions are supposed to work culture invariant, case-sensitive and in 'single line' mode and allow Unicode characters. 
-
-#### contains(string : string) : boolean
-A simpler variation of `matches()` that returns a boolean when the given `string` is a substring of the single string in the input collection.
+If the input collection contains a single item of type string, the function will return `true` when the  value matches the given regular expression. Regular expressions are supposed to work culture invariant, case-sensitive and in 'single line' mode and allow Unicode characters. 
 
 #### replaceMatches(regex : string, substitution: string) : string
 If the input collection contains a single item of type string, the function will match the input using the regular expression in `regex` and replace each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression. 
@@ -300,9 +338,6 @@ This example of `replace()` will convert a string with a date formatted as MM/dd
            '${day}-${month}-${year}')
 
 > Note: All platforms will use their native regular expression implementations, which will commonly be close to the regular expressions in Perl 5, however there are always small differences. I don't think we can prescribe any "common" dialect for FluentPath.
-
-### replace(pattern : string, substitution : string) : string
-A simpler variation of `replaceMatches` that returns the input string with all instances of `pattern` replaced with `substitution`.
 
 #### length() : integer
 If the input collection contains a single item of type string, the function will return the length of the string.
@@ -474,7 +509,7 @@ Multiplies both arguments (numbers only)
 Divides the left operand by the right operand (numbers only). 
 
 #### + (addition)
-For numbers, add the numbers. For strings, concatenates the right operand to the left operand.
+For integer and decimal, add the operands. For strings, concatenates the right operand to the left operand.
 
 #### - (subtraction)
 Subtracts the right operand from the left operand (numbers only).
@@ -484,6 +519,9 @@ Performs truncated division of the left operand by the right operand (numbers on
 
 #### mod
 Computes the remainder of the truncated division of its arguments (numbers only).
+
+#### & (string concatenation)
+For strings, will concatenate the strings, where an empty operand is taken to be the empty string. This differs from `+` on two strings, which will result in an empty collection when one of the operans is empty. 
 
 ### 6.5 Operator precedence
  
@@ -615,7 +653,7 @@ FluentPath is used in five places in the FHIR specifications:
 - URL templates in Smart on FHIR's cds-hooks
 - may be used for Patch in the future
 
-As stated in the introduction, FluentPath uses a tree model that abstracts away the actual underlying datamodel of the data being queries. For FHIR, this means that the contents of the resources and data types as described in the Logical views (or the UML diagrams) are used as the model, rather than the JSON and XML formats, so specific xml or json features are not visible to the FluentPath language (such as comments and the split representation of primitives).
+As stated in the introduction, FluentPath uses a tree model that abstracts away the actual underlying datamodel of the data being queried. For FHIR, this means that the contents of the resources and data types as described in the Logical views (or the UML diagrams) are used as the model, rather than the JSON and XML formats, so specific xml or json features are not visible to the FluentPath language (such as comments and the split representation of primitives).
 
 More specifically:
 * A FluentPath may optionally start with a full resource name
