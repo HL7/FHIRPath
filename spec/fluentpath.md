@@ -543,7 +543,7 @@ Performs truncated division of the left operand by the right operand (numbers on
 Computes the remainder of the truncated division of its arguments (numbers only).
 
 #### & (string concatenation)
-For strings, will concatenate the strings, where an empty operand is taken to be the empty string. This differs from `+` on two strings, which will result in an empty collection when one of the operans is empty. 
+For strings, will concatenate the strings, where an empty operand is taken to be the empty string. This differs from `+` on two strings, which will result in an empty collection when one of the operands is empty. 
 
 ### 6.5 Operator precedence
  
@@ -553,7 +553,7 @@ Precedence of operations, in order from high to low:
 	#02 [] (indexer)
 	#03 unary + and -
     #04: *, /, div, mod
-    #05: +, -,
+    #05: +, -, &
 	#06: |
     #07: >, <, >=, <=
 	#08: is, as
