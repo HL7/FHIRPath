@@ -95,20 +95,15 @@ Decimals cannot use exponential notation.
 * The date may be followed by a `time` as described in the next section.
 * Consult the formal grammar for more details.   
 
-If a `datetime` has no indication of timezone, the timezone of the evaluating machine is assumed.
-
 #### time
 
 `time` uses a subset of ISO8601:
 
 * A time begins with a `T`
-* If a timezone is present, the notation "±hh:mm" is used (so must include both minutes and hours)
+* Timezone is optional, but if present the notation "±hh:mm" is used (so must include both minutes and hours)
 * `Z` is allowed for the zero UTC offset.
  
 Consult the formal grammar for more details.   
-
-If a `time` has no indication of timezone, the timezone of the evaluating machine is assumed.
-
 
 ### Operators
 Expressions can also contain _operators_, like those for mathematical operations and boolean logic:
@@ -307,7 +302,10 @@ If the input collection contains a single item, this function will return a sing
 In all other cases, the function will return an empty collection.
 
 ### 5.6 String manipulation
-The functions in this section operate on collections with a single item. If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
+The functions in this section operate on collections with a single item. If there is more than one item, or an item that is not a string, the evaluation of the expression will end and signal an error to the calling environment.
+
+#### indexOf(substring : string) : integer
+If the input collection contains a single item of type string, will return the 0-based index of the first position this substring is found in the input string, or -1 if it is not found. If the `substring` is an empty string, the function returns 0. 
 
 #### substring(start : integer [, length : integer]) : string
 If the input collection contains a single item of type string, it returns a collection with the part of the string starting at position `start` (zero-based). If `length` is given, will return at most `length` number of characters from the input string.
@@ -323,7 +321,7 @@ If the input collection contains a single item of type string, the function will
 #### contains(substring : string) : boolean
 If the input collection contains a single item of type string, the function will return `true` when the given `substring` is a substring of the input string. Also returns `true` when `substring` is the empty string.
 
-### replace(pattern : string, substitution : string) : string
+#### replace(pattern : string, substitution : string) : string
 If the input collection contains a single item of type string, the function will return the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string, the instances of the pattern are removed from the input string. If the pattern is the empty string, every character in the input string is surrounded by the substitution, e.g. `'abc'.replace('','x')` becomes `'xaxbxcx'`.
 
 #### matches(regex : string) : boolean
@@ -368,7 +366,13 @@ Returns a datetime containing the current date and time, including timezone.
 
 6. Operations
 -------------
-Operators are allowed to be used between any kind of path expressions (e.g. expr op expr). Like functions, operators will generally propagate an empty collection in any of their operands. This is true even when comparing two empty collections using the equality operators.
+Operators are allowed to be used between any kind of path expressions (e.g. expr op expr). Like functions, operators will generally propagate an empty collection in any of their operands. This is true even when comparing two empty collections using the equality operators, e.g.
+
+	{} = {} 
+	true > {}
+	{} != 'dummy'
+
+all result in `{}`.
 
 ### 6.1 Equality
 
@@ -377,9 +381,13 @@ Returns `true` if the left collection is equal to the right collection:
 
 If both operands are collections with a single item:
 * For primitives:
-	* If the value is a string, the strings must be exactly the same
-	* For numbers, equality requires that the 2 values have the same precision 
-	* For boolean values, the values must be the same
+		* `string`: comparison is based on Unicode values
+		* `integer`: values must be exactly equal
+	    * `decimal`: values must be equal, trailing zeroes are ignored 
+		* `boolean`: values must be the same
+		* `dateTime`: must be exactly the same, including timezone (though +24:00 = +00:00 = Z)
+		* `time`: must be exactly the same, including timezone (though +24:00 = +00:00 = Z)
+		* If a `time` or `dateTime` has no indication of timezone, the timezone of the evaluating machine is assumed.
 * For complex types, equality requires all child properties to be equal, recursively.
 
 If both operands are collections with at least one item:
@@ -390,18 +398,24 @@ Otherwise, equals returns `false`.
 
 Note that this implies that if both collections have a different number of items to compare, the result will be `false`. 
 
-Typically, this operator is used with single fixed values as operands. This means that Patient.telecom.system = 'phone' will return `false` if there is more than one telecom with a use. Typically, you'd want Patient.telecom.where(system = 'phone')
+Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = 'phone'` will return `false` if there is more than one `telecom` with a `use`. Typically, you'd want Patient.telecom.where(system = 'phone')
 
 If one or both of the operands is the empty collection, this operation returns an empty collection.
- 
+
+Note: in FHIR, comparing a primitive with extensions against a primitive will compare  
 #### ~ (Equivalent)
 Returns `true` if the collections are the same.
 
 If both operands are collections with a single item:
 * For primitives
-	* If the value is a string, the strings must be the same while ignoring case and accents
-	* For numbers, precision is ignored (exact rules to be discussed) 
-	* For boolean values, the values must be the same
+	* `string`: the strings must be the same while ignoring case, accents, and nonspacing combing characters (i.e. German ß and 'ss').
+	* `integer`: exactly equal
+	* `decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes are ignored in determining precision.
+	* `dateTime`: only the date part must be exactly equal. If one operand
+has less precision than the other, comparison is done at the lowest precision.
+	* `time`: comparison disregards seconds and microseconds, though timezone is still relevant (see equals). If one operand
+has less precision than the other, comparison is done at the lowest precision.
+	* `boolean`: the values must be the same
 * For complex types, equivalence requires all child properties to be equivalent, recursively.
 
 If both operands are collections with multiple items:
@@ -424,7 +438,7 @@ The inverse of the equivalent operator.
 * Unless there is only one item in each collection (left and right), the comparisons return false
 * Both arguments must be of the same type, and the evaluator will throw an error if the types differ.
 * When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible. 
-* String evaluation is strictly lexical and is based on the Unicode value of the individual characters, not based on any defined meaning of order
+* String ordering is strictly lexical and is based on the Unicode value of the individual characters.
 
 #### \> (Greater Than)
      
