@@ -452,8 +452,9 @@
 
 	<group name="testEquality">
 		<test inputfile="patient-example.xml"><expression>1 = 1</expression><output type="boolean">true</output></test>
-		<!-- This test is incorrect, as comparing with any empty operand will always return an empty operand -->
-		<test inputfile="patient-example.xml"><expression>{} = {}</expression></test>
+		<test inputfile="patient-example.xml"><expression>{} = {}</expression><!-- empty --></test>
+		<test inputfile="patient-example.xml"><expression>true = {}</expression><!-- empty --></test>
+		<test inputfile="patient-example.xml"><expression>{} = 'dummy'</expression><!-- empty --></test>
 		<test inputfile="patient-example.xml"><expression>1 = 2</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>'a' = 'a'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'a' = 'A'</expression><output type="boolean">false</output></test>
