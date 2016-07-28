@@ -138,7 +138,7 @@ Collections can be evaluated as booleans in logical tests in criteria. When a co
 * ELSE IF the collection is empty THEN
   - the collection evaluates to an empty collection
 * ELSE 
-  - the collection evaluates to `true`
+  - an error is raised
 
 This same principle applies when using the path statement in invariants.
 
