@@ -66,6 +66,7 @@ In addition to paths, FluentPath expressions may contain _literals_ and _functio
 	decimal: 0.0, 3.141592653587793236
 	datetime: @2015-02-04T14:34:28Z (`@` followed by ISO8601 compliant date/time)
 	time: @T14:34:28+09:00 (`@` followed by ISO8601 compliant time beginning with `T`)
+	quantity: 10 'mg', 4 days
 
 #### string
 Unicode is supported in both string literals and quoted identifiers. String literals are surrounded by single quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
@@ -104,6 +105,19 @@ Decimals cannot use exponential notation.
 * `Z` is allowed for the zero UTC offset.
  
 Consult the formal grammar for more details.   
+
+#### quantity
+
+`quantity` is a number, integer or decimal, followed by a valid [Unified Code for Units of Measure (UCUM)](http://unitsofmeasure.org/trac) unit, expressed as a string, or a date/time unit, plural or singular:
+
+* year, years
+* month, months
+* week, weeks
+* day, days
+* hour, hours
+* minute, minutes
+* second, seconds
+* millisecond, milliseconds
 
 ### Operators
 Expressions can also contain _operators_, like those for mathematical operations and boolean logic:
@@ -360,9 +374,6 @@ Returns a collection with all descendant nodes of all items in the input collect
 
 ### 5.7 Utility functions
 
-#### memberOf(valueset : string) : boolean
-If the input collection contains a single string item, it is taken to be a code and valueset membership is tested against the valueset passed as the argument. The `valueset` argument is a uri used to resolve to a valueset.  
-
 #### trace(name : string) : collection
 Add a string representation of the input collection to the diagnostic log, using the parameter `name` as the name in the log. This log should be made available to the user in some appropriate fashion. Does not change the input, so returns the input collection as output.
 
@@ -394,7 +405,7 @@ If both operands are collections with a single item:
 	    * `decimal`: values must be equal, trailing zeroes are ignored 
 		* `boolean`: values must be the same
 		* `dateTime`: must be exactly the same, including timezone (though +24:00 = +00:00 = Z)
-		* `time`: must be exactly the same, including timezone (though +24:00 = +00:00 = Z)
+		* `time`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
 		* If a `time` or `dateTime` has no indication of timezone, the timezone of the evaluating machine is assumed.
 * For complex types, equality requires all child properties to be equal, recursively.
 
@@ -591,7 +602,29 @@ Authors of Implementation Guides should be aware that adding specific environmen
 
 Note that these tokens are not restricted to simple types, and they may not have defined fixed values that are known before evaluation at run-time, though there is no way to define these kind of values in implementation guides.
 
-8. Type safety and strict evaluation
+8. Reflection
+-------------
+FluentPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection.
+
+For primitive types, the result is a `SimpleTypeInfo`:
+ 
+    SimpleTypeInfo { name: String, baseType: TypeInfo }
+    
+For class types, the result is a `ClassInfo`:
+
+    ClassInfoElement { name: String, type: TypeInfo }
+    ClassInfo { name: String, baseType: TypeInfo, element: List<ClassInfoElement> }
+    
+For collection types, the result is a `ListTypeInfo`:
+
+    ListTypeInfo { elementType: TypeInfo }
+    
+And for anonymous types, the result is a `TupleTypeInfo`:
+
+    TupleTypeInfoElement { name: String, type: TypeInfo }
+    TupleTypeInfo { element: List<TupleTypeInfoElement> }
+
+9. Type safety and strict evaluation
 ------------------------------
 Strongly typed languages are intended to help authors avoid mistakes by ensuring that expressions written describe valid operations. For example, a strongly typed language would typically disallow the expression:
 
@@ -734,9 +767,28 @@ If fetching the resource fails, the failure message is added to the output colle
 #### as(type : identifier) : collection
 In FHIR, only concrete core types are allowed as an argument. All primitives are considered to be independent types (so `markdown` is **not** a subclass of `string`). Profiled types are not allowed, so to select `SimpleQuantity` one would pass `Quantity` as an argument.
 
+#### elementDefinition() : collection
+Returns the FHIR element definition information for each element in the input collection.
+
+#### slice(structure : string, name : string) : collection
+Returns the given slice as defined in the given structure definition. The structure argument is a uri that resolves to the structure definition, and the name must be the name of a slice within that structure definition. If the structure cannot be resolved, or the name of the slice within the resolved structure is not present, an error is thrown. 
+
+For every element in the input collection, if the resolved slice is present on the element, it will be returned. If the slice does not match any element in the input collection, or if the input collection is empty, the result is an empty collection (`{ }`).
+
+#### checkModifiers([{modifier : string}]) : collection
+For each element in the input collection, verifies that there are no modifying extensions defined other than the ones given by the `modifier` argument. If the check passes, the input collection is returned. Otherwise, an error is thrown.
+
+#### conformsTo(structure : string) : boolean
+Returns true if the single input element conforms to the profile specified by the `structure` argument, and false otherwise. If the structure cannot be resolved to a valid profile, an error is thrown. If the input contains more than one element, an error is thrown. If the input is empty, the result is empty.
+
 ### A.4 Changes to operators
 #### ~ (Equivalence)
 Equivalence works in exactly the same manner, but with the addition that for complex types, equality requires all child properties to be equal, **except for "id" elements**.
+
+#### in (Membership)
+Membership works in the same way, with the added capability that if the argument is a string, it is resolved as a uri to a value set and the operation performs value set membership.
+
+Note that implementations are encouraged to make use of a terminology service to provide this functionality.
 
 ### A.5 Environment variables
 The FHIR specification specified one additional variable:
@@ -748,7 +800,7 @@ The FHIR specification specified one additional variable:
 
 # Appendix B - Use of FluentPath in Clinical Quality Language (CQL)
 
-Clinical Quality Language is being extended to use FluentPath as its core expression language, in much the same way that XQuery uses XPath to represent expressions within queries. In particular, the following extensions to CQL are proposed:
+Clinical Quality Language is being extended to use FluentPath as its core path language, in much the same way that XQuery uses XPath to represent paths within queries. In particular, the following extensions to CQL are proposed:
 
 ### Path Traversal
 When a path expression involves an element with multiple cardinality, the expression is considered short-hand for an equivalent query invocation. For example:
@@ -767,7 +819,7 @@ FluentPath has the ability to reference contexts (using the `$` prefix) and envi
 ### Additional Operators
 The following additional operators are being added to CQL:
 * `~`, `!~` - Equivalent operators (formerly `matches` in CQL)
-* `!=` - As a synonym for `<>`
+* `!=` - As a replacement for `<>`
 * `implies` - Logical implication
 * `|` - As a synonym for `union`
 
