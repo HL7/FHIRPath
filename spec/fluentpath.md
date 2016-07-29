@@ -22,7 +22,7 @@ FluentPath allows navigation through the tree by composing a path of concatenate
 
 	name.given
 
-This would result in a set of nodes, one with the value "Wouter" and one with the value "Gert". In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The focus at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step. 
+This would result in a collection of nodes, one with the value "Wouter" and one with the value "Gert". In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The focus at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step. 
 
 The path may start with the type of the root node (which otherwise does not have a name), but this is optional. To illustrate this point, the path `name.given` above can be evaluated as an expression on a set of data of any type. However the expression may be prefixed with the name of the type of the root:
 
@@ -30,9 +30,19 @@ The path may start with the type of the root node (which otherwise does not have
   
 The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`.
 
-Syntactically, FluentPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use double quotes to include characters in path parts that would otherwise be interpreted as operators, e.g.:
+Syntactically, FluentPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use double quotes to include characters in path parts that would otherwise be interpreted as keywords or operators, e.g.:
 
 	Message."PID-1"
+
+### 3.1 Collections
+Collections are fundamental to FluentPath, in that the result of every expression is a collection, even if that expression only results in a single element. This approach allows paths to be specified without having to care about the cardinality of any particular element, and is therefore ideally suited to graph traversal.
+
+Within FluentPath, a collection is:
+* Ordered - The order of items in the collection is important and is preserved through operations as much as possible.
+* Non-Unique - Duplicate elements are allowed within a collection. Some functions, such as `distinct()` and `union()` produce collections of unique elements, but in general, duplicate elements are allowed.
+* Indexed - Each item in a collection can be uniquely addressed by it's index, i.e. ordinal position within the collection
+* Countable - The number of items in a given collection can always be determined using the `count()` function
+* 0-based - The first item in a collection has index 0
 
 ### 3.1 Paths and polymorphic items
 In the underlying representation of data, nodes may be typed and represent polymorphic items. Paths may either ignore the type of a node, and continue along the path or may be explicit about the expected node and filter the set of nodes by type before navigating down child nodes: 
@@ -52,7 +62,7 @@ It is sometimes useful to refer to the current item under evaluation when writin
 	Patient.name.given.where(substring($this.length()-3)) = "out"
 
 ### 3.3 Order nodes and traversal
-Collections of nodes are inherently ordered, and implementations must retain the original order of a collection. There are two special cases: the outcome of operations like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the standard order, and some may not, and some may be different depending on the underlying source.
+Collections in FluentPath are inherently ordered, and implementations must retain the original order of a collection. There are two special cases: the outcome of operations like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the logical order implied by the data model, and some may not, and some may be different depending on the underlying source.
 
 4. Expressions
 --------------
@@ -108,7 +118,7 @@ Consult the formal grammar for more details.
 
 #### quantity
 
-`quantity` is a number, integer or decimal, followed by a valid [Unified Code for Units of Measure (UCUM)](http://unitsofmeasure.org/trac) unit, expressed as a string, or a date/time unit, plural or singular:
+`quantity` is a number (integer or decimal), followed by a valid [Unified Code for Units of Measure (UCUM)](http://unitsofmeasure.org/trac) unit, expressed as a string, or a date/time unit, plural or singular:
 
 * year, years
 * month, months
@@ -123,14 +133,14 @@ Consult the formal grammar for more details.
 Expressions can also contain _operators_, like those for mathematical operations and boolean logic:
 
 	Appointment.minutesDuration / 60 > 5
-	MedicationAdministration.wasNotGiven.exists() implies MedicationAdministration.reasonNotGiven.exists()
-	name.given | name.family
+	MedicationAdministration.wasNotGiven implies MedicationAdministration.reasonNotGiven.exists()
+	name.given | name.family // union of given and family names
 	'sir ' + name.given
 
 ### Functions	
 Finally, FluentPath supports the notion of functions, which all take a collection of values as input and produce another collection as output. For example:
 
-	(name.given | name.family).distinct()
+	(name.given | name.family).count()
 	identifier.where(use = 'official')
 
 Since all functions work on collections, constants will first be converted to a collection when functions are invoked on constants:
@@ -140,7 +150,7 @@ Since all functions work on collections, constants will first be converted to a 
 will return `1`, since this is implicitly a collection with one constant number `9`.
 
 ### Null and empty 
-There is no concept of `null` in FluentPath. This means that when, in an underlying datamodel a member is null or missing, there will simply be no corresponding node for that member in the tree, e.g. `Patient.name` will return an empty collection (not null) if there are no name elements in the instance.
+There is no concept of `null` in FluentPath. This means that when, in an underlying data object a member is null or missing, there will simply be no corresponding node for that member in the tree, e.g. `Patient.name` will return an empty collection (not null) if there are no name elements in the instance.
 
 In expressions, the empty collection is represented as `{}`.
 
@@ -168,9 +178,9 @@ When functions behave differently (for example the `count()` and `empty()` funct
 
 5. Functions
 -------------------------
-Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more parameters. Functions always take a collection as input and produce another collection as output, even though these may be collections of just a single item. Correspondingly, arguments to the functions can be any FluentPath expression, though some functions require these expressions to evaluate to a collection containing a single item of a specific type.
+Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more parameters. With a few minor exceptions (e.g. the today()function), functions in FluentPath always take a collection as input and produce another collection as output, even though these may be collections of just a single item. Correspondingly, arguments to the functions can be any FluentPath expression, though some functions require these expressions to evaluate to a collection containing a single item of a specific type. This approach allows functions to be chained, successively operating on the results of the previous function in order to produce the desired final result.
 
-The following list contains all functions supported in FluentPath, detailing the expected kind of parameters and kind of collection returned by the function:
+The following sections describe the functions supported in FluentPath, detailing the expected types of parameters and type of collection returned by the function:
 
 * If the function expects a parameter to be a single value (e.g. `item(index: integer)` and it is passed an argument that evaluates to a collection with multiple items or a collection with an item that is not of the required type, the evaluation of the expression will end and an error will be signaled to the calling environment.
 * If the function takes an `expression` as a parameter, the function will evaluate this parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` element, which represents the item from the input collection currently under evaluation. For example, in:
@@ -181,7 +191,7 @@ The following list contains all functions supported in FluentPath, detailing the
 
 	the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
 * Optional parameters are enclosed in square brackets in the definition of a function.
-* All functions return a collection, but if this is a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : boolean`
+* All functions return a collection, but if the function or operation will always produce a collection containing a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : boolean`
 
 ### 5.1 Existence
 #### empty() : boolean
@@ -228,13 +238,13 @@ Returns a collection with a single value which is the integer count of the numbe
 ### 5.2 Filtering and projection
 
 #### where(criteria : expression) : collection
-Filter the input collection to only those elements for which the stated criteria expression evaluates to true.
+Filter the input collection to only those elements for which the stated `criteria` expression evaluates to `true`. Elements for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
 
 #### select(projection: expression) : collection
-Evaluates the given expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_).
+Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_).
 
 #### repeat(projection: expression) : collection
-A version of `select` that will repeat the projection and add it to the output collection, as long as the projection yields new items (as determined by the Equals operator). 
+A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the equals (`=`) operator). 
 
 This operation can be used to traverse a tree and selecting only specific children:
 
@@ -259,30 +269,30 @@ Returns `true` if the collection contains a single element of the given type or 
 Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof.
 
 ### 5.3 Subsetting
-#### _name_[ index : integer ] : collection
-This indexer operation returns a collection with only the `index`-th item (0-based index). If the index lies outside the boundaries of the input collection, an empty collection is returned.
+#### [ index : integer ] : collection
+The indexer operation returns a collection with only the `index`-th item (0-based index). If the index lies outside the boundaries of the input collection, an empty collection is returned.
 
 Example:
 
 	Patient.name[0]
 
 #### single() : collection
-Will return the single item in the input if there is just one item. If there are multiple items, an error is signaled to the evaluation environment.
+Will return the single item in the input if there is just one item. If there are multiple items, an error is signaled to the evaluation environment. This operation is useful for ensuring that an error is returned if an assumption about cardinality is violated at run-time.
 
 #### first() : collection
-Returns a collection containing just the first item in the list. Equivalent to `item(0)`, so it will return an empty collection if the input collection has no items.
+Returns a collection containing just the first item in the input collection. Equivalent to `item(0)`, so it will return an empty collection if the input collection has no items.
 
 #### last() : collection
-Returns a collection containing the last item in the list. Will return an empty collection if the input collection has no items.
+Returns a collection containing the last item in the input collection. Will return an empty collection if the input collection has no items.
 
 #### tail() : collection
-Returns a collection containing all but the first item in the list. Will return an empty collection if the input collection has no or just one item.
+Returns a collection containing all but the first item in the input collection. Will return an empty collection if the input collection has no or just one item.
 
 #### skip(num : integer) : collection
-Returns a collection containing all but the first `num` items in the list. Will return an empty collection if there are no items remaining after the indicated number of items have been skipped.
+Returns a collection containing all but the first `num` items in the input collection. Will return an empty collection if there are no items remaining after the indicated number of items have been skipped, or if the input collection is empty. If `num` is less than or equal to zero, the input collection is simply returned.
 
 #### take(num : integer) : collection
-Returns a collection containing the first `num` items in the list, or less if there are less then `num` items. Will return an empty collection if the input collection is empty.
+Returns a collection containing the first `num` items in the input collection, or less if there are less than `num` items. If num is less than or equal to 0, or if the input collection is empty (`{ }`), `take` returns an empty collection if the input collection is empty.
 
 ### 5.5 Conversion
 The functions in this section operate on collections with a single item. If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
@@ -290,6 +300,8 @@ The functions in this section operate on collections with a single item. If ther
 To use these functions over a collection with multiple items, one may use filters like `where()` and `select()`:
 
 	Patient.name.given.select(substring(1))
+	
+This example returns a collection containing the first character of all the given names for a patient.
 
 #### iif(criterium: boolean, true: collection [, otherwise: collection]) : collection
 If `criterium` is true, the function evaluates the `true-expression` on the input and returns that as a result. 
@@ -308,7 +320,7 @@ In all other cases, the function will return an empty collection.
 #### toDecimal() : decimal
 If the input collection contains a single item, this function will return a single decimal if:
 
-* the item in the input collection is a decimal
+* the item in the input collection is an integer or decimal
 * the item in the input collection is a string and is convertible to a decimal
 * the item is a boolean, where `true` results in a 1 and `false` results in a 0.
 
@@ -357,7 +369,7 @@ This example of `replace()` will convert a string with a date formatted as MM/dd
 	'11/30/1972'.replace('\\b(?<month>\\d{1,2})/(?<day>\\d{1,2})/(?<year>\\d{2,4})\\b',
            '${day}-${month}-${year}')
 
-> Note: All platforms will use their native regular expression implementations, which will commonly be close to the regular expressions in Perl 5, however there are always small differences. I don't think we can prescribe any "common" dialect for FluentPath.
+> Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FluentPath does not prescribe a particular dialect, but recommends the use of the dialect defined by as part of [XML Schema 1.1](https://www.w3.org/TR/xmlschema11-2/#regexs) as the dialect most likely to be broadly supported and understood.
 
 #### length() : integer
 If the input collection contains a single item of type string, the function will return the length of the string.
@@ -404,7 +416,7 @@ If both operands are collections with a single item:
 		* `integer`: values must be exactly equal
 	    * `decimal`: values must be equal, trailing zeroes are ignored 
 		* `boolean`: values must be the same
-		* `dateTime`: must be exactly the same, including timezone (though +24:00 = +00:00 = Z)
+		* `dateTime`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
 		* `time`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
 		* If a `time` or `dateTime` has no indication of timezone, the timezone of the evaluating machine is assumed.
 * For complex types, equality requires all child properties to be equal, recursively.
@@ -421,7 +433,11 @@ Typically, this operator is used with single fixed values as operands. This mean
 
 If one or both of the operands is the empty collection, this operation returns an empty collection.
 
-Note: in FHIR, comparing a primitive with extensions against a primitive will compare  
+For `dateTime` and `time` comparisons with partial values (e.g. dateTimes specified only to the day, or times specified only to the hour), the comparison returns empty (`{ }`), not `false`.
+
+> Note: in FHIR, comparing a primitive with extensions against a primitive will compare `false`
+// BTR: Shouldn't this just be if there are modifier extensions? Shouldn't primitive comparisons with non-modifiers be okay?
+
 #### ~ (Equivalent)
 Returns `true` if the collections are the same.
 
@@ -823,7 +839,7 @@ is allowed, and is considered a short-hand for the following query expression:
 
     Patient.telecom X where X.use is not null return X.use
 
-Given a patient with multiple telecom entries, the above query will return a list containing the use element from each entry. Note that the restriction is required as it ensures that the resulting list will not contain any null elements. In addition, if the element itself is list-valued, the result is expanded:
+Given a patient with multiple telecom entries, the above query will return a list containing the `use` element from each entry. Note that the restriction is required as it ensures that the resulting list will not contain any `null` elements. In addition, if the element itself is list-valued, the result is expanded:
 
     Patient.name.given
     
