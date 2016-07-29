@@ -2,7 +2,7 @@ FluentPath
 ==========
 FluentPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and projection of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (FHIR) and HL7 Clinical Quality Language (CQL).
 
-In both FHIR and CQL, this means that expressions can be written that deal with the contents of the resources and data types as described in the Logical views, or the UML diagrams, rather than against the physical representation of those resources. JSON and XML specific features are not visible to the FluentPath language (such as comments and the split representation of primitives).
+In both FHIR and CQL, this means that expressions can be written that deal with the contents of the resources and data types as described in the Logical views, or the UML diagrams, rather than against the physical representation of those resources. JSON and XML specific features are not visible to the FluentPath language (such as comments and the split representation of primitives (i.e. `value[x]`)).
 
 The expressions can in theory be converted to equivalent expressions in XPath, OCL, or another similarly expressive language.
 
@@ -347,7 +347,7 @@ If the input collection contains a single item of type string, the function will
 If the input collection contains a single item of type string, the function will return the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string, the instances of the pattern are removed from the input string. If the pattern is the empty string, every character in the input string is surrounded by the substitution, e.g. `'abc'.replace('','x')` becomes `'xaxbxcx'`.
 
 #### matches(regex : string) : boolean
-If the input collection contains a single item of type string, the function will return `true` when the  value matches the given regular expression. Regular expressions are supposed to work culture invariant, case-sensitive and in 'single line' mode and allow Unicode characters. 
+If the input collection contains a single item of type string, the function will return `true` when the value matches the given regular expression. Regular expressions should function consistently, regardless of any culture- and locale-specific settings in the environment, should be case-sensitive, use 'single line' mode and allow Unicode characters.
 
 #### replaceMatches(regex : string, substitution: string) : string
 If the input collection contains a single item of type string, the function will match the input using the regular expression in `regex` and replace each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression. 
@@ -528,6 +528,10 @@ If the left operand evaluates to `true`, this operator returns the boolean evalu
 |`false`|`true`|`true`|`true`|
 |empty (`{ }`)|`true`|empty (`{ }`)|empty (`{ }`)|
 
+The implies operator is useful for testing conditionals. For example, if a given name is present, then a family name must be as well:
+
+    Patient.name.given.exists() implies Patient.name.family.exists()
+    
 ### 6.6 Math
 The math operators require each operand to be a single element. Both operands must be of the same type, each operator below specifies which types are supported.
 
@@ -584,23 +588,15 @@ A token introduced by a % refers to a value that is passed into the evaluation e
 The following environmental values are set for all contexts:
 
 ```
-%sct        - (string) url for snomed ct
-%loinc      - (string) url for loinc
 %ucum       - (string) url for ucum
-%"vs-[name]" - (string) full url for the provided HL7 value set with id [name]
-%"ext-[name]" - (string) full url for the provided HL7 extension with id [name]
 %context	- The original node that was passed to the evaluation engine before starting evaluation
-
-Note how the names of the `vs-` and `ext-` constants are escaped (just like paths) to allow "-" in the name. 
 ```
 
-Implementers should note that using additional environment variables is a formal extension point for the language. Implementation Guides are allowed to define their own externals, and implementers should provide some appropriate configuration framework to allow these constants to be provided to the evaluation engine at run time. E.g.:
+Implementers should note that using additional environment variables is a formal extension point for the language. Various usages of FluentPath may define their own externals, and implementers should provide some appropriate configuration framework to allow these constants to be provided to the evaluation engine at run time. E.g.:
 
 	%us-zip = '[0-9]{5}(-[0-9]{4}){0,1}'
 
-Authors of Implementation Guides should be aware that adding specific environment variables restricts the use of the FluentPath to their particular context. 
-
-Note that these tokens are not restricted to simple types, and they may not have defined fixed values that are known before evaluation at run-time, though there is no way to define these kind of values in implementation guides.
+Note that these tokens are not restricted to simple types, and they may have values that are not defined fixed values known prior to evaluation at run-time, though there is no way to define these kind of values in implementation guides.
 
 8. Reflection
 -------------
@@ -626,7 +622,7 @@ And for anonymous types, the result is a `TupleTypeInfo`:
 
 9. Type safety and strict evaluation
 ------------------------------
-Strongly typed languages are intended to help authors avoid mistakes by ensuring that expressions written describe valid operations. For example, a strongly typed language would typically disallow the expression:
+Strongly typed languages are intended to help authors avoid mistakes by ensuring that the expressions describe meaningful operations. For example, a strongly typed language would typically disallow the expression:
 
     1 + 'John'
 
@@ -791,12 +787,28 @@ Membership works in the same way, with the added capability that if the argument
 Note that implementations are encouraged to make use of a terminology service to provide this functionality.
 
 ### A.5 Environment variables
-The FHIR specification specified one additional variable:
+The FHIR specification adds support for additional environment variables:
+
+The following environmental values are set for all contexts:
 
 ```
+%sct        - (string) url for snomed ct
+%loinc      - (string) url for loinc
+%"vs-[name]" - (string) full url for the provided HL7 value set with id [name]
+%"ext-[name]" - (string) full url for the provided HL7 extension with id [name]
 %resource	- The original resource current context is part of.
  			  When evaluating a datatype, this would be the resource the element is part of. Do not go past a root resource into a bundle, if it is contained in a bundle
+
+Note how the names of the `vs-` and `ext-` constants are escaped (just like paths) to allow "-" in the name. 
 ```
+
+Implementation Guides are allowed to define their own externals, and implementers should provide some appropriate configuration framework to allow these constants to be provided to the evaluation engine at run time. E.g.:
+
+	%us-zip = '[0-9]{5}(-[0-9]{4}){0,1}'
+
+Authors of Implementation Guides should be aware that adding specific environment variables restricts the use of the FluentPath to their particular context. 
+
+Note that these tokens are not restricted to simple types, and they may have fixed values that are not known before evaluation at run-time, though there is no way to define these kind of values in implementation guides.
 
 # Appendix B - Use of FluentPath in Clinical Quality Language (CQL)
 
@@ -805,16 +817,24 @@ Clinical Quality Language is being extended to use FluentPath as its core path l
 ### Path Traversal
 When a path expression involves an element with multiple cardinality, the expression is considered short-hand for an equivalent query invocation. For example:
 
-    Patient.name
+    Patient.telecom.use
 
 is allowed, and is considered a short-hand for the following query expression:
 
-    Patient.name X where X.name is not null return X.name
+    Patient.telecom X where X.use is not null return X.use
 
-Note that the restriction is required as it ensures that the resulting list will not contain any null elements.
+Given a patient with multiple telecom entries, the above query will return a list containing the use element from each entry. Note that the restriction is required as it ensures that the resulting list will not contain any null elements. In addition, if the element itself is list-valued, the result is expanded:
+
+    Patient.name.given
+    
+is short-hand for:
+
+    expand (Patient.name X where X.given is not null return (X.given Y where Y is not null))
+     
+In this case, given a patient with multiple names, each of which has multiple givens, this will return a single list containing all the given names in all the names.
 
 ### Constants and Contexts
-FluentPath has the ability to reference contexts (using the `$` prefix) and environment-defined variables (using the `%` prefix). Within CQL, these contexts and environment-defined variables are added to the appropriate scope (global for environment-variables, local for contexts) with the prefix included. This allows them to be referenced like any other variable within CQL, but preserves the prefix as a namespace differentiator.
+FluentPath has the ability to reference contexts (using the `$` prefix) and environment-defined variables (using the `%` prefix). Within CQL, these contexts and environment-defined variables are added to the appropriate scope (global for environment-variables, local for contexts) without the prefix. Additionally, because the `%` prefix is optional, it is not required to access environment-defined variables within CQL.
 
 ### Additional Operators
 The following additional operators are being added to CQL:
