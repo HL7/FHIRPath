@@ -207,12 +207,12 @@ Returns `true` if the input collection evaluates to `false`, and `false` if it e
 | empty (`{ }`) | empty (`{ }`) |
 
 #### exists([criteria : expression]) : boolean
-Returns `true` if the collection has any elements, and `false` otherwise. This is the opposite of `empty()`, and as such is a shorthand for `empty().not()`.
+Returns `true` if the collection has any elements, and `false` otherwise. This is the opposite of `empty()`, and as such is a shorthand for `empty().not()`. If the input collection is empty (`{ }`), the result is `false`.
 
 The operator can also take an optional criteria to be applied to the collection prior to the determination of the exists. In this case, the operation is shorthand for `where(criteria).exists()`.
 
 #### all(criteria : expression) : boolean
-Returns `true` if for every element in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`.
+Returns `true` if for every element in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
 
 #### allTrue() : boolean
 Takes a collection of boolean values and returns `true` if all the items are `true`. If any items are `false`, the result is `false`. If the input is empty (`{ }`), the result is `true`.
