@@ -733,6 +733,8 @@ And for anonymous types, the result is a `TupleTypeInfo`:
 
     TupleTypeInfoElement { name: String, type: TypeInfo }
     TupleTypeInfo { element: List<TupleTypeInfoElement> }
+    
+> Note: These structures are a subset of the abstract metamodel used by the Clinical Quality Language Tooling defined here: [modelinfo.xsd](https://github.com/cqframework/clinical_quality_language/blob/dstu-updates/Src/cql-lm/schema/elm/modelinfo.xsd).    
 
 Type safety and strict evaluation
 ------------------------------
@@ -813,8 +815,158 @@ Appendices
 Formal Syntax
 --------
 
-Representation of Type Information
---------
+    grammar fluentpath;
+    
+    expression
+            : term                                                      #termExpression
+            | expression '.' invocation                                 #invocationExpression
+            | expression '[' expression ']'                             #indexerExpression
+            | ('+' | '-') expression                                    #polarityExpression
+            | expression ('*' | '/' | 'div' | 'mod') expression         #multiplicativeExpression
+            | expression ('+' | '-' | '&') expression                   #additiveExpression
+            | expression '|' expression                                 #unionExpression
+            | expression ('<=' | '<' | '>' | '>=') expression           #inequalityExpression
+            | expression ('is' | 'as') typeSpecifier                    #typeExpression
+            | expression ('=' | '~' | '!=' | '!~' | '<>') expression    #equalityExpression
+            | expression ('in' | 'contains') expression                 #membershipExpression
+            | expression 'and' expression                               #andExpression
+            | expression ('or' | 'xor') expression                      #orExpression
+            | expression 'implies' expression                           #impliesExpression
+            ;
+    
+    term
+            : invocation                                            #invocationTerm
+            | literal                                               #literalTerm
+            | externalConstant                                      #externalConstantTerm
+            | '(' expression ')'                                    #parenthesizedTerm
+            ;
+    
+    literal
+            : '{' '}'                                               #nullLiteral
+            | ('true' | 'false')                                    #booleanLiteral
+            | STRING                                                #stringLiteral
+            | NUMBER                                                #numberLiteral
+            | DATETIME                                              #dateTimeLiteral
+            | TIME                                                  #timeLiteral
+            | quantity                                              #quantityLiteral
+            ;
+    
+    externalConstant
+            : '%' identifier
+            ;
+    
+    invocation                          // Terms that can be used after the function/member invocation '.'
+            : identifier                                            #memberInvocation
+            | function                                              #functionInvocation
+            | '$this'                                               #thisInvocation
+            ;
+    
+    function
+            : identifier '(' paramList? ')'
+            ;
+    
+    paramList
+            : expression (',' expression)*
+            ;
+    
+    quantity
+            : NUMBER unit?
+            ;
+    
+    unit
+            : dateTimePrecision
+            | pluralDateTimePrecision
+            | STRING // UCUM syntax for units of measure
+            ;
+    
+    dateTimePrecision
+            : 'year' | 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond'
+            ;
+    
+    pluralDateTimePrecision
+            : 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'
+            ;
+    
+    typeSpecifier
+            : qualifiedIdentifier
+            ;
+    
+    qualifiedIdentifier
+            : identifier ('.' identifier)*
+            ;
+    
+    identifier
+            : IDENTIFIER
+            | QUOTEDIDENTIFIER
+            | 'as'
+            | 'is'
+            ;
+    
+    DATETIME
+            : '@'
+                [0-9][0-9][0-9][0-9] // year
+                (
+                    '-'[0-9][0-9] // month
+                    (
+                        '-'[0-9][0-9] // day
+                        (
+                            'T'
+                                [0-9][0-9] (':'[0-9][0-9] (':'[0-9][0-9] ('.'[0-9]+)?)?)?
+                                ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone
+                        )?
+                     )?
+                 )?
+                 'Z'? // UTC specifier
+            ;
+    
+    TIME
+            : '@'
+                'T'
+                    [0-9][0-9] (':'[0-9][0-9] (':'[0-9][0-9] ('.'[0-9]+)?)?)?
+                    ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone
+            ;
+    
+    IDENTIFIER
+            : ([A-Za-z] | '_')([A-Za-z0-9] | '_')*  // Added _ to support CQL (FHIR could constrain it out)
+            ;
+    
+    QUOTEDIDENTIFIER
+            : '"' (ESC | ~[\\"])* '"'
+            ;
+    
+    STRING
+            : '\'' (ESC | ~[\'])* '\''
+            ;
+    
+    // Also allows leading zeroes now (just like CQL and XSD)
+    NUMBER
+            : [0-9]+('.' [0-9]+)?
+            ;
+    
+    // Pipe whitespace to the HIDDEN channel to support retrieving source text through the parser.
+    WS
+            : [ \r\n\t]+ -> channel(HIDDEN)
+            ;
+    
+    COMMENT
+            : '/*' .*? '*/' -> channel(HIDDEN)
+            ;
+    
+    LINE_COMMENT
+            : '//' ~[\r\n]* -> channel(HIDDEN)
+            ;
+    
+    fragment ESC
+            : '\\' (["'\\/fnrt] | UNICODE)    // allow \", \', \\, \/, \f, etc. and \uXXX
+            ;
+    
+    fragment UNICODE
+            : 'u' HEX HEX HEX HEX
+            ;
+    
+    fragment HEX
+            : [0-9a-fA-F]
+            ;
 
 Use of FluentPath in HL7 FHIR
 ----------
