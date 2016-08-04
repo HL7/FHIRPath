@@ -2,13 +2,36 @@ FluentPath
 ==========
 FluentPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (FHIR) and HL7 Clinical Quality Language (CQL).
 
-In both FHIR and CQL, this means that expressions can be written that deal with the contents of the resources and data types as described in the Logical views, or the UML diagrams, rather than against the physical representation of those resources. JSON and XML specific features are not visible to the FluentPath language (such as comments and the split representation of primitives (i.e. `value[x]`)).
+Overview
+--------------
+In Information Systems in general, and Healthcare Information Systems in particular, the need for formal representation of logic is both pervasive and critical. From low-level technical specifications, through intermediate logical architectures, up to the high-level conceptual descriptions of requirements and behavior, the ability to formally represent knowledge in terms of expressions and information models is essential to the specification and implementation of these systems.
 
+### Requirements
+Of particular importance is the ability to easily and precisely express conditions of basic logic, such as those found in requirements constraints (e.g. Patients must have a name), decision support (e.g. if the patient has diabetes and has not had a recent comprehensive foot exam), cohort definitions (e.g. All male patients aged 60-75), protocol descriptions (e.g. if the specimen has tested positive for the presence of sodium), and numerous other environments.
+
+Precisely because the need for such expressions is so pervasive, there is no shortage of existing languages for representing them. However, these languages tend to be tightly coupled to the data structures, and even the information models on which they operate, XPath being a typical example. To ensure that the knowledge captured by the representation of these expressions can survive technological drift, a representation that can be used independent of any underlying physical implementation and information model is required.
+
+Languages meeting these additional requirements also exist, such as Java, JavaScript, C#, and others. However, these languages are both tightly coupled to the platforms in which they operate, and, because they are general-purpose development languages, come with much heavier tooling and technology dependencies than is warranted or desirable.
+
+Given these constraints, and the lack of a specific language that meets all of these requirements, there is a need for a simple, lightweight, platform- and structure-independent graph traversal language. FluentPath meets these requirements, and can be used within various environments to provide for simple but effective formal representation of expressions.
+
+### Features
+* Graph-traversal: FluentPath is a graph-traversal language; authors can clearly and concisely express graph traversal on hierarchical information models (e.g. HL7 V3, FHIR, vMR, CIMI, and QDM).
+* Collection-centric: FluentPath deals with all values as collections, allowing it to easily deal with information models with repeating elements.
+* Platform-independent: FluentPath is a conceptual and logical specification that can be implemented in any platform.
+* Model-independent: FluentPath deals with data as an abstract model, allowing it to be used with any information model.
+
+### Usage  
+In Fast Healthcare Interoperability Resources (FHIR), FluentPath is used within the specification to provide formal definitions for conditions such as validation invariants, search parameter paths, etc. Within Clinical Quality Language (CQL), FluentPath is used to simplify graph-traversal for hierarchical information models.
+
+In both FHIR and CQL, the model independence of FluentPath means that expressions can be written that deal with the contents of the resources and data types as described in the Logical views, or the UML diagrams, rather than against the physical representation of those resources. JSON and XML specific features are not visible to the FluentPath language (such as comments and the split representation of primitives (i.e. `value[x]`)).
+ 
 The expressions can in theory be converted to equivalent expressions in XPath, OCL, or another similarly expressive language.
-
+ 
+### Conventions
 Throughout this documentation, `monospace font` is used to delineate expressions of FluentPath.
 
-1. Navigation model
+Navigation model
 ---------------------
 FluentPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FluentPath query is run. This way, FluentPath can be used on in-memory Java POJOs, Xml data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FluentPath operates on a directed acyclic graph of classes as defined by a MOF-equivalent type system.
 
@@ -18,7 +41,7 @@ Data is represented as a tree of labelled nodes, where each node may optionally 
 
 The diagram shows a tree with a repeating `name` node, which represents repeating members of the FHIR object model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
 
-2. Path selection
+Path selection
 -----------------
 FluentPath allows navigation through the tree by composing a path of concatenated labels, e.g.
 
@@ -66,7 +89,7 @@ It is sometimes useful to refer to the current item under evaluation when writin
 ### Order nodes and traversal
 Collections in FluentPath are inherently ordered, and implementations must retain the original order of a collection. There are two special cases: the outcome of operations like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the logical order implied by the data model, and some may not, and some may be different depending on the underlying source.
 
-3. Expressions
+Expressions
 --------------
 
 ### Literals
@@ -168,19 +191,23 @@ Collections can be evaluated as booleans in logical tests in criteria. When a co
 
 This same principle applies when using the path statement in invariants.
 
-> Note: Because the path language is side effect free, it does not matter whether implementations use short circuit boolean evaluation or not. However with regard to performance, implementations are encouraged to use short circuit evaluation, and authors of path statements should pay attention to short circuit evaluation when designing statements for optimal performance.
-
 ### Propagation of empty results
-FluentPath functions and operators both propagate empty results. This means in general that if any input to a function or operator is empty, then the result will be empty as well. More specifically:
-* If a function operates on an empty collection, the result is an empty collection
-* If a function is passed an empty collection as argument, the result is an empty collection
-* If any operand to an operator is an empty collection, the result is an empty collection.
+FluentPath functions and operators both propagate empty results, but the behavior is in general different when the argument to the function or operator expects a collection (e.g. `select()`, `where()` and `|` (union)) versus when the argument to the function or operator expects singleton value (e.g. `+` and `substring()`).
+ 
+For functions or operators that expect singleton values, this means in general if the input is empty, then the result will be empty as well. More specifically:
+* If a singleton function operates on an empty collection, the result is an empty collection
+* If a singleton function is passed an empty collection as an argument, the result is an empty collection
+* If any operand to a singleton operator is an empty collection, the result is an empty collection.
 
-When functions behave differently (for example the `count()` and `empty()` functions), this is clearly documented in the next sections.
+For functions or arguments that expect collections, in general the empty collection is treated as any other collection would be. For example, the union (`|`) of an empty collection with a non-empty collection is the non-empty collection.
 
-4. Functions
+When functions or operators behave differently from these general principles, (for example the `count()` and `empty()` functions), this is clearly documented in the next sections.
+
+Functions
 -------------------------
-Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more parameters. With a few minor exceptions (e.g. the today()function), functions in FluentPath always take a collection as input and produce another collection as output, even though these may be collections of just a single item. Correspondingly, arguments to the functions can be any FluentPath expression, though some functions require these expressions to evaluate to a collection containing a single item of a specific type. This approach allows functions to be chained, successively operating on the results of the previous function in order to produce the desired final result.
+Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more parameters. With a few minor exceptions (e.g. the `today()` function), functions in FluentPath always take a collection as input and produce another collection as output, even though these may be collections of just a single item. 
+
+Correspondingly, arguments to the functions can be any FluentPath expression, though singleton functions require these expressions to evaluate to a collection containing a single item of a specific type. This approach allows functions to be chained, successively operating on the results of the previous function in order to produce the desired final result.
 
 The following sections describe the functions supported in FluentPath, detailing the expected types of parameters and type of collection returned by the function:
 
@@ -191,8 +218,8 @@ The following sections describe the functions supported in FluentPath, detailing
  	name.given.where($this > 'ba' and $this < 'bc')
 	```
 
-	the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
-* Optional parameters are enclosed in square brackets in the definition of a function.
+the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
+* Optional parameters are enclosed in square brackets in the definition of a function. Note that the brackets are only used to indicate optionality in the signature, they are not part of the actual syntax of FluentPath.
 * All functions return a collection, but if the function or operation will always produce a collection containing a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : boolean`
 
 ### Existence
@@ -225,14 +252,26 @@ Takes a collection of boolean values and returns `true` if any of the items are 
 #### subsetOf(other : collection) :  boolean
 Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the equals (`=`) operation (see below).
 
+Conceptually, this function is evaluated by testing each element in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
+
 #### supersetOf(other : collection) : boolean
 Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the equals (`=`) operation (see below).
+
+Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `false`. This means that if the input collection is empty (`{ }`), the result is `false`, otherwise if the `other` collection is empty (`{ }`), the result is `true`.
 
 #### isDistinct() : boolean
 Returns `true` if all the items in the input collection are distinct. To determine whether two items are distinct, the equals (`=`) operator is used, as defined below.
 
+Conceptually, this function is shorthand for a comparison of the `count()` of the input collection against the `count()` of the `distinct()` of the input collection:
+
+    X.count() = X.distinct().count()
+    
+This means that if the input collection is empty (`{ }`), the result is true.
+
 #### distinct() : collection
 Returns a collection containing only the unique items in the input collection. To determine whether two items are the same, the equals (`=`) operator is used, as defined below.
+
+If the input collection is empty (`{ }`), the result is empty.
 
 #### count() : integer
 Returns a collection with a single value which is the integer count of the number of items in the input collection. Returns 0 when the input collection is empty.
@@ -240,10 +279,12 @@ Returns a collection with a single value which is the integer count of the numbe
 ### Filtering and projection
 
 #### where(criteria : expression) : collection
-Filter the input collection to only those elements for which the stated `criteria` expression evaluates to `true`. Elements for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
+Returns a collection containing only those elements in the input collection for which the stated `criteria` expression evaluates to `true`. Elements for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
+
+If the input collection is emtpy (`{ }`), the result is empty.
 
 #### select(projection: expression) : collection
-Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_).
+Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_). This means that if the evaluation for an element results in the empty collection (`{ }`), no element is added to the result, and that if the input collection is empty (`{ }`), the result is empty as well.
 
 #### repeat(projection: expression) : collection
 A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the equals (`=`) operator). 
@@ -265,33 +306,33 @@ Note that this is slightly different from
 which would find **any** descendants called `group` or `question`, not just the ones nested inside other `group` or `question` elements.
 
 #### ofType(type : identifier) : collection
-Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof.
+Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty.
 
 ### Subsetting
 #### [ index : integer ] : collection
-The indexer operation returns a collection with only the `index`-th item (0-based index). If the index lies outside the boundaries of the input collection, an empty collection is returned.
+The indexer operation returns a collection with only the `index`-th item (0-based index). If the input collection is empty (`{ }`), or the index lies outside the boundaries of the input collection, an empty collection is returned.
 
 Example:
 
 	Patient.name[0]
 
 #### single() : collection
-Will return the single item in the input if there is just one item. If there are multiple items, an error is signaled to the evaluation environment. This operation is useful for ensuring that an error is returned if an assumption about cardinality is violated at run-time.
+Will return the single item in the input if there is just one item. If the input collection is empty (`{ }`), the result is empty. If there are multiple items, an error is signaled to the evaluation environment. This operation is useful for ensuring that an error is returned if an assumption about cardinality is violated at run-time.
 
 #### first() : collection
-Returns a collection containing just the first item in the input collection. Equivalent to `item(0)`, so it will return an empty collection if the input collection has no items.
+Returns a collection containing only the first item in the input collection. This function is equivalent to `item(0)`, so it will return an empty collection if the input collection has no items.
 
 #### last() : collection
-Returns a collection containing the last item in the input collection. Will return an empty collection if the input collection has no items.
+Returns a collection containing only the last item in the input collection. Will return an empty collection if the input collection has no items.
 
 #### tail() : collection
-Returns a collection containing all but the first item in the input collection. Will return an empty collection if the input collection has no or just one item.
+Returns a collection containing all but the first item in the input collection. Will return an empty collection if the input collection has no items, or only one item.
 
 #### skip(num : integer) : collection
 Returns a collection containing all but the first `num` items in the input collection. Will return an empty collection if there are no items remaining after the indicated number of items have been skipped, or if the input collection is empty. If `num` is less than or equal to zero, the input collection is simply returned.
 
 #### take(num : integer) : collection
-Returns a collection containing the first `num` items in the input collection, or less if there are less than `num` items. If num is less than or equal to 0, or if the input collection is empty (`{ }`), `take` returns an empty collection if the input collection is empty.
+Returns a collection containing the first `num` items in the input collection, or less if there are less than `num` items. If num is less than or equal to 0, or if the input collection is empty (`{ }`), `take` returns an empty collection.
 
 ### Conversion
 The functions in this section operate on collections with a single item. If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
@@ -302,7 +343,7 @@ To use these functions over a collection with multiple items, one may use filter
 	
 This example returns a collection containing the first character of all the given names for a patient.
 
-#### iif(criterium: boolean, true: collection [, otherwise: collection]) : collection
+#### iif(criterium: boolean, true-expression: collection [, otherwise-expression: collection]) : collection
 If `criterium` is true, the function evaluates the `true-expression` on the input and returns that as a result. 
 
 If `criterium` is `false` or an empty collection, the `otherwise-expression` is evaluated on the input and returned, unless the optional `otherwise-expression` is not given, in which case the function returns an empty collection.
@@ -314,6 +355,10 @@ If the input collection contains a single item, this function will return a sing
 * the item in the input collection is a string and is convertible to an integer
 * the item is a boolean, where `true` results in a 1 and `false` results in a 0.
 
+If the item is not one the above types, the evaluation of the expression will end and signal an error to the calling environment.
+
+If the item is a string, but the string is not convertible to an integer (using the regex format `(+|-)?#0`), the evaluation of the expression will end and signal an error to the calling environment.
+
 In all other cases, the function will return an empty collection.
 
 #### toDecimal() : decimal
@@ -321,7 +366,11 @@ If the input collection contains a single item, this function will return a sing
 
 * the item in the input collection is an integer or decimal
 * the item in the input collection is a string and is convertible to a decimal
-* the item is a boolean, where `true` results in a 1 and `false` results in a 0.
+* the item is a boolean, where `true` results in a `1.0` and `false` results in a `0.0`.
+
+If the item is not one of the above types, the evaluation of the expression will end and signal an error to the calling environment.
+
+If the item is a string, but the string is not convertible to a decimal (using the regex format `(+|-)?#0(.0#)?`), the evaluation of the expression will end and signal an error to the calling environment.
 
 In all other cases, the function will return an empty collection.
 
@@ -330,7 +379,22 @@ If the input collection contains a single item, this function will return a sing
 
 * the item in the input collection is a string
 * the item in the input collection is an integer, decimal, time or dateTime the output will contain its string representation
-* the item is a boolean, where `true` results in "true" and `false` in "false".
+* the item is a boolean, where `true` results in `'true'` and `false` in `'false'`.
+
+If the item is not one of the above types, the evaluation of the expression will end and signal an error to the calling environment.
+
+The string representation uses the following formats:
+
+|Type|Representation|
+|----|----|
+|`boolean`|`true` or `false`|
+|`integer`|`(-)?#0`|
+|`decimal`|`(-)?#0.0#`|
+|`quantity`|`(-)?#0.0# '<unit>'`|
+|`dateTime`|`YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`|
+|`time`|`Thh:mm:ss.fff(+/-)hh:mm`|
+
+Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
 
 In all other cases, the function will return an empty collection.
 
@@ -371,7 +435,7 @@ This example of `replace()` will convert a string with a date formatted as MM/dd
 > Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FluentPath does not prescribe a particular dialect, but recommends the use of the dialect defined by as part of [XML Schema 1.1](https://www.w3.org/TR/xmlschema11-2/#regexs) as the dialect most likely to be broadly supported and understood.
 
 #### length() : integer
-If the input collection contains a single item of type string, the function will return the length of the string.
+If the input collection contains a single item of type string, the function will return the length of the string. If the input collection is empty (`{ }`), the result is empty.
 
 ### Tree navigation
 
@@ -381,9 +445,9 @@ Returns a collection with all immediate child nodes of all items in the input co
 #### descendants() : collection
 Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. Is a shorthand for `repeat(children())`.
 
-> Note: Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `as()` as described in the previous section to maintain type safety. See section 8 for more information about type safe use of FluentPath expressions.
+> Note: Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See section 8 for more information about type safe use of FluentPath expressions.
 
-### 5.7 Utility functions
+### Utility functions
 
 #### trace(name : string) : collection
 Add a string representation of the input collection to the diagnostic log, using the parameter `name` as the name in the log. This log should be made available to the user in some appropriate fashion. Does not change the input, so returns the input collection as output.
@@ -394,7 +458,7 @@ Returns a datetime containing the current date.
 #### now() : datetime
 Returns a datetime containing the current date and time, including timezone.
 
-5. Operations
+Operations
 -------------
 Operators are allowed to be used between any kind of path expressions (e.g. expr op expr). Like functions, operators will generally propagate an empty collection in any of their operands. This is true even when comparing two empty collections using the equality operators, e.g.
 
@@ -497,8 +561,9 @@ If the left operand is a collection with a single item, this operator returns tr
 If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. This is the inverse operation of in.
 
 ### Boolean logic
-
 For all boolean operators, the collections passed as operands are first evaluated as booleans (as described in Boolean Evaluation of Collections). The operators then use three-valued logic to propagate empty operands.
+
+> Note: To ensure that FluentPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If a condition is needed to ensure correct evaluation of a subsequent expression, the `iif()` function should be used to guarantee that the condition determines whether evaluation of an expression will occur at run-time.
 
 #### and     
 Returns `true` if both operands evaluate to `true`, `false` if either operand evaluates to `false`, and empty collection (`{ }`) otherwise:
@@ -630,9 +695,8 @@ Precedence of operations, in order from high to low:
 
 As customary, expressions may be grouped by parenthesis (`()`).
   
-6. Environment variables
+Environment variables
 -------------------
-
 A token introduced by a % refers to a value that is passed into the evaluation engine by the calling environment. Using environment variables, authors can avoid repetition of fixed values and can pass in external values and data.
 
 The following environmental values are set for all contexts:
@@ -648,7 +712,7 @@ Implementers should note that using additional environment variables is a formal
 
 Note that these tokens are not restricted to simple types, and they may have values that are not defined fixed values known prior to evaluation at run-time, though there is no way to define these kind of values in implementation guides.
 
-7. Reflection
+Reflection
 -------------
 FluentPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection.
 
@@ -670,7 +734,7 @@ And for anonymous types, the result is a `TupleTypeInfo`:
     TupleTypeInfoElement { name: String, type: TypeInfo }
     TupleTypeInfo { element: List<TupleTypeInfoElement> }
 
-8. Type safety and strict evaluation
+Type safety and strict evaluation
 ------------------------------
 Strongly typed languages are intended to help authors avoid mistakes by ensuring that the expressions describe meaningful operations. For example, a strongly typed language would typically disallow the expression:
 
@@ -743,8 +807,17 @@ engine is allowed to be aware of contextual constraints in addition to the type 
 
 >   	Questionnaire.descendants().question.concept.as('Coding').etc
 
+Appendices
+==========
 
-# Appendix A - Use of FluentPath in HL7 FHIR
+Formal Syntax
+--------
+
+Representation of Type Information
+--------
+
+Use of FluentPath in HL7 FHIR
+----------
 
 FluentPath is used in five places in the FHIR specifications:
 - search parameter paths - used to define what contents the parameter refers to 
@@ -763,12 +836,12 @@ More specifically:
 * There is no difference between an attribute and an element
 * Repeating elements turn into multiple nodes with the same name
 
-### A.1 Polymorphism in FHIR
+### Polymorphism in FHIR
 FHIR has the notion of choice elements, where elements can be one of multiple types, e.g. `Patient.deceased[x]`. In actual instances these will be present as either `Patient.deceasedBoolean` or `Patient.deceasedDateTime`. In FluentPath choice elements are labeled according to the name without the '[x]' suffix, and children can be explicitly filtered using the `as` operation:
 
 	Observation.value.as(Quantity).unit
 
-### A.2 Using FHIR types in expressions 
+### Using FHIR types in expressions 
 The evaluation engine will automatically convert the value of FHIR types representing primitives to FluentPath types when they are used in expression in the following fashion:
 
 |FHIR primitive type|FluentPath type|
@@ -785,7 +858,7 @@ Note that FHIR primitives may contain extensions, so that the following expressi
 	Patient.name.given = 'Ewout'			// value of Patient.name.given as a string
 	Patient.name.given.extension.first().value = true	// extension of the primitive value
 
-### A.3 Additional functions
+### Additional functions
 
 FHIR adds (backwards compatible) functionality to the common set of functions:
 
@@ -810,7 +883,7 @@ The items in the collection may also represent a Reference, in which case the `R
 
 If fetching the resource fails, the failure message is added to the output collection.
 
-#### as(type : identifier) : collection
+#### ofType(type : identifier) : collection
 In FHIR, only concrete core types are allowed as an argument. All primitives are considered to be independent types (so `markdown` is **not** a subclass of `string`). Profiled types are not allowed, so to select `SimpleQuantity` one would pass `Quantity` as an argument.
 
 #### elementDefinition() : collection
@@ -827,7 +900,7 @@ For each element in the input collection, verifies that there are no modifying e
 #### conformsTo(structure : string) : boolean
 Returns `true` if the single input element conforms to the profile specified by the `structure` argument, and false otherwise. If the structure cannot be resolved to a valid profile, an error is thrown. If the input contains more than one element, an error is thrown. If the input is empty, the result is empty.
 
-### A.4 Changes to operators
+### Changes to operators
 #### ~ (Equivalence)
 Equivalence works in exactly the same manner, but with the addition that for complex types, equality requires all child properties to be equal, **except for "id" elements**.
 
@@ -836,7 +909,7 @@ Membership works in the same way, with the added capability that if the argument
 
 Note that implementations are encouraged to make use of a terminology service to provide this functionality.
 
-### A.5 Environment variables
+### Environment variables
 The FHIR specification adds support for additional environment variables:
 
 The following environmental values are set for all contexts:
@@ -860,7 +933,8 @@ Authors of Implementation Guides should be aware that adding specific environmen
 
 Note that these tokens are not restricted to simple types, and they may have fixed values that are not known before evaluation at run-time, though there is no way to define these kind of values in implementation guides.
 
-# Appendix B - Use of FluentPath in Clinical Quality Language (CQL)
+Use of FluentPath in Clinical Quality Language (CQL)
+-----------------
 
 Clinical Quality Language is being extended to use FluentPath as its core path language, in much the same way that XQuery uses XPath to represent paths within queries. In particular, the following extensions to CQL are proposed:
 
