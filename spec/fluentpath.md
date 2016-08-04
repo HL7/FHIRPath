@@ -466,7 +466,7 @@ The inverse of the equivalent operator.
 * Both arguments must be of the same type, and the evaluator will throw an error if the types differ.
 * When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible. 
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
-
+* For partial date/time values, the comparison is performed to the highest precision specified in both values.
 #### \> (Greater Than)
      
 #### < (Less Than)
@@ -591,7 +591,7 @@ For `dateTime` values, the quantity unit must be one of: `years`, `months`, `day
 
 For `time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
 
-For partial date/time values, the operation is performed by attempting to derive the highest granularity precision first, working down successive granularities to the granularity of the time-valued quantity. For example:
+For partial date/time values, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value. For example:
 
     @2014 + 24 months
     
@@ -604,7 +604,7 @@ For `dateTime` values, the quantity unit must be one of: `years`, `months`, `day
 
 For `time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
 
-For partial date/time values, the operation is performed by attempting to derive the highest granularity precision first, working down successive granularities to the granularity of the time-valued quantity. For example:
+For partial date/time values, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then subtracting from the date/time value. For example:
 
     @2014 - 24 months
     
