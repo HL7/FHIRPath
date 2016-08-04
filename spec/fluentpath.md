@@ -1,10 +1,12 @@
 FluentPath
 ==========
-FluentPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and projection of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (FHIR) and HL7 Clinical Quality Language (CQL).
+FluentPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (FHIR) and HL7 Clinical Quality Language (CQL).
 
 In both FHIR and CQL, this means that expressions can be written that deal with the contents of the resources and data types as described in the Logical views, or the UML diagrams, rather than against the physical representation of those resources. JSON and XML specific features are not visible to the FluentPath language (such as comments and the split representation of primitives (i.e. `value[x]`)).
 
 The expressions can in theory be converted to equivalent expressions in XPath, OCL, or another similarly expressive language.
+
+Throughout this documentation, `monospace font` is used to delineate expressions of FluentPath.
 
 1. Navigation model
 ---------------------
@@ -34,7 +36,7 @@ Syntactically, FluentPath defines identifiers as any sequence of characters cons
 
 	Message."PID-1"
 
-### 3.1 Collections
+### Collections
 Collections are fundamental to FluentPath, in that the result of every expression is a collection, even if that expression only results in a single element. This approach allows paths to be specified without having to care about the cardinality of any particular element, and is therefore ideally suited to graph traversal.
 
 Within FluentPath, a collection is:
@@ -44,7 +46,7 @@ Within FluentPath, a collection is:
 * Countable - The number of items in a given collection can always be determined using the `count()` function
 * 0-based - The first item in a collection has index 0
 
-### 3.1 Paths and polymorphic items
+### Paths and polymorphic items
 In the underlying representation of data, nodes may be typed and represent polymorphic items. Paths may either ignore the type of a node, and continue along the path or may be explicit about the expected node and filter the set of nodes by type before navigating down child nodes: 
 
 	Observation.value.unit - all kinds of value	
@@ -56,15 +58,15 @@ The `is` function can be used to determine whether or not a given value is of a 
 
 The list of available types that can be passed as a parameter to the `as` and `is` functions is determined by the underlying data model.
 
-### 3.2 Referring to the current item
+### Referring to the current item
 It is sometimes useful to refer to the current item under evaluation when writing an expression, especially within operations like `where()` when the value of the current item needs to be passed as a function parameter. This can be done using the special path `$this`:
 
 	Patient.name.given.where(substring($this.length()-3)) = "out"
 
-### 3.3 Order nodes and traversal
+### Order nodes and traversal
 Collections in FluentPath are inherently ordered, and implementations must retain the original order of a collection. There are two special cases: the outcome of operations like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the logical order implied by the data model, and some may not, and some may be different depending on the underlying source.
 
-4. Expressions
+3. Expressions
 --------------
 
 ### Literals
@@ -154,7 +156,7 @@ There is no concept of `null` in FluentPath. This means that when, in an underly
 
 In expressions, the empty collection is represented as `{}`.
 
-### 4.1 Boolean evaluation of collections
+### Boolean evaluation of collections
 Collections can be evaluated as booleans in logical tests in criteria. When a collection is implicitly converted to a boolean then:
 
 * IF the collection contains a single node AND the node's value is a boolean THEN
@@ -168,7 +170,7 @@ This same principle applies when using the path statement in invariants.
 
 > Note: Because the path language is side effect free, it does not matter whether implementations use short circuit boolean evaluation or not. However with regard to performance, implementations are encouraged to use short circuit evaluation, and authors of path statements should pay attention to short circuit evaluation when designing statements for optimal performance.
 
-### 4.2 Propagation of empty results
+### Propagation of empty results
 FluentPath functions and operators both propagate empty results. This means in general that if any input to a function or operator is empty, then the result will be empty as well. More specifically:
 * If a function operates on an empty collection, the result is an empty collection
 * If a function is passed an empty collection as argument, the result is an empty collection
@@ -176,7 +178,7 @@ FluentPath functions and operators both propagate empty results. This means in g
 
 When functions behave differently (for example the `count()` and `empty()` functions), this is clearly documented in the next sections.
 
-5. Functions
+4. Functions
 -------------------------
 Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more parameters. With a few minor exceptions (e.g. the today()function), functions in FluentPath always take a collection as input and produce another collection as output, even though these may be collections of just a single item. Correspondingly, arguments to the functions can be any FluentPath expression, though some functions require these expressions to evaluate to a collection containing a single item of a specific type. This approach allows functions to be chained, successively operating on the results of the previous function in order to produce the desired final result.
 
@@ -193,7 +195,7 @@ The following sections describe the functions supported in FluentPath, detailing
 * Optional parameters are enclosed in square brackets in the definition of a function.
 * All functions return a collection, but if the function or operation will always produce a collection containing a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : boolean`
 
-### 5.1 Existence
+### Existence
 #### empty() : boolean
 Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
 
@@ -235,7 +237,7 @@ Returns a collection containing only the unique items in the input collection. T
 #### count() : integer
 Returns a collection with a single value which is the integer count of the number of items in the input collection. Returns 0 when the input collection is empty.
 
-### 5.2 Filtering and projection
+### Filtering and projection
 
 #### where(criteria : expression) : collection
 Filter the input collection to only those elements for which the stated `criteria` expression evaluates to `true`. Elements for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
@@ -262,13 +264,10 @@ Note that this is slightly different from
 
 which would find **any** descendants called `group` or `question`, not just the ones nested inside other `group` or `question` elements.
 
-#### is(type : identifier) : boolean
-Returns `true` if the collection contains a single element of the given type or a subclass thereof.
-
-#### as(type : identifier) : collection
+#### ofType(type : identifier) : collection
 Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof.
 
-### 5.3 Subsetting
+### Subsetting
 #### [ index : integer ] : collection
 The indexer operation returns a collection with only the `index`-th item (0-based index). If the index lies outside the boundaries of the input collection, an empty collection is returned.
 
@@ -294,7 +293,7 @@ Returns a collection containing all but the first `num` items in the input colle
 #### take(num : integer) : collection
 Returns a collection containing the first `num` items in the input collection, or less if there are less than `num` items. If num is less than or equal to 0, or if the input collection is empty (`{ }`), `take` returns an empty collection if the input collection is empty.
 
-### 5.5 Conversion
+### Conversion
 The functions in this section operate on collections with a single item. If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
 
 To use these functions over a collection with multiple items, one may use filters like `where()` and `select()`:
@@ -335,7 +334,7 @@ If the input collection contains a single item, this function will return a sing
 
 In all other cases, the function will return an empty collection.
 
-### 5.6 String manipulation
+### String Manipulation
 The functions in this section operate on collections with a single item. If there is more than one item, or an item that is not a string, the evaluation of the expression will end and signal an error to the calling environment.
 
 #### indexOf(substring : string) : integer
@@ -374,7 +373,7 @@ This example of `replace()` will convert a string with a date formatted as MM/dd
 #### length() : integer
 If the input collection contains a single item of type string, the function will return the length of the string.
 
-### 5.6 Tree navigation
+### Tree navigation
 
 #### children() : collection
 Returns a collection with all immediate child nodes of all items in the input collection.
@@ -395,7 +394,7 @@ Returns a datetime containing the current date.
 #### now() : datetime
 Returns a datetime containing the current date and time, including timezone.
 
-6. Operations
+5. Operations
 -------------
 Operators are allowed to be used between any kind of path expressions (e.g. expr op expr). Like functions, operators will generally propagate an empty collection in any of their operands. This is true even when comparing two empty collections using the equality operators, e.g.
 
@@ -405,29 +404,30 @@ Operators are allowed to be used between any kind of path expressions (e.g. expr
 
 all result in `{}`.
 
-### 6.1 Equality
+### Equality
 
 #### = (Equals)
 Returns `true` if the left collection is equal to the right collection:
 
 If both operands are collections with a single item:
+
 * For primitives:
-		* `string`: comparison is based on Unicode values
-		* `integer`: values must be exactly equal
-	    * `decimal`: values must be equal, trailing zeroes are ignored 
-		* `boolean`: values must be the same
-		* `dateTime`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
-		* `time`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
-		* If a `time` or `dateTime` has no indication of timezone, the timezone of the evaluating machine is assumed.
+    * `string`: comparison is based on Unicode values
+    * `integer`: values must be exactly equal
+    * `decimal`: values must be equal, trailing zeroes are ignored 
+    * `boolean`: values must be the same
+    * `dateTime`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
+    * `time`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
+    * If a `time` or `dateTime` has no indication of timezone, the timezone of the evaluating machine is assumed.
 * For complex types, equality requires all child properties to be equal, recursively.
 
-If both operands are collections with at least one item:
+If both operands are collections with multiple items:
 * Each item must be equal
 * Comparison is order dependent
 
 Otherwise, equals returns `false`. 
 
-Note that this implies that if both collections have a different number of items to compare, the result will be `false`. 
+Note that this implies that if the collections have a different number of items to compare, the result will be `false`. 
 
 Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = 'phone'` will return `false` if there is more than one `telecom` with a `use`. Typically, you'd want Patient.telecom.where(system = 'phone')
 
@@ -435,21 +435,15 @@ If one or both of the operands is the empty collection, this operation returns a
 
 For `dateTime` and `time` comparisons with partial values (e.g. dateTimes specified only to the day, or times specified only to the hour), the comparison returns empty (`{ }`), not `false`.
 
-> Note: in FHIR, comparing a primitive with extensions against a primitive will compare `false`
-// BTR: Shouldn't this just be if there are modifier extensions? Shouldn't primitive comparisons with non-modifiers be okay?
-
 #### ~ (Equivalent)
-Returns `true` if the collections are the same.
+Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }` will result in `true`.
 
 If both operands are collections with a single item:
 * For primitives
-	* `string`: the strings must be the same while ignoring case, accents, and nonspacing combing characters (i.e. German ß and 'ss').
+	* `string`: the strings must be the same while ignoring case and normalizing whitespace.
 	* `integer`: exactly equal
 	* `decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes are ignored in determining precision.
-	* `dateTime`: only the date part must be exactly equal. If one operand
-has less precision than the other, comparison is done at the lowest precision.
-	* `time`: comparison disregards seconds and microseconds, though timezone is still relevant (see equals). If one operand
-has less precision than the other, comparison is done at the lowest precision.
+	* `dateTime` and `time`: values must be equal, except that for partial date/time values, the comparison returns `false`, not empty (`{ }`). If one operand has less precision than the other, comparison is done at the lowest precision.
 	* `boolean`: the values must be the same
 * For complex types, equivalence requires all child properties to be equivalent, recursively.
 
@@ -457,9 +451,7 @@ If both operands are collections with multiple items:
 * Each item must be equivalent
 * Comparison is not order dependent
 
-Note that this implies that if both collections have a different number of items to compare, the result will be `false`. 
-
-If one or both of the operands is the empty collection, this operation returns an empty collection.
+Note that this implies that if the collections have a different number of items to compare, the result will be `false`. 
 
 ####  != (Not Equals)
 The inverse of the equals operator.
@@ -467,7 +459,7 @@ The inverse of the equals operator.
 #### !~ (Not Equivalent)
 The inverse of the equivalent operator.
 
-### 6.2 Comparison
+### Comparison
 * The comparison operators are defined for strings, integers, decimals, datetimes and times.
 * If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
 * Unless there is only one item in each collection (left and right), the comparisons return false
@@ -483,7 +475,7 @@ The inverse of the equivalent operator.
 
 #### \>= (Greater or Equal)
 
-### 6.3 Types
+### Types
 
 #### is
 If the left operand is a collection with a single item and the second operand is an identifier, this operator returns `true` if the type of the left operand is the type specified in the second operand, or a subclass thereof. In all other cases this function returns the empty collection.
@@ -493,7 +485,7 @@ If the left operand is a collection with a single item and the second operand is
 #### as
 If the left operand is a collection with a single item and the second operand is an identifier, this function returns the value of the left operand, or a subclass thereof. Otherwise, this operator returns the empty collection.
 
-### 6.4 Collections
+### Collections
 
 #### | (union collections)
 Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality).
@@ -504,9 +496,9 @@ If the left operand is a collection with a single item, this operator returns tr
 #### contains (containership)
 If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. This is the inverse operation of in.
 
-### 6.5 Boolean logic
+### Boolean logic
 
-For all boolean operators, the collections passed as operands are first evaluated as booleans (as described in 4.1). The operators then use three-valued logic to propagate empty operands.
+For all boolean operators, the collections passed as operands are first evaluated as booleans (as described in Boolean Evaluation of Collections). The operators then use three-valued logic to propagate empty operands.
 
 #### and     
 Returns `true` if both operands evaluate to `true`, `false` if either operand evaluates to `false`, and empty collection (`{ }`) otherwise:
@@ -548,7 +540,7 @@ The implies operator is useful for testing conditionals. For example, if a given
 
     Patient.name.given.exists() implies Patient.name.family.exists()
     
-### 6.6 Math
+### Math
 The math operators require each operand to be a single element. Both operands must be of the same type, each operator below specifies which types are supported.
 
 If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
@@ -576,7 +568,49 @@ Computes the remainder of the truncated division of its arguments (numbers only)
 #### & (string concatenation)
 For strings, will concatenate the strings, where an empty operand is taken to be the empty string. This differs from `+` on two strings, which will result in an empty collection when one of the operands is empty. 
 
-### 6.5 Operator precedence
+### Date/Time Arithmetic
+Date and time arithmetic operators are used to add time-valued quantities to date/time values. The left operand must be a `dateTime` or `time` value, and the right operand must be a `quantity` with a time-valued unit:
+
+* `year`, `year`, or `'a'`
+* `month`, `months`, or `'mo'`
+* `week`, `weeks` or `'wk'`
+* `day`, `days`, or `'d'`
+* `hour`, `hours`, or `'h'`
+* `minute`, `minutes`, or `'min'`
+* `second`, `seconds`, or `'s'`
+* `millisecond`, `milliseconds`, or `'ms'`
+
+If there is more than one item, or an item of an incompatible type, the evaluation of the expression will end and signal an error to the calling environment.
+
+If either or both arguments are empty (`{ }`), the result is empty (`{ }`).
+
+#### + (addition)
+Returns the value of the given `dateTime` or `time`, incremented by the time-valued quantity, respecting variable length periods for calendar years and months.
+
+For `dateTime` values, the quantity unit must be one of: `years`, `months`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
+
+For `time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
+
+For partial date/time values, the operation is performed by attempting to derive the highest granularity precision first, working down successive granularities to the granularity of the time-valued quantity. For example:
+
+    @2014 + 24 months
+    
+This expression will evaluate to the value `@2016` even though the date/time value is not specified to the level of precision of the time-valued quantity.
+
+#### - (subtraction)
+Returns the value of the given `dateTime` or `time`, decremented by the time-valued quantity, respecting variable length periods for calendar years and months.
+
+For `dateTime` values, the quantity unit must be one of: `years`, `months`, `days`, `hours`, `minutes`, `seconds`, `milliseconds` (or an equivalent unit), or an error is raised.
+
+For `time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
+
+For partial date/time values, the operation is performed by attempting to derive the highest granularity precision first, working down successive granularities to the granularity of the time-valued quantity. For example:
+
+    @2014 - 24 months
+    
+This expression will evaluate to the value `@2012` even though the date/time value is not specified to the level of precision of the time-valued quantity.
+
+### Operator precedence
  
 Precedence of operations, in order from high to low:
 
@@ -596,7 +630,7 @@ Precedence of operations, in order from high to low:
 
 As customary, expressions may be grouped by parenthesis (`()`).
   
-7. Environment variables
+6. Environment variables
 -------------------
 
 A token introduced by a % refers to a value that is passed into the evaluation engine by the calling environment. Using environment variables, authors can avoid repetition of fixed values and can pass in external values and data.
@@ -614,7 +648,7 @@ Implementers should note that using additional environment variables is a formal
 
 Note that these tokens are not restricted to simple types, and they may have values that are not defined fixed values known prior to evaluation at run-time, though there is no way to define these kind of values in implementation guides.
 
-8. Reflection
+7. Reflection
 -------------
 FluentPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection.
 
@@ -636,7 +670,7 @@ And for anonymous types, the result is a `TupleTypeInfo`:
     TupleTypeInfoElement { name: String, type: TypeInfo }
     TupleTypeInfo { element: List<TupleTypeInfoElement> }
 
-9. Type safety and strict evaluation
+8. Type safety and strict evaluation
 ------------------------------
 Strongly typed languages are intended to help authors avoid mistakes by ensuring that the expressions describe meaningful operations. For example, a strongly typed language would typically disallow the expression:
 
@@ -791,7 +825,7 @@ For every element in the input collection, if the resolved slice is present on t
 For each element in the input collection, verifies that there are no modifying extensions defined other than the ones given by the `modifier` argument. If the check passes, the input collection is returned. Otherwise, an error is thrown.
 
 #### conformsTo(structure : string) : boolean
-Returns true if the single input element conforms to the profile specified by the `structure` argument, and false otherwise. If the structure cannot be resolved to a valid profile, an error is thrown. If the input contains more than one element, an error is thrown. If the input is empty, the result is empty.
+Returns `true` if the single input element conforms to the profile specified by the `structure` argument, and false otherwise. If the structure cannot be resolved to a valid profile, an error is thrown. If the input contains more than one element, an error is thrown. If the input is empty, the result is empty.
 
 ### A.4 Changes to operators
 #### ~ (Equivalence)
