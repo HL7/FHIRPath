@@ -11,7 +11,7 @@ expression
         | expression '[' expression ']'                             #indexerExpression
         | ('+' | '-') expression                                    #polarityExpression
         | expression ('*' | '/' | 'div' | 'mod') expression         #multiplicativeExpression
-        | expression ('+' | '-' ) expression                        #additiveExpression
+        | expression ('+' | '-' | '&') expression                   #additiveExpression
         | expression '|' expression                                 #unionExpression
         | expression ('<=' | '<' | '>' | '>=') expression           #inequalityExpression
         | expression ('is' | 'as') typeSpecifier                    #typeExpression
@@ -117,7 +117,7 @@ DATETIME
                     (
                         'T'
                             [0-9][0-9] (':'[0-9][0-9] (':'[0-9][0-9] ('.'[0-9]+)?)?)?
-                            (('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone
+                            ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone
                     )?
                  )?
              )?
@@ -128,7 +128,7 @@ TIME
         : '@'
             'T'
                 [0-9][0-9] (':'[0-9][0-9] (':'[0-9][0-9] ('.'[0-9]+)?)?)?
-                ('Z' | (('+' | '-') [0-9][0-9]':'[0-9][0-9]))? // timezone
+                ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone
         ;
 
 IDENTIFIER
