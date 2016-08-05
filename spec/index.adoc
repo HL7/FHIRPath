@@ -661,13 +661,12 @@ The inverse of the equivalent operator.
 
 === Comparison
 
-* The comparison operators are defined for strings, integers, decimals, datetimes and times.
+* The comparison operators are defined for strings, integers, decimals, dateTimes and times.
 * If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
-* Unless there is only one item in each collection (left and right), the comparisons return false
+* Both arguments must be singletons, and the evaluator will throw an error if either collection has more than one item.
 * Both arguments must be of the same type, and the evaluator will throw an error if the types differ.
 * When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible.
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
-* 
 
 For partial date/time values, the comparison is performed to the highest precision specified in both values.
 
@@ -683,7 +682,7 @@ For partial date/time values, the comparison is performed to the highest precisi
 
 ==== is
 
-If the left operand is a collection with a single item and the second operand is an identifier, this operator returns `true` if the type of the left operand is the type specified in the second operand, or a subclass thereof. In all other cases this function returns the empty collection.
+If the left operand is a collection with a single item and the second operand is a type identifier, this operator returns `true` if the type of the left operand is the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. This is a singleton operator; if the input collections contains more than one item, the evaluator will throw an error. In all other cases this function returns the empty collection.
 
 [source]
 ----
@@ -692,7 +691,7 @@ Patient.contained.all($this is Patient implies age > 10)
 
 ==== as
 
-If the left operand is a collection with a single item and the second operand is an identifier, this function returns the value of the left operand, or a subclass thereof. Otherwise, this operator returns the empty collection.
+If the left operand is a collection with a single item and the second operand is an identifier, this function returns the value of the left operand if it is of the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If there is more than one item in the input collection, the evaluator will throw an error. Otherwise, this operator returns the empty collection.
 
 === Collections
 
@@ -940,7 +939,7 @@ TupleTypeInfo { element: List<TupleTypeInfoElement> }
 
 ____
 
-Note: These structures are a subset of the abstract metamodel used by the Clinical Quality Language Tooling defined here: https://github.com/cqframework/clinical_quality_language/blob/dstu-updates/Src/cql-lm/schema/elm/modelinfo.xsd[modelinfo.xsd]. 
+Note: These structures are a subset of the abstract metamodel used by the https://github.com/cqframework/clinical_quality_language[Clinical Quality Language Tooling].
 
 ____
 
@@ -1042,163 +1041,17 @@ will really always just select the "anonymous" child called "question" and thus 
 ____
 
 [appendix]
-== Formal Syntax
+== Formal Specifications
 
-[source]
-----
-grammar fluentpath;
+=== Formal Syntax
 
-expression
-        : term                                                      #termExpression
-        | expression '.' invocation                                 #invocationExpression
-        | expression '[' expression ']'                             #indexerExpression
-        | ('+' | '-') expression                                    #polarityExpression
-        | expression ('*' | '/' | 'div' | 'mod') expression         #multiplicativeExpression
-        | expression ('+' | '-' | '&') expression                   #additiveExpression
-        | expression '|' expression                                 #unionExpression
-        | expression ('<=' | '<' | '>' | '>=') expression           #inequalityExpression
-        | expression ('is' | 'as') typeSpecifier                    #typeExpression
-        | expression ('=' | '~' | '!=' | '!~' | '<>') expression    #equalityExpression
-        | expression ('in' | 'contains') expression                 #membershipExpression
-        | expression 'and' expression                               #andExpression
-        | expression ('or' | 'xor') expression                      #orExpression
-        | expression 'implies' expression                           #impliesExpression
-        ;
+The formal syntax for FluentPath is specified as an http://www.antlr.org/[Antlr 4.0] grammar file (g4) and included in this specification link:grammar.html[here].
 
-term
-        : invocation                                            #invocationTerm
-        | literal                                               #literalTerm
-        | externalConstant                                      #externalConstantTerm
-        | '(' expression ')'                                    #parenthesizedTerm
-        ;
+=== Model Information
 
-literal
-        : '{' '}'                                               #nullLiteral
-        | ('true' | 'false')                                    #booleanLiteral
-        | STRING                                                #stringLiteral
-        | NUMBER                                                #numberLiteral
-        | DATETIME                                              #dateTimeLiteral
-        | TIME                                                  #timeLiteral
-        | quantity                                              #quantityLiteral
-        ;
+The model information for FluentPath is specified as an XML Schema document (xsd) and included in this specification link:modelinfo.xsd[here].
 
-externalConstant
-        : '%' identifier
-        ;
-
-invocation                          // Terms that can be used after the function/member invocation '.'
-        : identifier                                            #memberInvocation
-        | function                                              #functionInvocation
-        | '$this'                                               #thisInvocation
-        ;
-
-function
-        : identifier '(' paramList? ')'
-        ;
-
-paramList
-        : expression (',' expression)*
-        ;
-
-quantity
-        : NUMBER unit?
-        ;
-
-unit
-        : dateTimePrecision
-        | pluralDateTimePrecision
-        | STRING // UCUM syntax for units of measure
-        ;
-
-dateTimePrecision
-        : 'year' | 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond'
-        ;
-
-pluralDateTimePrecision
-        : 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'
-        ;
-
-typeSpecifier
-        : qualifiedIdentifier
-        ;
-
-qualifiedIdentifier
-        : identifier ('.' identifier)*
-        ;
-
-identifier
-        : IDENTIFIER
-        | QUOTEDIDENTIFIER
-        | 'as'
-        | 'is'
-        ;
-
-DATETIME
-        : '@'
-            [0-9][0-9][0-9][0-9] // year
-            (
-                '-'[0-9][0-9] // month
-                (
-                    '-'[0-9][0-9] // day
-                    (
-                        'T'
-                            [0-9][0-9] (':'[0-9][0-9] (':'[0-9][0-9] ('.'[0-9]+)?)?)?
-                            ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone
-                    )?
-                 )?
-             )?
-             'Z'? // UTC specifier
-        ;
-
-TIME
-        : '@'
-            'T'
-                [0-9][0-9] (':'[0-9][0-9] (':'[0-9][0-9] ('.'[0-9]+)?)?)?
-                ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone
-        ;
-
-IDENTIFIER
-        : ([A-Za-z] | '_')([A-Za-z0-9] | '_')*  // Added _ to support CQL (FHIR could constrain it out)
-        ;
-
-QUOTEDIDENTIFIER
-        : '"' (ESC | ~[\\"])* '"'
-        ;
-
-STRING
-        : '\'' (ESC | ~[\'])* '\''
-        ;
-
-// Also allows leading zeroes now (just like CQL and XSD)
-NUMBER
-        : [0-9]+('.' [0-9]+)?
-        ;
-
-// Pipe whitespace to the HIDDEN channel to support retrieving source text through the parser.
-WS
-        : [ \r\n\t]+ -> channel(HIDDEN)
-        ;
-
-COMMENT
-        : '/*' .*? '*/' -> channel(HIDDEN)
-        ;
-
-LINE_COMMENT
-        : '//' ~[\r\n]* -> channel(HIDDEN)
-        ;
-
-fragment ESC
-        : '\\' (["'\\/fnrt] | UNICODE)    // allow \", \', \\, \/, \f, etc. and \uXXX
-        ;
-
-fragment UNICODE
-        : 'u' HEX HEX HEX HEX
-        ;
-
-fragment HEX
-        : [0-9a-fA-F]
-        ;
-----
+NOTE: The model information file included here is not a normative aspect of the FluentPath specification. It is the same model information file used by the http://github.com/cqframework/clinical_quality_language[Clinical Quality Framework Tooling] and is included for reference as a simple formalism that meets the requirements described in the normative <<reflection,Reflection>> section above.
 
 [appendix]
 == Use of FluentPath in HL7 FHIR
