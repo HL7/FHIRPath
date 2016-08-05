@@ -755,19 +755,15 @@
 		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime1').empty()</expression><output type="boolean">true</output></test>
 	</group>
 
-<!--
-	<group name="testDollarResource">
+  	<group name="testDollarResource">
 		testBoolean(patient(), patient().getManagingOrganization(), "Reference", "reference.startsWith('#').not() or (reference.substring(1).trace('url') in %resource.contained.id.trace('ids'))</expression><output type="boolean">true</output></test>
 		testBoolean(patient(), patient(), "Patient", "contained.select(('#'+id in %resource.descendents().reference).not()).empty()</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression  invalid="true">contained.select(('#'+id in %resource.descendents().reference).not()).empty()");
 	</group>
 
+<!--
 
-	<group name="testTyping">
-		ElementDefinition ed = new ElementDefinition();
-		ed.getBinding().setValueSet(new UriType("http://test.org"));
-		testBoolean(null, ed.getBinding().getValueSet(), "ElementDefinition.binding.valueSetUri", "startsWith('http:') or startsWith('https') or startsWith('urn:')</expression><output type="boolean">true</output></test>
-	</group>
+
 
 	@Test
 	public void testDecimalRA()
