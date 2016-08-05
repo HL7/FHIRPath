@@ -81,6 +81,7 @@ Message."PID-1"
 Collections are fundamental to FluentPath, in that the result of every expression is a collection, even if that expression only results in a single element. This approach allows paths to be specified without having to care about the cardinality of any particular element, and is therefore ideally suited to graph traversal.
 
 Within FluentPath, a collection is:
+
 * Ordered - The order of items in the collection is important and is preserved through operations as much as possible.
 * Non-Unique - Duplicate elements are allowed within a collection. Some functions, such as `distinct()` and `union()` produce collections of unique elements, but in general, duplicate elements are allowed.
 * Indexed - Each item in a collection can be uniquely addressed by it's index, i.e. ordinal position within the collection
@@ -244,6 +245,7 @@ This same principle applies when using the path statement in invariants.
 FluentPath functions and operators both propagate empty results, but the behavior is in general different when the argument to the function or operator expects a collection (e.g. `select()`, `where()` and `|` (union)) versus when the argument to the function or operator expects singleton value (e.g. `+` and `substring()`).
 
 For functions or operators that expect singleton values, this means in general if the input is empty, then the result will be empty as well. More specifically:
+
 * If a singleton function operates on an empty collection, the result is an empty collection
 * If a singleton function is passed an empty collection as an argument, the result is an empty collection
 * If any operand to a singleton operator is an empty collection, the result is an empty collection.
@@ -261,16 +263,8 @@ Correspondingly, arguments to the functions can be any FluentPath expression, th
 The following sections describe the functions supported in FluentPath, detailing the expected types of parameters and type of collection returned by the function:
 
 * If the function expects a parameter to be a single value (e.g. `item(index: integer)` and it is passed an argument that evaluates to a collection with multiple items or a collection with an item that is not of the required type, the evaluation of the expression will end and an error will be signaled to the calling environment.
-* 
-
-If the function takes an `expression` as a parameter, the function will evaluate this parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` element, which represents the item from the input collection currently under evaluation. For example, in:
-
-[source]
-----
- 	name.given.where($this > 'ba' and $this < 'bc')
-----
-
-the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
+* If the function takes an `expression` as a parameter, the function will evaluate this parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` element, which represents the item from the input collection currently under evaluation. For example, in:
+`name.given.where($this > 'ba' and $this < 'bc')` the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
 * Optional parameters are enclosed in square brackets in the definition of a function. Note that the brackets are only used to indicate optionality in the signature, they are not part of the actual syntax of FluentPath.
 * All functions return a collection, but if the function or operation will always produce a collection containing a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : boolean`
 
@@ -619,6 +613,7 @@ If both operands are collections with a single item:
 * For complex types, equality requires all child properties to be equal, recursively.
 
 If both operands are collections with multiple items:
+
 * Each item must be equal
 * Comparison is order dependent
 
@@ -637,6 +632,7 @@ For `dateTime` and `time` comparisons with partial values (e.g. dateTimes specif
 Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }` will result in `true`.
 
 If both operands are collections with a single item:
+
 * For primitives
 	* `string`: the strings must be the same while ignoring case and normalizing whitespace.
 	* `integer`: exactly equal
@@ -646,6 +642,7 @@ If both operands are collections with a single item:
 * For complex types, equivalence requires all child properties to be equivalent, recursively.
 
 If both operands are collections with multiple items:
+
 * Each item must be equivalent
 * Comparison is not order dependent
 
@@ -999,6 +996,7 @@ but is still less concise than would be possible if constraints were well known 
 The strict option provides a mode in which the author of the FluentPath statement is protected against such cases by employing strict typing. Based on the definition of the operators and functions and given the type of input, a compiler can trace the statement and determine whether "unsafe" situations can occur.
 
 Unsafe uses are:
+
 * A function that requires an input collection with a single item is called on an output that is not guaranteed to have only one item.
 * A function is passed an argument that is not guaranteed to be a single value.
 * A function is passed an input value or argument that is not of the expected type
@@ -1007,6 +1005,7 @@ Unsafe uses are:
 * Equality operators are used on operands that are not both collections or collections of single items.
 
 There are a few constructs in the FluentPath language where the compiler cannot trace the type, and should issue a warning to the user when doing "strict" evaluation:
+
 * The `children()` and `descendants()` functions
 * The `resolve()` function
 * A member which is polymorphic (e.g. a choice[x] type in FHIR)
@@ -1212,6 +1211,7 @@ FluentPath is used in five places in the FHIR specifications:
 As stated in the introduction, FluentPath uses a tree model that abstracts away the actual underlying datamodel of the data being queried. For FHIR, this means that the contents of the resources and data types as described in the Logical views (or the UML diagrams) are used as the model, rather than the JSON and XML formats, so specific xml or json features are not visible to the FluentPath language (such as comments and the split representation of primitives).
 
 More specifically:
+
 * A FluentPath may optionally start with a full resource name
 * Elements of datatypes and resources are used as the name of the nodes which can be navigated over, except for choice elements (ending with '[x]'), see below.
 * The `contained` element node does not have the name of the Resource as its first and only child (instead it directly contains the contained resource's children)
@@ -1388,6 +1388,7 @@ FluentPath has the ability to reference contexts (using the `$` prefix) and envi
 === Additional Operators
 
 The following additional operators are being added to CQL:
+
 * `~`, `!~` - Equivalent operators (formerly `matches` in CQL)
 * `!=` - As a replacement for `&lt;&gt;`
 * `implies` - Logical implication
