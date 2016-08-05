@@ -1,8 +1,11 @@
-= FluentPath
+= FluentPath (STU1 Ballot)
+:page-layout: current
 :sectnums:
 :toc: macro
 
 FluentPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (FHIR) and HL7 Clinical Quality Language (CQL).
+
+Version: 0.3 Public Domain (Creative Commons 0)
 
 toc::[]
 
