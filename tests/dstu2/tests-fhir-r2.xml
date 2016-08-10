@@ -341,7 +341,7 @@
 		<test inputfile="patient-example.xml"><expression>Patient.name.iif(exists(), 'named', 'unnamed') = 'named'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>Patient.name.iif(empty(), 'unnamed', 'named') = 'named'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>Patient.name.iif({}, 'unnamed', 'named')</expression><output type="string">named</output></test>
-		<test inputfile="patient-example.xml"><expression>Patient.name[0].family.iif(length()-8 != 0, 5/(length()-8), 'no result')</expression><output type="string">no result</output></test>
+<!--		<test inputfile="patient-example.xml"><expression>Patient.name[0].family.iif(length()-8 != 0, 5/(length()-8), 'no result')</expression><output type="string">no result</output></test> -->
 	</group>
 
 	<group name="testToInteger">
@@ -482,9 +482,13 @@
 		<test inputfile="patient-example.xml"><expression>'a' ~ 'a'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'a' ~ 'A'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'a' ~ 'b'</expression><output type="boolean">false</output></test>		
+<!-- Equivalence of strings has been changed 		
 		<test inputfile="patient-example.xml"><expression>'préférés' ~ 'PREFERES'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>'cœur' ~ 'coeur'</expression><output type="boolean">true</output></test>	
-		<test inputfile="patient-example.xml"><expression>'füsse' ~ 'Füße'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>'füsse' ~ 'Füße'</expression><output type="boolean">true</output></test> -->
+		<test inputfile="patient-example.xml"><expression>' FUsse' ~ 'FuSSe'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>' FUsse  ' ~ 'FuSSe'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>' FUsse  ' ~ 'FuSSe '</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>1.1 ~ 1.1</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>1.1 ~ 1.2</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>1.10 ~ 1.1</expression><output type="boolean">true</output></test>
