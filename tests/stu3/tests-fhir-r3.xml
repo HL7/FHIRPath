@@ -249,8 +249,8 @@
 
 	<group name="testDistinct">
 		<test inputfile="patient-example.xml"><expression>(1 | 2 | 3).isDistinct()</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().linkId.isDistinct()</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().linkId.select(substring(0,1)).isDistinct().not()</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendants().linkId.isDistinct()</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendants().linkId.select(substring(0,1)).isDistinct().not()</expression><output type="boolean">true</output></test>
 
 		<test inputfile="patient-example.xml">
 			<expression>(1 | 2 | 3).distinct()</expression>
@@ -260,7 +260,7 @@
 		</test>
 		
 		<test inputfile="questionnaire-example.xml">
-			<expression>Questionnaire.descendents().linkId.distinct()</expression>
+			<expression>Questionnaire.descendants().linkId.distinct()</expression>
 			<output type="string"></output>
 			<output type="string"></output>
 			<output type="string"></output>
@@ -273,7 +273,7 @@
 		</test>
     
 		<test inputfile="questionnaire-example.xml">
-			<expression>Questionnaire.descendents().linkId.select(substring(0,1)).distinct()</expression>
+			<expression>Questionnaire.descendants().linkId.select(substring(0,1)).distinct()</expression>
 			<output type="string"></output>
 			<output type="string"></output>
 		</test>
@@ -301,7 +301,7 @@
 	<group name="testRepeat">
 		<test inputfile="valueset-example-expansion.xml"><expression>ValueSet.expansion.repeat(contains).count() = 10</expression><output type="boolean">true</output></test>
 		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.repeat(item).concept.count() = 10</expression><output type="boolean">true</output></test>
-		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendents().concept.count() = 10</expression><output type="boolean">true</output></test>
+		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.descendants().concept.count() = 10</expression><output type="boolean">true</output></test>
 		<test inputfile="questionnaire-example.xml"><expression>Questionnaire.children().concept.count() = 2</expression><output type="boolean">true</output></test>
 	</group>
 
@@ -755,13 +755,14 @@
 		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime1').empty()</expression><output type="boolean">true</output></test>
 	</group>
 
-  	<group name="testDollarResource">
+<!--
+  <group name="testDollarResource">
 		testBoolean(patient(), patient().getManagingOrganization(), "Reference", "reference.startsWith('#').not() or (reference.substring(1).trace('url') in %resource.contained.id.trace('ids'))</expression><output type="boolean">true</output></test>
-		testBoolean(patient(), patient(), "Patient", "contained.select(('#'+id in %resource.descendents().reference).not()).empty()</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression  invalid="true">contained.select(('#'+id in %resource.descendents().reference).not()).empty()");
+		testBoolean(patient(), patient(), "Patient", "contained.select(('#'+id in %resource.descendants().reference).not()).empty()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression  invalid="true">contained.select(('#'+id in %resource.descendants().reference).not()).empty()");
 	</group>
 
-<!--
+<!-.-
 
 
 
@@ -835,8 +836,8 @@
 
 		@Test
 		public void testCareplan() throws FileNotFoundException, IOException, FHIRException, org.hl7.fhir.exceptions.FHIRException {
-		testBoolean(careplan(), "contained.select(('#'+id in %resource.descendents().reference).not()).empty()</expression><output type="boolean">false</output></test>
-		testBoolean(careplanE(), "contained.select(('#'+id in %resource.descendents().reference).not()).empty()</expression><output type="boolean">false</output></test>
+		testBoolean(careplan(), "contained.select(('#'+id in %resource.descendants().reference).not()).empty()</expression><output type="boolean">false</output></test>
+		testBoolean(careplanE(), "contained.select(('#'+id in %resource.descendants().reference).not()).empty()</expression><output type="boolean">false</output></test>
 		}
 
 		}
@@ -912,8 +913,8 @@ return new org.hl7.fhir.dstu3.elementmodel.XmlParser(TestingUtilities.context).p
   @Test
   public void testDollarResource() throws FileNotFoundException, FHIRFormatError, IOException, FHIRException {
     testBoolean(patient(), patient().getManagingOrganization(), "Reference", "reference.startsWith('#').not() or (reference.substring(1).trace('url') in %resource.contained.id.trace('ids'))", true);
-    testBoolean(patient(), patient(), "Patient", "contained.select(('#'+id in %resource.descendents().reference).not()).empty()", true);
-    testWrong(patient(), "contained.select(('#'+id in %resource.descendents().reference).not()).empty()");
+    testBoolean(patient(), patient(), "Patient", "contained.select(('#'+id in %resource.descendants().reference).not()).empty()", true);
+    testWrong(patient(), "contained.select(('#'+id in %resource.descendants().reference).not()).empty()");
   }
   
   @Test
@@ -990,14 +991,14 @@ return new org.hl7.fhir.dstu3.elementmodel.XmlParser(TestingUtilities.context).p
 
   @Test
   public void testCareplan() throws FileNotFoundException, IOException, FHIRException, org.hl7.fhir.exceptions.FHIRException {
-    testBoolean(careplan(), "contained.where(('#'+id in %resource.descendents().reference).not()).empty()", true);
-    testBoolean(careplan(), "contained.where(('#'+id in %resource.descendents().reference)).empty().not()", true);
-    testBoolean(careplanE(), "contained.where(('#'+id in %resource.descendents().reference).not()).empty()", true);
+    testBoolean(careplan(), "contained.where(('#'+id in %resource.descendants().reference).not()).empty()", true);
+    testBoolean(careplan(), "contained.where(('#'+id in %resource.descendants().reference)).empty().not()", true);
+    testBoolean(careplanE(), "contained.where(('#'+id in %resource.descendants().reference).not()).empty()", true);
   }
 
   public void testCodeSystem() throws FileNotFoundException, IOException, FHIRException, org.hl7.fhir.exceptions.FHIRException {
-    testBoolean(codesystem(), "descendents().code.isDistinct()", true);
-    testBoolean(codesystemE(), "descendents().code.isDistinct()", true);
+    testBoolean(codesystem(), "descendants().code.isDistinct()", true);
+    testBoolean(codesystemE(), "descendants().code.isDistinct()", true);
   }
 }
 -->
