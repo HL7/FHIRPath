@@ -42,6 +42,10 @@ The expressions can in theory be converted to equivalent expressions in XPath, O
 
 Throughout this documentation, `monospace font` is used to delineate expressions of FluentPath.
 
+Optional parameters to functions are enclosed in square brackets in the definition of a function. Note that the brackets are only used to indicate optionality in the signature, they are not part of the actual syntax of FluentPath.
+
+All functions return a collection, but if the function or operation will always produce a collection containing a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : boolean`
+
 == Navigation model
 
 FluentPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FluentPath query is run. This way, FluentPath can be used on in-memory Java POJOs, Xml data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FluentPath operates on a directed acyclic graph of classes as defined by a MOF-equivalent type system.
@@ -270,8 +274,10 @@ The following sections describe the functions supported in FluentPath, detailing
 
 * If the function expects a parameter to be a single value (e.g. `item(index: integer)` and it is passed an argument that evaluates to a collection with multiple items or a collection with an item that is not of the required type, the evaluation of the expression will end and an error will be signaled to the calling environment.
 * If the function takes an `expression` as a parameter, the function will evaluate this parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` element, which represents the item from the input collection currently under evaluation. For example, in `name.given.where($this > 'ba' and $this < 'bc')` the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
-* Optional parameters are enclosed in square brackets in the definition of a function. Note that the brackets are only used to indicate optionality in the signature, they are not part of the actual syntax of FluentPath.
-* All functions return a collection, but if the function or operation will always produce a collection containing a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : boolean`
+
+Note that the bracket notation in function signatures indicates optional parameters, and is not part of the formal syntax of FluentPath.
+
+Note also that although all functions return collections, if a given function is defined to return a single element function, the return type is simplified to just the type of the single element, rather than the list type.
 
 === Existence
 
