@@ -114,6 +114,7 @@ The `as` operator can be used to treat a value as a specific type:
 [source]
 ----
 Observation.value as Quantity - returns value as a Quantity if it is of type Quantity, and an empty result otherwise
+----
 
 The list of available types that can be passed as a parameter to the `ofType()` function and `is` and `as` operators is determined by the underlying data model. Within FHIRPath, they are just identifiers, either quoted or non-quoted.
 
@@ -245,22 +246,19 @@ For functions or arguments that expect collections, in general the empty collect
 
 When functions or operators behave differently from these general principles, (for example the `count()` and `empty()` functions), this is clearly documented in the next sections.
 
-=== Boolean evaluation of collections
+=== Singleton evaluation of collections
 
-Collections can be evaluated as booleans in logical tests in criteria. When a collection is implicitly converted to a boolean then:
+In general, when a collection is passed as an argument to a function or operator that expects a single item as input, the collection is implicitly converted to a singleton as follows:
 
 [source]
 ----
-IF the collection contains a single node AND the node's value is a boolean THEN
-  The collection evaluates to the value of that single boolean node
+IF the collection contains a single node AND the node's value is of the expected input type THEN
+  The collection evaluates to the value of that single node
 ELSE IF the collection is empty THEN
   The collection evaluates to an empty collection
 ELSE
   An error is raised
 ----
-
-This same principle applies when using the path statement in invariants.
-
 
 == Functions
 
