@@ -50,7 +50,7 @@ All functions return a collection, but if the function or operation will always 
 
 FluentPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FluentPath query is run. This way, FluentPath can be used on in-memory Java POJOs, Xml data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FluentPath operates on a directed acyclic graph of classes as defined by a MOF-equivalent type system.
 
-Data is represented as a tree of labelled nodes, where each node may optionally carry a primitive value and have child nodes. Nodes need not have a unique label, and leaf nodes must carry a primitive value. For example, a (partial) representation of a FHIR Patient resource in this model looks like this:
+Data are represented as a tree of labelled nodes, where each node may optionally carry a primitive value and have child nodes. Nodes need not have a unique label, and leaf nodes must carry a primitive value. For example, a (partial) representation of a FHIR Patient resource in this model looks like this:
 
 image:treestructure.png["Tree representation of a Patient",height="375",width="500"]
 
