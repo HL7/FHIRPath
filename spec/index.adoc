@@ -109,8 +109,13 @@ The `is` operator can be used to determine whether or not a given value is of a 
 Observation.value is Quantity - returns true if the value is of type Quantity
 ----
 
-The list of available types that can be passed as a parameter to the `ofType()` function and `is` operator is determined by the underlying data model.
+The `as` operator can be used to treat a value as a specific type:
 
+[source]
+----
+Observation.value as Quantity - returns value as a Quantity if it is of type Quantity, and an empty result otherwise
+
+The list of available types that can be passed as a parameter to the `ofType()` function and `is` and `as` operators is determined by the underlying data model. Within FHIRPath, they are just identifiers, either quoted or non-quoted.
 
 == Expressions
 
