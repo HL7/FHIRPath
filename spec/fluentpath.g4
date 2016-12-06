@@ -15,7 +15,7 @@ expression
         | expression '|' expression                                 #unionExpression
         | expression ('<=' | '<' | '>' | '>=') expression           #inequalityExpression
         | expression ('is' | 'as') typeSpecifier                    #typeExpression
-        | expression ('=' | '~' | '!=' | '!~' | '<>') expression    #equalityExpression
+        | expression ('=' | '~' | '!=' | '!~') expression           #equalityExpression
         | expression ('in' | 'contains') expression                 #membershipExpression
         | expression 'and' expression                               #andExpression
         | expression ('or' | 'xor') expression                      #orExpression

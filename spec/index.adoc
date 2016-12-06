@@ -902,6 +902,166 @@ Precedence of operations, in order from high to low:
 
 As customary, expressions may be grouped by parenthesis (`()`).
 
+== Lexical Elements
+FluentPath defines the following lexical elements:
+
+|===
+|Element|Description
+
+|Whitespace
+|Whitespace defines the separation between tokens in the language
+
+|Comment
+|Comments are ignored by the language, allowing for descriptive text
+
+|Literal
+|Literals allow basic values to be represented within the language
+
+|Symbol
+|Symbols such as `+`, `-`, `*`, and `/`
+
+|Keyword
+|Grammar-recognized tokens such as `and`, `or` and `in`
+
+|Identifier
+|Labels such as type names and property names
+|===
+
+=== Whitespace
+FluentPath defines _tab_, _space_, and _return_ as _whitespace_, meaning they are only used to separate other tokens within the language. Any number of whitespace characters can appear, and the language does not use whitespace for anything other than delimiting tokens.
+
+=== Comments
+FluentPath defines two styles of comments, _single-line_, and _multi-line_. A single-line comment consists of two forward slashes, followed by any text up to the end of the line:
+
+----
+2 + 2 // This is a single-line comment
+----
+
+To begin a multi-line comment, the typical forward slash-asterisk token is used. The comment is closed with an asterisk-forward slash, and everything enclosed is ignored:
+
+----
+/*
+This is a multi-line comment
+Any text enclosed within is ignored
+*/
+----
+
+=== Literals
+Literals provide for the representation of values within FluentPath. The following types of literals are supported:
+
+|===
+|Literal|Description
+
+|Empty (`{ }`)
+|The empty collection
+
+|boolean
+|The boolean literals (`true` and `false`)
+
+|integer
+|Sequences of digits in the range 0-2^32-1
+
+|decimal
+|Sequences of digits with a decimal point, in the range 0.0..10^28-10^-8
+
+|string
+|Strings of any character enclosed within single-ticks (`'`)
+
+|dateTime
+|The at-symbol (`@`) followed by a date time
+
+|time
+|The at-symbol (`@`) followed by a time
+
+|quantity
+|An integer or decimal literal followed by a datetime precision specifier, or a UCUM unit specifier
+|===
+
+For a more detailed discussion of the use and semantics of literals within expressions, refer to the Expressions section above.
+
+=== Symbols
+Symbols provide structure to the language and allow symbolic invocation of common operators such as addition. FluentPath defines the following symbols:
+
+|===
+|Symbol|Description
+
+|`()`
+|Parentheses for delimiting groups within expressions
+
+|`[]`
+|Brackets for indexing into lists and strings
+
+|`{}`
+|Braces for delimiting lists
+
+|`.`
+|Period for qualifiers, accessors, and dot-invocation
+
+|`,`
+|Comma for delimiting items in a syntactic list
+
+|`= != <= < > >=`
+|Comparison operators for comparing values
+
+|`+ - * / | &`
+|Arithmetic and other operators for performing computation
+|===
+
+=== Keywords
+Keywords are tokens that are recognized by the parser and used to build the various language constructs. FluentPath defines the following keywords:
+
+|===
+|`$this`|`hour`|`month`
+|`and`|`implies`|`or`
+|`as`|`in`|`second`
+|`contains`|`is`|`true`
+|`day`|`millisecond`|`week`
+|`div`|`minute`|`xor`
+|`false`|`mod`|`year`
+|===
+
+In general, keywords within FluentPath are also considered _reserved_ words, meaning that it is illegal to use them as identifiers. If necessary, identifiers that clash with a reserved word can be quoted.
+
+=== Identifiers
+Identifiers are used as labels to allow expressions to reference elements such as model types and properties. FluentPath supports two types of identifiers, _simple_ and _quoted_.
+
+A simple identifier is any alphabetical character or an underscore, followed by any number of alpha-numeric characters or underscores. For example, the following are all valid simple identifiers:
+
+----
+Patient
+_id
+valueDateTime
+----
+
+A quoted identifier is any sequence of characters enclosed in double-quotes (`"`):
+
+----
+"QI-Core Patient"
+"US-Core Diagnostic Request"
+"us-zip"
+----
+
+The use of double-quotes allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have property or type names that are not valid simple identifiers.
+
+FluentPath escape sequences for strings also work for quoted identifiers:
+
+
+|===
+|Escape|Character
+
+|`\'`|Single-quote
+|`\"`|Double-quote
+|`\r`|Carriage Return
+|`\n`|Line Feed
+|`\t`|Tab
+|`\f`|Form Feed
+|`\\`|Backslash
+|`\uXXXX`|Unicode character, where XXXX is the hexadecimal representation of the character
+|===
+
+=== Case-Sensitivity
+FluentPath is a case-sensitive language, meaning that case is considered when matching keywords in the language. However, because FluentPath can be used with different models, the case-sensitivity of type and property names is defined by each model.
+
 == Environment variables
 
 A token introduced by a % refers to a value that is passed into the evaluation engine by the calling environment. Using environment variables, authors can avoid repetition of fixed values and can pass in external values and data.
