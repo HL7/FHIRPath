@@ -315,6 +315,14 @@ Takes a collection of boolean values and returns `true` if all the items are `tr
 
 Takes a collection of boolean values and returns `true` if any of the items are `true`. If all the items are `false`, or if the input is empty (`{ }`), the result is `false`.
 
+==== allFalse() : boolean
+
+Takes a collection of boolean values and returns `true` if all the items are `false`. If any items are `true`, the result is `false`. If the input is empty (`{ }`), the result is `true`.
+
+==== anyFalse() : boolean
+
+Takes a collection of boolean values and returns `true` if any of the items are `false`. If all the items are `true`, or if the input is empty (`{ }`), the result is `false`.
+
 ==== subsetOf(other : collection) : boolean
 
 Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the equals (`=`) operation (see below).
