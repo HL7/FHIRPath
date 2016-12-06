@@ -440,6 +440,14 @@ Returns a collection containing all but the first `num` items in the input colle
 
 Returns a collection containing the first `num` items in the input collection, or less if there are less than `num` items. If num is less than or equal to 0, or if the input collection is empty (`{ }`), `take` returns an empty collection.
 
+=== Combining
+
+==== | (union collections)
+Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
+
+==== combine(other : collection) : collection
+Merge the input and other collections into a single collection without eliminating duplicate values. Combining an empty collection with a non-empty collection will return the non-empty collection. There is no expectation of order in the resulting collection.
+
 === Conversion
 
 The functions in this section operate on collections with a single item. If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
@@ -712,7 +720,7 @@ If the left operand is a collection with a single item and the second operand is
 === Collections
 
 ==== | (union collections)
-Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Joining an empty collection to a non-empty collection will return the non-empty collection.
+Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
 
 ==== in (membership)
 If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is the empty collection is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
