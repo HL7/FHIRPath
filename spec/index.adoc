@@ -1254,15 +1254,6 @@ In addition, a media type is defined to support describing FHIRPath content:
 text/fhirpath
 
 [appendix]
-== References
-
-[bibliography]
-- [[[ANTLR]]] Another Tool for Language Recognition (ANTLR) http://www.antlr.org/
-- [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, DSTU Release 1.1. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
-- [[[XMLRE]]] Regular Expressions. https://www.w3.org/TR/xmlschema11-2/#regexs
-- [[[PCRE]]] Pearl-Compatible Regular Expressions. http://www.pcre.org/
-
-[appendix]
 == Use of FHIRPath in HL7 FHIR
 
 FHIRPath is used in five places in the FHIR specifications:
@@ -1562,6 +1553,15 @@ Message.group("PATIENT").group("PATIENT_OBSERVATION").item.as(Segment)
 
 return any OBXs from the patient observations (and ignore others e.g. in a R01 message) segments that have LOINC codes.
 Note that if the parser cannot properly parse the Abstract Message Syntax, group() must fail with an error message.
+
+[appendix]
+== References
+
+[bibliography]
+- [[[ANTLR]]] Another Tool for Language Recognition (ANTLR) http://www.antlr.org/
+- [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, DSTU Release 1.1. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
+- [[[XMLRE]]] Regular Expressions. https://www.w3.org/TR/xmlschema11-2/#regexs
+- [[[PCRE]]] Pearl-Compatible Regular Expressions. http://www.pcre.org/
 
 
 
