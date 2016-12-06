@@ -134,7 +134,7 @@ boolean: true, false
 string: 'test string', 'urn:oid:3.4.5.6.7.8'
 integer: 0, 45
 decimal: 0.0, 3.141592653589793236
-datetime: @2015-02-04T14:34:28Z (`@` followed by ISO8601 compliant date/time)
+dateTime: @2015-02-04T14:34:28Z (`@` followed by ISO8601 compliant date/time)
 time: @T14:34:28+09:00 (`@` followed by ISO8601 compliant time beginning with `T`)
 quantity: 10 'mg', 4 days
 ----
@@ -158,13 +158,13 @@ Unicode is supported in both string literals and quoted identifiers. String lite
 
 Decimals cannot use exponential notation.
 
-==== datetime
+==== dateTime
 
-`datetime` uses a subset of ISO8601:
+`dateTime` uses a subset of ISO8601:
 
 * It uses the `YYYY-MM-DD` format, though month and day parts are optional
 * Week dates and ordinal dates are not allowed
-* Years must be present (`-MM-DD` is not a valid datetime in FluentPath)
+* Years must be present (`-MM-DD` is not a valid dateTime in FluentPath)
 * Months must be present if a day is present
 * The date may be followed by a `time` as described in the next section.
 * Consult the formal grammar for more details.
@@ -592,13 +592,13 @@ ____
 
 Add a string representation of the input collection to the diagnostic log, using the parameter `name` as the name in the log. This log should be made available to the user in some appropriate fashion. Does not change the input, so returns the input collection as output.
 
-==== today() : datetime
+==== today() : dateTime
 
-Returns a datetime containing the current date.
+Returns a dateTime containing the current date.
 
-==== now() : datetime
+==== now() : dateTime
 
-Returns a datetime containing the current date and time, including timezone.
+Returns a dateTime containing the current date and time, including timezone.
 
 == Operations
 
@@ -925,15 +925,15 @@ For primitive types, the result is a `SimpleTypeInfo`:
 
 [source]
 ----
-SimpleTypeInfo { name: String, baseType: SimpleTypeInfo }
+SimpleTypeInfo { name: string, baseType: SimpleTypeInfo }
 ----
 
 For class types, the result is a `ClassInfo`:
 
 [source]
 ----
-ClassInfoElement { name: String, type: TypeInfo }
-ClassInfo { name: String, baseType: TypeInfo, element: List<ClassInfoElement> }
+ClassInfoElement { name: string, type: TypeInfo }
+ClassInfo { name: string, baseType: TypeInfo, element: List<ClassInfoElement> }
 ----
 
 For collection types, the result is a `ListTypeInfo`:
@@ -947,7 +947,7 @@ And for anonymous types, the result is a `TupleTypeInfo`:
 
 [source]
 ----
-TupleTypeInfoElement { name: String, type: TypeInfo }
+TupleTypeInfoElement { name: string, type: TypeInfo }
 TupleTypeInfo { element: List<TupleTypeInfoElement> }
 ----
 
@@ -1109,7 +1109,7 @@ The evaluation engine will automatically convert the value of FHIR types represe
 |string, uri, code, oid, id, uuid, sid, markdown, base64Binary |string
 |integer, unsignedInt, positiveInt |integer
 |decimal |decimal
-|date, dateTime, instant |datetime
+|date, dateTime, instant |dateTime
 |time |time
 |===
 
