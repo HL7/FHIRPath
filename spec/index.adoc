@@ -715,6 +715,8 @@ If the left operand is a collection with a single item and the second operand is
 Patient.contained.all($this is Patient implies age > 10)
 ----
 
+This example returns true if for all the contained resources, if the contained resource is of type `Patient`, then the `age` is greater than ten.
+
 ==== as
 
 If the left operand is a collection with a single item and the second operand is an identifier, this function returns the value of the left operand if it is of the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If there is more than one item in the input collection, the evaluator will throw an error. Otherwise, this operator returns the empty collection.
