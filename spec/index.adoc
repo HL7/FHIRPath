@@ -26,6 +26,7 @@ Given these constraints, and the lack of a specific language that meets all of t
 === Features
 
 * Graph-traversal: FHIRPath is a graph-traversal language; authors can clearly and concisely express graph traversal on hierarchical information models (e.g. HL7 V3, FHIR, vMR, CIMI, and QDM).
+* Fluent: FHIRPath has a syntax based on the https://en.wikipedia.org/wiki/Fluent_interface[Fluent Interface] pattern
 * Collection-centric: FHIRPath deals with all values as collections, allowing it to easily deal with information models with repeating elements.
 * Platform-independent: FHIRPath is a conceptual and logical specification that can be implemented in any platform.
 * Model-independent: FHIRPath deals with data as an abstract model, allowing it to be used with any information model.
@@ -37,6 +38,8 @@ In Fast Healthcare Interoperability Resources (FHIR), FHIRPath is used within th
 In both FHIR and CQL, the model independence of FHIRPath means that expressions can be written that deal with the contents of the resources and data types as described in the Logical views, or the UML diagrams, rather than against the physical representation of those resources. JSON and XML specific features are not visible to the FHIRPath language (such as comments and the split representation of primitives (i.e. `value[x]`)).
 
 The expressions can in theory be converted to equivalent expressions in XPath, OCL, or another similarly expressive language.
+
+FHIRPath can be used against many other graphs as well. For example, <<hl7v2>> describes how FHIRPath is used in HL7 v2.
 
 === Conventions
 
@@ -61,8 +64,7 @@ The diagram shows a tree with a repeating `name` node, which represents repeatin
 FHIRPath allows navigation through the tree by composing a path of concatenated labels, e.g.
 
 [source]
-----
-name.given
+----name.given
 ----
 
 This would result in a collection of nodes, one with the value "Wouter" and one with the value "Gert". In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The focus at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step.
@@ -1501,11 +1503,13 @@ Because CQL is a type-safe language, embedded FHIRPath expressions should be com
 
 In addition, the underlying Expression Logical Model (ELM) is being extended to allow for dynamic invocation. A `Dynamic` type is introduced with appropriate operators to support run-time invocation where necessary. However, these operators are introduced as an additional layer on top of core ELM, and CQL compiled with the _strict_ option will never produce expressions containing these elements. This avoids placing additional implementation burden on systems that do not need dynamic capabilities.
 
+[[hl7v2]]
 [appendix]
-== Use of FluentPath on HL7 Version 2 messages
+== Use of FHIRPath on HL7 Version 2 messages
 
-FluentPath can be used against HL7 v2 messages. This UML diagram summarises the 
-object model on which the FluentPath statements are written:
+
+FHIRPath can be used against HL7 v2 messages. This UML diagram summarises the 
+object model on which the FHIRPath statements are written:
 
 image:v2-object-model.png["Object Model for HL7 v2",height="456",width="760"]
 
