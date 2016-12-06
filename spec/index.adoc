@@ -902,7 +902,7 @@ Implementers should note that using additional environment variables is a formal
 
 [source]
 ----
-%us-zip = '[0-9]{5}(-[0-9]{4}){0,1}'
+%"us-zip" = '[0-9]{5}(-[0-9]{4}){0,1}'
 ----
 
 Note that these tokens are not restricted to simple types, and they may have values that are not defined fixed values known prior to evaluation at run-time, though there is no way to define these kind of values in implementation guides.
