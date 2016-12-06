@@ -1375,6 +1375,15 @@ Membership works in the same way, with the added capability that if the right ar
 
 Note that implementations are encouraged to make use of a terminology service to provide this functionality.
 
+For example:
+
+[source]
+----
+Observation.component.where(code in 'http://hl7.org/fhir/ValueSet/observation-vitalsignresult')
+----
+
+This expression returns components that have a code that is a member of the observation-vitalsignresult valueset.
+
 === Environment variables
 
 The FHIR specification adds support for additional environment variables:
@@ -1392,7 +1401,16 @@ The following environmental values are set for all contexts:
 // Note that the names of the `vs-` and `ext-` constants are quoted (just like paths) to allow "-" in the name.
 ----
 
-Implementation Guides are allowed to define their own externals, and implementers should provide some appropriate configuration framework to allow these constants to be provided to the evaluation engine at run time. E.g.:
+For example:
+
+[source]
+----
+Observation.component.where(code in %"vs-observation-vitalsignresult")
+----
+
+This expression returns components that have a code that is a member of the observation-vitalsignresult valueset.
+
+Note: Implementation Guides are allowed to define their own externals, and implementers should provide some appropriate configuration framework to allow these constants to be provided to the evaluation engine at run time. E.g.:
 
 [source]
 ----
