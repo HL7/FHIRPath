@@ -402,6 +402,11 @@ Bundle.entry.select((resource as Patient).telecom.where(system = 'phone'))
 
 This example results in a collection with all the telecom elements with system of `phone` for all the patients in the bundle.
 
+[source]
+----
+Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
+----
+
 ==== repeat(projection: expression) : collection
 
 A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the equals (`=`) operator).
@@ -983,12 +988,14 @@ FHIRPath defines _tab_, _space_, and _return_ as _whitespace_, meaning they are 
 === Comments
 FHIRPath defines two styles of comments, _single-line_, and _multi-line_. A single-line comment consists of two forward slashes, followed by any text up to the end of the line:
 
+[source]
 ----
 2 + 2 // This is a single-line comment
 ----
 
 To begin a multi-line comment, the typical forward slash-asterisk token is used. The comment is closed with an asterisk-forward slash, and everything enclosed is ignored:
 
+[source]
 ----
 /*
 This is a multi-line comment
@@ -1077,6 +1084,7 @@ Identifiers are used as labels to allow expressions to reference elements such a
 
 A simple identifier is any alphabetical character or an underscore, followed by any number of alpha-numeric characters or underscores. For example, the following are all valid simple identifiers:
 
+[source]
 ----
 Patient
 _id
@@ -1085,6 +1093,7 @@ valueDateTime
 
 A quoted identifier is any sequence of characters enclosed in double-quotes (`"`):
 
+[source]
 ----
 "QI-Core Patient"
 "US-Core Diagnostic Request"
@@ -1186,9 +1195,9 @@ Strongly typed languages are intended to help authors avoid mistakes by ensuring
 
 because it performs an invalid operation, namely adding numbers and strings. However, there are cases where the author knows that a particular invocation may be safe, but the compiler is not aware of, or cannot infer, the reason. In these cases, type-safety errors can become an unwelcome burden, especially for experienced developers.
 
-As a result, FHIRPath defines a _strict_ option that allows an execution environment to determine how much type safety should be applied. With _strict_ enabled, FHIRPath behaves as a traditional strongly-typed language, whereas without _strict_, it behaves as a traditional dynamically-typed language.
+Because FHIRPath may be used in different situations and environments requiring different levels of type safety, implementations may make different choices about how much type checking should be done at compile-time versus run-time, and in what situations. Some implementations requiring a high degree of type-safety may choose to perform strict type-checking at compile time for all invocations. On the other hand, some implementations may be unconcerned with compile-time versus run-time checking and may choose to defer all correctness checks to run-time.
 
-For example, since some functions and most operators will only accept a single item as input, and throw an exception otherwise:
+For example, since some functions and most operators will only accept a single item as input (and throw a runtime exception otherwise):
 
 [source]
 ----
@@ -1227,7 +1236,7 @@ Patient.name.where(given = 'Wouter').exists()
 
 but is still less concise than would be possible if constraints were well known in advance.
 
-The strict option provides a mode in which the author of the FHIRPath statement is protected against such cases by employing strict typing. Based on the definition of the operators and functions and given the type of input, a compiler can trace the statement and determine whether "unsafe" situations can occur.
+In cases where compile-time checking like this is desirable, implementations may choose to protect against such cases by employing strict typing. Based on the definitions of the operators and functions involved in the expression, and given the types of the inputs, a compiler can analyze the expression and determine whether "unsafe" situations can occur.
 
 Unsafe uses are:
 
@@ -1236,42 +1245,20 @@ Unsafe uses are:
 * A function is passed an input value or argument that is not of the expected type
 * An operator that requires operands to be collections with a single item is called with arguments that are not guaranteed to have only one item.
 * An operator has operands that are not of the expected type
-* Equality operators are used on operands that are not both collections or collections containing a single items.
+* Equality operators are used on operands that are not both collections or collections containing a single item of the same type.
 
-There are a few constructs in the FHIRPath language where the compiler cannot trace the type, and should issue a warning to the user when doing "strict" evaluation:
+There are a few constructs in the FHIRPath language where the compiler cannot determine the type:
 
 * The `children()` and `descendants()` functions
 * The `resolve()` function
 * A member which is polymorphic (e.g. a choice[x] type in FHIR)
 
-Authors can use the `as` operator directly after such constructs to inform the compiler of the expected type, so that strict type-checking can continue.
+Authors can use the `as` operator or `ofType()` function directly after such constructs to inform the compiler of the expected type.
 
-In strict mode, when the compiler finds places where a collection of multiple items can be present while just a single item is expected, the author will need to make explicit how repetitions are dealt with. Depending on the situation one may:
+In cases where a compiler finds places where a collection of multiple items can be present while just a single item is expected, the author will need to make explicit how repetitions are dealt with. Depending on the situation one may:
 
 * Use `first()`, `last()` or indexer (`[ ]`) to select a single item
 * Use `select()` and `where()` to turn the expression into one that evaluates each of the repeating items individually (as in the examples above)
-* Use `single()` to return either the single item or else an empty collection. This is especially useful when using FHIRPath to formulate invariants: in cases where single items are considered the "positive" or "true" situation, `single()` will return an empty collection, so the invariant will evaluate to the empty collection (or false) in any other circumstance.
-
-[source]
-----
-[27-1-2016 20:53:40] Grahame Grieve: I still disagree with the way that the strict evaluation
-section is framed. The issue should be described, and then possible approaches defined,
-including type level evaluation for warnings. I'm not sure when a strict mode on evaluation would actually be appropriate or
-whether strict must be applied purely based on the type definitions, or whether an evaluation
-engine is allowed to be aware of contextual constraints in addition to the type definitions
-----
-
-____
-
-The `as` operator will not be useable if the parent, children or descendants contain backbone elements (which they will). This might not be a big problem, e.g.
-
- Questionnaire.descendants().question
-
-will really always just select the "anonymous" child called "question" and thus the Question complex element, but we will not get any typesafety again until we do
-
- Questionnaire.descendants().question.concept.as('Coding').etc
-
-____
 
 [appendix]
 == Formal Specifications
