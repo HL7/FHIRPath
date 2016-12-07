@@ -376,6 +376,20 @@ If the input collection is emtpy (`{ }`), the result is empty.
 
 Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_). This means that if the evaluation for an element results in the empty collection (`{ }`), no element is added to the result, and that if the input collection is empty (`{ }`), the result is empty as well.
 
+[source]
+----
+Bundle.entry.select(resource as Patient)
+----
+
+This example results in a collection with only the patient resources from the bundle.
+
+[source]
+----
+Bundle.entry.select((resource as Patient).telecom.where(system = 'phone'))
+----
+
+This example results in a collection with all the telecom elements with system of `phone` for all the patients in the bundle.
+
 ==== repeat(projection: expression) : collection
 
 A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the equals (`=`) operator).
