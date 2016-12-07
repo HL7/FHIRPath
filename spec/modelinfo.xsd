@@ -63,6 +63,11 @@
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string"/>
 		<xs:attribute name="prohibited" type="xs:boolean"/>
+		<xs:attribute name="basis" type="xs:integer" use="optional">
+			<xs:annotation>
+				<xs:documentation>Indicates the starting index for the element if it is a list-valued element. By default, lists are zero-based</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="ClassInfo">
 		<xs:annotation>
@@ -128,6 +133,12 @@
 	<xs:complexType name="TupleTypeInfoElement">
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="prohibited" type="xs:boolean"/>
+		<xs:attribute name="basis" type="xs:integer" use="optional">
+			<xs:annotation>
+				<xs:documentation>Indicates the starting index for the element if it is a list-valued element. By default, lists are zero-based</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="TupleTypeInfo">
 		<xs:complexContent>

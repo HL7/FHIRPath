@@ -66,7 +66,8 @@ The diagram shows a tree with a repeating `name` node, which represents repeatin
 FHIRPath allows navigation through the tree by composing a path of concatenated labels, e.g.
 
 [source]
-----name.given
+----
+name.given
 ----
 
 This would result in a collection of nodes, one with the value "Wouter" and one with the value "Gert". In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The focus at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step.
@@ -407,6 +408,11 @@ which would find *any* descendants called `group` or `question`, not just the on
 
 Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty.
 
+[source]
+----
+Bundle.entry.resource.ofType(Patient)
+----
+
 === Subsetting
 
 ==== [ index : integer ] : collection
@@ -722,6 +728,11 @@ This example returns true if for all the contained resources, if the contained r
 ==== as
 
 If the left operand is a collection with a single item and the second operand is an identifier, this function returns the value of the left operand if it is of the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If there is more than one item in the input collection, the evaluator will throw an error. Otherwise, this operator returns the empty collection.
+
+[source]
+----
+Observation.component.where((value as quantity) > 30 'mg')
+----
 
 === Collections
 
@@ -1106,7 +1117,7 @@ For class types, the result is a `ClassInfo`:
 
 [source]
 ----
-ClassInfoElement { name: string, type: TypeInfo }
+ClassInfoElement { name: string, type: TypeInfo, basis: Integer }
 ClassInfo { name: string, baseType: TypeInfo, element: List<ClassInfoElement> }
 ----
 
@@ -1121,7 +1132,7 @@ And for anonymous types, the result is a `TupleTypeInfo`:
 
 [source]
 ----
-TupleTypeInfoElement { name: string, type: TypeInfo }
+TupleTypeInfoElement { name: string, type: TypeInfo, basis: Integer }
 TupleTypeInfo { element: List<TupleTypeInfoElement> }
 ----
 
