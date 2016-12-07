@@ -1274,10 +1274,11 @@ text/fhirpath
 [appendix]
 == Use of FHIRPath in HL7 FHIR
 
-FHIRPath is used in five places in the FHIR specifications:
-- search parameter paths - used to define what contents the parameter refers to
-- slicing discriminator - used to indicate what element(s) define uniqueness
-- invariants in ElementDefinition, used to apply co-occurrence and other rules to the contents
+FHIRPath is used in several places in the FHIR and related specifications:
+
+- search parameter paths - used to define what contents the parameter refers to (e.g. `Observation.dataAbsentReason`)
+- slicing discriminator - used to indicate what element(s) define uniqueness (e.g. `Observation.category`)
+- invariants in ElementDefinition, used to apply co-occurrence and other rules to the contents (e.g. `value.empty() or code!=component.code`)
 - error message locations in OperationOutcome
 - URL templates in Smart on FHIR's cds-hooks
 - may be used for Patch in the future
@@ -1294,7 +1295,7 @@ More specifically:
 
 === Polymorphism in FHIR
 
-FHIR has the notion of choice elements, where elements can be one of multiple types, e.g. `Patient.deceased[x]`. In actual instances these will be present as either `Patient.deceasedBoolean` or `Patient.deceasedDateTime`. In FHIRPath choice elements are labeled according to the name without the '[x]' suffix, and children can be explicitly filtered using the `as` operation:
+FHIR has the notion of choice elements, where elements can be one of multiple types, e.g. `Patient.deceased[x]`. In actual instances these will be present as either `Patient.deceasedBoolean` or `Patient.deceasedDateTime`. In FHIRPath choice elements are labeled according to the name without the '[x]' suffix, and children can be explicitly treated as a specific type using the `as` operation:
 
 [source]
 ----
@@ -1303,7 +1304,7 @@ FHIR has the notion of choice elements, where elements can be one of multiple ty
 
 === Using FHIR types in expressions
 
-The evaluation engine will automatically convert the value of FHIR types representing primitives to FHIRPath types when they are used in expression in the following fashion:
+The evaluation engine will automatically convert the value of FHIR types representing primitives to FHIRPath types when they are used in expressions according to the following mapping:
 
 |===
 |FHIR primitive type |FHIRPath type
