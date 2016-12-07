@@ -97,7 +97,7 @@ Within FHIRPath, a collection is:
 * Ordered - The order of items in the collection is important and is preserved through operations as much as possible.
 * Non-Unique - Duplicate elements are allowed within a collection. Some functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
 * Indexed - Each item in a collection can be uniquely addressed by it's index, i.e. ordinal position within the collection. 
-* Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alterantive to 0 based collections), _any collections genrated from operations on the 1 based list are 0 based_.
+* Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 * Countable - The number of items in a given collection can always be determined using the `count()` function
 
 Note that the outcome of operations like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the logical order implied by the data model, and some may not, and some may be different depending on the underlying source.
@@ -419,6 +419,8 @@ Bundle.entry.resource.ofType(Patient)
 ==== [ index : integer ] : collection
 
 The indexer operation returns a collection with only the `index`-th item (0-based index). If the input collection is empty (`{ }`), or the index lies outside the boundaries of the input collection, an empty collection is returned.
+
+Note: Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 
 Example:
 
@@ -1118,7 +1120,7 @@ For class types, the result is a `ClassInfo`:
 
 [source]
 ----
-ClassInfoElement { name: string, type: TypeInfo, basis: Integer }
+ClassInfoElement { name: string, type: TypeInfo, isOneBased: boolean }
 ClassInfo { name: string, baseType: TypeInfo, element: List<ClassInfoElement> }
 ----
 
@@ -1133,7 +1135,7 @@ And for anonymous types, the result is a `TupleTypeInfo`:
 
 [source]
 ----
-TupleTypeInfoElement { name: string, type: TypeInfo, basis: Integer }
+TupleTypeInfoElement { name: string, type: TypeInfo, isOneBased: boolean }
 TupleTypeInfo { element: List<TupleTypeInfoElement> }
 ----
 
