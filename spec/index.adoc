@@ -175,6 +175,12 @@ Decimals cannot use exponential notation.
 * The date may be followed by a `time` as described in the next section.
 * Consult the formal grammar for more details.
 
+[source]
+----
+@2014-01-25
+@2014-01-25T14:30:14.559
+----
+
 ==== time
 
 `time` uses a subset of ISO8601:
@@ -182,6 +188,12 @@ Decimals cannot use exponential notation.
 * A time begins with a `T`
 * Timezone is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
 * `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
+
+[source]
+----
+@T12:00:00.0Z
+@T14:30:14.559-07:00
+----
 
 Consult the formal grammar for more details.
 
@@ -434,7 +446,11 @@ Bundle.entry.resource.ofType(Patient)
 
 The indexer operation returns a collection with only the `index`-th item (0-based index). If the input collection is empty (`{ }`), or the index lies outside the boundaries of the input collection, an empty collection is returned.
 
+____
+
 Note: Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
+
+____
 
 Example:
 
@@ -587,7 +603,7 @@ If the input collection contains a single item of type string, the function will
 
 If the input collection contains a single item of type string, the function will match the input using the regular expression in `regex` and replace each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression.
 
-This example of `replace()` will convert a string with a date formatted as MM/dd/yy to dd-MM-yy:
+This example of `replaceMatches()` will convert a string with a date formatted as MM/dd/yy to dd-MM-yy:
 
 [source]
 ----
@@ -675,7 +691,7 @@ Otherwise, equals returns `false`.
 
 Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
 
-Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = &#39;phone&#39;` will return `false` if there is more than one `telecom` with a `use`. Typically, you'd want Patient.telecom.where(system = 'phone')
+Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = &#39;phone&#39;` will return `false` if there is more than one `telecom` with a `use`. Typically, you'd want `Patient.telecom.where(system = 'phone')`
 
 If one or both of the operands is the empty collection, this operation returns an empty collection.
 
@@ -1439,7 +1455,11 @@ Observation.component.where(code in %"vs-observation-vitalsignresult")
 
 This expression returns components that have a code that is a member of the observation-vitalsignresult valueset.
 
+____
+
 Note: Implementation Guides are allowed to define their own externals, and implementers should provide some appropriate configuration framework to allow these constants to be provided to the evaluation engine at run time. E.g.:
+
+____
 
 [source]
 ----
