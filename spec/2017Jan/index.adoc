@@ -1,5 +1,5 @@
 = FHIRPath (STU1 Release)
-:page-layout: current
+:page-layout: stu1release
 :sectnums:
 :toc: macro
 

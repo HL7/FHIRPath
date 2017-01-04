@@ -1,0 +1,18 @@
+{
+	"paths": {
+		"resources": ["resources"],
+		"specification": "http://hl7.org/fhirpath",
+		"pages": "spec",
+		"temp": "temp",
+		"output": "output",
+		"txCache": "txCache",
+		"qa": "qa"
+	},
+	"sct-edition": "http://snomed.info/sct/731000124108",
+	"tool": "jekyll",
+	"resources": {
+	},
+	"canonicalBase": "http://hl7.org/fhirpath",
+	"version": "1.9.0",
+	"source": "ig.xml"
+}
