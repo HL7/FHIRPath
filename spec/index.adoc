@@ -1,4 +1,4 @@
-= FHIRPath (STU1 Release)
+= FHIRPath (Working Draft)
 :page-layout: current
 :sectnums:
 :toc: macro
