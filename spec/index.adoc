@@ -488,13 +488,24 @@ Returns a collection containing all but the first `num` items in the input colle
 
 Returns a collection containing the first `num` items in the input collection, or less if there are less than `num` items. If num is less than or equal to 0, or if the input collection is empty (`{ }`), `take` returns an empty collection.
 
+==== intersection(other: collection) : collection
+
+Returns the set of elements that are in both collections. Duplicate items will be eliminated by this operation.
+
+==== excluding(other: collection) : collection
+
+Returns the set of elements that are not in the other collections. Duplicate items will not be eliminated by this operation, and order will be preserved.
+
 === Combining
 
 ==== | (union collections)
+
 Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
 
 ==== combine(other : collection) : collection
+
 Merge the input and other collections into a single collection without eliminating duplicate values. Combining an empty collection with a non-empty collection will return the non-empty collection. There is no expectation of order in the resulting collection.
+
 
 === Conversion
 
@@ -595,6 +606,14 @@ If the input collection contains a single item of type string, the function will
 ==== contains(substring : string) : boolean
 
 If the input collection contains a single item of type string, the function will return `true` when the given `substring` is a substring of the input string. Also returns `true` when `substring` is the empty string.
+
+==== upper() : string
+
+If the input collection contains a single item of type string, the function will return the string with all characters converted to upper case.
+
+==== lower() : string
+
+If the input collection contains a single item of type string, the function will return the string with all characters converted to lower case.
 
 ==== replace(pattern : string, substitution : string) : string
 
@@ -1349,6 +1368,28 @@ FHIR adds (backwards compatible) functionality to the common set of functions:
 ==== extension(url : string) : collection
 
 Will filter the focus for items named "extension" with the given url. This is a syntactical shortcut for `.extension.where(url = string)`, but is simpler to write. Will return an empty collection if the focus is empty or the url is empty.
+
+==== hasValue() : boolean
+
+Returns true if the FHIR primitive has a an primitive value (e.g. as opposed to not having a value and just having extensions). 
+
+____
+
+*Note to implementers*: The FHIR conceptual model talks about "primitives" as superclasses of the type Element that also have id and extensions. 
+What this actually means is that a FHIR primitive is not a primitive in an implementation language. The introduction (section 2 above)
+describes the navigation tree as if the the FHIR model applies - primitives are both primitives and elements with children. There is
+an open issue about how this is represented in FHIRPath. The following are valid options:
+
+* FHIR primitives have a value child, but they are automatically cast to FHIRPath primitives when comparisons are made
+* The value of a FHIR primitive is a special value that is only available implicitly 
+* The FHIR primitives are just another node, and the only way to access the real primitive value is by a .value
+
+The FHIR specification contains many invariants that assume #3 is not the case, but it doesn't contain any invariants that 
+cause a difference between #1 and #2 (by design). 
+
+Comment is welcome at http://wiki.hl7.org/index.php?title=FHIR_Specification_Feedback_(STU_3)
+____
+
 
 ==== trace(name : string) : collection
 
