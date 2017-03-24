@@ -1385,7 +1385,8 @@ an open issue about how this is represented in FHIRPath. The following are valid
 * The FHIR primitives are just another node, and the only way to access the real primitive value is by a .value
 
 The FHIR specification contains many invariants that assume #3 is not the case, but it doesn't contain any invariants that 
-cause a difference between #1 and #2 (by design). 
+cause a difference between #1 and #2 (by design). The important place is difference is whether the primitive value appears
+in the set returned by children() or descendents().
 
 Comment is welcome at http://wiki.hl7.org/index.php?title=FHIR_Specification_Feedback_(STU_3)
 ____
