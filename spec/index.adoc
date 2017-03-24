@@ -1371,7 +1371,7 @@ Will filter the focus for items named "extension" with the given url. This is a 
 
 ==== hasValue() : boolean
 
-Returns true if the FHIR primitive has a an primitive value (e.g. as opposed to not having a value and just having extensions). 
+Returns true if there is a single focus, which is a FHIR primitive, and it has a primitive value (e.g. as opposed to not having a value and just having extensions). 
 
 ____
 
@@ -1408,7 +1408,7 @@ from
 
 ==== resolve() : collection
 
-For each item in the collection, if it is a string, locate the target of the reference, and add it to the resulting collection. If the item is not a string, the item is ignored and nothing is added to the output collection.
+For each item in the collection, if it is a string that is a URI or a Reference, locate the target of the reference, and add it to the resulting collection. If the item is not a string, the item is ignored and nothing is added to the output collection.
 
 The items in the collection may also represent a Reference, in which case the `Reference.reference` is resolved.
 
