@@ -496,6 +496,8 @@ Returns the set of elements that are in both collections. Duplicate items will b
 
 Returns the set of elements that are not in the other collections. Duplicate items will not be eliminated by this operation, and order will be preserved.
 
+e.g. Patient.children().excluding(name|birthDate) would return all the properties of the Patient except for the name and birthDate.
+
 === Combining
 
 ==== | (union collections)
