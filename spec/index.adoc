@@ -70,7 +70,7 @@ FHIRPath allows navigation through the tree by composing a path of concatenated 
 name.given
 ----
 
-This would result in a collection of nodes, one with the value "Wouter" and one with the value "Gert". In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The focus at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step.
+This would result in a collection of nodes, one with the value "Wouter" and one with the value "Gert". In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The input collection at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step.
 
 The path may start with the type of the root node (which otherwise does not have a name), but this is optional. To illustrate this point, the path `name.given` above can be evaluated as an expression on a set of data of any type. However the expression may be prefixed with the name of the type of the root:
 
@@ -488,21 +488,33 @@ Returns a collection containing all but the first `num` items in the input colle
 
 Returns a collection containing the first `num` items in the input collection, or less if there are less than `num` items. If num is less than or equal to 0, or if the input collection is empty (`{ }`), `take` returns an empty collection.
 
-==== intersection(other: collection) : collection
+==== intersect(other: collection) : collection
 
 Returns the set of elements that are in both collections. Duplicate items will be eliminated by this operation.
 
-==== excluding(other: collection) : collection
+==== exclude(other: collection) : collection
 
 Returns the set of elements that are not in the other collections. Duplicate items will not be eliminated by this operation, and order will be preserved.
 
-e.g. Patient.children().excluding(name|birthDate) would return all the properties of the Patient except for the name and birthDate.
+e.g. Patient.children().exclude(name|birthDate) would return all the properties of the Patient except for the name and birthDate.
 
 === Combining
 
-==== | (union collections)
+==== union(other : collection)
 
 Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
+
+This function can also be invoked using the | operator.
+
+----
+a.union(b)
+---
+
+is synonymous with
+
+----
+a | b
+---
 
 ==== combine(other : collection) : collection
 
@@ -1319,7 +1331,8 @@ FHIRPath is used in several places in the FHIR and related specifications:
 - invariants in ElementDefinition, used to apply co-occurrence and other rules to the contents (e.g. `value.empty() or code!=component.code`)
 - error message locations in OperationOutcome
 - URL templates in Smart on FHIR's cds-hooks
-- may be used for Patch in the future
+- FHIRPath based Patch 
+- Invariants in the TestScript resource
 
 As stated in the introduction, FHIRPath uses a tree model that abstracts away the actual underlying datamodel of the data being queried. For FHIR, this means that the contents of the resources and data types as described in the Logical views (or the UML diagrams) are used as the model, rather than the JSON and XML formats, so specific xml or json features are not visible to the FHIRPath language (such as comments and the split representation of primitives).
 
@@ -1369,22 +1382,22 @@ FHIR adds (backwards compatible) functionality to the common set of functions:
 
 ==== extension(url : string) : collection
 
-Will filter the focus for items named "extension" with the given url. This is a syntactical shortcut for `.extension.where(url = string)`, but is simpler to write. Will return an empty collection if the focus is empty or the url is empty.
+Will filter the input collection for items named "extension" with the given url. This is a syntactical shortcut for `.extension.where(url = string)`, but is simpler to write. Will return an empty collection if the input collection is empty or the url is empty.
 
 ==== hasValue() : boolean
 
-Returns true if there is a single focus, which is a FHIR primitive, and it has a primitive value (e.g. as opposed to not having a value and just having extensions). 
+Returns true if the input collection contains a single value which is a FHIR primitive, and it has a primitive value (e.g. as opposed to not having a value and just having extensions). 
 
 ____
 
-*Note to implementers*: The FHIR conceptual model talks about "primitives" as superclasses of the type Element that also have id and extensions. 
+*Note to implementers*: The FHIR conceptual model talks about "primitives" as subclasses of the type Element that also have id and extensions. 
 What this actually means is that a FHIR primitive is not a primitive in an implementation language. The introduction (section 2 above)
 describes the navigation tree as if the the FHIR model applies - primitives are both primitives and elements with children. There is
 an open issue about how this is represented in FHIRPath. The following are valid options:
 
-* FHIR primitives have a value child, but they are automatically cast to FHIRPath primitives when comparisons are made
-* The value of a FHIR primitive is a special value that is only available implicitly 
-* The FHIR primitives are just another node, and the only way to access the real primitive value is by a .value
+# FHIR primitives have a value child, but they are automatically cast to FHIRPath primitives when comparisons are made
+# The value of a FHIR primitive is a special value that is only available implicitly 
+# The FHIR primitives are just another node, and the only way to access the real primitive value is by a .value
 
 The FHIR specification contains many invariants that assume #3 is not the case, but it doesn't contain any invariants that 
 cause a difference between #1 and #2 (by design). The important place is difference is whether the primitive value appears
