@@ -137,11 +137,11 @@ IDENTIFIER
         ;
 
 QUOTEDIDENTIFIER
-        : '"' (ESC | ~[\\"])* '"'
+        : '"' (ESC | .)*? '"'
         ;
 
 STRING
-        : '\'' (ESC | ~[\'])* '\''
+        : '\'' (ESC | .)*? '\''
         ;
 
 // Also allows leading zeroes now (just like CQL and XSD)
