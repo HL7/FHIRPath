@@ -802,7 +802,7 @@ If the left operand is a collection with a single item and the second operand is
 
 [source]
 ----
-Observation.component.where((value as quantity) > 30 'mg')
+Observation.component.where((value as Quantity) > 30 'mg')
 ----
 
 === Collections
@@ -1390,22 +1390,10 @@ Returns true if the input collection contains a single value which is a FHIR pri
 
 ____
 
-*Note to implementers*: The FHIR conceptual model talks about "primitives" as subclasses of the type Element that also have id and extensions. 
-What this actually means is that a FHIR primitive is not a primitive in an implementation language. The introduction (section 2 above)
-describes the navigation tree as if the the FHIR model applies - primitives are both primitives and elements with children. There is
-an open issue about how this is represented in FHIRPath. The following are valid options:
+*Note to implementers*: The FHIR conceptual model talks about "primitives" as subclasses of the type Element that also have id and extensions. What this actually means is that a FHIR primitive is not a primitive in an implementation language. The introduction (section 2 above) describes the navigation tree as if the the FHIR model applies - primitives are both primitives and elements with children.
 
-# FHIR primitives have a value child, but they are automatically cast to FHIRPath primitives when comparisons are made
-# The value of a FHIR primitive is a special value that is only available implicitly 
-# The FHIR primitives are just another node, and the only way to access the real primitive value is by a .value
-
-The FHIR specification contains many invariants that assume #3 is not the case, but it doesn't contain any invariants that 
-cause a difference between #1 and #2 (by design). The important place is difference is whether the primitive value appears
-in the set returned by children() or descendents().
-
-Comment is welcome at http://wiki.hl7.org/index.php?title=FHIR_Specification_Feedback_(STU_3)
+In FHIRPath, this means that FHIR primitives have a `value` child, but they are automatically cast to FHIRPath primitives when comparisons are made, and that the primitive value will be included in the set returned by `children()` or `descendents()`.
 ____
-
 
 ==== trace(name : string) : collection
 
@@ -1687,9 +1675,9 @@ There is a test harness for FHIRPath here:
 
 https://github.com/brianpos/FhirPathTester
 
-The CQL-to-ELM translator that is maintained as part of the tooling for Clinical Quality Language is incorporating FHIRPath as part of the 1.2 branch:
+The CQL-to-ELM translator that is maintained as part of the tooling for Clinical Quality Language supports FHIRPath:
 
-https://github.com/cqframework/clinical_quality_language/tree/v12
+https://github.com/cqframework/clinical_quality_language
 
 For the most current listing of known implementations, refer to the HL7 wiki:
 
@@ -1700,7 +1688,7 @@ http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 
 [bibliography]
 - [[[ANTLR]]] Another Tool for Language Recognition (ANTLR) http://www.antlr.org/
-- [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, DSTU Release 1.1. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
+- [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, DSTU Release 1.2. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
 - [[[XMLRE]]] Regular Expressions. https://www.w3.org/TR/xmlschema11-2/#regexs
 - [[[PCRE]]] Pearl-Compatible Regular Expressions. http://www.pcre.org/
 
