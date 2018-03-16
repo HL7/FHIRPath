@@ -1,6 +1,7 @@
 = FHIRPath (Working Draft)
 :page-layout: current
 :sectnums:
+:sectanchors:
 :toc: macro
 
 FHIRPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (FHIR) and HL7 Clinical Quality Language (CQL).
@@ -268,7 +269,7 @@ For functions or arguments that expect collections, in general the empty collect
 
 When functions or operators behave differently from these general principles, (for example the `count()` and `empty()` functions), this is clearly documented in the next sections.
 
-=== Singleton evaluation of collections
+=== Singleton Evaluation of Collections
 
 In general, when a collection is passed as an argument to a function or operator that expects a single item as input, the collection is implicitly converted to a singleton as follows:
 
@@ -817,7 +818,7 @@ If the left operand is a collection with a single item, this operator returns tr
 If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. This is the inverse operation of in.
 
 === Boolean logic
-For all boolean operators, the collections passed as operands are first evaluated as booleans (as described in Boolean Evaluation of Collections). The operators then use three-valued logic to propagate empty operands.
+For all boolean operators, the collections passed as operands are first evaluated as booleans (as described in <<Singleton Evaluation of Collections>>). The operators then use three-valued logic to propagate empty operands.
 
 ____
 
