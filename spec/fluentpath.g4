@@ -48,6 +48,7 @@ invocation                          // Terms that can be used after the function
         : identifier                                            #memberInvocation
         | function                                              #functionInvocation
         | '$this'                                               #thisInvocation
+        | '$index'                                              #indexInvocation
         ;
 
 function
