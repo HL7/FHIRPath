@@ -530,7 +530,7 @@ To use these functions over a collection with multiple items, one may use filter
 
 [source]
 ----
-Patient.name.given.select(substring(1))
+Patient.name.given.select(substring(0))
 ----
 
 This example returns a collection containing the first character of all the given names for a patient.
@@ -812,7 +812,7 @@ Observation.component.where((value as Quantity) > 30 'mg')
 Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
 
 ==== in (membership)
-If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is the empty collection is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
+If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
 
 ==== contains (containership)
 If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. This is the inverse operation of in.
@@ -823,12 +823,11 @@ For all boolean operators, the collections passed as operands are first evaluate
 ____
 
 Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If a condition is needed to ensure correct evaluation of a subsequent expression, the `iif()` function should be used to guarantee that the condition determines whether evaluation of an expression will occur at run-time.
-
 ____
 
 ==== and
 
-Returns `true` if both operands evaluate to `true`, `false` if either operand evaluates to `false`, and empty collection (`{ }`) otherwise:
+Returns `true` if both operands evaluate to `true`, `false` if either operand evaluates to `false`, and the empty collection (`{ }`) otherwise:
 
 |===
 |&nbsp; |`true` |`false` |empty (`{ }`)
@@ -1444,15 +1443,13 @@ For each element in the input collection, verifies that there are no modifying e
 
 Returns `true` if the single input element conforms to the profile specified by the `structure` argument, and false otherwise. If the structure cannot be resolved to a valid profile, an error is thrown. If the input contains more than one element, an error is thrown. If the input is empty, the result is empty.
 
-=== Changes to operators
+==== memberOf(valueset : string) : boolean
 
-==== ~ (Equivalence)
+When invoked on a code-valued element, returns true if the code is a member of the given valueset.
+When invoked on a concept-valued element, returns true if any code in the concept is a member of the given valueset.
+When invoked on a string, returns true if the string is equal to a code in the valueset, so long as the valueset only contains one codesystem. If the valueset in this case contains more than one codesystem, an error is thrown.
 
-Equivalence works in exactly the same manner, but with the addition that for complex types, equality requires all child properties to be equal, *except for "id" elements*.
-
-==== in (Membership)
-
-Membership works in the same way, with the added capability that if the right argument is a string, it is resolved as a uri to a value set and the operation performs value set membership.
+If the valueset cannot be resolved as a uri to a value set, an error is thrown.
 
 Note that implementations are encouraged to make use of a terminology service to provide this functionality.
 
@@ -1460,10 +1457,16 @@ For example:
 
 [source]
 ----
-Observation.component.where(code in 'http://hl7.org/fhir/ValueSet/observation-vitalsignresult')
+Observation.component.where(code.memberOf('http://hl7.org/fhir/ValueSet/observation-vitalsignresult'))
 ----
 
 This expression returns components that have a code that is a member of the observation-vitalsignresult valueset.
+
+=== Changes to operators
+
+==== ~ (Equivalence)
+
+Equivalence works in exactly the same manner, but with the addition that for complex types, equality requires all child properties to be equal, *except for "id" elements*.
 
 === Environment variables
 
@@ -1486,7 +1489,7 @@ For example:
 
 [source]
 ----
-Observation.component.where(code in %"vs-observation-vitalsignresult")
+Observation.component.where(code.memberOf(%"vs-observation-vitalsignresult"))
 ----
 
 This expression returns components that have a code that is a member of the observation-vitalsignresult valueset.
