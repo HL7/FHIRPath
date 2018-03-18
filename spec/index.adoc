@@ -208,6 +208,11 @@ Consult the formal grammar for more details.
   100 '[degF]'
 ----
 
+[NOTE]
+====
+When using UCUM units within FHIRPath, implementations shall use case-sensitive comparisons.
+====
+
 For date/time units, an alternative representation may be used (note that both a plural and singular version exist):
 
 * `year`/`years`, `month`/`months`, `week`/`weeks`, `day`/`days`, `hour`/`hours`, `minute`/`minutes`, `second`/`seconds`, `millisecond`/`milliseconds`
@@ -739,6 +744,12 @@ Typically, this operator is used with single fixed values as operands. This mean
 
 If one or both of the operands is the empty collection, this operation returns an empty collection.
 
+When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+
+Implementations that do support units SHALL do so as specified by UCUM.
+
 For `dateTime` and `time` comparisons with partial values (e.g. dateTimes specified only to the day, or times specified only to the hour), the comparison returns empty (`{ }`), not `false`.
 
 ==== ~ (Equivalent)
@@ -762,6 +773,12 @@ If both operands are collections with multiple items:
 
 Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
 
+When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+
+Implementations that do support units SHALL do so as specified by UCUM.
+
 ==== != (Not Equals)
 
 The inverse of the equals operator.
@@ -778,6 +795,12 @@ The inverse of the equivalent operator.
 * Both arguments must be of the same type, and the evaluator will throw an error if the types differ.
 * When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible.
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
+
+When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+
+Implementations that do support units SHALL do so as specified by UCUM.
 
 For partial date/time values, the comparison is performed to the highest precision specified in both values.
 
@@ -893,21 +916,44 @@ If there is more than one item, or an incompatible item, the evaluation of the e
 
 As with the other operators, the math operators will return an empty collection if one or both of the operands are empty.
 
+When operating on quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+
+Implementations that do support units SHALL do so as specified by UCUM.
+
 ==== * (multiplication)
 
-Multiplies both arguments (numbers only)
+Multiplies both arguments (numbers and quantities). For multiplication involving quantities, the resulting quantity will have the appropriate unit:
+
+[source]
+----
+12 'cm' * 3 'cm' // 36 'cm2'
+3 'cm' * 12 'cm2' // 36 'cm3'
+----
 
 ==== / (division)
 
-Divides the left operand by the right operand (numbers only).
+Divides the left operand by the right operand (numbers and quantities). The result of a division is always decimal, even if the inputs are both integer. For integer division, use the `div` operator.
+
+For division involving quantities, the resulting quantity will have the appropriate unit:
+
+[source]
+----
+12 'cm2' / 3 'cm' // 4.0 'cm'
+----
 
 ==== + (addition)
 
-For integer and decimal, add the operands. For strings, concatenates the right operand to the left operand.
+For integer, decimal, and quantity, adds the operands. For strings, concatenates the right operand to the left operand.
+
+When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
 
 ==== - (subtraction)
 
-Subtracts the right operand from the left operand (numbers only).
+Subtracts the right operand from the left operand (numbers and quantities).
+
+When subtracting quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
 
 ==== div
 
