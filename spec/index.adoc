@@ -218,6 +218,11 @@ For date/time units, an alternative representation may be used (note that both a
   4 days
 ----
 
+[NOTE]
+====
+Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601.
+====
+
 === Operators
 
 Expressions can also contain _operators_, like those for mathematical operations and boolean logic:
