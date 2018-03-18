@@ -1488,7 +1488,9 @@ Note that implementations are encouraged to make use of a terminology service to
 
 Equivalence works in exactly the same manner, but with the addition that for complex types, equality requires all child properties to be equal, *except for "id" elements*.
 
-In addition, for Coding values, equivalence is defined in terms of the code and system elements only, display and version are ignored for the purposes of determining equivalence.
+In addition, for Coding values, equivalence is defined based on the code and system elements only. The version, display, and userSelected elements are ignored for the purposes of determining Coding equivalence.
+
+For CodeableConcept values, equivalence is defined as a non-empty intersection of Coding elements, using equivalence. In other words, two CodeableConcepts are considered equivalent if any Coding in one is equivalent to any Coding in the other.
 
 === Environment variables
 
