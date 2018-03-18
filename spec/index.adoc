@@ -1462,11 +1462,33 @@ Observation.component.where(code.memberOf('http://hl7.org/fhir/ValueSet/observat
 
 This expression returns components that have a code that is a member of the observation-vitalsignresult valueset.
 
+==== subsumes(code : Coding | CodeableConcept) : boolean
+
+When invoked on a Coding-valued element and the given code is Coding-valued, returns true if the source code is equivalent to the given code, or if the source code subsumes the given code (i.e. the source code is an ancestor of the given code in a subsumption hierarchy), and false otherwise.
+
+If the Codings are from different code systems, the relationships between the code systems must be well-defined or a run-time error is thrown.
+
+When the source or given elements are CodeableConcepts, returns true if any Coding in the source or given elements is equivalent to or subsumes the given code.
+
+Note that implementations are encouraged to make use of a terminology service to provide this functionality.
+
+==== subsumedBy(code: Coding | CodeableConcept) : boolean
+
+When invoked on a Coding-valued element and the given code is Coding-valued, returns true if the source code is equivalent to the given code, or if the source code is subsumed by the given code (i.e. the given code is an ancestor of the source code in a subsumption hierarchy), and false otherwise.
+
+If the Codings are from different code systems, the relationships between the code systems must be well-defined or a run-time error is thrown.
+
+When the source or given elements are CodeableConcepts, returns true if any Coding in the source or given elements is equivalent to or subsumed by the given code.
+
+Note that implementations are encouraged to make use of a terminology service to provide this functionality.
+
 === Changes to operators
 
 ==== ~ (Equivalence)
 
 Equivalence works in exactly the same manner, but with the addition that for complex types, equality requires all child properties to be equal, *except for "id" elements*.
+
+In addition, for Coding values, equivalence is defined in terms of the code and system elements only, display and version are ignored for the purposes of determining equivalence.
 
 === Environment variables
 
