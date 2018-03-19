@@ -534,7 +534,7 @@ Merge the input and other collections into a single collection without eliminati
 
 === Conversion
 
-The functions in this section operate on collections with a single item. If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
+The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
 
 To use these functions over a collection with multiple items, one may use filters like `where()` and `select()`:
 
@@ -545,23 +545,53 @@ Patient.name.given.select(substring(0))
 
 This example returns a collection containing the first character of all the given names for a patient.
 
-==== iif(criterium: expression, true-result: collection [, otherwise-result: collection]) : collection
+==== iif(criterion: expression, true-result: collection [, otherwise-result: collection]) : collection
 
-If `criterium` is true, the function returns the value of `true-result` parameter.
+If `criterion` is true, the function returns the value of `true-result` parameter.
 
-If `criterium` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-expression` is not given, in which case the function returns an empty collection.
+If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-expression` is not given, in which case the function returns an empty collection.
+
+==== isInteger() : boolean
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is an integer
+* the item is a string and is convertible to an integer
+* the item is a boolean
+
+If the item is not one of the above types, or the item is a string, but is not convertible to an integer (using the regex format `(\\+|-)?\d+`), the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
 
 ==== toInteger() : integer
 
 If the input collection contains a single item, this function will return a single integer if:
 
-* the item in the input collection is an integer
-* the item in the input collection is a string and is convertible to an integer
+* the item is an integer
+* the item is a string and is convertible to an integer
 * the item is a boolean, where `true` results in a 1 and `false` results in a 0.
 
-If the item is not one the above types, the evaluation of the expression will end and signal an error to the calling environment.
+If the item is not one the above types, the result is empty.
 
-If the item is a string, but the string is not convertible to an integer (using the regex format `(\\+|-)?\d+`), the evaluation of the expression will end and signal an error to the calling environment.
+If the item is a string, but the string is not convertible to an integer (using the regex format `(\\+|-)?\d+`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== isDecimal() : boolean
+
+If the input collection contains a single item, this function will true if:
+
+* the item is an integer or decimal
+* the item is a string and is convertible to a decimal
+* the item is a boolean
+
+If the item is not one of the above types, or is not convertible to a decimal (using the regex format `(\\+|-)?\d+('.'\d+)?`), the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
 
 In all other cases, the function will return an empty collection.
 
@@ -569,13 +599,61 @@ In all other cases, the function will return an empty collection.
 
 If the input collection contains a single item, this function will return a single decimal if:
 
-* the item in the input collection is an integer or decimal
-* the item in the input collection is a string and is convertible to a decimal
+* the item is an integer or decimal
+* the item is a string and is convertible to a decimal
 * the item is a boolean, where `true` results in a `1.0` and `false` results in a `0.0`.
 
-If the item is not one of the above types, the evaluation of the expression will end and signal an error to the calling environment.
+If the item is not one of the above types, the result is empty.
 
-If the item is a string, but the string is not convertible to a decimal (using the regex format `(\\+|-)?\d+('.' \d+)?`), the evaluation of the expression will end and signal an error to the calling environment.
+If the item is a string, but the string is not convertible to a decimal (using the regex format `(\\+|-)?\d+('.' \d+)?`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== isQuantity() : boolean
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is an integer, decimal, or quantity
+* the item is a string that is convertible to a quantity
+* the item is a boolean
+
+If the item is not one of the above types, or is not convertible to a quantity (using the regex format `(\\+|-)?\d+(.\d+)? &#39;&lt;unit&gt;&#39;`), the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== toQuantity() : quantity
+
+If the input collection contains a single item, this function will return a single quantity if:
+
+* the item is an integer, or decimal, where the resulting quantity will have the default unit (`&#39;1&#39;`)
+* the item is a quantity
+* the item is a string and is convertible to a decimal
+* the item is a boolean, where `true` results in the quantity `1.0 &#39;1&#39;`, and `false` results in the quantity `0.0 &#39;1&#39;`
+
+If the item is not one of the above types, the result is empty.
+
+If the item is a string, but the string is not convertible to a quantity (using the regex format `(\\+|-)?\d+('.' \d+)?` &#39;&lt;unit&gt;&#39;`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+If all other cases, the function will return an empty collection.
+
+==== isString() : string
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is a string
+* the item is an integer, decimal, time, or dateTime
+* the item is a boolean
+* the item is a quantity
+
+If the item is not one of the above types, the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 In all other cases, the function will return an empty collection.
 
@@ -584,10 +662,10 @@ In all other cases, the function will return an empty collection.
 If the input collection contains a single item, this function will return a single string if:
 
 * the item in the input collection is a string
-* the item in the input collection is an integer, decimal, time or dateTime the output will contain its string representation
+* the item in the input collection is an integer, decimal, time, dateTime, or quantity the output will contain its string representation
 * the item is a boolean, where `true` results in `&#39;true&#39;` and `false` in `&#39;false&#39;`.
 
-If the item is not one of the above types, the evaluation of the expression will end and signal an error to the calling environment.
+If the item is not one of the above types, the result is false.
 
 The string representation uses the following formats:
 
@@ -603,6 +681,8 @@ The string representation uses the following formats:
 |===
 
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
+
+If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
 
 In all other cases, the function will return an empty collection.
 
