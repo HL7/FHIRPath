@@ -12,9 +12,9 @@ expression
         | ('+' | '-') expression                                    #polarityExpression
         | expression ('*' | '/' | 'div' | 'mod') expression         #multiplicativeExpression
         | expression ('+' | '-' | '&') expression                   #additiveExpression
+        | expression ('is' | 'as') typeSpecifier                    #typeExpression
         | expression '|' expression                                 #unionExpression
         | expression ('<=' | '<' | '>' | '>=') expression           #inequalityExpression
-        | expression ('is' | 'as') typeSpecifier                    #typeExpression
         | expression ('=' | '~' | '!=' | '!~') expression           #equalityExpression
         | expression ('in' | 'contains') expression                 #membershipExpression
         | expression 'and' expression                               #andExpression

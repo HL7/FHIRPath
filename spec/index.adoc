@@ -1118,9 +1118,9 @@ Precedence of operations, in order from high to low:
 #03 unary + and -
 #04: *, /, div, mod
 #05: +, -, &
-#06: |
-#07: >, <, >=, <=
-#08: is, as
+#06: is, as
+#07: |
+#08: >, <, >=, <=
 #09: =, ~, !=, !~
 #10: in, contains
 #11: and
