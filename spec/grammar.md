@@ -1,11 +1,11 @@
 ---
 layout: current
-title: FluentPath Grammar
+title: FHIRPath Grammar
 ---
 
-This page contains the [Antlr 4.0](http://www.antlr.org/) grammar for FluentPath.
+This page contains the [Antlr 4.0](http://www.antlr.org/) grammar for FHIRPath.
 
 <pre>
-{% include_relative fluentpath.g4 %}
+{% include_relative fhirpath.g4 %}
 
 </pre>

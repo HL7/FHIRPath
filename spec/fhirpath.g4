@@ -1,4 +1,4 @@
-grammar fluentpath;
+grammar fhirpath;
 
 // Grammar rules
 
@@ -49,6 +49,7 @@ invocation                          // Terms that can be used after the function
         | function                                              #functionInvocation
         | '$this'                                               #thisInvocation
         | '$index'                                              #indexInvocation
+        | '$total'                                              #totalInvocation
         ;
 
 function
