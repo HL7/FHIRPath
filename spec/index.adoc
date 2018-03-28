@@ -519,13 +519,13 @@ This function can also be invoked using the | operator.
 
 ----
 a.union(b)
----
+----
 
 is synonymous with
 
 ----
 a | b
----
+----
 
 ==== combine(other : collection) : collection
 
@@ -1408,7 +1408,7 @@ For primitive types, the result is a `SimpleTypeInfo`:
 
 [source]
 ----
-SimpleTypeInfo { modelName: string, name: string, baseType: TypeSpecifier }
+SimpleTypeInfo { namespace: string, name: string, baseType: TypeSpecifier }
 ----
 
 For class types, the result is a `ClassInfo`:
@@ -1416,7 +1416,7 @@ For class types, the result is a `ClassInfo`:
 [source]
 ----
 ClassInfoElement { name: string, type: TypeSpecifier, isOneBased: Boolean }
-ClassInfo { modelName: string, name: string, baseType: TypeSpecifier, element: List<ClassInfoElement> }
+ClassInfo { namespace: string, name: string, baseType: TypeSpecifier, element: List<ClassInfoElement> }
 ----
 
 For collection types, the result is a `ListTypeInfo`:
