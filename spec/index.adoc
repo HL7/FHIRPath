@@ -285,13 +285,17 @@ In general, when a collection is passed as an argument to a function or operator
 
 [source]
 ----
-IF the collection contains a single node AND the node's value is of the expected input type THEN
+IF the collection contains a single node AND the node's value can be converted to the expected input type THEN
   The collection evaluates to the value of that single node
+ELSE IF the collection contains a single node AND the expected input type is Boolean THEN
+  The collection evaluates to true
 ELSE IF the collection is empty THEN
   The collection evaluates to an empty collection
 ELSE
   An error is raised
 ----
+
+Note that in the special case that the input type is Boolean and the value is not, if the collection contains a single item
 
 == Functions
 
