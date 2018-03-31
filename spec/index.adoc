@@ -1,4 +1,4 @@
-= FHIRPath (Working Draft)
+= FHIRPath (Normative Ballot)
 :page-layout: current
 :sectnums:
 :sectanchors:
@@ -8,7 +8,7 @@ FHIRPath is a path based navigation and extraction language, somewhat like XPath
 
 Looking for implementations? See http://wiki.hl7.org/index.php?title=FHIRPath_Implementations[FHIRPath Implementations on the HL7 wiki]
 
-Version: 1.0.0 Public Domain (http://creativecommons.org/publicdomain/zero/1.0/[Creative Commons 0])
+Version: 1.1.0 Public Domain (http://creativecommons.org/publicdomain/zero/1.0/[Creative Commons 0])
 
 toc::[]
 

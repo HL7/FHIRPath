@@ -104,14 +104,34 @@ The following versions of FHIRPath are available:
   </tr>
   <tr>
     <td><a href="index.html">Dec 6, 2016</a></td>
-    <td>1.0.0</td>
-    <td>STU1 Release</td>
+    <td>1.1.0</td>
+    <td>Normative Ballot</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/FHIR/FHIRPath/blob/master/spec/FHIRPath.md">(current)</a></td>
+    <td><a href="https://github.com/FHIR/fluentpath/blob/master/spec/index.adoc">(current)</a></td>
     <td>(last commit)</td>
     <td>Current Development build (may be incoherent and change rapidly)</td>
   </tr>
+  <tr> 
+    <td colspan="3" style="background: #EFEFEF"><b>Normative sequence</b></td>
+  </tr>
+  <tr>
+    <td><a href="2018May/index.html">March 31, 2018</a></td>
+    <td>1.1.0</td>
+    <td>Normative Ballot. Changes:<br/>
+      <ul>
+        <li>Added terminology operators to FHIR appendix</li>
+        <li>Increased precedence of is/as operators</li>
+        <li>Added .aggregate() operator</li>
+        <li>Clarified support for namespaces in FHIRPath and its usage contexts (FHIR, CQL, V2)</li>
+        <li>Relaxed conversion failures to return null instead of throw an error</li>
+        <li>Added support for quantity comparisons</li>
+        <li>Relaxed definition of code equivalence (only uses code and system, not version or text/display)</li>
+        <li>Added $index accessor to iteratio contexts</li>
+        <li>Added profile validation operators to FHIR appendix</li>
+      </ul>
+      <p>See changes from ballot to release for the <a href="http://services.w3.org/htmldiff?doc1=http%3A%2F%2Fhl7.org%2Ffhirpath%2F2016Sept%2Findex.html&amp;doc2=http%3A%2F%2Fhl7.org%2Ffhirpath%2Findex.html">spec</a> or the <a href="http://services.w3.org/htmldiff?doc1=http%3A%2F%2Fhl7.org%2Ffhirpath%2F2016Sept%2Fgrammar.html&amp;doc2=http%3A%2F%2Fhl7.org%2Ffhirpath%2Fgrammar.html">grammar</a></p>
+    </td>
   <tr> 
     <td colspan="3" style="background: #EFEFEF"><b>STU1 sequence</b></td>
   </tr>
