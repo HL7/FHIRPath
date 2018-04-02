@@ -4,13 +4,11 @@
 :sectanchors:
 :toc: macro
 
-FHIRPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (FHIR) and HL7 Clinical Quality Language (CQL).
+FHIRPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (link:http://hl7.org/fhir[FHIR]) and HL7 Clinical Quality Language (link:http://cql.hl7.org/03-developersguide.html#using-fhirpath[CQL]).
 
 Looking for implementations? See http://wiki.hl7.org/index.php?title=FHIRPath_Implementations[FHIRPath Implementations on the HL7 wiki]
 
 Version: 1.1.0 Public Domain (http://creativecommons.org/publicdomain/zero/1.0/[Creative Commons 0])
-
-FHIRPath is used by the link:http://hl7.org/fhir[FHIR Specification], as well as link:http://cql.hl7.org/03-developersguide.html#using-fhirpath[Clinical Quality Language].
 
 ____
 NOTE: The appendices are included as additional documentation and are informative content.
