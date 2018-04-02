@@ -10,6 +10,12 @@ Looking for implementations? See http://wiki.hl7.org/index.php?title=FHIRPath_Im
 
 Version: 1.1.0 Public Domain (http://creativecommons.org/publicdomain/zero/1.0/[Creative Commons 0])
 
+FHIRPath is used by the link:http://hl7.org/fhir[FHIR Specification], as well as link:http://cql.hl7.org/03-developersguide.html#using-fhirpath[Clinical Quality Language].
+
+____
+NOTE: The appendices are included as additional documentation and are informative content.
+____
+
 toc::[]
 
 == Overview
@@ -1520,7 +1526,6 @@ In cases where a compiler finds places where a collection of multiple items can 
 * Use `first()`, `last()` or indexer (`[ ]`) to select a single item
 * Use `select()` and `where()` to turn the expression into one that evaluates each of the repeating items individually (as in the examples above)
 
-[appendix]
 == Formal Specifications
 
 === Formal Syntax
@@ -1756,99 +1761,6 @@ ____
 Authors of Implementation Guides should be aware that adding specific environment variables restricts the use of the FHIRPath to their particular context.
 
 Note that these tokens are not restricted to simple types, and they may have fixed values that are not known before evaluation at run-time, though there is no way to define these kind of values in implementation guides.
-
-[appendix]
-== Use of FHIRPath in Clinical Quality Language (CQL)
-
-Clinical Quality Language is being extended to use FHIRPath as its core path language, in much the same way that XQuery uses XPath to represent paths within queries. In particular, the following extensions to CQL are proposed:
-
-=== Path Traversal
-
-When a path expression involves an element with multiple cardinality, the expression is considered short-hand for an equivalent query invocation. For example:
-
-[source]
-----
-Patient.telecom.use
-----
-
-is allowed, and is considered a short-hand for the following query expression:
-
-[source]
-----
-Patient.telecom X where X.use is not null return X.use
-----
-
-Given a patient with multiple telecom entries, the above query will return a list containing the `use` element from each entry. Note that the restriction is required as it ensures that the resulting list will not contain any `null` elements. In addition, if the element itself is list-valued, the result is expanded:
-
-[source]
-----
-Patient.name.given
-----
-
-is short-hand for:
-
-[source]
-----
-expand (Patient.name X where X.given is not null return (X.given Y where Y is not null))
-----
-
-In this case, given a patient with multiple names, each of which has multiple givens, this will return a single list containing all the given names in all the names.
-
-=== Constants and Contexts
-
-FHIRPath has the ability to reference contexts (using the `$` prefix) and environment-defined variables (using the `%` prefix). Within CQL, these contexts and environment-defined variables are added to the appropriate scope (global for environment-variables, local for contexts) without the prefix. Additionally, because the `%` prefix is optional, it is not required to access environment-defined variables within CQL.
-
-=== Additional Operators
-
-The following additional operators are being added to CQL:
-
-* `~`, `!~` - Equivalent operators (formerly `matches` in CQL)
-* `!=` - As a replacement for `&lt;&gt;`
-* `implies` - Logical implication
-* `|` - As a synonym for `union`
-
-=== Method-style Invocation
-
-One of the primary syntactic features of FHIRPath is the ability to "invoke" a function on a collection. For example:
-
-[source]
-----
-Patient.name.given.substring(3)
-----
-
-The CQL syntax is being extended to support this style of invocation, but as a short-hand for an equivalent CQL statement for each operator. For example:
-
-[source]
-----
-stringValue.substring(3, 5)
-----
-
-is allowed, and is considered a short-hand for the following CQL expression:
-
-[source]
-----
-Substring(stringValue, 3, 5)
-----
-
-For most functions, this short-hand is a simple rewrite, but for contextual functions such as `where()` and `select()`, this rewrite must preserve the context semantics:
-
-[source]
-----
-Patient.name.where(given = 'John')
-----
-
-is short-hand for:
-
-[source]
-----
-Patient.name N where N.given = 'John'
-----
-
-=== Strict Evaluation
-
-Because CQL is a type-safe language, embedded FHIRPath expressions should be compiled in _strict_ mode. However, to enable the use of FHIRPath in _loose_ mode, an implicit conversion from a list of elements to an element is added. This implicit conversion is implemented as an invocation of `singleton from`, ensuring that if the list has multiple elements at run-time an error will be thrown.
-
-In addition, the underlying Expression Logical Model (ELM) is being extended to allow for dynamic invocation. A `Dynamic` type is introduced with appropriate operators to support run-time invocation where necessary. However, these operators are introduced as an additional layer on top of core ELM, and CQL compiled with the _strict_ option will never produce expressions containing these elements. This avoids placing additional implementation burden on systems that do not need dynamic capabilities.
 
 [[hl7v2]]
 [appendix]
