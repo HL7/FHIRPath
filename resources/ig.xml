@@ -8,12 +8,11 @@
   <status value="draft"/>
   <experimental value="false"/>
   <publisher value="FHIR Project"/>
-  <package>
-    <name value="base"/>
-  </package>
+  <definition>
   <page>
-    <source value="index.html"/>
+    <nameUrl value="index.html"/>
     <title value="FHIRPath Specification"/>
-    <kind value="page"/>
+    <generation value="html"/>
   </page>
+  </definition>
 </ImplementationGuide>

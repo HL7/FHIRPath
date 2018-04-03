@@ -1,0 +1,1653 @@
+= FHIRPath (Normative Ballot)
+:page-layout: stu11ballot
+:sectnums:
+:sectanchors:
+:toc: macro
+
+FHIRPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (link:http://hl7.org/fhir[FHIR]) and HL7 Clinical Quality Language (link:http://cql.hl7.org/03-developersguide.html#using-fhirpath[CQL]).
+
+Looking for implementations? See http://wiki.hl7.org/index.php?title=FHIRPath_Implementations[FHIRPath Implementations on the HL7 wiki]
+
+Version: 1.1.0 Public Domain (http://creativecommons.org/publicdomain/zero/1.0/[Creative Commons 0])
+
+____
+NOTE: The appendices are included as additional documentation and are informative content.
+____
+
+toc::[]
+
+== Overview
+
+In Information Systems in general, and Healthcare Information Systems in particular, the need for formal representation of logic is both pervasive and critical. From low-level technical specifications, through intermediate logical architectures, up to the high-level conceptual descriptions of requirements and behavior, the ability to formally represent knowledge in terms of expressions and information models is essential to the specification and implementation of these systems.
+
+=== Requirements
+
+Of particular importance is the ability to easily and precisely express conditions of basic logic, such as those found in requirements constraints (e.g. Patients must have a name), decision support (e.g. if the patient has diabetes and has not had a recent comprehensive foot exam), cohort definitions (e.g. All male patients aged 60-75), protocol descriptions (e.g. if the specimen has tested positive for the presence of sodium), and numerous other environments.
+
+Precisely because the need for such expressions is so pervasive, there is no shortage of existing languages for representing them. However, these languages tend to be tightly coupled to the data structures, and even the information models on which they operate, XPath being a typical example. To ensure that the knowledge captured by the representation of these expressions can survive technological drift, a representation that can be used independent of any underlying physical implementation and information model is required.
+
+Languages meeting these additional requirements also exist, such as Java, JavaScript, C#, and others. However, these languages are both tightly coupled to the platforms in which they operate, and, because they are general-purpose development languages, come with much heavier tooling and technology dependencies than is warranted or desirable. Even constraining one of these grammars would be insufficient, resulting in the need to extend, defeating the purpose of basing it on an existing language in the first place.
+
+Given these constraints, and the lack of a specific language that meets all of these requirements, there is a need for a simple, lightweight, platform- and structure-independent graph traversal language. FHIRPath meets these requirements, and can be used within various environments to provide for simple but effective formal representation of expressions.
+
+=== Features
+
+* Graph-traversal: FHIRPath is a graph-traversal language; authors can clearly and concisely express graph traversal on hierarchical information models (e.g. HL7 V3, FHIR, vMR, CIMI, and QDM).
+* Fluent: FHIRPath has a syntax based on the https://en.wikipedia.org/wiki/Fluent_interface[Fluent Interface] pattern
+* Collection-centric: FHIRPath deals with all values as collections, allowing it to easily deal with information models with repeating elements.
+* Platform-independent: FHIRPath is a conceptual and logical specification that can be implemented in any platform.
+* Model-independent: FHIRPath deals with data as an abstract model, allowing it to be used with any information model.
+
+=== Usage
+
+In Fast Healthcare Interoperability Resources (FHIR), FHIRPath is used within the specification to provide formal definitions for conditions such as validation invariants, search parameter paths, etc. Within Clinical Quality Language (CQL), FHIRPath is used to simplify graph-traversal for hierarchical information models.
+
+In both FHIR and CQL, the model independence of FHIRPath means that expressions can be written that deal with the contents of the resources and data types as described in the Logical views, or the UML diagrams, rather than against the physical representation of those resources. JSON and XML specific features are not visible to the FHIRPath language (such as comments and the split representation of primitives (i.e. `value[x]`)).
+
+The expressions can in theory be converted to equivalent expressions in XPath, OCL, or another similarly expressive language.
+
+FHIRPath can be used against many other graphs as well. For example, <<hl7v2>> describes how FHIRPath is used in HL7 v2.
+
+=== Conventions
+
+Throughout this documentation, `monospace font` is used to delineate expressions of FHIRPath.
+
+Optional parameters to functions are enclosed in square brackets in the definition of a function. Note that the brackets are only used to indicate optionality in the signature, they are not part of the actual syntax of FHIRPath.
+
+All functions return a collection, but if the function or operation will always produce a collection containing a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : Boolean`
+
+== Navigation model
+
+FHIRPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FHIRPath query is run. This way, FHIRPath can be used on in-memory Java POJOs, Xml data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FHIRPath operates on a directed acyclic graph of classes as defined by a MOF-equivalent type system.
+
+Data are represented as a tree of labelled nodes, where each node may optionally carry a primitive value and have child nodes. Nodes need not have a unique label, and leaf nodes must carry a primitive value. For example, a (partial) representation of a FHIR Patient resource in this model looks like this:
+
+image:treestructure.png["Tree representation of a Patient",height="375",width="500"]
+
+The diagram shows a tree with a repeating `name` node, which represents repeating members of the FHIR object model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
+
+== Path selection
+
+FHIRPath allows navigation through the tree by composing a path of concatenated labels, e.g.
+
+[source]
+----
+name.given
+----
+
+This would result in a collection of nodes, one with the value "Wouter" and one with the value "Gert". In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The input collection at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step.
+
+The path may start with the type of the root node (which otherwise does not have a name), but this is optional. To illustrate this point, the path `name.given` above can be evaluated as an expression on a set of data of any type. However the expression may be prefixed with the name of the type of the root:
+
+[source]
+----
+Patient.name.given
+----
+
+The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`.
+
+Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use double quotes to include characters in path parts that would otherwise be interpreted as keywords or operators, e.g.:
+
+[source]
+----
+Message."PID-1"
+----
+
+=== Collections
+
+Collections are fundamental to FHIRPath, in that the result of every expression is a collection, even if that expression only results in a single element. This approach allows paths to be specified without having to care about the cardinality of any particular element, and is therefore ideally suited to graph traversal.
+
+Within FHIRPath, a collection is:
+
+* Ordered - The order of items in the collection is important and is preserved through operations as much as possible.
+* Non-Unique - Duplicate elements are allowed within a collection. Some functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
+* Indexed - Each item in a collection can be uniquely addressed by it's index, i.e. ordinal position within the collection. 
+* Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
+* Countable - The number of items in a given collection can always be determined using the `count()` function
+
+Note that the outcome of operations like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the logical order implied by the data model, and some may not, and some may be different depending on the underlying source.
+
+=== Paths and polymorphic items
+
+In the underlying representation of data, nodes may be typed and represent polymorphic items. Paths may either ignore the type of a node, and continue along the path or may be explicit about the expected node and filter the set of nodes by type before navigating down child nodes:
+
+[source]
+----
+Observation.value.unit - all kinds of value
+Observation.value.ofType(Quantity).unit - only values that are of type Quantity
+----
+
+The `is` operator can be used to determine whether or not a given value is of a given type:
+
+[source]
+----
+Observation.value is Quantity - returns true if the value is of type Quantity
+----
+
+The `as` operator can be used to treat a value as a specific type:
+
+[source]
+----
+Observation.value as Quantity - returns value as a Quantity if it is of type Quantity, and an empty result otherwise
+----
+
+The list of available types that can be passed as a parameter to the `ofType()` function and `is` and `as` operators is determined by the underlying data model. Within FHIRPath, they are just identifiers, either quoted or non-quoted.
+
+== Expressions
+
+=== Literals
+
+In addition to paths, FHIRPath expressions may contain _literals_ and _function invocations_. FHIRPath supports the following types of literals:
+
+[source]
+----
+Boolean: true, false
+String: 'test string', 'urn:oid:3.4.5.6.7.8'
+Integer: 0, 45
+Decimal: 0.0, 3.141592653589793236
+DateTime: @2015-02-04T14:34:28Z (`@` followed by ISO8601 compliant date/time)
+Time: @T14:34:28+09:00 (`@` followed by ISO8601 compliant time beginning with `T`)
+Quantity: 10 'mg', 4 days
+----
+
+==== String
+
+Unicode is supported in both string literals and quoted identifiers. String literals are surrounded by single quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
+
+* Unicode characters may be escaped using `\u` followed by four hex digits.
+* Additional escapes are those supported in JSON:
+** `\\` (backslash),
+** `\/` (slash),
+** `\f` (form feed - \u000c),
+** `\n` (newline - \u000a),
+** `\r` (carriage return - \u000d),
+** `\t` (tab - \u0009)
+** `\"` (double quote)
+** `\'` (single quote)
+
+==== Decimal
+
+Decimals cannot use exponential notation.
+
+==== DateTime
+
+`DateTime` uses a subset of ISO8601:
+
+* It uses the `YYYY-MM-DD` format, though month and day parts are optional
+* Week dates and ordinal dates are not allowed
+* Years must be present (`-MM-DD` is not a valid dateTime in FHIRPath)
+* Months must be present if a day is present
+* The date may be followed by a time as described in the next section.
+* Consult the formal grammar for more details.
+
+[source]
+----
+@2014-01-25
+@2014-01-25T14:30:14.559
+----
+
+==== Time
+
+`Time` uses a subset of ISO8601:
+
+* A time begins with a `T`
+* Timezone is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
+* `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
+
+[source]
+----
+@T12:00:00.0Z
+@T14:30:14.559-07:00
+----
+
+Consult the formal grammar for more details.
+
+==== Quantity
+
+`Quantity` is a number (integer or decimal), followed by a (single quoted) string representing a valid http://unitsofmeasure.org/trac[Unified Code for Units of Measure (UCUM)] unit:
+
+[source]
+----
+  4.5 'mg'
+  100 '[degF]'
+----
+
+[NOTE]
+====
+When using UCUM units within FHIRPath, implementations shall use case-sensitive comparisons.
+====
+
+For date/time units, an alternative representation may be used (note that both a plural and singular version exist):
+
+* `year`/`years`, `month`/`months`, `week`/`weeks`, `day`/`days`, `hour`/`hours`, `minute`/`minutes`, `second`/`seconds`, `millisecond`/`milliseconds`
+
+[source]
+----
+  1 year
+  4 days
+----
+
+[NOTE]
+====
+Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601.
+====
+
+=== Operators
+
+Expressions can also contain _operators_, like those for mathematical operations and boolean logic:
+
+[source]
+----
+Appointment.minutesDuration / 60 > 5
+MedicationAdministration.wasNotGiven implies MedicationAdministration.reasonNotGiven.exists()
+name.given | name.family // union of given and family names
+'sir ' + name.given
+----
+
+=== Functions
+
+Finally, FHIRPath supports the notion of functions, which all take a collection of values as input and produce another collection as output and may take parameters. For example:
+
+[source]
+----
+(name.given | name.family).substring(0,4)
+identifier.where(use = 'official')
+----
+
+Since all functions work on collections, constants will first be converted to a collection when functions are invoked on constants:
+
+[source]
+----
+(4+5).count()
+----
+
+will return `1`, since this is implicitly a collection with one constant number `9`.
+
+=== Null and empty
+
+There is no concept of `null` in FHIRPath. This means that when, in an underlying data object a member is null or missing, there will simply be no corresponding node for that member in the tree, e.g. `Patient.name` will return an empty collection (not null) if there are no name elements in the instance.
+
+In expressions, the empty collection is represented as `{}`.
+
+==== Propagation of empty results in expressions
+
+FHIRPath functions and operators both propagate empty results, but the behavior is in general different when the argument to the function or operator expects a collection (e.g. `select()`, `where()` and `|` (union)) versus when the argument to the function or operator takes a single value as input (e.g. `+` and `substring()`).
+
+For functions or operators that take a single values as input, this means in general if the input is empty, then the result will be empty as well. More specifically:
+
+* If a single-input function operates on an empty collection, the result is an empty collection
+* If a single-input function is passed an empty collection as an argument, the result is an empty collection
+* If any operand to a single-input operator is an empty collection, the result is an empty collection.
+
+For functions or arguments that expect collections, in general the empty collection is treated as any other collection would be. For example, the union (`|`) of an empty collection with a non-empty collection is the non-empty collection.
+
+When functions or operators behave differently from these general principles, (for example the `count()` and `empty()` functions), this is clearly documented in the next sections.
+
+=== Singleton Evaluation of Collections
+
+In general, when a collection is passed as an argument to a function or operator that expects a single item as input, the collection is implicitly converted to a singleton as follows:
+
+[source]
+----
+IF the collection contains a single node AND the node's value can be converted to the expected input type THEN
+  The collection evaluates to the value of that single node
+ELSE IF the collection contains a single node AND the expected input type is Boolean THEN
+  The collection evaluates to true
+ELSE IF the collection is empty THEN
+  The collection evaluates to an empty collection
+ELSE
+  An error is raised
+----
+
+Note that in the special case that the input type is Boolean and the value is not, if the collection contains a single item
+
+== Functions
+
+Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more parameters. With a few minor exceptions (e.g. the `today()` function), functions in FHIRPath always take a collection as input and produce another collection as output, even though these may be collections of just a single item.
+
+Correspondingly, arguments to the functions can be any FHIRPath expression, though functions taking a single item as input require these expressions to evaluate to a collection containing a single item of a specific type. This approach allows functions to be chained, successively operating on the results of the previous function in order to produce the desired final result.
+
+The following sections describe the functions supported in FHIRPath, detailing the expected types of parameters and type of collection returned by the function:
+
+* If the function expects a parameter to be a single value (e.g. `item(index: Integer)` and it is passed an argument that evaluates to a collection with multiple items or a collection with an item that is not of the required type, the evaluation of the expression will end and an error will be signaled to the calling environment.
+* If the function takes an `expression` as a parameter, the function will evaluate this parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` and `$index` elements, which represent the item from the input collection currently under evaluation, and its index in the collection, respectively. For example, in `name.given.where($this > 'ba' and $this < 'bc')` the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
+
+Note that the bracket notation in function signatures indicates optional parameters, and is not part of the formal syntax of FHIRPath.
+
+Note also that although all functions return collections, if a given function is defined to return a single element function, the return type is simplified to just the type of the single element, rather than the list type.
+
+=== Existence
+
+==== empty() : Boolean
+
+Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
+
+==== not() : Boolean
+
+Returns `true` if the input collection evaluates to `false`, and `false` if it evaluates to `true`. Otherwise, the result is empty (`{ }`):
+
+|===
+|&nbsp; |not
+
+|`true` |`false`
+|`false` |`true`
+|empty (`{ }`) |empty (`{ }`)
+|===
+
+==== exists([criteria : expression]) : Boolean
+
+Returns `true` if the collection has any elements, and `false` otherwise. This is the opposite of `empty()`, and as such is a shorthand for `empty().not()`. If the input collection is empty (`{ }`), the result is `false`.
+
+The operator can also take an optional criteria to be applied to the collection prior to the determination of the exists. In this case, the operation is shorthand for `where(criteria).exists()`.
+
+==== all(criteria : expression) : Boolean
+
+Returns `true` if for every element in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
+
+==== allTrue() : Boolean
+
+Takes a collection of Boolean values and returns `true` if all the items are `true`. If any items are `false`, the result is `false`. If the input is empty (`{ }`), the result is `true`.
+
+==== anyTrue() : Boolean
+
+Takes a collection of Boolean values and returns `true` if any of the items are `true`. If all the items are `false`, or if the input is empty (`{ }`), the result is `false`.
+
+==== allFalse() : Boolean
+
+Takes a collection of Boolean values and returns `true` if all the items are `false`. If any items are `true`, the result is `false`. If the input is empty (`{ }`), the result is `true`.
+
+==== anyFalse() : Boolean
+
+Takes a collection of Boolean values and returns `true` if any of the items are `false`. If all the items are `true`, or if the input is empty (`{ }`), the result is `false`.
+
+==== subsetOf(other : collection) : Boolean
+
+Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the equals (`=`) operation (see below).
+
+Conceptually, this function is evaluated by testing each element in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
+
+==== supersetOf(other : collection) : Boolean
+
+Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the equals (`=`) operation (see below).
+
+Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `false`. This means that if the input collection is empty (`{ }`), the result is `false`, otherwise if the `other` collection is empty (`{ }`), the result is `true`.
+
+==== isDistinct() : Boolean
+
+Returns `true` if all the items in the input collection are distinct. To determine whether two items are distinct, the equals (`=`) operator is used, as defined below.
+
+Conceptually, this function is shorthand for a comparison of the `count()` of the input collection against the `count()` of the `distinct()` of the input collection:
+
+[source]
+----
+X.count() = X.distinct().count()
+----
+
+This means that if the input collection is empty (`{ }`), the result is true.
+
+==== distinct() : collection
+
+Returns a collection containing only the unique items in the input collection. To determine whether two items are the same, the equals (`=`) operator is used, as defined below.
+
+If the input collection is empty (`{ }`), the result is empty.
+
+==== count() : Integer
+
+Returns a collection with a single value which is the integer count of the number of items in the input collection. Returns 0 when the input collection is empty.
+
+=== Filtering and projection
+
+==== where(criteria : expression) : collection
+
+Returns a collection containing only those elements in the input collection for which the stated `criteria` expression evaluates to `true`. Elements for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
+
+If the input collection is emtpy (`{ }`), the result is empty.
+
+==== select(projection: expression) : collection
+
+Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_). This means that if the evaluation for an element results in the empty collection (`{ }`), no element is added to the result, and that if the input collection is empty (`{ }`), the result is empty as well.
+
+[source]
+----
+Bundle.entry.select(resource as Patient)
+----
+
+This example results in a collection with only the patient resources from the bundle.
+
+[source]
+----
+Bundle.entry.select((resource as Patient).telecom.where(system = 'phone'))
+----
+
+This example results in a collection with all the telecom elements with system of `phone` for all the patients in the bundle.
+
+[source]
+----
+Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
+----
+
+==== repeat(projection: expression) : collection
+
+A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the equals (`=`) operator).
+
+This operation can be used to traverse a tree and selecting only specific children:
+
+[source]
+----
+ValueSet.expansion.repeat(contains)
+----
+
+Will repeat finding children called `contains`, until no new nodes are found.
+
+[source]
+----
+Questionnaire.repeat(group | question).question
+----
+
+Will repeat finding children called `group` or `question`, until no new nodes are found.
+
+Note that this is slightly different from:
+
+[source]
+----
+Questionnaire.descendants().select(group | question)
+----
+
+which would find *any* descendants called `group` or `question`, not just the ones nested inside other `group` or `question` elements.
+
+==== ofType(type : identifier) : collection
+
+Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty.
+
+[source]
+----
+Bundle.entry.resource.ofType(Patient)
+----
+
+=== Subsetting
+
+==== [ index : Integer ] : collection
+
+The indexer operation returns a collection with only the `index`-th item (0-based index). If the input collection is empty (`{ }`), or the index lies outside the boundaries of the input collection, an empty collection is returned.
+
+____
+
+Note: Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
+
+____
+
+Example:
+
+[source]
+----
+Patient.name[0]
+----
+
+==== single() : collection
+
+Will return the single item in the input if there is just one item. If the input collection is empty (`{ }`), the result is empty. If there are multiple items, an error is signaled to the evaluation environment. This operation is useful for ensuring that an error is returned if an assumption about cardinality is violated at run-time.
+
+==== first() : collection
+
+Returns a collection containing only the first item in the input collection. This function is equivalent to `item(0)`, so it will return an empty collection if the input collection has no items.
+
+==== last() : collection
+
+Returns a collection containing only the last item in the input collection. Will return an empty collection if the input collection has no items.
+
+==== tail() : collection
+
+Returns a collection containing all but the first item in the input collection. Will return an empty collection if the input collection has no items, or only one item.
+
+==== skip(num : Integer) : collection
+
+Returns a collection containing all but the first `num` items in the input collection. Will return an empty collection if there are no items remaining after the indicated number of items have been skipped, or if the input collection is empty. If `num` is less than or equal to zero, the input collection is simply returned.
+
+==== take(num : Integer) : collection
+
+Returns a collection containing the first `num` items in the input collection, or less if there are less than `num` items. If num is less than or equal to 0, or if the input collection is empty (`{ }`), `take` returns an empty collection.
+
+==== intersect(other: collection) : collection
+
+Returns the set of elements that are in both collections. Duplicate items will be eliminated by this operation.
+
+==== exclude(other: collection) : collection
+
+Returns the set of elements that are not in the other collections. Duplicate items will not be eliminated by this operation, and order will be preserved.
+
+e.g. Patient.children().exclude(name|birthDate) would return all the properties of the Patient except for the name and birthDate.
+
+=== Combining
+
+==== union(other : collection)
+
+Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
+
+This function can also be invoked using the | operator.
+
+----
+a.union(b)
+----
+
+is synonymous with
+
+----
+a | b
+----
+
+==== combine(other : collection) : collection
+
+Merge the input and other collections into a single collection without eliminating duplicate values. Combining an empty collection with a non-empty collection will return the non-empty collection. There is no expectation of order in the resulting collection.
+
+
+=== Conversion
+
+The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
+
+To use these functions over a collection with multiple items, one may use filters like `where()` and `select()`:
+
+[source]
+----
+Patient.name.given.select(substring(0))
+----
+
+This example returns a collection containing the first character of all the given names for a patient.
+
+==== iif(criterion: expression, true-result: collection [, otherwise-result: collection]) : collection
+
+If `criterion` is true, the function returns the value of `true-result` parameter.
+
+If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-expression` is not given, in which case the function returns an empty collection.
+
+==== isInteger() : Boolean
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is an Integer
+* the item is a String and is convertible to an Integer
+* the item is a Boolean
+
+If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\\+|-)?\d+`), the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== toInteger() : Integer
+
+If the input collection contains a single item, this function will return a single integer if:
+
+* the item is an Integer
+* the item is a String and is convertible to an integer
+* the item is a Boolean, where `true` results in a 1 and `false` results in a 0.
+
+If the item is not one the above types, the result is empty.
+
+If the item is a String, but the string is not convertible to an integer (using the regex format `(\\+|-)?\d+`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== isDecimal() : Boolean
+
+If the input collection contains a single item, this function will true if:
+
+* the item is an Integer or Decimal
+* the item is a String and is convertible to a decimal
+* the item is a Boolean
+
+If the item is not one of the above types, or is not convertible to a decimal (using the regex format `(\\+|-)?\d+('.'\d+)?`), the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== toDecimal() : Decimal
+
+If the input collection contains a single item, this function will return a single decimal if:
+
+* the item is an Integer or Decimal
+* the item is a String and is convertible to a decimal
+* the item is a Boolean, where `true` results in a `1.0` and `false` results in a `0.0`.
+
+If the item is not one of the above types, the result is empty.
+
+If the item is a String, but the string is not convertible to a decimal (using the regex format `(\\+|-)?\d+('.' \d+)?`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== isQuantity() : Boolean
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is an Integer, Decimal, or Quantity
+* the item is a String that is convertible to a quantity
+* the item is a Boolean
+
+If the item is not one of the above types, or is not convertible to a quantity (using the regex format `(\\+|-)?\d+(.\d+)? &#39;&lt;unit&gt;&#39;`), the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== toQuantity() : Quantity
+
+If the input collection contains a single item, this function will return a single quantity if:
+
+* the item is an Integer, or Decimal, where the resulting quantity will have the default unit (`&#39;1&#39;`)
+* the item is a Quantity
+* the item is a String and is convertible to a decimal
+* the item is a Boolean, where `true` results in the quantity `1.0 &#39;1&#39;`, and `false` results in the quantity `0.0 &#39;1&#39;`
+
+If the item is not one of the above types, the result is empty.
+
+If the item is a String, but the string is not convertible to a quantity (using the regex format `(\\+|-)?\d+('.' \d+)?` &#39;&lt;unit&gt;&#39;`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+If all other cases, the function will return an empty collection.
+
+==== isString() : String
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is a String
+* the item is an Integer, Decimal, Time, or DateTime
+* the item is a Boolean
+* the item is a Quantity
+
+If the item is not one of the above types, the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== toString() : String
+
+If the input collection contains a single item, this function will return a single String if:
+
+* the item in the input collection is a String
+* the item in the input collection is an Integer, Decimal, Time, DateTime, or Quantity the output will contain its String representation
+* the item is a Boolean, where `true` results in `&#39;true&#39;` and `false` in `&#39;false&#39;`.
+
+If the item is not one of the above types, the result is false.
+
+The String representation uses the following formats:
+
+|===
+|Type |Representation
+
+|`Boolean` |`true` or `false`
+|`Integer` |`(\\+\|-)?\d+`
+|`Decimal` |`(\\+\|-)?\d+(.\d+)?`
+|`Quantity` |`(\\+\|-)?\d+(.\d+)? &#39;&lt;unit&gt;&#39;`
+|`DateTime` |`YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`
+|`Time` |`Thh:mm:ss.fff(+/-)hh:mm`
+|===
+
+Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
+
+If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+=== String Manipulation
+
+The functions in this section operate on collections with a single item. If there is more than one item, or an item that is not a String, the evaluation of the expression will end and signal an error to the calling environment.
+
+==== indexOf(substring : String) : Integer
+
+If the input collection contains a single item of type String, will return the 0-based index of the first position this substring is found in the input string, or -1 if it is not found. If the `substring` is an empty string, the function returns 0.
+
+==== substring(start : Integer [, length : Integer]) : String
+
+If the input collection contains a single item of type String, it returns a collection with the part of the string starting at position `start` (zero-based). If `length` is given, will return at most `length` number of characters from the input string.
+
+If `start` lies outside the length of the string, the function returns an empty collection. If there are less remaining characters in the string than indicated by `length`, the function returns just the remaining characters.
+
+==== startsWith(prefix : String) : Boolean
+
+If the input collection contains a single item of type String, the function will return `true` when the input string starts with the given `prefix`. Also returns `true` when `prefix` is the empty string.
+
+==== endsWith(suffix : String) : Boolean
+
+If the input collection contains a single item of type String, the function will return `true` when the input string ends with the given `suffix`. Also returns `true` when `suffix` is the empty string.
+
+==== contains(substring : String) : Boolean
+
+If the input collection contains a single item of type String, the function will return `true` when the given `substring` is a substring of the input string. Also returns `true` when `substring` is the empty string.
+
+==== upper() : String
+
+If the input collection contains a single item of type String, the function will return the string with all characters converted to upper case.
+
+==== lower() : String
+
+If the input collection contains a single item of type String, the function will return the string with all characters converted to lower case.
+
+==== replace(pattern : String, substitution : String) : String
+
+If the input collection contains a single item of type String, the function will return the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string, the instances of the pattern are removed from the input string. If the pattern is the empty string, every character in the input string is surrounded by the substitution, e.g. `&#39;abc&#39;.replace(&#39;&#39;,&#39;x&#39;)` becomes `&#39;xaxbxcx&#39;`.
+
+==== matches(regex : String) : Boolean
+
+If the input collection contains a single item of type String, the function will return `true` when the value matches the given regular expression. Regular expressions should function consistently, regardless of any culture- and locale-specific settings in the environment, should be case-sensitive, use 'single line' mode and allow Unicode characters.
+
+==== replaceMatches(regex : String, substitution: String) : String
+
+If the input collection contains a single item of type String, the function will match the input using the regular expression in `regex` and replace each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression.
+
+This example of `replaceMatches()` will convert a string with a date formatted as MM/dd/yy to dd-MM-yy:
+
+[source]
+----
+'11/30/1972'.replace('\\b(?<month>\\d{1,2})/(?<day>\\d{1,2})/(?<year>\\d{2,4})\\b',
+       '${day}-${month}-${year}')
+----
+
+____
+
+Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the dialect defined by as part of https://www.w3.org/TR/xmlschema11-2/#regexs[XML Schema 1.1] as the dialect most likely to be broadly supported and understood.
+
+____
+
+==== length() : Integer
+
+If the input collection contains a single item of type String, the function will return the length of the string. If the input collection is empty (`{ }`), the result is empty.
+
+==== toChars() : collection
+
+If the input collection contains a single item of type String, the function will return the list of characters in the string. If the input collection is empty (`{ }`), the result is empty.
+
+[source]
+----
+'abc'.toChars() // { 'a', 'b', 'c' }
+----
+
+=== Tree navigation
+
+==== children() : collection
+
+Returns a collection with all immediate child nodes of all items in the input collection. Note that the ordering of the children is undefined and using operations like `first()` on the result may return different results on different platforms.
+
+==== descendants() : collection
+
+Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. Is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using operations like `first()` on the result may return different results on different platforms.
+
+____
+
+Note: Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See section 8 for more information about type safe use of FHIRPath expressions.
+
+____
+
+=== Utility functions
+
+==== trace(name : String) : collection
+
+Add a String representation of the input collection to the diagnostic log, using the parameter `name` as the name in the log. This log should be made available to the user in some appropriate fashion. Does not change the input, so returns the input collection as output.
+
+==== today() : dateTime
+
+Returns a dateTime containing the current date.
+
+==== now() : dateTime
+
+Returns a dateTime containing the current date and time, including timezone.
+
+== Operations
+
+Operators are allowed to be used between any kind of path expressions (e.g. expr op expr). Like functions, operators will generally propagate an empty collection in any of their operands. This is true even when comparing two empty collections using the equality operators, e.g.
+
+[source]
+----
+{} = {}
+true > {}
+{} != 'dummy'
+----
+
+all result in `{}`.
+
+=== Equality
+
+==== = (Equals)
+
+Returns `true` if the left collection is equal to the right collection:
+
+If both operands are collections with a single item:
+
+* For primitives:
+** `String`: comparison is based on Unicode values
+** `Integer`: values must be exactly equal
+** `Decimal`: values must be equal, trailing zeroes are ignored
+** `Boolean`: values must be the same
+** `DateTime`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
+** `Time`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
+** If a time or date/time has no indication of timezone, the timezone of the evaluating machine is assumed.
+* For complex types, equality requires all child properties to be equal, recursively.
+
+If both operands are collections with multiple items:
+
+* Each item must be equal
+* Comparison is order dependent
+
+Otherwise, equals returns `false`.
+
+Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
+
+Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = &#39;phone&#39;` will return `false` if there is more than one `telecom` with a `use`. Typically, you'd want `Patient.telecom.where(system = 'phone')`
+
+If one or both of the operands is the empty collection, this operation returns an empty collection.
+
+When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+
+Implementations that do support units SHALL do so as specified by UCUM.
+
+For `DateTime` and `Time` comparisons with partial values (e.g. date/times specified only to the day, or times specified only to the hour), the comparison returns empty (`{ }`), not `false`.
+
+==== ~ (Equivalent)
+
+Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }` will result in `true`.
+
+If both operands are collections with a single item:
+
+* For primitives
+	* `String`: the strings must be the same while ignoring case and normalizing whitespace.
+	* `Integer`: exactly equal
+	* `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes are ignored in determining precision.
+	* `DateTime` and `Time`: values must be equal, except that for partial date/time values, the comparison returns `false`, not empty (`{ }`). If one operand has less precision than the other, comparison is done at the lowest precision.
+	* `Boolean`: the values must be the same
+* For complex types, equivalence requires all child properties to be equivalent, recursively.
+
+If both operands are collections with multiple items:
+
+* Each item must be equivalent
+* Comparison is not order dependent
+
+Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
+
+When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+
+Implementations that do support units SHALL do so as specified by UCUM.
+
+==== != (Not Equals)
+
+The inverse of the equals operator.
+
+==== !~ (Not Equivalent)
+
+The inverse of the equivalent operator.
+
+=== Comparison
+
+* The comparison operators are defined for strings, integers, decimals, datetimes and times.
+* If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
+* Both arguments must be collections with single values, and the evaluator will throw an error if either collection has more than one item.
+* Both arguments must be of the same type, and the evaluator will throw an error if the types differ.
+* When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible.
+* String ordering is strictly lexical and is based on the Unicode value of the individual characters.
+
+When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+
+Implementations that do support units SHALL do so as specified by UCUM.
+
+For partial date/time values, the comparison is performed to the highest precision specified in both values.
+
+==== &gt; (Greater Than)
+
+==== &lt; (Less Than)
+
+==== &lt;= (Less or Equal)
+
+==== &gt;= (Greater or Equal)
+
+=== Types
+
+==== is
+
+If the left operand is a collection with a single item and the second operand is a type identifier, this operator returns `true` if the type of the left operand is the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If the input collections contains more than one item, the evaluator will throw an error. In all other cases this function returns the empty collection.
+
+[source]
+----
+Patient.contained.all($this is Patient implies age > 10)
+----
+
+This example returns true if for all the contained resources, if the contained resource is of type `Patient`, then the `age` is greater than ten.
+
+==== as
+
+If the left operand is a collection with a single item and the second operand is an identifier, this function returns the value of the left operand if it is of the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If there is more than one item in the input collection, the evaluator will throw an error. Otherwise, this operator returns the empty collection.
+
+[source]
+----
+Observation.component.where((value as Quantity) > 30 'mg')
+----
+
+=== Collections
+
+==== | (union collections)
+Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
+
+==== in (membership)
+If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
+
+==== contains (containership)
+If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. This is the inverse operation of in.
+
+=== Boolean logic
+For all boolean operators, the collections passed as operands are first evaluated as Booleans (as described in <<Singleton Evaluation of Collections>>). The operators then use three-valued logic to propagate empty operands.
+
+____
+
+Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If a condition is needed to ensure correct evaluation of a subsequent expression, the `iif()` function should be used to guarantee that the condition determines whether evaluation of an expression will occur at run-time.
+____
+
+==== and
+
+Returns `true` if both operands evaluate to `true`, `false` if either operand evaluates to `false`, and the empty collection (`{ }`) otherwise:
+
+|===
+|&nbsp; |`true` |`false` |empty (`{ }`)
+
+|`true` |`true` |`false` |empty (`{ }`)
+|`false` |`false` |`false` |`false`
+|empty (`{ }`) |empty (`{ }`) |`false` |empty (`{ }`)
+|===
+
+==== or
+
+Returns `false` if both operands evaluate to `false`, `true` if either operand evaluates to `true`, and empty (`{ }`) otherwise:
+
+|===
+|&nbsp; |`true` |`false` |empty (`{ }`)
+
+|`true` |`true` |`true` |`true`
+|`false` |`true` |`false` |empty (`{ }`)
+|empty (`{ }`) |`true` |empty (`{ }`) |empty (`{ }`)
+|===
+
+==== xor
+
+Returns `true` if exactly one of the operands evaluates to `true`, `false` if either both operands evaluate to `true` or both operands evaluate to `false`, and the empty collection (`{ }`) otherwise:
+
+|===
+|&nbsp; |`true` |`false` |empty (`{ }`)
+
+|`true` |`false` |`true` |empty (`{ }`)
+|`false` |`true` |`false` |empty (`{ }`)
+|empty (`{ }`) |empty (`{ }`) |empty (`{ }`) |empty (`{ }`)
+|===
+
+==== implies
+
+If the left operand evaluates to `true`, this operator returns the boolean evaluation of the right operand. If the left operand evaluates to `false`, this operator returns `true`. Otherwise, this operator returns `true` if the right operand evaluates to `true`, and the empty collection (`{ }`) otherwise.
+
+|===
+|&nbsp; |`true` |`false` |empty (`{ }`)
+
+|`true` |`true` |`false` |empty (`{ }`)
+|`false` |`true` |`true` |`true`
+|empty (`{ }`) |`true` |empty (`{ }`) |empty (`{ }`)
+|===
+
+The implies operator is useful for testing conditionals. For example, if a given name is present, then a family name must be as well:
+
+[source]
+----
+Patient.name.given.exists() implies Patient.name.family.exists()
+----
+
+=== Math
+
+The math operators require each operand to be a single element. Both operands must be of the same type, each operator below specifies which types are supported.
+
+If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
+
+As with the other operators, the math operators will return an empty collection if one or both of the operands are empty.
+
+When operating on quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+
+Implementations that do support units SHALL do so as specified by UCUM.
+
+==== * (multiplication)
+
+Multiplies both arguments (numbers and quantities). For multiplication involving quantities, the resulting quantity will have the appropriate unit:
+
+[source]
+----
+12 'cm' * 3 'cm' // 36 'cm2'
+3 'cm' * 12 'cm2' // 36 'cm3'
+----
+
+==== / (division)
+
+Divides the left operand by the right operand (numbers and quantities). The result of a division is always Decimal, even if the inputs are both Integer. For integer division, use the `div` operator.
+
+For division involving quantities, the resulting quantity will have the appropriate unit:
+
+[source]
+----
+12 'cm2' / 3 'cm' // 4.0 'cm'
+----
+
+==== + (addition)
+
+For Integer, Decimal, and quantity, adds the operands. For strings, concatenates the right operand to the left operand.
+
+When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
+
+==== - (subtraction)
+
+Subtracts the right operand from the left operand (numbers and quantities).
+
+When subtracting quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
+
+==== div
+
+Performs truncated division of the left operand by the right operand (numbers only).
+
+==== mod
+
+Computes the remainder of the truncated division of its arguments (numbers only).
+
+==== &amp; (String concatenation)
+
+For strings, will concatenate the strings, where an empty operand is taken to be the empty string. This differs from `+` on two strings, which will result in an empty collection when one of the operands is empty.
+
+=== Date/Time Arithmetic
+
+Date and time arithmetic operators are used to add time-valued quantities to date/time values. The left operand must be a `DateTime` or `Time` value, and the right operand must be a `Quantity` with a time-valued unit:
+
+* `year`, `years`, or `&#39;a&#39;`
+* `month`, `months`, or `&#39;mo&#39;`
+* `week`, `weeks` or `&#39;wk&#39;`
+* `day`, `days`, or `&#39;d&#39;`
+* `hour`, `hours`, or `&#39;h&#39;`
+* `minute`, `minutes`, or `&#39;min&#39;`
+* `second`, `seconds`, or `&#39;s&#39;`
+* `millisecond`, `milliseconds`, or `&#39;ms&#39;`
+
+If there is more than one item, or an item of an incompatible type, the evaluation of the expression will end and signal an error to the calling environment.
+
+If either or both arguments are empty (`{ }`), the result is empty (`{ }`).
+
+==== + (addition)
+
+Returns the value of the given `DateTime` or `Time`, incremented by the time-valued quantity, respecting variable length periods for calendar years and months.
+
+For `DateTime` values, the quantity unit must be one of: `years`, `months`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
+
+For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
+
+For partial date/time values, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value. For example:
+
+[source]
+----
+@2014 + 24 months
+----
+
+This expression will evaluate to the value `@2016` even though the date/time value is not specified to the level of precision of the time-valued quantity.
+
+==== - (subtraction)
+
+Returns the value of the given `DateTime` or `Time`, decremented by the time-valued quantity, respecting variable length periods for calendar years and months.
+
+For `DateTime` values, the quantity unit must be one of: `years`, `months`, `days`, `hours`, `minutes`, `seconds`, `milliseconds` (or an equivalent unit), or an error is raised.
+
+For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
+
+For partial date/time values, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then subtracting from the date/time value. For example:
+
+[source]
+----
+@2014 - 24 months
+----
+
+This expression will evaluate to the value `@2012` even though the date/time value is not specified to the level of precision of the time-valued quantity.
+
+=== Operator precedence
+
+Precedence of operations, in order from high to low:
+
+[source]
+----
+#01 . (path/function invocation)
+#02 [] (indexer)
+#03 unary + and -
+#04: *, /, div, mod
+#05: +, -, &
+#06: is, as
+#07: |
+#08: >, <, >=, <=
+#09: =, ~, !=, !~
+#10: in, contains
+#11: and
+#12: xor, or
+#13: implies
+----
+
+As customary, expressions may be grouped by parenthesis (`()`).
+
+== Aggregates
+FHIRPath supports a general-purpose aggregate operator to enable operations such as sum, min, and max to be expressed:
+
+=== aggregate(aggregator : expression [, init : value]) : value
+Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
+
+The value of the `$total` variable is set to `init`, or empty (`{ }`) if no `init` value is supplied, and is set to the result of the aggregator expression after every iteration.
+
+Using this operator, sum can be expressed as:
+
+[source]
+----
+value.aggregate($this + $total, 0)
+----
+
+Min can be expressed as:
+
+[source]
+----
+value.aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))
+----
+
+and average would be expressed as:
+
+[source]
+----
+value.aggregate($total + $this, 0) / value.count()
+----
+
+== Lexical Elements
+FHIRPath defines the following lexical elements:
+
+|===
+|Element|Description
+
+|Whitespace
+|Whitespace defines the separation between tokens in the language
+
+|Comment
+|Comments are ignored by the language, allowing for descriptive text
+
+|Literal
+|Literals allow basic values to be represented within the language
+
+|Symbol
+|Symbols such as `+`, `-`, `*`, and `/`
+
+|Keyword
+|Grammar-recognized tokens such as `and`, `or` and `in`
+
+|Identifier
+|Labels such as type names and property names
+|===
+
+=== Whitespace
+FHIRPath defines _tab_, _space_, and _return_ as _whitespace_, meaning they are only used to separate other tokens within the language. Any number of whitespace characters can appear, and the language does not use whitespace for anything other than delimiting tokens.
+
+=== Comments
+FHIRPath defines two styles of comments, _single-line_, and _multi-line_. A single-line comment consists of two forward slashes, followed by any text up to the end of the line:
+
+[source]
+----
+2 + 2 // This is a single-line comment
+----
+
+To begin a multi-line comment, the typical forward slash-asterisk token is used. The comment is closed with an asterisk-forward slash, and everything enclosed is ignored:
+
+[source]
+----
+/*
+This is a multi-line comment
+Any text enclosed within is ignored
+*/
+----
+
+=== Literals
+Literals provide for the representation of values within FHIRPath. The following types of literals are supported:
+
+|===
+|Literal|Description
+
+|Empty (`{ }`)
+|The empty collection
+
+|Boolean
+|The boolean literals (`true` and `false`)
+
+|Integer
+|Sequences of digits in the range 0-2^32-1
+
+|Decimal
+|Sequences of digits with a decimal point, in the range 0.0..10^28-10^-8
+
+|String
+|Strings of any character enclosed within single-ticks (`'`)
+
+|DateTime
+|The at-symbol (`@`) followed by a datetime
+
+|Time
+|The at-symbol (`@`) followed by a time
+
+|Quantity
+|An integer or decimal literal followed by a datetime precision specifier, or a UCUM unit specifier
+|===
+
+For a more detailed discussion of the use and semantics of literals within expressions, refer to the Expressions section above.
+
+=== Symbols
+Symbols provide structure to the language and allow symbolic invocation of common operators such as addition. FHIRPath defines the following symbols:
+
+|===
+|Symbol|Description
+
+|`()`
+|Parentheses for delimiting groups within expressions
+
+|`[]`
+|Brackets for indexing into lists and strings
+
+|`{}`
+|Braces for delimiting lists
+
+|`.`
+|Period for qualifiers, accessors, and dot-invocation
+
+|`,`
+|Comma for delimiting items in a syntactic list
+
+|`= != <= < > >=`
+|Comparison operators for comparing values
+
+|`+ - * / | &`
+|Arithmetic and other operators for performing computation
+|===
+
+=== Keywords
+Keywords are tokens that are recognized by the parser and used to build the various language constructs. FHIRPath defines the following keywords:
+
+|===
+|`$index`|`hours`|`months`
+|`$this`|`implies`|`or`
+|`and`|`in`|`second`
+|`as`|`is`|`seconds`
+|`contains`|`millisecond`|`true`
+|`day`|`milliseconds`|`week`
+|`days`|`minute`|`xor`
+|`div`|`minutes`|`year`
+|`false`|`mod`|`years`
+|`hour`|`month`|
+|===
+
+In general, keywords within FHIRPath are also considered _reserved_ words, meaning that it is illegal to use them as identifiers. If necessary, identifiers that clash with a reserved word can be quoted.
+
+=== Identifiers
+Identifiers are used as labels to allow expressions to reference elements such as model types and properties. FHIRPath supports two types of identifiers, _simple_ and _quoted_.
+
+A simple identifier is any alphabetical character or an underscore, followed by any number of alpha-numeric characters or underscores. For example, the following are all valid simple identifiers:
+
+[source]
+----
+Patient
+_id
+valueDateTime
+----
+
+A quoted identifier is any sequence of characters enclosed in double-quotes (`"`):
+
+[source]
+----
+"QI-Core Patient"
+"US-Core Diagnostic Request"
+"us-zip"
+----
+
+The use of double-quotes allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have property or type names that are not valid simple identifiers.
+
+FHIRPath escape sequences for strings also work for quoted identifiers:
+
+
+|===
+|Escape|Character
+
+|`\'`|Single-quote
+|`\"`|Double-quote
+|`\r`|Carriage Return
+|`\n`|Line Feed
+|`\t`|Tab
+|`\f`|Form Feed
+|`\\`|Backslash
+|`\uXXXX`|Unicode character, where XXXX is the hexadecimal representation of the character
+|===
+
+=== Case-Sensitivity
+FHIRPath is a case-sensitive language, meaning that case is considered when matching keywords in the language. However, because FHIRPath can be used with different models, the case-sensitivity of type and property names is defined by each model.
+
+== Environment variables
+
+A token introduced by a % refers to a value that is passed into the evaluation engine by the calling environment. Using environment variables, authors can avoid repetition of fixed values and can pass in external values and data.
+
+The following environmental values are set for all contexts:
+
+[source]
+----
+%ucum       // (string) url for ucum
+%context	// The original node that was passed to the evaluation engine before starting evaluation
+----
+
+Implementers should note that using additional environment variables is a formal extension point for the language. Various usages of FHIRPath may define their own externals, and implementers should provide some appropriate configuration framework to allow these constants to be provided to the evaluation engine at run-time. E.g.:
+
+[source]
+----
+%"us-zip" = '[0-9]{5}(-[0-9]{4}){0,1}'
+----
+
+Note that the identifier portion of the token is allowed to be either a simple identifier (as in `%ucum`), or a quoted identifier to allow for alternative characters (as in `%"us-zip"`).
+
+Note also that these tokens are not restricted to simple types, and they may have values that are not defined fixed values known prior to evaluation at run-time, though there is no way to define these kind of values in implementation guides.
+
+== Types and Reflection
+
+FHIRPath defines a basic set of primitive types, plus a Quantity:
+
+[source]
+----
+Boolean: true, false
+String: 'test string', 'urn:oid:3.4.5.6.7.8'
+Integer: 0, 45
+Decimal: 0.0, 3.141592653589793236
+DateTime: @2015-02-04T14:34:28Z (`@` followed by ISO8601 compliant date/time)
+Time: @T14:34:28+09:00 (`@` followed by ISO8601 compliant time beginning with `T`)
+Quantity: 10 'mg', 4 days
+----
+
+=== System Types
+
+==== System.Boolean
+
+The `Boolean` type represents the logical Boolean values `true` and `false`.
+
+==== System.String
+
+The `String` type represents string values up to `2^31-1` characters in length.
+
+==== System.Integer
+
+The `Integer` type represents whole numbers in the range `-2^31` to `2^31-1`.
+
+==== System.Decimal
+
+The `Decimal` type represents real values in the range -10^28-10^-8 to 10^28-10^-8 with a step size of 10^-8. This range is defined based on a survey of decimal-value implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger decimals and higher precision, but must provide at least the range and precision defined here. In addition, implementations should use fixed-precision decimal formats to ensure that decimal values are accurately represented.
+
+==== System.DateTime
+
+The `DateTime` type represents date and time values with potential uncertainty in the range `@0001-01-01T00:00:00.0 to @9999-12-31T23:59:59.999` with a 1 millisecond step size. This range is defined based on a survey of datetime implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger ranges and higher precision, but must provide at least the range and precision defined here.
+
+==== System.Time
+
+The `Time` type represents time-of-day values with potential uncertainty in the range @T00:00:00.0 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. Implementations can provide support for higher precision, but must provide at least the range and precision defined here.
+
+==== System.Quantity
+
+The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be a valid UCUM unit.
+
+=== Models
+
+Because FHIRPath is defined to work in multiple contexts, each context provides the definition for the structures available in that context. These structures are the *model* available for FHIRPath expressions. For example, within FHIR, the FHIR data types and resources are the model. To prevent namespace clashes, the type names within each model are prefixed (or namespaced) with the name of the model. For example, the fully qualified name of the Patient resource in FHIR is `FHIR.Patient`.
+
+When resolving a type name, the context-specific model is searched first. If no match is found, the system model (containing only the built-in types defined in the previous section) is searched.
+
+=== Reflection
+
+FHIRPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection, using one of the following concrete subtypes of `TypeInfo`:
+
+For primitive types, the result is a `SimpleTypeInfo`:
+
+[source]
+----
+SimpleTypeInfo { namespace: string, name: string, baseType: TypeSpecifier }
+----
+
+For class types, the result is a `ClassInfo`:
+
+[source]
+----
+ClassInfoElement { name: string, type: TypeSpecifier, isOneBased: Boolean }
+ClassInfo { namespace: string, name: string, baseType: TypeSpecifier, element: List<ClassInfoElement> }
+----
+
+For collection types, the result is a `ListTypeInfo`:
+
+[source]
+----
+ListTypeInfo { elementType: TypeSpecifier }
+----
+
+And for anonymous types, the result is a `TupleTypeInfo`:
+
+[source]
+----
+TupleTypeInfoElement { name: string, type: TypeSpecifier, isOneBased: Boolean }
+TupleTypeInfo { element: List<TupleTypeInfoElement> }
+----
+
+____
+
+Note: These structures are a subset of the abstract metamodel used by the https://github.com/cqframework/clinical_quality_language[Clinical Quality Language Tooling].
+
+____
+
+== Type safety and strict evaluation
+
+Strongly typed languages are intended to help authors avoid mistakes by ensuring that the expressions describe meaningful operations. For example, a strongly typed language would typically disallow the expression:
+
+[source]
+----
+1 + 'John'
+----
+
+because it performs an invalid operation, namely adding numbers and strings. However, there are cases where the author knows that a particular invocation may be safe, but the compiler is not aware of, or cannot infer, the reason. In these cases, type-safety errors can become an unwelcome burden, especially for experienced developers.
+
+Because FHIRPath may be used in different situations and environments requiring different levels of type safety, implementations may make different choices about how much type checking should be done at compile-time versus run-time, and in what situations. Some implementations requiring a high degree of type-safety may choose to perform strict type-checking at compile-time for all invocations. On the other hand, some implementations may be unconcerned with compile-time versus run-time checking and may choose to defer all correctness checks to run-time.
+
+For example, since some functions and most operators will only accept a single item as input (and throw a run-time exception otherwise):
+
+[source]
+----
+Patient.name.given + ' ' + Patient.name.family
+----
+
+will work perfectly fine, as long as the patient has a single name, but will fail otherwise. It is in fact "safer" to formulate such statements as either:
+
+[source]
+----
+Patient.name.select(given + ' ' + family)
+----
+
+which would return a collection of concatenated first and last names, one for each name of a patient. Of course, if the patient turns out to have multiple given names, even this statement will fail and the author would need to choose the first name in each collection explicitly:
+
+[source]
+----
+Patient.name.first().select(given.first() + ' ' + family.first())
+----
+
+It is clear that, although more robust, the last expression is also much more elaborate, certainly in situations where, because of external constraints, the author is sure names will not repeat, even if the unconstrained data model allows repetition.
+
+Apart from throwing exceptions, unexpected outcomes may result because of the way the equality operators are defined. The expression
+
+[source]
+----
+Patient.name.given = 'Wouter'
+----
+
+will return false as soon as a patient has multiple names, even though one of those may well be 'Wouter'. Again, this can be corrected:
+
+[source]
+----
+Patient.name.where(given = 'Wouter').exists()
+----
+
+but is still less concise than would be possible if constraints were well known in advance.
+
+In cases where compile-time checking like this is desirable, implementations may choose to protect against such cases by employing strict typing. Based on the definitions of the operators and functions involved in the expression, and given the types of the inputs, a compiler can analyze the expression and determine whether "unsafe" situations can occur.
+
+Unsafe uses are:
+
+* A function that requires an input collection with a single item is called on an output that is not guaranteed to have only one item.
+* A function is passed an argument that is not guaranteed to be a single value.
+* A function is passed an input value or argument that is not of the expected type
+* An operator that requires operands to be collections with a single item is called with arguments that are not guaranteed to have only one item.
+* An operator has operands that are not of the expected type
+* Equality operators are used on operands that are not both collections or collections containing a single item of the same type.
+
+There are a few constructs in the FHIRPath language where the compiler cannot determine the type:
+
+* The `children()` and `descendants()` functions
+* The `resolve()` function
+* A member which is polymorphic (e.g. a choice[x] type in FHIR)
+
+Authors can use the `as` operator or `ofType()` function directly after such constructs to inform the compiler of the expected type.
+
+In cases where a compiler finds places where a collection of multiple items can be present while just a single item is expected, the author will need to make explicit how repetitions are dealt with. Depending on the situation one may:
+
+* Use `first()`, `last()` or indexer (`[ ]`) to select a single item
+* Use `select()` and `where()` to turn the expression into one that evaluates each of the repeating items individually (as in the examples above)
+
+== Formal Specifications
+
+=== Formal Syntax
+
+The formal syntax for FHIRPath is specified as an http://www.antlr.org/[Antlr 4.0] grammar file (g4) and included in this specification at the following link:
+
+link:grammar.html[grammar.html]
+
+=== Model Information
+
+The model information returned by the reflection function `type()`  is specified as an XML Schema document (xsd) and included in this specification at the following link:
+
+link:modelinfo.xsd[modelinfo.xsd]
+
+NOTE: The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the http://github.com/cqframework/clinical_quality_language[Clinical Quality Framework Tooling] and is included for reference as a simple formalism that meets the requirements described in the normative <<reflection,Reflection>> section above.
+
+As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and tooling should respect the case-sensitive settings for each model.
+
+=== URI and Media Types
+To uniquely identify the FHIRPath language, the following URI is defined:
+
+http://hl7.org/fhirpath
+
+In addition, a media type is defined to support describing FHIRPath content:
+
+text/fhirpath
+
+[[hl7v2]]
+[appendix]
+== Use of FHIRPath on HL7 Version 2 messages
+
+
+FHIRPath can be used against HL7 v2 messages. This UML diagram summarises the 
+object model on which the FHIRPath statements are written:
+
+image:v2-object-model.png["Object Model for HL7 v2",height="456",width="760"]
+
+In this Object Model:
+
+* The object graph always starts with a message.
+* Each message has a list of segments.
+* In addition, Abstract Message Syntax is available through the groups() operation, for use where the message follows the Abstract Message Syntax sufficiently for the parser to reconcile the segment list with the structure.
+* The names of the groups are the names published in the specification, e.g. 'PATIENT_OBSERVATION' (with spaces, where present, replaced by underscores. In case of doubt, consult the v2 XML schemas).
+* Each Segment has a list of fields, which each have a list of "Cells". This is necessary to allow for repeats, but users are accustomed to just jumping to Element - use the operation elements() which returns all repeats with the given index.
+* A "cell" can be either an Element, a Component or a Sub-Components. Elements can contain Components, which can contain Sub-Components. Sub-Sub-Components are not allowed.
+* Calls may have a simple text content, or a series of (sub-)components. The simple() operation returns either the text, if it exists, or the return value of simple() from the first component
+* A v2 data type (e.g. ST, SN, CE etc) is a profile on Cell that specifies whether it has simple content, or complex content.
+* todo: this object model doesn't make provision for non-syntax escapes in the simple content (e.g. \.b\).
+* all the lists are 1 based. That means the first item in the list is numbered 1, not 0.
+
+Some example queries:
+
+[source]
+----
+Message.segment.where(code = 'PID').field[3].element.first.simple()
+----
+
+Get the value of the first component in the first repeat of PID-3
+
+[source]
+----
+Message.segment[2].elements(3).simple()
+----
+
+Get a collection  with is the string values of all the repeats in the the 3rd element of the 2nd segement. Typically, this assumes that there is no repeats, and so this is a simple value
+
+[source]
+----
+Message.segment.where(code = 'PID').field[3].element.where(component[4].value = 'MR').simple()
+----
+
+Pick out the MR number from PID-3 (assuming, in this case, that there's only one PID segment in the message. No good for an A17). Note that this returns the whole Cell - e.g. |value^^^^MR|, though often more components will be present)
+
+[source]
+----
+Message.segment.where(code = 'PID').elements(3).where(component[4].value = 'MR').component[1].text
+----
+
+Same as the last, but pick out just the MR value
+
+[source]
+----
+Message.group("PATIENT").group("PATIENT_OBSERVATION").item.ofType(Segment)
+  .where(code = 'OBX' and elements(2).any(components(2) = 'LN')))
+----
+
+return any OBXs from the patient observations (and ignore others e.g. in a R01 message) segments that have LOINC codes.
+Note that if the parser cannot properly parse the Abstract Message Syntax, group() must fail with an error message.
+
+[appendix]
+== FHIRPath Tooling and Implementation
+
+This section lists known tooling and implementation projects for the FHIRPath language:
+
+* JavaScript: http://niquola.github.io/fhirpath-demo/#/
+* Java RI: In the FHIR build tooling at org.hl7.fhir.dstu3.utils.FHIRPathEngine
+* Pascal RI: https://github.com/grahamegrieve/fhirserver/blob/master/reference-platform/dstu3/FhirPath.pas
+* .NET RI: https://github.com/ewoutkramer/fhir-net-fhirpath
+
+In addition, there is a Notepad++ FHIR Plugin that enables evaluation of FHIRPath expressions:
+
+http://www.healthintersections.com.au/?p=2386
+
+There is a test harness for FHIRPath here:
+
+https://github.com/brianpos/FhirPathTester
+
+The CQL-to-ELM translator that is maintained as part of the tooling for Clinical Quality Language supports FHIRPath:
+
+https://github.com/cqframework/clinical_quality_language
+
+For the most current listing of known implementations, refer to the HL7 wiki:
+
+http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
+
+[appendix]
+== References
+
+[bibliography]
+- [[[ANTLR]]] Another Tool for Language Recognition (ANTLR) http://www.antlr.org/
+- [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.2. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
+- [[[XMLRE]]] Regular Expressions. https://www.w3.org/TR/xmlschema11-2/#regexs
+- [[[PCRE]]] Pearl-Compatible Regular Expressions. http://www.pcre.org/
+
+
+
+
