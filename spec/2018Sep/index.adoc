@@ -559,7 +559,50 @@ If `criterion` is true, the function returns the value of `true-result` paramete
 
 If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-expression` is not given, in which case the function returns an empty collection.
 
-==== isInteger() : Boolean
+==== convertsToBoolean() : Boolean
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is a Boolean
+* the item is an Integer and is convertible to a Boolean using one of the possible integer representations of Boolean values
+* the item is a String and is convertible to a Boolean using one of the possible string representations of Boolean values
+
+If the item is not one of the above types, or the item is a String or Integer, but is not one of the possible values convertible to a Boolean, the result is false.
+
+Possible values for Integer and String are described in the toBoolean() function.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== toBoolean() : Boolean
+
+If the input collection contains a single item, this function will return a single integer if:
+
+* the item is an Boolean
+* the item is an Integer and is convertible to a Boolean using one of the possible integer representations of Boolean values
+* the item is a String and is convertible to a Boolean using one of the possible string representations of Boolean values
+
+If the item is not one the above types, or the item is a String or Integer, but is not one of the possible values convertible to a Boolean, the result is empty.
+
+If the item is a String, but the string is not convertible to an integer (using the regex format `(\\+|-)?\d+`), the result is empty.
+
+The following table describes the possible values convertible to an Boolean:
+
+|===
+|Type |Representation |Result
+
+|`String` |`'true'`, `'t'`, `'yes'`, `'y'`, '`1`' |`true`
+| |`'false'`, `'f'`, `'no'`, `'n'`, '`0`' |`false`
+| `Integer` |`1` |`true`
+| |`0` |`false`
+|===
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== convertsToInteger() : Boolean
 
 If the input collection contains a single item, this function will return true if:
 
@@ -569,7 +612,7 @@ If the input collection contains a single item, this function will return true i
 
 If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\\+|-)?\d+`), the result is false.
 
-If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 In all other cases, the function will return an empty collection.
 
@@ -585,11 +628,39 @@ If the item is not one the above types, the result is empty.
 
 If the item is a String, but the string is not convertible to an integer (using the regex format `(\\+|-)?\d+`), the result is empty.
 
-If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 In all other cases, the function will return an empty collection.
 
-==== isDecimal() : Boolean
+==== convertsToDateTime() : Boolean
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is a DateTime
+* the item is a String and is convertible to a DateTime
+
+If the item is not one of the above types, or is not convertible to a DateTime (using the format `YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`), the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== toDateTime() : DateTime
+
+If the input collection contains a single item, this function will return a single datetime if:
+
+* the item is a DateTime
+* the item is a String and is convertible to a DateTime
+
+If the item is not one of the above types, the result is empty.
+
+If the item is a String, but the string is not convertible to a DateTime (using the format `YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== convertsToDecimal() : Boolean
 
 If the input collection contains a single item, this function will true if:
 
@@ -599,7 +670,7 @@ If the input collection contains a single item, this function will true if:
 
 If the item is not one of the above types, or is not convertible to a decimal (using the regex format `(\\+|-)?\d+('.'\d+)?`), the result is false.
 
-If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 In all other cases, the function will return an empty collection.
 
@@ -619,7 +690,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 In all other cases, the function will return an empty collection.
 
-==== isQuantity() : Boolean
+==== convertsToQuantity() : Boolean
 
 If the input collection contains a single item, this function will return true if:
 
@@ -650,7 +721,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If all other cases, the function will return an empty collection.
 
-==== isString() : String
+==== convertsToString() : String
 
 If the input collection contains a single item, this function will return true if:
 
@@ -691,6 +762,34 @@ The String representation uses the following formats:
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
 
 If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== convertsToTime() : Boolean
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is a Time
+* the item is a String and is convertible to a Time
+
+If the item is not one of the above types, or is not convertible to a Time (using the format `Thh:mm:ss.fff(+/-)hh:mm`), the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== toTime() : Time
+
+If the input collection contains a single item, this function will return a single time if:
+
+* the item is a Time
+* the item is a String and is convertible to a Time
+
+If the item is not one of the above types, the result is empty.
+
+If the item is a String, but the string is not convertible to a Time (using the format `Thh:mm:ss.fff(+/-)hh:mm`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 In all other cases, the function will return an empty collection.
 
