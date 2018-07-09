@@ -169,13 +169,13 @@ Unicode is supported in both string literals and quoted identifiers. String lite
 
 Decimals cannot use exponential notation.
 
-==== DateTime
+==== Date
 
-`DateTime` uses a subset of ISO8601:
+`Date` uses a subset of ISO8601:
 
 * It uses the `YYYY-MM-DD` format, though month and day parts are optional
 * Week dates and ordinal dates are not allowed
-* Years must be present (`-MM-DD` is not a valid dateTime in FHIRPath)
+* Years must be present (`-MM-DD` is not a valid Date in FHIRPath)
 * Months must be present if a day is present
 * The date may be followed by a time as described in the next section.
 * Consult the formal grammar for more details.
@@ -183,14 +183,16 @@ Decimals cannot use exponential notation.
 [source]
 ----
 @2014-01-25
-@2014-01-25T14:30:14.559
+@2014-01
+@2014
 ----
 
 ==== Time
 
 `Time` uses a subset of ISO8601:
 
-* A time begins with a `T`
+* A time begins with a `@T`
+* It uses the `Thh:mm:ss.ffff±hh:mm` format, though minute, second, millisecond parts are optional
 * Timezone is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
 * `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
 
@@ -201,6 +203,20 @@ Decimals cannot use exponential notation.
 ----
 
 Consult the formal grammar for more details.
+
+==== DateTime
+
+`DateTime` combines the `Date` and `Time` literals
+
+`DateTime` uses a subset of ISO8601:
+
+* It uses the `YYYY-MM-DDThh:mm:ss.ffff±hh:mm` format
+* Consult the formal grammar for more details.
+
+[source]
+----
+@2014-01-25T14:30:14.559
+----
 
 ==== Quantity
 
@@ -632,11 +648,42 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 In all other cases, the function will return an empty collection.
 
+==== convertsToDate() : Boolean
+
+If the input collection contains a single item, this function will return true if:
+
+* the item is a Date
+* the item is a DateTime
+* the item is a String and is convertible to a Date
+
+If the item is not one of the above types, or is not convertible to a Date (using the format `YYYY-MM-DD`), the result is false.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
+==== toDate() : Date
+
+If the input collection contains a single item, this function will return a single date if:
+
+* the item is a Date
+* the item is a DateTime
+* the item is a String and is convertible to a Date
+
+If the item is not one of the above types, the result is empty.
+
+If the item is a String, but the string is not convertible to a Date (using the format `YYYY-MM-DD`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+In all other cases, the function will return an empty collection.
+
 ==== convertsToDateTime() : Boolean
 
 If the input collection contains a single item, this function will return true if:
 
 * the item is a DateTime
+* the item is a Date
 * the item is a String and is convertible to a DateTime
 
 If the item is not one of the above types, or is not convertible to a DateTime (using the format `YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`), the result is false.
@@ -650,6 +697,7 @@ In all other cases, the function will return an empty collection.
 If the input collection contains a single item, this function will return a single datetime if:
 
 * the item is a DateTime
+* the item is a Date, in which case the result is a DateTime with the year, month, and day of the Date, and the time components empty (not set to zero)
 * the item is a String and is convertible to a DateTime
 
 If the item is not one of the above types, the result is empty.
@@ -726,7 +774,7 @@ If all other cases, the function will return an empty collection.
 If the input collection contains a single item, this function will return true if:
 
 * the item is a String
-* the item is an Integer, Decimal, Time, or DateTime
+* the item is an Integer, Decimal, Date, Time, or DateTime
 * the item is a Boolean
 * the item is a Quantity
 
@@ -741,7 +789,7 @@ In all other cases, the function will return an empty collection.
 If the input collection contains a single item, this function will return a single String if:
 
 * the item in the input collection is a String
-* the item in the input collection is an Integer, Decimal, Time, DateTime, or Quantity the output will contain its String representation
+* the item in the input collection is an Integer, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation
 * the item is a Boolean, where `true` results in `&#39;true&#39;` and `false` in `&#39;false&#39;`.
 
 If the item is not one of the above types, the result is false.
@@ -755,13 +803,14 @@ The String representation uses the following formats:
 |`Integer` |`(\\+\|-)?\d+`
 |`Decimal` |`(\\+\|-)?\d+(.\d+)?`
 |`Quantity` |`(\\+\|-)?\d+(.\d+)? &#39;&lt;unit&gt;&#39;`
+|`Date` |`YYYY-MM-DD`
 |`DateTime` |`YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`
 |`Time` |`Thh:mm:ss.fff(+/-)hh:mm`
 |===
 
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
 
-If the input collection contains multiple items, the evaluation of the expression will end and singal an error to the calling environment.
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 In all other cases, the function will return an empty collection.
 
@@ -888,13 +937,13 @@ ____
 
 Add a String representation of the input collection to the diagnostic log, using the parameter `name` as the name in the log. This log should be made available to the user in some appropriate fashion. Does not change the input, so returns the input collection as output.
 
-==== today() : dateTime
+==== today() : Date
 
-Returns a dateTime containing the current date.
+Returns a Date containing the current date.
 
-==== now() : dateTime
+==== now() : DateTime
 
-Returns a dateTime containing the current date and time, including timezone.
+Returns a DateTime containing the current date and time, including timezone.
 
 == Operations
 
@@ -922,6 +971,7 @@ If both operands are collections with a single item:
 ** `Integer`: values must be exactly equal
 ** `Decimal`: values must be equal, trailing zeroes are ignored
 ** `Boolean`: values must be the same
+** `Date`: must be exactly the same
 ** `DateTime`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
 ** `Time`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
 ** If a time or date/time has no indication of timezone, the timezone of the evaluating machine is assumed.
@@ -946,7 +996,7 @@ Implementations are not required to fully support operations on units, but they 
 
 Implementations that do support units SHALL do so as specified by UCUM.
 
-For `DateTime` and `Time` comparisons with partial values (e.g. date/times specified only to the day, or times specified only to the hour), the comparison returns empty (`{ }`), not `false`.
+For `Date`, `DateTime` and `Time` comparisons with partial values (e.g. date/times specified only to the day, or times specified only to the hour), the comparison returns empty (`{ }`), not `false`.
 
 ==== ~ (Equivalent)
 
@@ -958,7 +1008,7 @@ If both operands are collections with a single item:
 	* `String`: the strings must be the same while ignoring case and normalizing whitespace.
 	* `Integer`: exactly equal
 	* `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes are ignored in determining precision.
-	* `DateTime` and `Time`: values must be equal, except that for partial date/time values, the comparison returns `false`, not empty (`{ }`). If one operand has less precision than the other, comparison is done at the lowest precision.
+	* `Date`, `DateTime` and `Time`: values must be equal, except that for partial date/time values, the comparison returns `false`, not empty (`{ }`). If one operand has less precision than the other, comparison is done at the lowest precision.
 	* `Boolean`: the values must be the same
 * For complex types, equivalence requires all child properties to be equivalent, recursively.
 
@@ -1182,7 +1232,9 @@ If either or both arguments are empty (`{ }`), the result is empty (`{ }`).
 
 ==== + (addition)
 
-Returns the value of the given `DateTime` or `Time`, incremented by the time-valued quantity, respecting variable length periods for calendar years and months.
+Returns the value of the given `Date`, `DateTime`, or `Time`, incremented by the time-valued quantity, respecting variable length periods for calendar years and months.
+
+For `Date` values, the quantity unit must be one of: `years`, `months`, or `days`
 
 For `DateTime` values, the quantity unit must be one of: `years`, `months`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
 
@@ -1199,7 +1251,9 @@ This expression will evaluate to the value `@2016` even though the date/time val
 
 ==== - (subtraction)
 
-Returns the value of the given `DateTime` or `Time`, decremented by the time-valued quantity, respecting variable length periods for calendar years and months.
+Returns the value of the given `Date`, `DateTime`, or `Time`, decremented by the time-valued quantity, respecting variable length periods for calendar years and months.
+
+For `Date` values, the quantity unit must be one of: `years`, `months`, or `days`
 
 For `DateTime` values, the quantity unit must be one of: `years`, `months`, `days`, `hours`, `minutes`, `seconds`, `milliseconds` (or an equivalent unit), or an error is raised.
 
@@ -1333,11 +1387,14 @@ Literals provide for the representation of values within FHIRPath. The following
 |String
 |Strings of any character enclosed within single-ticks (`'`)
 
+|Date
+|The at-symbol (`@`) followed by a date (YYYY-MM-DD)
+
 |DateTime
-|The at-symbol (`@`) followed by a datetime
+|The at-symbol (`@`) followed by a datetime (YYYY-MM-DDThh:mm:ss.ffff(+/-)hh:mm)
 
 |Time
-|The at-symbol (`@`) followed by a time
+|The at-symbol (`@`) followed by a time (Thh:mm:ss.ffff(+/-)hh:mm)
 
 |Quantity
 |An integer or decimal literal followed by a datetime precision specifier, or a UCUM unit specifier
@@ -1466,6 +1523,7 @@ Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
 Integer: 0, 45
 Decimal: 0.0, 3.141592653589793236
+Date: @2015-02 (`@` followed by ISO8601 compliant date)
 DateTime: @2015-02-04T14:34:28Z (`@` followed by ISO8601 compliant date/time)
 Time: @T14:34:28+09:00 (`@` followed by ISO8601 compliant time beginning with `T`)
 Quantity: 10 'mg', 4 days
@@ -1488,6 +1546,10 @@ The `Integer` type represents whole numbers in the range `-2^31` to `2^31-1`.
 ==== System.Decimal
 
 The `Decimal` type represents real values in the range -10^28-10^-8 to 10^28-10^-8 with a step size of 10^-8. This range is defined based on a survey of decimal-value implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger decimals and higher precision, but must provide at least the range and precision defined here. In addition, implementations should use fixed-precision decimal formats to ensure that decimal values are accurately represented.
+
+==== System.Date
+
+The `Date` type represents date values with potential uncertainty in the range @0001-01-01 to @9999-12-31 with a 1 day step size.
 
 ==== System.DateTime
 
