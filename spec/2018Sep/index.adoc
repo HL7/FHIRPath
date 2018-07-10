@@ -560,6 +560,30 @@ Merge the input and other collections into a single collection without eliminati
 
 The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
 
+The following table lists the possible conversions supported, and whether the conversion is implicit or explicit:
+
+[cols=",,,,,,,,",options="header",]
+|===============================================================================================
+|From\To |Boolean |Integer |Decimal |Quantity |String |Date |DateTime |Time
+|*Boolean* |N/A |Explicit |Explicit |- |Explicit |- |- |-
+|*Integer* |Explicit |N/A |Implicit |Implicit |Explicit |- |- |-
+|*Decimal* |Explicit |- |N/A |Implicit |Explicit |- |- |-
+|*Quantity* |- |- |- |N/A |Explicit |- |- |-
+|*String* |Explicit |Explicit |Explicit |Explicit |N/A |Explicit |Explicit |Explicit
+|*Date* |- |- |- |- |Explicit |N/A |Implicit |-
+|*DateTime* |- |- |- |- |Explicit |- |N/A |-
+|*Time* |- |- |- |- |Explicit |- |- |N/A
+|===============================================================================================
+
+Implicit conversion is performed when an operator or function is used with a compatible type. For example:
+
+[source]
+----
+5 + 10.0
+----
+
+In the above expression, the addition operator expects either two Integers, or two Decimals, so implicit conversion is used to convert the integer to a decimal, resulting in decimal addition.
+
 To use these functions over a collection with multiple items, one may use filters like `where()` and `select()`:
 
 [source]
@@ -581,11 +605,12 @@ If the input collection contains a single item, this function will return true i
 
 * the item is a Boolean
 * the item is an Integer and is convertible to a Boolean using one of the possible integer representations of Boolean values
+* the item is a Decimal and is convertible to a Boolean using one of the possible decimal representations of Boolean values
 * the item is a String and is convertible to a Boolean using one of the possible string representations of Boolean values
 
 If the item is not one of the above types, or the item is a String or Integer, but is not one of the possible values convertible to a Boolean, the result is false.
 
-Possible values for Integer and String are described in the toBoolean() function.
+Possible values for Integer, Decimal, and String are described in the toBoolean() function.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -597,6 +622,7 @@ If the input collection contains a single item, this function will return a sing
 
 * the item is an Boolean
 * the item is an Integer and is convertible to a Boolean using one of the possible integer representations of Boolean values
+* the item is a Decimal and is convertible to a Boolean using one of the possible decimal representation of Boolean values
 * the item is a String and is convertible to a Boolean using one of the possible string representations of Boolean values
 
 If the item is not one the above types, or the item is a String or Integer, but is not one of the possible values convertible to a Boolean, the result is empty.
@@ -608,11 +634,15 @@ The following table describes the possible values convertible to an Boolean:
 |===
 |Type |Representation |Result
 
-|`String` |`'true'`, `'t'`, `'yes'`, `'y'`, '`1`' |`true`
-| |`'false'`, `'f'`, `'no'`, `'n'`, '`0`' |`false`
+|`String` |`'true'`, `'t'`, `'yes'`, `'y'`, `'1'`, `'1.0'` |`true`
+| |`'false'`, `'f'`, `'no'`, `'n'`, '`0`', '`0.0`' |`false`
 | `Integer` |`1` |`true`
 | |`0` |`false`
+| `Decimal` |`1.0` |`true`
+| |`0.0` |`false`
 |===
+
+Note for the purposes of string representations, case is ignored (so that both `'T'` and `'t'` are considered `true`).
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1176,7 +1206,7 @@ Patient.name.given.exists() implies Patient.name.family.exists()
 
 === Math
 
-The math operators require each operand to be a single element. Both operands must be of the same type, each operator below specifies which types are supported.
+The math operators require each operand to be a single element. Both operands must be of the same type, or of compatible types according to the rules for implicit conversion. Each operator below specifies which types are supported.
 
 If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1190,7 +1220,7 @@ Implementations that do support units SHALL do so as specified by UCUM.
 
 ==== * (multiplication)
 
-Multiplies both arguments (numbers and quantities). For multiplication involving quantities, the resulting quantity will have the appropriate unit:
+Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have the appropriate unit:
 
 [source]
 ----
@@ -1200,7 +1230,7 @@ Multiplies both arguments (numbers and quantities). For multiplication involving
 
 ==== / (division)
 
-Divides the left operand by the right operand (numbers and quantities). The result of a division is always Decimal, even if the inputs are both Integer. For integer division, use the `div` operator.
+Divides the left operand by the right operand (supported for Integer, Decimal, and Quantity). The result of a division is always Decimal, even if the inputs are both Integer. For integer division, use the `div` operator.
 
 For division involving quantities, the resulting quantity will have the appropriate unit:
 
@@ -1217,17 +1247,17 @@ When adding quantities, the dimensions of each quantity must be the same, but no
 
 ==== - (subtraction)
 
-Subtracts the right operand from the left operand (numbers and quantities).
+Subtracts the right operand from the left operand (supported for Integer, Decimal, and Quantity).
 
 When subtracting quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
 
 ==== div
 
-Performs truncated division of the left operand by the right operand (numbers only).
+Performs truncated division of the left operand by the right operand (supported for Integer and Decimal).
 
 ==== mod
 
-Computes the remainder of the truncated division of its arguments (numbers only).
+Computes the remainder of the truncated division of its arguments (supported for Integer and Decimal).
 
 ==== &amp; (String concatenation)
 
