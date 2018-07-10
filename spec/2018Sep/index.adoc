@@ -1485,16 +1485,14 @@ Keywords are tokens that are recognized by the parser and used to build the vari
 
 |===
 
-|`$index`|`hours`|`months`
-|`$this`|`implies`|`or`
-|`and`|`in`|`second`
-|`as`|`is`|`seconds`
-|`contains`|`millisecond`|`true`
-|`day`|`milliseconds`|`week`
-|`days`|`minute`|`xor`
-|`div`|`minutes`|`year`
-|`false`|`mod`|`years`
-|`hour`|`month`|
+|`$index` |`div` |`milliseconds` |`true`
+|`$this` |`false` |`minute` |`week`
+|`$total` |`hour` |`minutes` |`weeks`
+|`and` |`hours` |`mod` |`xor`
+|`as` |`implies` |`month` |`year`
+|`contains` |`in` |`months` |`years`
+|`day` |`is` |`or` |`second` |
+|`days` |`millisecond` |`seconds` |
 |===
 
 In general, keywords within FHIRPath are also considered _reserved_ words, meaning that it is illegal to use them as identifiers. If necessary, identifiers that clash with a reserved word can be quoted.
