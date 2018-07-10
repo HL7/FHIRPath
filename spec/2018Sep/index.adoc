@@ -951,7 +951,7 @@ Returns a collection with all immediate child nodes of all items in the input co
 
 ==== descendants() : collection
 
-Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. Is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using operations like `first()` on the result may return different results on different platforms.
+Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using operations like `first()` on the result may return different results on different platforms.
 
 ____
 
