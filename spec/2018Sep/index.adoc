@@ -1263,7 +1263,7 @@ For strings, will concatenate the strings, where an empty operand is taken to be
 
 === Date/Time Arithmetic
 
-Date and time arithmetic operators are used to add time-valued quantities to date/time values. The left operand must be a `DateTime` or `Time` value, and the right operand must be a `Quantity` with a time-valued unit:
+Date and time arithmetic operators are used to add time-valued quantities to date/time values. The left operand must be a `Date`, `DateTime`, or `Time` value, and the right operand must be a `Quantity` with a time-valued unit:
 
 * `year`, `years`, or `&#39;a&#39;`
 * `month`, `months`, or `&#39;mo&#39;`
@@ -1282,9 +1282,9 @@ If either or both arguments are empty (`{ }`), the result is empty (`{ }`).
 
 Returns the value of the given `Date`, `DateTime`, or `Time`, incremented by the time-valued quantity, respecting variable length periods for calendar years and months.
 
-For `Date` values, the quantity unit must be one of: `years`, `months`, or `days`
+For `Date` values, the quantity unit must be one of: `years`, `months`, `weeks`, or `days`
 
-For `DateTime` values, the quantity unit must be one of: `years`, `months`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
+For `DateTime` values, the quantity unit must be one of: `years`, `months`, `weeks`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
 
 For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
 
@@ -1301,9 +1301,9 @@ This expression will evaluate to the value `@2016` even though the date/time val
 
 Returns the value of the given `Date`, `DateTime`, or `Time`, decremented by the time-valued quantity, respecting variable length periods for calendar years and months.
 
-For `Date` values, the quantity unit must be one of: `years`, `months`, or `days`
+For `Date` values, the quantity unit must be one of: `years`, `months`, `weeks`, or `days`
 
-For `DateTime` values, the quantity unit must be one of: `years`, `months`, `days`, `hours`, `minutes`, `seconds`, `milliseconds` (or an equivalent unit), or an error is raised.
+For `DateTime` values, the quantity unit must be one of: `years`, `months`, `weeks`, `days`, `hours`, `minutes`, `seconds`, `milliseconds` (or an equivalent unit), or an error is raised.
 
 For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or an error is raised.
 
