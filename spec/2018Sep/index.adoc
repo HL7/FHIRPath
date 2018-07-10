@@ -1476,7 +1476,7 @@ Symbols provide structure to the language and allow symbolic invocation of commo
 |`= != <= < > >=`
 |Comparison operators for comparing values
 
-|`+ - * / | &`
+|`+ - * / \| &`
 |Arithmetic and other operators for performing computation
 |===
 
@@ -1484,6 +1484,7 @@ Symbols provide structure to the language and allow symbolic invocation of commo
 Keywords are tokens that are recognized by the parser and used to build the various language constructs. FHIRPath defines the following keywords:
 
 |===
+
 |`$index`|`hours`|`months`
 |`$this`|`implies`|`or`
 |`and`|`in`|`second`
