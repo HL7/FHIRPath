@@ -1596,15 +1596,15 @@ The `Decimal` type represents real values in the range -10^28-10^-8 to 10^28-10^
 
 ==== System.Date
 
-The `Date` type represents date values with potential uncertainty in the range @0001-01-01 to @9999-12-31 with a 1 day step size.
+The `Date` type represents date and partial date values in the range @0001-01-01 to @9999-12-31 with a 1 day step size.
 
 ==== System.DateTime
 
-The `DateTime` type represents date and time values with potential uncertainty in the range `@0001-01-01T00:00:00.0 to @9999-12-31T23:59:59.999` with a 1 millisecond step size. This range is defined based on a survey of datetime implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger ranges and higher precision, but must provide at least the range and precision defined here.
+The `DateTime` type represents date/time and partial date/time values in the range `@0001-01-01T00:00:00.0 to @9999-12-31T23:59:59.999` with a 1 millisecond step size. This range is defined based on a survey of datetime implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger ranges and higher precision, but must provide at least the range and precision defined here.
 
 ==== System.Time
 
-The `Time` type represents time-of-day values with potential uncertainty in the range @T00:00:00.0 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. Implementations can provide support for higher precision, but must provide at least the range and precision defined here.
+The `Time` type represents time-of-day and partial time-of-day values in the range @T00:00:00.0 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. Implementations can provide support for higher precision, but must provide at least the range and precision defined here.
 
 ==== System.Quantity
 
