@@ -315,8 +315,6 @@ ELSE
   An error is raised
 ----
 
-Note that in the special case that the input type is Boolean and the value is not, if the collection contains a single item
-
 == Functions
 
 Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more parameters. With a few minor exceptions (e.g. the `today()` function), functions in FHIRPath always take a collection as input and produce another collection as output, even though these may be collections of just a single item.
