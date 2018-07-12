@@ -11,7 +11,9 @@ Looking for implementations? See http://wiki.hl7.org/index.php?title=FHIRPath_Im
 Version: 1.2.0 Public Domain (http://creativecommons.org/publicdomain/zero/1.0/[Creative Commons 0])
 
 ____
-NOTE: The appendices are included as additional documentation and are informative content.
+
+Note: The appendices are included as additional documentation and are informative content.
+
 ____
 
 toc::[]
@@ -121,14 +123,14 @@ The `is` operator can be used to determine whether or not a given value is of a 
 
 [source]
 ----
-Observation.value is Quantity - returns true if the value is of type Quantity
+Observation.value is Quantity // returns true if the value is of type Quantity
 ----
 
 The `as` operator can be used to treat a value as a specific type:
 
 [source]
 ----
-Observation.value as Quantity - returns value as a Quantity if it is of type Quantity, and an empty result otherwise
+Observation.value as Quantity // returns value as a Quantity if it is of type Quantity, and an empty result otherwise
 ----
 
 The list of available types that can be passed as a parameter to the `ofType()` function and `is` and `as` operators is determined by the underlying data model. Within FHIRPath, they are just identifiers, either quoted or non-quoted.
@@ -145,8 +147,9 @@ Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
 Integer: 0, 45
 Decimal: 0.0, 3.141592653589793236
-DateTime: @2015-02-04T14:34:28Z (`@` followed by ISO8601 compliant date/time)
-Time: @T14:34:28+09:00 (`@` followed by ISO8601 compliant time beginning with `T`)
+Date: @2015-02-04 (@ followed by ISO8601 compliant date)
+DateTime: @2015-02-04T14:34:28Z (@ followed by ISO8601 compliant date/time)
+Time: @T14:34:28+09:00 (@ followed by ISO8601 compliant time beginning with `T`)
 Quantity: 10 'mg', 4 days
 ----
 
@@ -228,10 +231,11 @@ Consult the formal grammar for more details.
   100 '[degF]'
 ----
 
-[NOTE]
-====
-When using UCUM units within FHIRPath, implementations shall use case-sensitive comparisons.
-====
+____
+
+Note: When using UCUM units within FHIRPath, implementations shall use case-sensitive comparisons.
+
+____
 
 For date/time units, an alternative representation may be used (note that both a plural and singular version exist):
 
@@ -243,10 +247,11 @@ For date/time units, an alternative representation may be used (note that both a
   4 days
 ----
 
-[NOTE]
-====
-Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601.
-====
+____
+
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601.
+
+____
 
 === Operators
 
@@ -341,11 +346,11 @@ Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
 Returns `true` if the input collection evaluates to `false`, and `false` if it evaluates to `true`. Otherwise, the result is empty (`{ }`):
 
 |===
-|&nbsp; |not
+|not |
 
-|`true` |`false`
-|`false` |`true`
-|empty (`{ }`) |empty (`{ }`)
+|*true* |`false`
+|*false* |`true`
+|*empty* |empty (`{ }`)
 |===
 
 ==== exists([criteria : expression]) : Boolean
@@ -632,11 +637,11 @@ The following table describes the possible values convertible to an Boolean:
 |===
 |Type |Representation |Result
 
-|`String` |`'true'`, `'t'`, `'yes'`, `'y'`, `'1'`, `'1.0'` |`true`
+|*String* |`'true'`, `'t'`, `'yes'`, `'y'`, `'1'`, `'1.0'` |`true`
 | |`'false'`, `'f'`, `'no'`, `'n'`, '`0`', '`0.0`' |`false`
-| `Integer` |`1` |`true`
+| *Integer* |`1` |`true`
 | |`0` |`false`
-| `Decimal` |`1.0` |`true`
+| *Decimal* |`1.0` |`true`
 | |`0.0` |`false`
 |===
 
@@ -827,13 +832,13 @@ The String representation uses the following formats:
 |===
 |Type |Representation
 
-|`Boolean` |`true` or `false`
-|`Integer` |`(\\+\|-)?\d+`
-|`Decimal` |`(\\+\|-)?\d+(.\d+)?`
-|`Quantity` |`(\\+\|-)?\d+(.\d+)? &#39;&lt;unit&gt;&#39;`
-|`Date` |`YYYY-MM-DD`
-|`DateTime` |`YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`
-|`Time` |`Thh:mm:ss.fff(+/-)hh:mm`
+|*Boolean* |`true` or `false`
+|*Integer* |`(\\+\|-)?\d+`
+|*Decimal* |`(\\+\|-)?\d+(.\d+)?`
+|*Quantity* |`(\\+\|-)?\d+(.\d+)? &#39;&lt;unit&gt;&#39;`
+|*Date* |`YYYY-MM-DD`
+|*DateTime* |`YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`
+|*Time* |`Thh:mm:ss.fff(+/-)hh:mm`
 |===
 
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
@@ -1145,18 +1150,19 @@ For all boolean operators, the collections passed as operands are first evaluate
 ____
 
 Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If a condition is needed to ensure correct evaluation of a subsequent expression, the `iif()` function should be used to guarantee that the condition determines whether evaluation of an expression will occur at run-time.
+
 ____
 
 ==== and
 
-Returns `true` if both operands evaluate to `true`, `false` if either operand evaluates to `false`, and the empty collection (`{ }`) otherwise:
+Returns `true` if both operands evaluate to `true`, `false` if either operand evaluates to `false`, and the empty collection (`{ }`) otherwise.
 
 |===
-|&nbsp; |`true` |`false` |empty (`{ }`)
+|and |true |false |empty
 
-|`true` |`true` |`false` |empty (`{ }`)
-|`false` |`false` |`false` |`false`
-|empty (`{ }`) |empty (`{ }`) |`false` |empty (`{ }`)
+|*true* |`true` |`false` |empty (`{ }`)
+|*false* |`false` |`false` |`false`
+|*empty* |empty (`{ }`) |`false` |empty (`{ }`)
 |===
 
 ==== or
@@ -1164,11 +1170,11 @@ Returns `true` if both operands evaluate to `true`, `false` if either operand ev
 Returns `false` if both operands evaluate to `false`, `true` if either operand evaluates to `true`, and empty (`{ }`) otherwise:
 
 |===
-|&nbsp; |`true` |`false` |empty (`{ }`)
+|or |true |false |empty
 
-|`true` |`true` |`true` |`true`
-|`false` |`true` |`false` |empty (`{ }`)
-|empty (`{ }`) |`true` |empty (`{ }`) |empty (`{ }`)
+|*true* |`true` |`true` |`true`
+|*false* |`true` |`false` |empty (`{ }`)
+|*empty* |`true` |empty (`{ }`) |empty (`{ }`)
 |===
 
 ==== xor
@@ -1176,11 +1182,11 @@ Returns `false` if both operands evaluate to `false`, `true` if either operand e
 Returns `true` if exactly one of the operands evaluates to `true`, `false` if either both operands evaluate to `true` or both operands evaluate to `false`, and the empty collection (`{ }`) otherwise:
 
 |===
-|&nbsp; |`true` |`false` |empty (`{ }`)
+|xor |true |false |empty
 
-|`true` |`false` |`true` |empty (`{ }`)
-|`false` |`true` |`false` |empty (`{ }`)
-|empty (`{ }`) |empty (`{ }`) |empty (`{ }`) |empty (`{ }`)
+|*true* |`false` |`true` |empty (`{ }`)
+|*false* |`true` |`false` |empty (`{ }`)
+|*empty* |empty (`{ }`) |empty (`{ }`) |empty (`{ }`)
 |===
 
 ==== implies
@@ -1188,11 +1194,11 @@ Returns `true` if exactly one of the operands evaluates to `true`, `false` if ei
 If the left operand evaluates to `true`, this operator returns the boolean evaluation of the right operand. If the left operand evaluates to `false`, this operator returns `true`. Otherwise, this operator returns `true` if the right operand evaluates to `true`, and the empty collection (`{ }`) otherwise.
 
 |===
-|&nbsp; |`true` |`false` |empty (`{ }`)
+|implies |true |false |empty
 
-|`true` |`true` |`false` |empty (`{ }`)
-|`false` |`true` |`true` |`true`
-|empty (`{ }`) |`true` |empty (`{ }`) |empty (`{ }`)
+|*true* |`true` |`false` |empty (`{ }`)
+|*false* |`true` |`true` |`true`
+|*empty* |`true` |empty (`{ }`) |empty (`{ }`)
 |===
 
 The implies operator is useful for testing conditionals. For example, if a given name is present, then a family name must be as well:
@@ -1374,22 +1380,22 @@ FHIRPath defines the following lexical elements:
 |===
 |Element|Description
 
-|Whitespace
+|*Whitespace*
 |Whitespace defines the separation between tokens in the language
 
-|Comment
+|*Comment*
 |Comments are ignored by the language, allowing for descriptive text
 
-|Literal
+|*Literal*
 |Literals allow basic values to be represented within the language
 
-|Symbol
+|*Symbol*
 |Symbols such as `+`, `-`, `*`, and `/`
 
-|Keyword
+|*Keyword*
 |Grammar-recognized tokens such as `and`, `or` and `in`
 
-|Identifier
+|*Identifier*
 |Labels such as type names and property names
 |===
 
@@ -1420,31 +1426,31 @@ Literals provide for the representation of values within FHIRPath. The following
 |===
 |Literal|Description
 
-|Empty (`{ }`)
+|*Empty* (`{ }`)
 |The empty collection
 
-|Boolean
+|*Boolean*
 |The boolean literals (`true` and `false`)
 
-|Integer
+|*Integer*
 |Sequences of digits in the range 0-2^32-1
 
-|Decimal
+|*Decimal*
 |Sequences of digits with a decimal point, in the range 0.0..10^28-10^-8
 
-|String
+|*String*
 |Strings of any character enclosed within single-ticks (`'`)
 
-|Date
+|*Date*
 |The at-symbol (`@`) followed by a date (YYYY-MM-DD)
 
-|DateTime
+|*DateTime*
 |The at-symbol (`@`) followed by a datetime (YYYY-MM-DDThh:mm:ss.ffff(+/-)hh:mm)
 
-|Time
+|*Time*
 |The at-symbol (`@`) followed by a time (Thh:mm:ss.ffff(+/-)hh:mm)
 
-|Quantity
+|*Quantity*
 |An integer or decimal literal followed by a datetime precision specifier, or a UCUM unit specifier
 |===
 
@@ -1489,7 +1495,7 @@ Keywords are tokens that are recognized by the parser and used to build the vari
 |`and` |`hours` |`mod` |`xor`
 |`as` |`implies` |`month` |`year`
 |`contains` |`in` |`months` |`years`
-|`day` |`is` |`or` |`second` |
+|`day` |`is` |`or` |`second`
 |`days` |`millisecond` |`seconds` |
 |===
 
@@ -1746,7 +1752,11 @@ The model information returned by the reflection function `type()`  is specified
 
 link:modelinfo.xsd[modelinfo.xsd]
 
-NOTE: The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the http://github.com/cqframework/clinical_quality_language[Clinical Quality Framework Tooling] and is included for reference as a simple formalism that meets the requirements described in the normative <<reflection,Reflection>> section above.
+____
+
+Note: The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the http://github.com/cqframework/clinical_quality_language[Clinical Quality Framework Tooling] and is included for reference as a simple formalism that meets the requirements described in the normative <<reflection,Reflection>> section above.
+
+____
 
 As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and tooling should respect the case-sensitive settings for each model.
 
