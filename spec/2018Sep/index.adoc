@@ -147,9 +147,9 @@ Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
 Integer: 0, 45
 Decimal: 0.0, 3.141592653589793236
-Date: @2015-02-04 (@ followed by link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601] compliant date)
-DateTime: @2015-02-04T14:34:28Z (@ followed by link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601] compliant date/time)
-Time: @T14:34:28+09:00 (@ followed by link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601] compliant time beginning with `T`)
+Date: @2015-02-04 (@ followed by ISO8601 compliant date)
+DateTime: @2015-02-04T14:34:28Z (@ followed by ISO8601 compliant date/time)
+Time: @T14:34:28+09:00 (@ followed by ISO8601 compliant time beginning with `T`)
 Quantity: 10 'mg', 4 days
 ----
 
