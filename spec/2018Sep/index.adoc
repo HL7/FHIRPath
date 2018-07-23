@@ -147,9 +147,9 @@ Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
 Integer: 0, 45
 Decimal: 0.0, 3.141592653589793236
-Date: @2015-02-04 (@ followed by ISO8601 compliant date)
-DateTime: @2015-02-04T14:34:28Z (@ followed by ISO8601 compliant date/time)
-Time: @T14:34:28+09:00 (@ followed by ISO8601 compliant time beginning with `T`)
+Date: @2015-02-04 (@ followed by link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601] compliant date)
+DateTime: @2015-02-04T14:34:28Z (@ followed by link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601] compliant date/time)
+Time: @T14:34:28+09:00 (@ followed by link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601] compliant time beginning with `T`)
 Quantity: 10 'mg', 4 days
 ----
 
@@ -174,7 +174,7 @@ Decimals cannot use exponential notation.
 
 ==== Date
 
-`Date` uses a subset of ISO8601:
+`Date` uses a subset of link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]:
 
 * It uses the `YYYY-MM-DD` format, though month and day parts are optional
 * Week dates and ordinal dates are not allowed
@@ -192,7 +192,7 @@ Decimals cannot use exponential notation.
 
 ==== Time
 
-`Time` uses a subset of ISO8601:
+`Time` uses a subset of link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]:
 
 * A time begins with a `@T`
 * It uses the `Thh:mm:ss.ffff±hh:mm` format, though minute, second, millisecond parts are optional
@@ -211,7 +211,7 @@ Consult the formal grammar for more details.
 
 `DateTime` combines the `Date` and `Time` literals
 
-`DateTime` uses a subset of ISO8601:
+`DateTime` uses a subset of link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]:
 
 * It uses the `YYYY-MM-DDThh:mm:ss.ffff±hh:mm` format
 * Consult the formal grammar for more details.
@@ -249,7 +249,7 @@ For date/time units, an alternative representation may be used (note that both a
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601.
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601].
 
 ____
 
@@ -1576,9 +1576,9 @@ Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
 Integer: 0, 45
 Decimal: 0.0, 3.141592653589793236
-Date: @2015-02 (`@` followed by ISO8601 compliant date)
-DateTime: @2015-02-04T14:34:28Z (`@` followed by ISO8601 compliant date/time)
-Time: @T14:34:28+09:00 (`@` followed by ISO8601 compliant time beginning with `T`)
+Date: @2015-02 (`@` followed by link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601] compliant date)
+DateTime: @2015-02-04T14:34:28Z (`@` followed by link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601] compliant date/time)
+Time: @T14:34:28+09:00 (`@` followed by link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601] compliant time beginning with `T`)
 Quantity: 10 'mg', 4 days
 ----
 
@@ -1862,7 +1862,8 @@ http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 
 [bibliography]
 - [[[ANTLR]]] Another Tool for Language Recognition (ANTLR) http://www.antlr.org/
-- [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.2. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
+- [[[ISO8601]]] Date and time format - ISO 8601. https://www.iso.org/iso-8601-date-and-time-format.html
+- [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.3. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
 - [[[XMLRE]]] Regular Expressions. https://www.w3.org/TR/xmlschema11-2/#regexs
 - [[[PCRE]]] Pearl-Compatible Regular Expressions. http://www.pcre.org/
 
