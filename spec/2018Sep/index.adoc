@@ -270,7 +270,7 @@ For date/time units, an alternative representation may be used (note that both a
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601].
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. See the section on <<Date/Time Arithmetic>> for more information.
 
 ____
 
@@ -285,6 +285,8 @@ MedicationAdministration.wasNotGiven implies MedicationAdministration.reasonNotG
 name.given | name.family // union of given and family names
 'sir ' + name.given
 ----
+
+Operators available in FHIRPath are covered in detail in the <<Operations>> section.
 
 === Functions
 
@@ -1062,6 +1064,12 @@ Implementations are not required to fully support operations on units, but they 
 
 Implementations that do support units SHALL do so as specified by UCUM.
 
+____
+
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. See the section on <<Date/Time Arithmetic>> for more information. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
+
+____
+
 For `Date`, `DateTime` and `Time` equality, the comparison is performed at the unit with the most precision of either input. If the input values have the same level of precision, the result is `true` if the values are the same, and `false` otherwise. If the input values have different levels of precision, the result is empty (`{ }`).
 
 For example:
@@ -1099,6 +1107,12 @@ When comparing quantities for equivalence, the dimensions of each quantity must 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
 Implementations that do support units SHALL do so as specified by UCUM.
+
+____
+
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. See the section on <<Date/Time Arithmetic>> for more information. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
+
+____
 
 For `Date`, `DateTime` and `Time` equivalence, the comparison is the same as for equality, with the exception that if the input values have different levels of precision, the result is `false`, rather than empty (`{ }`).
 
@@ -1336,6 +1350,12 @@ For partial date/time values, the operation is performed by converting the time-
 
 This expression will evaluate to the value `@2016` even though the date/time value is not specified to the level of precision of the time-valued quantity.
 
+____
+
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601].
+
+____
+
 ==== - (subtraction)
 
 Returns the value of the given `Date`, `DateTime`, or `Time`, decremented by the time-valued quantity, respecting variable length periods for calendar years and months.
@@ -1354,6 +1374,12 @@ For partial date/time values, the operation is performed by converting the time-
 ----
 
 This expression will evaluate to the value `@2012` even though the date/time value is not specified to the level of precision of the time-valued quantity.
+
+____
+
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601].
+
+____
 
 === Operator precedence
 
