@@ -95,6 +95,8 @@ Syntactically, FHIRPath defines identifiers as any sequence of characters consis
 Message."PID-1"
 ----
 
+When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
+
 === Collections
 
 Collections are fundamental to FHIRPath, in that the result of every expression is a collection, even if that expression only results in a single element. This approach allows paths to be specified without having to care about the cardinality of any particular element, and is therefore ideally suited to graph traversal.
@@ -1599,6 +1601,8 @@ FHIRPath escape sequences for strings also work for quoted identifiers:
 |`\uXXXX`|Unicode character, where XXXX is the hexadecimal representation of the character
 |===
 
+When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
+
 === Case-Sensitivity
 FHIRPath is a case-sensitive language, meaning that case is considered when matching keywords in the language. However, because FHIRPath can be used with different models, the case-sensitivity of type and property names is defined by each model.
 
@@ -1632,6 +1636,8 @@ Note also that these tokens are not restricted to simple types, and they may hav
 Because FHIRPath is defined to work in multiple contexts, each context provides the definition for the structures available in that context. These structures are the *model* available for FHIRPath expressions. For example, within FHIR, the FHIR data types and resources are the model. To prevent namespace clashes, the type names within each model are prefixed (or namespaced) with the name of the model. For example, the fully qualified name of the Patient resource in FHIR is `FHIR.Patient`. The system types defined within FHIRPath directly are prefixed with the namespace `System`.
 
 When resolving a type name, the context-specific model is searched first. If no match is found, the `System` model (containing only the built-in types defined in the <<Literals>> section) is searched.
+
+When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
 
 === Reflection
 
