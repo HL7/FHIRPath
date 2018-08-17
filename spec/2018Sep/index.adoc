@@ -1162,9 +1162,11 @@ For partial date/time values, the comparison is performed to the highest precisi
 
 === Types
 
-==== is
+==== is _type specifier_
 
 If the left operand is a collection with a single item and the second operand is a type identifier, this operator returns `true` if the type of the left operand is the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If the input collections contains more than one item, the evaluator will throw an error. In all other cases this function returns the empty collection.
+
+A _type specifier_ is an identifier that must resolve to the name of a type in a model. Type specifiers can have qualifiers, e.g. `FHIR.Patient`, where the qualifier is the name of the model.
 
 [source]
 ----
@@ -1173,9 +1175,11 @@ Patient.contained.all($this is Patient implies age > 10)
 
 This example returns true if for all the contained resources, if the contained resource is of type `Patient`, then the `age` is greater than ten.
 
-==== as
+==== as _type specifier_
 
 If the left operand is a collection with a single item and the second operand is an identifier, this function returns the value of the left operand if it is of the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If there is more than one item in the input collection, the evaluator will throw an error. Otherwise, this operator returns the empty collection.
+
+A _type specifier_ is an identifier that must resolve to the name of a type in a model. Type specifiers can have qualifiers, e.g. `FHIR.Patient`, where the qualifier is the name of the model.
 
 [source]
 ----
@@ -1634,6 +1638,8 @@ Note also that these tokens are not restricted to simple types, and they may hav
 === Models
 
 Because FHIRPath is defined to work in multiple contexts, each context provides the definition for the structures available in that context. These structures are the *model* available for FHIRPath expressions. For example, within FHIR, the FHIR data types and resources are the model. To prevent namespace clashes, the type names within each model are prefixed (or namespaced) with the name of the model. For example, the fully qualified name of the Patient resource in FHIR is `FHIR.Patient`. The system types defined within FHIRPath directly are prefixed with the namespace `System`.
+
+To allow type names to be referenced in expressions such as the `is` and `as` operators, the language includes a _type specifier_, which an optionally qualified identifier that must resolve to the name of a model type.
 
 When resolving a type name, the context-specific model is searched first. If no match is found, the `System` model (containing only the built-in types defined in the <<Literals>> section) is searched.
 
