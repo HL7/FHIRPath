@@ -1649,12 +1649,33 @@ When resolving an identifier that is also the root of a FHIRPath expression, it 
 
 FHIRPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection, using one of the following concrete subtypes of `TypeInfo`:
 
-For primitive types, the result is a `SimpleTypeInfo`:
+==== Primitive Types
+
+For primitive types such as `String` and `Integer`, the result is a `SimpleTypeInfo`:
 
 [source]
 ----
 SimpleTypeInfo { namespace: string, name: string, baseType: TypeSpecifier }
 ----
+
+For example:
+
+[source]
+----
+('John' | 'Mary').type()
+----
+
+Results in:
+
+[source]
+----
+{ 
+  SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' },
+  SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' }
+}
+----
+
+==== Class Types
 
 For class types, the result is a `ClassInfo`:
 
@@ -1664,6 +1685,32 @@ ClassInfoElement { name: string, type: TypeSpecifier, isOneBased: Boolean }
 ClassInfo { namespace: string, name: string, baseType: TypeSpecifier, element: List<ClassInfoElement> }
 ----
 
+For example:
+
+[source]
+====
+Patient.maritalStatus.type()
+====
+
+Results in:
+
+[source]
+====
+{
+  ClassInfo {
+    namespace: 'FHIR',
+    name: 'CodeableConcept',
+    baseType: 'FHIR.Element',
+    element: {
+      ClassInfoElement { name: 'coding', type: 'List<Coding>', isOneBased: false },
+      ClassInfoElement { name: text', type: 'FHIR.string' }
+    }
+  }
+}
+====
+
+==== Collection Types
+
 For collection types, the result is a `ListTypeInfo`:
 
 [source]
@@ -1671,12 +1718,56 @@ For collection types, the result is a `ListTypeInfo`:
 ListTypeInfo { elementType: TypeSpecifier }
 ----
 
+For example:
+
+[source]
+----
+Patient.address.type()
+----
+
+Results in:
+
+[source]
+----
+{
+  ListTypeInfo { elementType: 'FHIR.Address' }
+}
+----
+
+==== Anonymous Types
+
 And for anonymous types, the result is a `TupleTypeInfo`:
 
 [source]
 ----
 TupleTypeInfoElement { name: string, type: TypeSpecifier, isOneBased: Boolean }
 TupleTypeInfo { element: List<TupleTypeInfoElement> }
+----
+
+For example:
+
+[source]
+----
+Patient.contact.type()
+----
+
+Results in:
+
+[source]
+----
+{
+  TupleTypeInfo {
+    element: {
+      TupleTypeInfoElement { name: 'relationship', type: 'List<FHIR.CodeableConcept>', isOneBased: false },
+      TupleTypeInfoElement { name: 'name', type: 'FHIR.HumanName', isOneBased: false },
+      TupleTypeInfoElement { name: 'telecom', type: 'List<FHIR.ContactPoint>', isOneBased: false },
+      TupleTypeInfoElement { name: 'address', type: 'FHIR.Address', isOneBased: false },
+      TupleTypeInfoElement { name: 'gender', type: 'FHIR.code', isOneBased: false },
+      TupleTypeInfoElement { name: 'organization', type: 'FHIR.Reference', isOneBased: false },
+      TupleTypeInfoElement { name: 'period', type: 'FHIR.Period', isOneBased: false }
+    }
+  }
+}
 ----
 
 ____
