@@ -1688,14 +1688,14 @@ ClassInfo { namespace: string, name: string, baseType: TypeSpecifier, element: L
 For example:
 
 [source]
-====
+----
 Patient.maritalStatus.type()
-====
+----
 
 Results in:
 
 [source]
-====
+----
 {
   ClassInfo {
     namespace: 'FHIR',
@@ -1707,7 +1707,7 @@ Results in:
     }
   }
 }
-====
+----
 
 ==== Collection Types
 
