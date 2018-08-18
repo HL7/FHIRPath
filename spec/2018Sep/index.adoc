@@ -1,5 +1,6 @@
 = FHIRPath (Normative Ballot)
 :page-layout: normativeballot
+:backend: xhtml
 :sectnums:
 :sectanchors:
 :toc: macro
