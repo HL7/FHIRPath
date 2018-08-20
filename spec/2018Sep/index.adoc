@@ -89,11 +89,11 @@ Patient.name.given
 
 The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`.
 
-Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use double-quotes to include characters in path parts that would otherwise be interpreted as keywords or operators, e.g.:
+Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use backticks to include characters in path parts that would otherwise be interpreted as keywords or operators, e.g.:
 
 [source]
 ----
-Message."PID-1"
+Message.`PID-1`
 ----
 
 When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
@@ -136,7 +136,7 @@ The `as` operator can be used to treat a value as a specific type:
 Observation.value as Quantity // returns value as a Quantity if it is of type Quantity, and an empty result otherwise
 ----
 
-The list of available types that can be passed as a parameter to the `ofType()` function and `is` and `as` operators is determined by the underlying data model. Within FHIRPath, they are just identifiers, either quoted or non-quoted.
+The list of available types that can be passed as a parameter to the `ofType()` function and `is` and `as` operators is determined by the underlying data model. Within FHIRPath, they are just identifiers, either delimited or simple.
 
 == Expressions
 
@@ -174,10 +174,10 @@ The `String` type represents string values up to `2^31-1` characters in length. 
 ** `\n` (newline - \u000a),
 ** `\r` (carriage return - \u000d),
 ** `\t` (tab - \u0009)
-** `\"` (double-quote)
+** `\`` (backtick)
 ** `\'` (single-quote)
 
-Note that Unicode is supported in both string literals and quoted identifiers. 
+Note that Unicode is supported in both string literals and delimited identifiers. 
 
 ==== Integer
 
@@ -1565,10 +1565,10 @@ Keywords are tokens that are recognized by the parser and used to build the vari
 |`days` |`millisecond` |`seconds` |
 |===
 
-In general, keywords within FHIRPath are also considered _reserved_ words, meaning that it is illegal to use them as identifiers. If necessary, identifiers that clash with a reserved word can be quoted.
+In general, keywords within FHIRPath are also considered _reserved_ words, meaning that it is illegal to use them as identifiers. If necessary, identifiers that clash with a reserved word can be delimited using a backtick (`` ` ``).
 
 === Identifiers
-Identifiers are used as labels to allow expressions to reference elements such as model types and properties. FHIRPath supports two types of identifiers, _simple_ and _quoted_.
+Identifiers are used as labels to allow expressions to reference elements such as model types and properties. FHIRPath supports two types of identifiers, _simple_ and _delimited_.
 
 A simple identifier is any alphabetical character or an underscore, followed by any number of alpha-numeric characters or underscores. For example, the following are all valid simple identifiers:
 
@@ -1579,25 +1579,25 @@ _id
 valueDateTime
 ----
 
-A quoted identifier is any sequence of characters enclosed in double-quotes (`"`):
+A delimited identifier is any sequence of characters enclosed in backticks (`` ` ``):
 
 [source]
 ----
-"QI-Core Patient"
-"US-Core Diagnostic Request"
-"us-zip"
+`QI-Core Patient`
+`US-Core Diagnostic Request`
+`us-zip`
 ----
 
-The use of double-quotes allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have property or type names that are not valid simple identifiers.
+The use of backticks allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have property or type names that are not valid simple identifiers.
 
-FHIRPath escape sequences for strings also work for quoted identifiers:
+FHIRPath escape sequences for strings also work for delimited identifiers:
 
 
 |===
 |Escape|Character
 
 |`\'`|Single-quote
-|`\"`|Double-quote
+|`\``|Backtick
 |`\r`|Carriage Return
 |`\n`|Line Feed
 |`\t`|Tab
@@ -1627,10 +1627,10 @@ Implementers should note that using additional environment variables is a formal
 
 [source]
 ----
-%"us-zip" = '[0-9]{5}(-[0-9]{4}){0,1}'
+%`us-zip` = '[0-9]{5}(-[0-9]{4}){0,1}'
 ----
 
-Note that the identifier portion of the token is allowed to be either a simple identifier (as in `%ucum`), or a quoted identifier to allow for alternative characters (as in `%"us-zip"`).
+Note that the identifier portion of the token is allowed to be either a simple identifier (as in `%ucum`), or a delimited identifier to allow for alternative characters (as in `%`us-zip``).
 
 Note also that these tokens are not restricted to simple types, and they may have values that are not defined fixed values known prior to evaluation at run-time, though there is no way to define these kind of values in implementation guides.
 
@@ -1939,7 +1939,7 @@ Same as the last, but pick out just the MR value
 
 [source]
 ----
-Message.group("PATIENT").group("PATIENT_OBSERVATION").item.ofType(Segment)
+Message.group(`PATIENT`).group(`PATIENT_OBSERVATION`).item.ofType(Segment)
   .where(code = 'OBX' and elements(2).any(components(2) = 'LN')))
 ----
 
