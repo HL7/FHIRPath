@@ -1,4 +1,4 @@
-= FHIRPath (Normative Ballot)
+= FHIRPath (Normative Ballot 2)
 :page-layout: normativeballot
 :backend: xhtml
 :sectnums:
