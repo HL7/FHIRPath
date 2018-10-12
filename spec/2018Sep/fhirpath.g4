@@ -46,13 +46,13 @@ externalConstant
 
 invocation                          // Terms that can be used after the function/member invocation '.'
         : identifier                                            #memberInvocation
-        | function                                              #functionInvocation
+        | functn                                                #functionInvocation
         | '$this'                                               #thisInvocation
         | '$index'                                              #indexInvocation
         | '$total'                                              #totalInvocation
         ;
 
-function
+functn
         : identifier '(' paramList? ')'
         ;
 
