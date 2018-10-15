@@ -578,7 +578,7 @@ e.g. Patient.children().exclude(name|birthDate) would return all the properties 
 
 ==== union(other : collection)
 
-Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
+Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
 
 This function can also be invoked using the | operator.
 
