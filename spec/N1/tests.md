@@ -1,5 +1,5 @@
 ---
-layout: normativeballot
+layout: normativerelease
 title: FHIRPath Tests
 ---
 

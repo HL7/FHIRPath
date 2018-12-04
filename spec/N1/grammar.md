@@ -1,5 +1,5 @@
 ---
-layout: current
+layout: normativerelease
 title: FHIRPath Grammar
 ---
 
