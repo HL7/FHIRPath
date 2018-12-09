@@ -1543,7 +1543,7 @@ Symbols provide structure to the language and allow symbolic invocation of commo
 |`,`
 |Comma for delimiting items in a syntactic list
 
-|`= != <= < > >=`
+|`= != \<= < > >=`
 |Comparison operators for comparing values
 
 |`+ - * / \| &`
