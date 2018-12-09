@@ -1189,11 +1189,11 @@ For example:
 
 ==== != (Not Equals)
 
-The inverse of the equals operator.
+The converse of the equals operator.
 
 ==== !~ (Not Equivalent)
 
-The inverse of the equivalent operator.
+The converse of the equivalent operator.
 
 === Comparison
 
@@ -1255,7 +1255,7 @@ Merge the two collections into a single collection, eliminating any duplicate va
 If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
 
 ==== contains (containership)
-If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. This is the inverse operation of in.
+If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. This is the converse operation of in.
 
 === Boolean logic
 For all boolean operators, the collections passed as operands are first evaluated as Booleans (as described in <<Singleton Evaluation of Collections>>). The operators then use three-valued logic to propagate empty operands.
