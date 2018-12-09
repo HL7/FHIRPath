@@ -1379,6 +1379,8 @@ For partial date/time values, the operation is performed by converting the time-
 
 This expression will evaluate to the value `@2016` even though the date/time value is not specified to the level of precision of the time-valued quantity.
 
+Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
+
 ____
 
 Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601].
@@ -1403,6 +1405,8 @@ For partial date/time values, the operation is performed by converting the time-
 ----
 
 This expression will evaluate to the value `@2012` even though the date/time value is not specified to the level of precision of the time-valued quantity.
+
+Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
 
 ____
 
