@@ -1577,6 +1577,7 @@ A simple identifier is any alphabetical character or an underscore, followed by 
 Patient
 _id
 valueDateTime
+_1234
 ----
 
 A delimited identifier is any sequence of characters enclosed in backticks (`` ` ``):
