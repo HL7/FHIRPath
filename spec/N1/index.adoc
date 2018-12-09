@@ -273,7 +273,7 @@ For date/time units, an alternative representation may be used (note that both a
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. See the section on <<Date/Time Arithmetic>> for more information.
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601].
 
 ____
 
@@ -1069,7 +1069,7 @@ Implementations that do support units SHALL do so as specified by UCUM.
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. See the section on <<Date/Time Arithmetic>> for more information. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
 
 ____
 
@@ -1113,7 +1113,7 @@ Implementations that do support units SHALL do so as specified by UCUM.
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. See the section on <<Date/Time Arithmetic>> for more information. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
+Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
 
 ____
 
