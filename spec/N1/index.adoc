@@ -43,13 +43,13 @@ Given these constraints, and the lack of a specific language that meets all of t
 
 === Usage
 
-In Fast Healthcare Interoperability Resources (FHIR), FHIRPath is used within the specification to provide formal definitions for conditions such as validation invariants, search parameter paths, etc. Within Clinical Quality Language (CQL), FHIRPath is used to simplify graph-traversal for hierarchical information models.
+In Fast Healthcare Interoperability Resources ([FHIR](http://hl7.org/fhir)), FHIRPath is used within the specification to provide formal definitions for conditions such as validation invariants, search parameter paths, etc. Within Clinical Quality Language ([CQL](http://cql.hl7.org)), FHIRPath is used to simplify graph-traversal for hierarchical information models.
 
 In both FHIR and CQL, the model independence of FHIRPath means that expressions can be written that deal with the contents of the resources and data types as described in the Logical views, or the UML diagrams, rather than against the physical representation of those resources. JSON and XML specific features are not visible to the FHIRPath language (such as comments and the split representation of primitives (i.e. `value[x]`)).
 
 The expressions can in theory be converted to equivalent expressions in XPath, OCL, or another similarly expressive language.
 
-FHIRPath can be used against many other graphs as well. For example, <<hl7v2>> describes how FHIRPath is used in HL7 v2.
+FHIRPath can be used against many other graphs as well. For example, <<hl7v2>> describes how FHIRPath is used in HL7 V2.
 
 === Conventions
 
@@ -1890,21 +1890,21 @@ text/fhirpath
 == Use of FHIRPath on HL7 Version 2 messages
 
 
-FHIRPath can be used against HL7 v2 messages. This UML diagram summarises the 
+FHIRPath can be used against HL7 V2 messages. This UML diagram summarises the 
 object model on which the FHIRPath statements are written:
 
-image:v2-object-model.png["Object Model for HL7 v2",height="456",width="760"]
+image:v2-object-model.png["Object Model for HL7 V2",height="456",width="760"]
 
 In this Object Model:
 
 * The object graph always starts with a message.
 * Each message has a list of segments.
 * In addition, Abstract Message Syntax is available through the groups() operation, for use where the message follows the Abstract Message Syntax sufficiently for the parser to reconcile the segment list with the structure.
-* The names of the groups are the names published in the specification, e.g. 'PATIENT_OBSERVATION' (with spaces, where present, replaced by underscores. In case of doubt, consult the v2 XML schemas).
+* The names of the groups are the names published in the specification, e.g. 'PATIENT_OBSERVATION' (with spaces, where present, replaced by underscores. In case of doubt, consult the V2 XML schemas).
 * Each Segment has a list of fields, which each have a list of "Cells". This is necessary to allow for repeats, but users are accustomed to just jumping to Element - use the operation elements() which returns all repeats with the given index.
 * A "cell" can be either an Element, a Component or a Sub-Components. Elements can contain Components, which can contain Sub-Components. Sub-Sub-Components are not allowed.
 * Calls may have a simple text content, or a series of (sub-)components. The simple() operation returns either the text, if it exists, or the return value of simple() from the first component
-* A v2 data type (e.g. ST, SN, CE etc) is a profile on Cell that specifies whether it has simple content, or complex content.
+* A V2 data type (e.g. ST, SN, CE etc) is a profile on Cell that specifies whether it has simple content, or complex content.
 * todo: this object model doesn't make provision for non-syntax escapes in the simple content (e.g. \.b\).
 * all the lists are 1 based. That means the first item in the list is numbered 1, not 0.
 
