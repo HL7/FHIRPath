@@ -939,6 +939,12 @@ If the input collection contains a single item of type String, the function will
 
 If the input collection contains a single item of type String, the function will return `true` when the given `substring` is a substring of the input string. Also returns `true` when `substring` is the empty string.
 
+____
+
+Note: The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the `contains` operator, which is a list operator that looks for an element in a list.
+
+____
+
 ==== upper() : String
 
 If the input collection contains a single item of type String, the function will return the string with all characters converted to upper case.

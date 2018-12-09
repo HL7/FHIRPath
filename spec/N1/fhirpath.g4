@@ -91,6 +91,7 @@ identifier
         : IDENTIFIER
         | DELIMITEDIDENTIFIER
         | 'as'
+        | 'contains'
         | 'is'
         ;
 
