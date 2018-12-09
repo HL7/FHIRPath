@@ -1303,19 +1303,41 @@ For Integer, Decimal, and quantity, adds the operands. For strings, concatenates
 
 When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
 
+[source]
+----
+3 'm' + 3 'cm' // 303 'cm'
+----
+
 ==== - (subtraction)
 
 Subtracts the right operand from the left operand (supported for Integer, Decimal, and Quantity).
 
 When subtracting quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
 
+[source]
+----
+3 'm' - 3 'cm' // 297 'cm'
+----
+
 ==== div
 
-Performs truncated division of the left operand by the right operand (supported for Integer and Decimal).
+Performs truncated division of the left operand by the right operand (supported for Integer and Decimal). In other words, the division that ignores any remainder:
+
+[source]
+----
+5 div 2 // 2
+5.5 div 0.7 // 7
+----
 
 ==== mod
 
 Computes the remainder of the truncated division of its arguments (supported for Integer and Decimal).
+
+[source]
+----
+5 mod 2 // 1
+5.5 mod 0.7 // 0.6
+----
 
 ==== &amp; (String concatenation)
 
