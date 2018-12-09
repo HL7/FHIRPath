@@ -1,6 +1,7 @@
 grammar fhirpath;
 
 // Grammar rules
+// [FHIRPath](http://hl7.org/fhirpath) Normative Release 1
 
 //prog: line (line)*;
 //line: ID ( '(' expr ')') ':' expr '\r'? '\n';
