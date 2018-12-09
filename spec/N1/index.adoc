@@ -921,23 +921,57 @@ The functions in this section operate on collections with a single item. If ther
 
 If the input collection contains a single item of type String, will return the 0-based index of the first position this substring is found in the input string, or -1 if it is not found. If the `substring` is an empty string, the function returns 0.
 
+[source]
+----
+'abcdefg'.indexOf('bc') // 1
+'abcdefg'.indexOf('x') // -1
+'abcdefg'.indexOf('abcdefg') // 0
+----
+
 ==== substring(start : Integer [, length : Integer]) : String
 
 If the input collection contains a single item of type String, it returns a collection with the part of the string starting at position `start` (zero-based). If `length` is given, will return at most `length` number of characters from the input string.
 
 If `start` lies outside the length of the string, the function returns an empty collection. If there are less remaining characters in the string than indicated by `length`, the function returns just the remaining characters.
 
+[source]
+----
+'abcdefg'.substring(3) // 'defg'
+'abcdefg'.substring(1, 2) // 'bc'
+'abcdefg'.substring(6, 2) // 'g'
+'abcdefg'.substring(7, 1) // { }
+----
+
 ==== startsWith(prefix : String) : Boolean
 
 If the input collection contains a single item of type String, the function will return `true` when the input string starts with the given `prefix`. Also returns `true` when `prefix` is the empty string.
+
+[source]
+----
+'abcdefg'.startsWith('abc') // true
+'abcdefg'.startsWith('xyz') // false
+----
 
 ==== endsWith(suffix : String) : Boolean
 
 If the input collection contains a single item of type String, the function will return `true` when the input string ends with the given `suffix`. Also returns `true` when `suffix` is the empty string.
 
+[source]
+----
+'abcdefg'.endsWith('efg') // true
+'abcdefg'.ednsWith('abc') // false
+----
+
 ==== contains(substring : String) : Boolean
 
 If the input collection contains a single item of type String, the function will return `true` when the given `substring` is a substring of the input string. Also returns `true` when `substring` is the empty string.
+
+[source]
+----
+'abc'.contains('b') // true
+'abc'.contains('bc') // true
+'abc'.contains('d') // false
+----
 
 ____
 
@@ -949,13 +983,32 @@ ____
 
 If the input collection contains a single item of type String, the function will return the string with all characters converted to upper case.
 
+[source]
+----
+'abcdefg'.upper() // 'ABCDEFG'
+'AbCdefg'.upper() // 'ABCDEFG'
+----
+
 ==== lower() : String
 
 If the input collection contains a single item of type String, the function will return the string with all characters converted to lower case.
 
+[source]
+----
+'ABCDEFG'.lower() // 'abcdefg'
+'aBcDEFG'.lower() // 'abcdefg'
+----
+
 ==== replace(pattern : String, substitution : String) : String
 
 If the input collection contains a single item of type String, the function will return the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string, the instances of the pattern are removed from the input string. If the pattern is the empty string, every character in the input string is surrounded by the substitution, e.g. `&#39;abc&#39;.replace(&#39;&#39;,&#39;x&#39;)` becomes `&#39;xaxbxcx&#39;`.
+
+[source]
+----
+'abcdefg'.replace('cde', '123') // 'ab123fg'
+'abcdefg'.replace('cde', '') // 'abfg'
+'abc'.replace('', 'x') // 'xaxbxcx'
+----
 
 ==== matches(regex : String) : Boolean
 
