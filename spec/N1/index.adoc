@@ -199,7 +199,7 @@ The `Date` literal is a subset of link:https://www.iso.org/iso-8601-date-and-tim
 * Week dates and ordinal dates are not allowed
 * Years must be present (`-MM-DD` is not a valid Date in FHIRPath)
 * Months must be present if a day is present
-* The date may be followed by a time as described in the next section.
+* To specify a date and time together, see the description of `DateTime` below
 * Consult the formal grammar for more details.
 
 [source]
