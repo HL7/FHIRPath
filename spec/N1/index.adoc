@@ -1094,7 +1094,9 @@ all result in `{}`.
 
 Returns `true` if the left collection is equal to the right collection:
 
-If both operands are collections with a single item:
+As noted above, if either operand is an empty collection, the result is an empty collection. Otherwise:
+
+If both operands are collections with a single item, they must be of the same type, and:
 
 * For primitives:
 ** `String`: comparison is based on Unicode values
@@ -1116,7 +1118,7 @@ Otherwise, equals returns `false`.
 
 Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
 
-Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = &#39;phone&#39;` will return `false` if there is more than one `telecom` with a `use`. Typically, you'd want `Patient.telecom.where(system = 'phone')`
+Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = &#39;phone&#39;` will result in an error if there is more than one `telecom` with a `use`. Typically, you'd want `Patient.telecom.where(system = 'phone')`
 
 If one or both of the operands is the empty collection, this operation returns an empty collection.
 
@@ -1147,14 +1149,14 @@ For example:
 
 Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }` will result in `true`.
 
-If both operands are collections with a single item:
+If both operands are collections with a single item, they must be of the same type, and:
 
 * For primitives
-	* `String`: the strings must be the same while ignoring case and normalizing whitespace.
-	* `Integer`: exactly equal
-	* `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes are ignored in determining precision.
-	* `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).
-	* `Boolean`: the values must be the same
+** `String`: the strings must be the same while ignoring case and normalizing whitespace.
+** `Integer`: exactly equal
+** `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes are ignored in determining precision.
+** `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).
+** `Boolean`: the values must be the same
 * For complex types, equivalence requires all child properties to be equivalent, recursively.
 
 If both operands are collections with multiple items:
