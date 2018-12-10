@@ -367,18 +367,6 @@ Note also that although all functions return collections, if a given function is
 
 Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
 
-==== not() : Boolean
-
-Returns `true` if the input collection evaluates to `false`, and `false` if it evaluates to `true`. Otherwise, the result is empty (`{ }`):
-
-|===
-|not |
-
-|*true* |`false`
-|*false* |`true`
-|*empty* |empty (`{ }`)
-|===
-
 ==== exists([criteria : expression]) : Boolean
 
 Returns `true` if the collection has any elements, and `false` otherwise. This is the opposite of `empty()`, and as such is a shorthand for `empty().not()`. If the input collection is empty (`{ }`), the result is `false`.
@@ -1290,6 +1278,18 @@ Returns `false` if both operands evaluate to `false`, `true` if either operand e
 |*true* |`true` |`true` |`true`
 |*false* |`true` |`false` |empty (`{ }`)
 |*empty* |`true` |empty (`{ }`) |empty (`{ }`)
+|===
+
+==== not() : Boolean
+
+Returns `true` if the input collection evaluates to `false`, and `false` if it evaluates to `true`. Otherwise, the result is empty (`{ }`):
+
+|===
+|not |
+
+|*true* |`false`
+|*false* |`true`
+|*empty* |empty (`{ }`)
 |===
 
 ==== xor
