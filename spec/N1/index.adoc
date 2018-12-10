@@ -59,6 +59,16 @@ Optional parameters to functions are enclosed in square brackets in the definiti
 
 All functions return a collection, but if the function or operation will always produce a collection containing a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : Boolean`
 
+Formatting strings for Date, Time, and DateTime values are described using the following markers:
+
+* YYYY - A full four digit year, padded with leading zeroes if necessary
+* MM - A full two digit month value, padded with leading zeroes if necessary
+* DD - A full two digit day value, padded with leading zeroes if necessary
+* HH - A full two digit hour value (00..24), padded with leading zeroes if necessary
+* mm - A full two digit minute value (00..59), padded with leading zeroes if necessary
+* ss - A full two digit second value (00..59), padded with leading zeroes if necessary
+* fff - A fractional millisecond value (0..999)
+
 == Navigation model
 
 FHIRPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FHIRPath query is run. This way, FHIRPath can be used on in-memory Java POJOs, Xml data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FHIRPath operates on a directed acyclic graph of classes as defined by a MOF-equivalent type system.
@@ -219,7 +229,7 @@ The `Time` type represents time-of-day and partial time-of-day values in the ran
 The `Time` literal uses a subset of ISO8601 <<ISO8601>>:
 
 * A time begins with a `@T`
-* It uses the `Thh:mm:ss.ffff±hh:mm` format, though minute, second, millisecond parts are optional
+* It uses the `Thh:mm:ss.fff±hh:mm` format, though minute, second, millisecond parts are optional
 * Timezone is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
 * `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
 
@@ -239,7 +249,7 @@ The `DateTime` type represents date/time and partial date/time values in the ran
 
 The `DateTime` literal combines the `Date` and `Time` literals and is a subset of ISO8601 <<ISO8601>>:
 
-* It uses the `YYYY-MM-DDThh:mm:ss.ffff±hh:mm` format
+* It uses the `YYYY-MM-DDThh:mm:ss.fff±hh:mm` format
 
 The following example illustrates the use of the `DateTime` literal:
 
@@ -1653,10 +1663,10 @@ Literals provide for the representation of values within FHIRPath. The following
 |The at-symbol (`@`) followed by a date (YYYY-MM-DD)
 
 |*DateTime*
-|The at-symbol (`@`) followed by a datetime (YYYY-MM-DDThh:mm:ss.ffff(+/-)hh:mm)
+|The at-symbol (`@`) followed by a datetime (YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm)
 
 |*Time*
-|The at-symbol (`@`) followed by a time (Thh:mm:ss.ffff(+/-)hh:mm)
+|The at-symbol (`@`) followed by a time (Thh:mm:ss.fff(+/-)hh:mm)
 
 |*Quantity*
 |An integer or decimal literal followed by a datetime precision specifier, or a UCUM <<UCUM>> unit specifier
