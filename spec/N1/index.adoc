@@ -114,7 +114,7 @@ Within FHIRPath, a collection is:
 
 * Ordered - The order of items in the collection is important and is preserved through operations as much as possible. Operators and functions that do not preserve order will note that in their documentation.
 * Non-Unique - Duplicate elements are allowed within a collection. Some operations and functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
-* Indexed - Each item in a collection can be uniquely addressed by it's index, i.e. ordinal position within the collection. 
+* Indexed - Each item in a collection can be addressed by it's index, i.e. ordinal position within the collection. 
 * Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 * Countable - The number of items in a given collection can always be determined using the `count()` function
 
