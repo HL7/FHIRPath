@@ -193,7 +193,7 @@ Note that decimal literals cannot use exponential notation.
 
 The `Date` type represents date and partial date values in the range @0001-01-01 to @9999-12-31 with a 1 day step size.
 
-The `Date` literal is a subset of link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]:
+The `Date` literal is a subset of ISO8601 <<ISO8601>>:
 
 * It uses the `YYYY-MM-DD` format, though month and day parts are optional
 * Week dates and ordinal dates are not allowed
@@ -213,7 +213,7 @@ The `Date` literal is a subset of link:https://www.iso.org/iso-8601-date-and-tim
 
 The `Time` type represents time-of-day and partial time-of-day values in the range @T00:00:00.0 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. Implementations can provide support for higher precision, but must provide at least the range and precision defined here.
 
-The `Time` literal uses a subset of link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]:
+The `Time` literal uses a subset of ISO8601 <<ISO8601>>:
 
 * A time begins with a `@T`
 * It uses the `Thh:mm:ss.ffff±hh:mm` format, though minute, second, millisecond parts are optional
@@ -232,7 +232,7 @@ Consult the formal grammar for more details.
 
 The `DateTime` type represents date/time and partial date/time values in the range `@0001-01-01T00:00:00.0 to @9999-12-31T23:59:59.999` with a 1 millisecond step size. This range is defined based on a survey of datetime implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger ranges and higher precision, but must provide at least the range and precision defined here.
 
-The `DateTime` literal combines the `Date` and `Time` literals and is a subset of link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]:
+The `DateTime` literal combines the `Date` and `Time` literals and is a subset of ISO8601 <<ISO8601>>:
 
 * It uses the `YYYY-MM-DDThh:mm:ss.ffff±hh:mm` format
 
@@ -245,7 +245,7 @@ Consult the formal grammar for more details.
 
 ==== Quantity
 
-The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be a valid UCUM unit.
+The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be a valid UCUM <<UCUM>> unit.
 
 The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid http://unitsofmeasure.org/trac[Unified Code for Units of Measure (UCUM)] unit:
 
@@ -257,7 +257,7 @@ The `Quantity` literal is a number (integer or decimal), followed by a (single-q
 
 ____
 
-Note: When using UCUM units within FHIRPath, implementations shall use case-sensitive comparisons.
+Note: When using UCUM <<UCUM>> units within FHIRPath, implementations shall use case-sensitive comparisons.
 
 ____
 
@@ -273,7 +273,7 @@ For date/time units, an alternative representation may be used (note that both a
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601].
+Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>.
 
 ____
 
@@ -1114,11 +1114,11 @@ When comparing quantities for equality, the dimensions of each quantity must be 
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by UCUM.
+Implementations that do support units SHALL do so as specified by UCUM <<UCUM>>.
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
+Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
 
 ____
 
@@ -1158,11 +1158,11 @@ When comparing quantities for equivalence, the dimensions of each quantity must 
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by UCUM.
+Implementations that do support units SHALL do so as specified by UCUM <<UCUM>>.
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601]. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
+Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
 
 ____
 
@@ -1198,7 +1198,7 @@ When comparing quantities, the dimensions of each quantity must be the same, but
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by UCUM.
+Implementations that do support units SHALL do so as specified by UCUM <<UCUM>>.
 
 For partial date/time values, the comparison is performed to the highest precision specified in both values.
 
@@ -1335,7 +1335,7 @@ When operating on quantities, the dimensions of each quantity must be the same, 
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by UCUM.
+Implementations that do support units SHALL do so as specified by UCUM <<UCUM>>.
 
 ==== * (multiplication)
 
@@ -1444,7 +1444,7 @@ Calculations involving weeks are equivalent to multiplying the number of weeks b
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601].
+Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>.
 
 ____
 
@@ -1471,7 +1471,7 @@ Calculations involving weeks are equivalent to multiplying the number of weeks b
 
 ____
 
-Note: Although UCUM identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in link:https://www.iso.org/iso-8601-date-and-time-format.html[ISO8601].
+Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>.
 
 ____
 
@@ -1604,7 +1604,7 @@ Literals provide for the representation of values within FHIRPath. The following
 |The at-symbol (`@`) followed by a time (Thh:mm:ss.ffff(+/-)hh:mm)
 
 |*Quantity*
-|An integer or decimal literal followed by a datetime precision specifier, or a UCUM unit specifier
+|An integer or decimal literal followed by a datetime precision specifier, or a UCUM <<UCUM>> unit specifier
 |===
 
 For a more detailed discussion of the use and semantics of literals within expressions, refer to the Expressions section above.
@@ -1707,7 +1707,7 @@ The following environmental values are set for all contexts:
 
 [source]
 ----
-%ucum       // (string) url for ucum
+%ucum       // (string) url for UCUM
 %context	// The original node that was passed to the evaluation engine before starting evaluation
 ----
 
@@ -2071,6 +2071,7 @@ http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 - [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.3. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
 - [[[XMLRE]]] Regular Expressions. https://www.w3.org/TR/xmlschema11-2/#regexs
 - [[[PCRE]]] Pearl-Compatible Regular Expressions. http://www.pcre.org/
+- [[[UCUM]]] Unified Code for Units of Measure (UCUM) http://unitsofmeasure.org/ucum.html, Version 2.1, Revision 442 (2017-11-21)
 
 
 
