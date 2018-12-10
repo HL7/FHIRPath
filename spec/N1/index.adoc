@@ -230,7 +230,7 @@ The `Time` literal uses a subset of ISO8601 <<ISO8601>>:
 
 * A time begins with a `@T`
 * It uses the `Thh:mm:ss.fff±hh:mm` format, though minute, second, millisecond parts are optional
-* Timezone is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
+* Timezone offset is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
 * `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
 
 The following examples illustrate the use of the `Time` literal:
@@ -1096,7 +1096,7 @@ Returns a Date containing the current date.
 
 ==== now() : DateTime
 
-Returns a DateTime containing the current date and time, including timezone.
+Returns a DateTime containing the current date and time, including timezone offset.
 
 == Operations
 
@@ -1127,9 +1127,9 @@ If both operands are collections with a single item, they must be of the same ty
 ** `Decimal`: values must be equal, trailing zeroes are ignored
 ** `Boolean`: values must be the same
 ** `Date`: must be exactly the same
-** `DateTime`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
-** `Time`: must be exactly the same, respecting the timezone (though +24:00 = +00:00 = Z)
-** If a time or date/time has no indication of timezone, the timezone of the evaluating machine is assumed.
+** `DateTime`: must be exactly the same, respecting the timezone offset (though +24:00 = +00:00 = Z)
+** `Time`: must be exactly the same, respecting the timezone offset (though +24:00 = +00:00 = Z)
+** If a time or date/time has no timezone offset, the timezone offset of the evaluating machine is assumed.
 * For complex types, equality requires all child properties to be equal, recursively.
 
 If both operands are collections with multiple items:
@@ -1167,6 +1167,18 @@ For example:
 @2012 = @2013 // returns false
 @2012-01 = @2012 // returns empty ({ })
 ----
+
+Note that for Date, Time, and DateTime values, the specification is not prescriptive about how implementations "respect" timezone offsets, but the following examples illustrate expected behavior:
+
+[source]
+----
+@2017-11-05T01:30:00.0-04:00 > @2017-11-05T01:15:00.0-05:00 // false
+@2017-11-05T01:30:00.0-04:00 < @2017-11-05T01:15:00.0-05:00 // true
+@2017-11-05T01:30:00.0-04:00 = @2017-11-05T01:15:00.0-05:00 // false
+@2017-11-05T01:30:00.0-04:00 = @2017-11-05T00:30:00.0-05:00 // true
+----
+
+The exact details of the date comparison are difficult to characterize; additional functions to support more sophisticated timezone offset comparison (such as .toUTC()) may be defined in a future version.
 
 ==== ~ (Equivalent)
 
