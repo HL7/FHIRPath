@@ -200,7 +200,8 @@ The `Date` literal is a subset of ISO8601 <<ISO8601>>:
 * Years must be present (`-MM-DD` is not a valid Date in FHIRPath)
 * Months must be present if a day is present
 * To specify a date and time together, see the description of `DateTime` below
-* Consult the formal grammar for more details.
+
+The following examples illustrate the use of the `Date` literal:
 
 [source]
 ----
@@ -208,6 +209,8 @@ The `Date` literal is a subset of ISO8601 <<ISO8601>>:
 @2014-01
 @2014
 ----
+
+Consult the formal grammar for more details.
 
 ==== Time
 
@@ -219,6 +222,8 @@ The `Time` literal uses a subset of ISO8601 <<ISO8601>>:
 * It uses the `Thh:mm:ss.ffff±hh:mm` format, though minute, second, millisecond parts are optional
 * Timezone is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
 * `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
+
+The following examples illustrate the use of the `Time` literal:
 
 [source]
 ----
@@ -235,6 +240,8 @@ The `DateTime` type represents date/time and partial date/time values in the ran
 The `DateTime` literal combines the `Date` and `Time` literals and is a subset of ISO8601 <<ISO8601>>:
 
 * It uses the `YYYY-MM-DDThh:mm:ss.ffff±hh:mm` format
+
+The following example illustrates the use of the `DateTime` literal:
 
 [source]
 ----
