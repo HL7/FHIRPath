@@ -57,7 +57,7 @@ Throughout this documentation, `monospace font` is used to delineate expressions
 
 Optional parameters to functions are enclosed in square brackets in the definition of a function. Note that the brackets are only used to indicate optionality in the signature, they are not part of the actual syntax of FHIRPath.
 
-All functions return a collection, but if the function or operation will always produce a collection containing a single item of a predefined type, the description of the function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : Boolean`
+All operations and functions return a collection, but if the operation or function will always produce a collection containing a single item of a predefined type, the description of the operation or function will specify its output type explicitly, instead of just stating `collection`, e.g. `all(...) : Boolean`
 
 Formatting strings for Date, Time, and DateTime values are described using the following markers:
 
@@ -113,12 +113,12 @@ Collections are fundamental to FHIRPath, in that the result of every expression 
 Within FHIRPath, a collection is:
 
 * Ordered - The order of items in the collection is important and is preserved through operations as much as possible.
-* Non-Unique - Duplicate elements are allowed within a collection. Some functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
+* Non-Unique - Duplicate elements are allowed within a collection. Some operations and functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
 * Indexed - Each item in a collection can be uniquely addressed by it's index, i.e. ordinal position within the collection. 
 * Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 * Countable - The number of items in a given collection can always be determined using the `count()` function
 
-Note that the outcome of operations like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the logical order implied by the data model, and some may not, and some may be different depending on the underlying source.
+Note that the outcome of functions like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the logical order implied by the data model, and some may not, and some may be different depending on the underlying source.
 
 === Paths and polymorphic items
 
@@ -150,7 +150,7 @@ The list of available types that can be passed as a parameter to the `ofType()` 
 
 === Literals
 
-In addition to paths, FHIRPath expressions may contain _literals_ and _function invocations_. FHIRPath supports the following types of literals:
+In addition to paths, FHIRPath expressions may contain _literals_, _operators_, and _function invocations_. FHIRPath supports the following types of literals:
 
 [source]
 ----
@@ -337,11 +337,11 @@ FHIRPath functions and operators both propagate empty results, but the behavior 
 
 For functions or operators that take a single values as input, this means in general if the input is empty, then the result will be empty as well. More specifically:
 
-* If a single-input function operates on an empty collection, the result is an empty collection
-* If a single-input function is passed an empty collection as an argument, the result is an empty collection
-* If any operand to a single-input operator is an empty collection, the result is an empty collection.
+* If a single-input operator or function operates on an empty collection, the result is an empty collection
+* If a single-input operator or function is passed an empty collection as an argument, the result is an empty collection
+* If any operand to a single-input operator or function is an empty collection, the result is an empty collection.
 
-For functions or arguments that expect collections, in general the empty collection is treated as any other collection would be. For example, the union (`|`) of an empty collection with a non-empty collection is the non-empty collection.
+For operator or function arguments that expect collections, in general the empty collection is treated as any other collection would be. For example, the union (`|`) of an empty collection with some non-empty collection is that non-empty collection.
 
 When functions or operators behave differently from these general principles, (for example the `count()` and `empty()` functions), this is clearly documented in the next sections.
 
@@ -368,7 +368,7 @@ For example:
 Patient.name.family + ', ' + Patient.name.given
 ----
 
-If the `Patient` instance has a single `name`, and that name has a single `given`, then this will evaluate without any issues. However, if the `Patient` has multiple `name` elements, or the single name has multiple `given` elements, then it's ambiguous which of the elements should be used as the input to the function, and the result is an error.
+If the `Patient` instance has a single `name`, and that name has a single `given`, then this will evaluate without any issues. However, if the `Patient` has multiple `name` elements, or the single name has multiple `given` elements, then it's ambiguous which of the elements should be used as the input to the `+` operator, and the result is an error.
 
 As another example:
 
@@ -411,7 +411,7 @@ telecom.exists(system = 'phone' and use = 'mobile')
 generalPractitioner.exists($this is Practitioner)
 ----
 
-The operator can also take an optional criteria to be applied to the collection prior to the determination of the exists. In this case, the operation is shorthand for `where(criteria).exists()`.
+The function can also take an optional criteria to be applied to the collection prior to the determination of the exists. In this case, the function is shorthand for `where(criteria).exists()`.
 
 ==== all(criteria : expression) : Boolean
 
@@ -508,7 +508,7 @@ Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
 
 A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the equals (`=`) operator).
 
-This operation can be used to traverse a tree and selecting only specific children:
+This function can be used to traverse a tree and selecting only specific children:
 
 [source]
 ----
@@ -563,7 +563,7 @@ Patient.name[0]
 
 ==== single() : collection
 
-Will return the single item in the input if there is just one item. If the input collection is empty (`{ }`), the result is empty. If there are multiple items, an error is signaled to the evaluation environment. This operation is useful for ensuring that an error is returned if an assumption about cardinality is violated at run-time.
+Will return the single item in the input if there is just one item. If the input collection is empty (`{ }`), the result is empty. If there are multiple items, an error is signaled to the evaluation environment. This function is useful for ensuring that an error is returned if an assumption about cardinality is violated at run-time.
 
 ==== first() : collection
 
@@ -587,11 +587,11 @@ Returns a collection containing the first `num` items in the input collection, o
 
 ==== intersect(other: collection) : collection
 
-Returns the set of elements that are in both collections. Duplicate items will be eliminated by this operation.
+Returns the set of elements that are in both collections. Duplicate items will be eliminated by this function.
 
 ==== exclude(other: collection) : collection
 
-Returns the set of elements that are not in the other collections. Duplicate items will not be eliminated by this operation, and order will be preserved.
+Returns the set of elements that are not in the other collections. Duplicate items will not be eliminated by this function, and order will be preserved.
 
 e.g. Patient.children().exclude(name|birthDate) would return all the properties of the Patient except for the name and birthDate.
 
@@ -601,14 +601,16 @@ e.g. Patient.children().exclude(name|birthDate) would return all the properties 
 
 Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
 
-This function can also be invoked using the | operator.
+This function can also be invoked using the `|` operator.
 
+[source]
 ----
 a.union(b)
 ----
 
 is synonymous with
 
+[source]
 ----
 a | b
 ----
@@ -1070,11 +1072,11 @@ If the input collection contains a single item of type String, the function will
 
 ==== children() : collection
 
-Returns a collection with all immediate child nodes of all items in the input collection. Note that the ordering of the children is undefined and using operations like `first()` on the result may return different results on different platforms.
+Returns a collection with all immediate child nodes of all items in the input collection. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
 
 ==== descendants() : collection
 
-Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using operations like `first()` on the result may return different results on different platforms.
+Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
 
 ____
 
@@ -1303,7 +1305,7 @@ The greater or equal operator (`>=`) returns true if the first operand is greate
 
 ==== is _type specifier_
 
-If the left operand is a collection with a single item and the second operand is a type identifier, this operator returns `true` if the type of the left operand is the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If the input collections contains more than one item, the evaluator will throw an error. In all other cases this function returns the empty collection.
+If the left operand is a collection with a single item and the second operand is a type identifier, this operator returns `true` if the type of the left operand is the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If the input collections contains more than one item, the evaluator will throw an error. In all other cases this operator returns the empty collection.
 
 A _type specifier_ is an identifier that must resolve to the name of a type in a model. Type specifiers can have qualifiers, e.g. `FHIR.Patient`, where the qualifier is the name of the model.
 
@@ -1316,7 +1318,7 @@ This example returns true if for all the contained resources, if the contained r
 
 ==== as _type specifier_
 
-If the left operand is a collection with a single item and the second operand is an identifier, this function returns the value of the left operand if it is of the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If there is more than one item in the input collection, the evaluator will throw an error. Otherwise, this operator returns the empty collection.
+If the left operand is a collection with a single item and the second operand is an identifier, this operator returns the value of the left operand if it is of the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If there is more than one item in the input collection, the evaluator will throw an error. Otherwise, this operator returns the empty collection.
 
 A _type specifier_ is an identifier that must resolve to the name of a type in a model. Type specifiers can have qualifiers, e.g. `FHIR.Patient`, where the qualifier is the name of the model.
 
@@ -1596,14 +1598,14 @@ Precedence of operations, in order from high to low:
 As customary, expressions may be grouped by parenthesis (`()`).
 
 == Aggregates
-FHIRPath supports a general-purpose aggregate operator to enable operations such as sum, min, and max to be expressed:
+FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed:
 
 === aggregate(aggregator : expression [, init : value]) : value
 Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
 
 The value of the `$total` variable is set to `init`, or empty (`{ }`) if no `init` value is supplied, and is set to the result of the aggregator expression after every iteration.
 
-Using this operator, sum can be expressed as:
+Using this function, sum can be expressed as:
 
 [source]
 ----
@@ -2085,11 +2087,11 @@ In this Object Model:
 
 * The object graph always starts with a message.
 * Each message has a list of segments.
-* In addition, Abstract Message Syntax is available through the groups() operation, for use where the message follows the Abstract Message Syntax sufficiently for the parser to reconcile the segment list with the structure.
+* In addition, Abstract Message Syntax is available through the groups() function, for use where the message follows the Abstract Message Syntax sufficiently for the parser to reconcile the segment list with the structure.
 * The names of the groups are the names published in the specification, e.g. 'PATIENT_OBSERVATION' (with spaces, where present, replaced by underscores. In case of doubt, consult the V2 XML schemas).
-* Each Segment has a list of fields, which each have a list of "Cells". This is necessary to allow for repeats, but users are accustomed to just jumping to Element - use the operation elements() which returns all repeats with the given index.
+* Each Segment has a list of fields, which each have a list of "Cells". This is necessary to allow for repeats, but users are accustomed to just jumping to Element - use the function elements() which returns all repeats with the given index.
 * A "cell" can be either an Element, a Component or a Sub-Components. Elements can contain Components, which can contain Sub-Components. Sub-Sub-Components are not allowed.
-* Calls may have a simple text content, or a series of (sub-)components. The simple() operation returns either the text, if it exists, or the return value of simple() from the first component
+* Calls may have a simple text content, or a series of (sub-)components. The simple() function returns either the text, if it exists, or the return value of simple() from the first component
 * A V2 data type (e.g. ST, SN, CE etc) is a profile on Cell that specifies whether it has simple content, or complex content.
 * todo: this object model doesn't make provision for non-syntax escapes in the simple content (e.g. \.b\).
 * all the lists are 1 based. That means the first item in the list is numbered 1, not 0.
