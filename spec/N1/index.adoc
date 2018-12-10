@@ -262,7 +262,7 @@ Consult the formal grammar for more details.
 
 The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be a valid UCUM <<UCUM>> unit.
 
-The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid http://unitsofmeasure.org/trac[Unified Code for Units of Measure (UCUM)] unit:
+The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid http://unitsofmeasure.org/trac[Unified Code for Units of Measure (UCUM)] unit. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
 
 [source]
 ----
