@@ -363,6 +363,24 @@ ELSE
   An error is raised
 ----
 
+For example:
+
+[source]
+----
+Patient.name.family + ', ' + Patient.name.given
+----
+
+If the `Patient` instance has a single `name`, and that name has a single `given`, then this will evaluate without any issues. However, if the `Patient` has multiple `name` elements, or the single name has multiple `given` elements, then it's ambiguous which of the elements should be used as the input to the function, and the result is an error.
+
+As another example:
+
+[source]
+----
+Patient.active and Patient.gender and Patient.telecom
+----
+
+Assuming the `Patient` instance has an `active` value of `true`, a `gender` of `female` and a single `telecom` element, this expression will result in true. However, consider a different instance of `Patient` that has an `active` value of `true`, a `gender` of `male`, and multiple `telecom` elements, then this expression will result in an error because of the multiple telecom elements. 
+
 == Functions
 
 Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more parameters. With a few minor exceptions (e.g. the `today()` function), functions in FHIRPath always take a collection as input and produce another collection as output, even though these may be collections of just a single item.
