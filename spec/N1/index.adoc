@@ -600,7 +600,7 @@ The following table lists the possible conversions supported, and whether the co
 |*Quantity* |- |- |- |N/A |Explicit |- |- |-
 |*String* |Explicit |Explicit |Explicit |Explicit |N/A |Explicit |Explicit |Explicit
 |*Date* |- |- |- |- |Explicit |N/A |Implicit |-
-|*DateTime* |- |- |- |- |Explicit |- |N/A |-
+|*DateTime* |- |- |- |- |Explicit |Explicit |N/A |-
 |*Time* |- |- |- |- |Explicit |- |- |N/A
 |===============================================================================================
 
