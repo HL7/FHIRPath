@@ -1194,7 +1194,7 @@ The converse of the equivalent operator.
 
 === Comparison
 
-* The comparison operators are defined for strings, integers, decimals, datetimes and times.
+* The comparison operators are defined for strings, integers, decimals, quantities, dates, datetimes and times.
 * If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
 * Both arguments must be collections with single values, and the evaluator will throw an error if either collection has more than one item.
 * Both arguments must be of the same type, and the evaluator will throw an error if the types differ.
@@ -1211,11 +1211,51 @@ For partial date/time values, the comparison is performed to the highest precisi
 
 ==== &gt; (Greater Than)
 
+The greater than operator (`>`) returns true if the first operand is strictly greater than the second. The operands must be of the same type, or convertible to the same type using an implicit conversion.
+
+[source]
+----
+10 > 5 // true
+10 > 5.0 // true; note the 10 is converted to a decimal to perform the comparison
+'abc' > 'ABC' // true
+4 'm' > 4 'cm' // true (or { } if the implementation does not support unit conversion)
+----
+
 ==== &lt; (Less Than)
+
+The less than operator (`<`) returns true if the first operand is strictly less than the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+
+[source]
+----
+10 < 5 // false
+10 < 5.0 // false; note the 10 is converted to a decimal to perform the comparison
+'abc' < 'ABC' // false
+4 'm' < 4 'cm' // false (or { } if the implementation does not support unit conversion)
+----
 
 ==== &lt;= (Less or Equal)
 
+The less or equal operator (`\<=`) returns true if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+
+[source]
+----
+10 <= 5 // true
+10 <= 5.0 // true; note the 10 is converted to a decimal to perform the comparison
+'abc' <= 'ABC' // true
+4 'm' <= 4 'cm' // false (or { } if the implementation does not support unit conversion)
+----
+
 ==== &gt;= (Greater or Equal)
+
+The greater or equal operator (`>=`) returns true if the first operand is greater than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+
+[source]
+----
+10 >= 5 // false
+10 >= 5.0 // false; note the 10 is converted to a decimal to perform the comparison
+'abc' >= 'ABC' // false
+4 'm' >= 4 'cm' // true (or { } if the implementation does not support unit conversion)
+----
 
 === Types
 
