@@ -19,7 +19,7 @@ ____
 
 toc::[]
 
-== Overview
+== Background
 
 In Information Systems in general, and Healthcare Information Systems in particular, the need for formal representation of logic is both pervasive and critical. From low-level technical specifications, through intermediate logical architectures, up to the high-level conceptual descriptions of requirements and behavior, the ability to formally represent knowledge in terms of expressions and information models is essential to the specification and implementation of these systems.
 
@@ -43,7 +43,7 @@ Given these constraints, and the lack of a specific language that meets all of t
 
 === Usage
 
-In Fast Healthcare Interoperability Resources ([FHIR](http://hl7.org/fhir)), FHIRPath is used within the specification to provide formal definitions for conditions such as validation invariants, search parameter paths, etc. Within Clinical Quality Language ([CQL](http://cql.hl7.org)), FHIRPath is used to simplify graph-traversal for hierarchical information models.
+In Fast Healthcare Interoperability Resources (link:http://hl7.org/fhir[FHIR]), FHIRPath is used within the specification to provide formal definitions for conditions such as validation invariants, search parameter paths, etc. Within Clinical Quality Language (link:http://cql.hl7.org[CQL]), FHIRPath is used to simplify graph-traversal for hierarchical information models.
 
 In both FHIR and CQL, the model independence of FHIRPath means that expressions can be written that deal with the contents of the resources and data types as described in the Logical views, or the UML diagrams, rather than against the physical representation of those resources. JSON and XML specific features are not visible to the FHIRPath language (such as comments and the split representation of primitives (i.e. `value[x]`)).
 
@@ -1981,7 +1981,7 @@ There are a few constructs in the FHIRPath language where the compiler cannot de
 * The `resolve()` function
 * A member which is polymorphic (e.g. a choice[x] type in FHIR)
 
-Note that the `resolve()` function is defined by the FHIR context, it is not part of FHIRPath directly. For more information see the [FHIRPath](https://hl7.org/fhir/fhirpath.html#functions) section of the FHIR specification.
+Note that the `resolve()` function is defined by the FHIR context, it is not part of FHIRPath directly. For more information see the link:https://hl7.org/fhir/fhirpath.html#functions[FHIRPath] section of the FHIR specification.
 
 Authors can use the `as` operator or `ofType()` function directly after such constructs to inform the compiler of the expected type.
 
