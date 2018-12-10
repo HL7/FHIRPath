@@ -1449,7 +1449,15 @@ Computes the remainder of the truncated division of its arguments (supported for
 
 ==== &amp; (String concatenation)
 
-For strings, will concatenate the strings, where an empty operand is taken to be the empty string. This differs from `+` on two strings, which will result in an empty collection when one of the operands is empty.
+For strings, will concatenate the strings, where an empty operand is taken to be the empty string. This differs from `+` on two strings, which will result in an empty collection when one of the operands is empty. This operator is specifically included to simplify treating an empty collection as an empty string, a common use case in string manipulation.
+
+[source]
+----
+'ABC' + 'DEF' // 'ABCDEF'
+'ABC' + { } + 'DEF' // { }
+'ABC' & 'DEF' // 'ABCDEF'
+'ABC' & { } & 'DEF' // 'ABCDEF'
+----
 
 === Date/Time Arithmetic
 
