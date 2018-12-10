@@ -354,7 +354,7 @@ Correspondingly, arguments to the functions can be any FHIRPath expression, thou
 
 The following sections describe the functions supported in FHIRPath, detailing the expected types of parameters and type of collection returned by the function:
 
-* If the function expects a parameter to be a single value (e.g. `item(index: Integer)` and it is passed an argument that evaluates to a collection with multiple items or a collection with an item that is not of the required type, the evaluation of the expression will end and an error will be signaled to the calling environment.
+* If the function expects a parameter to be a single value (e.g. `item(index: Integer)` and it is passed an argument that evaluates to a collection with multiple items, or to a collection with an item that is not of the required type (or cannot be converted to the required type), the evaluation of the expression will end and an error will be signaled to the calling environment.
 * If the function takes an `expression` as a parameter, the function will evaluate this parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` and `$index` elements, which represent the item from the input collection currently under evaluation, and its index in the collection, respectively. For example, in `name.given.where($this > 'ba' and $this < 'bc')` the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
 
 Note that the bracket notation in function signatures indicates optional parameters, and is not part of the formal syntax of FHIRPath.
