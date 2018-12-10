@@ -112,7 +112,7 @@ Collections are fundamental to FHIRPath, in that the result of every expression 
 
 Within FHIRPath, a collection is:
 
-* Ordered - The order of items in the collection is important and is preserved through operations as much as possible.
+* Ordered - The order of items in the collection is important and is preserved through operations as much as possible. Operators and functions that do not preserve order will note that in their documentation.
 * Non-Unique - Duplicate elements are allowed within a collection. Some operations and functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
 * Indexed - Each item in a collection can be uniquely addressed by it's index, i.e. ordinal position within the collection. 
 * Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
@@ -469,6 +469,8 @@ Returns a collection containing only the unique items in the input collection. T
 
 If the input collection is empty (`{ }`), the result is empty.
 
+Note that the order of elements in the input collection is not guaranteed to be preserved in the result.
+
 ==== count() : Integer
 
 Returns a collection with a single value which is the integer count of the number of items in the input collection. Returns 0 when the input collection is empty.
@@ -533,6 +535,8 @@ Questionnaire.descendants().select(group | question)
 
 which would find *any* descendants called `group` or `question`, not just the ones nested inside other `group` or `question` elements.
 
+The order of items returned by the `repeat()` function is undefined.
+
 ==== ofType(type : identifier) : collection
 
 Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty.
@@ -587,7 +591,7 @@ Returns a collection containing the first `num` items in the input collection, o
 
 ==== intersect(other: collection) : collection
 
-Returns the set of elements that are in both collections. Duplicate items will be eliminated by this function.
+Returns the set of elements that are in both collections. Duplicate items will be eliminated by this function. Order of items is not guaranteed to be preserved in the result of this function.
 
 ==== exclude(other: collection) : collection
 
