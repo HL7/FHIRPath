@@ -1934,6 +1934,8 @@ There are a few constructs in the FHIRPath language where the compiler cannot de
 * The `resolve()` function
 * A member which is polymorphic (e.g. a choice[x] type in FHIR)
 
+Note that the `resolve()` function is defined by the FHIR context, it is not part of FHIRPath directly. For more information see the [FHIRPath](https://hl7.org/fhir/fhirpath.html#functions) section of the FHIR specification.
+
 Authors can use the `as` operator or `ofType()` function directly after such constructs to inform the compiler of the expected type.
 
 In cases where a compiler finds places where a collection of multiple items can be present while just a single item is expected, the author will need to make explicit how repetitions are dealt with. Depending on the situation one may:
