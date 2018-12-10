@@ -97,7 +97,7 @@ The path may start with the type of the root node (which otherwise does not have
 Patient.name.given
 ----
 
-The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`.
+The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`. When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
 
 Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use backticks to include characters in path parts that would otherwise be interpreted as keywords or operators, e.g.:
 
@@ -105,8 +105,6 @@ Syntactically, FHIRPath defines identifiers as any sequence of characters consis
 ----
 Message.`PID-1`
 ----
-
-When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
 
 === Collections
 
