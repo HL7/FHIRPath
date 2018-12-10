@@ -427,7 +427,7 @@ Conceptually, this function is evaluated by testing each element in the input co
 
 Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the equals (`=`) operation (see below).
 
-Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `false`. This means that if the input collection is empty (`{ }`), the result is `false`, otherwise if the `other` collection is empty (`{ }`), the result is `true`.
+Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
 
 ==== isDistinct() : Boolean
 
