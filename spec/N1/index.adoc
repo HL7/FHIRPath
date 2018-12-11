@@ -150,7 +150,7 @@ The list of available types that can be passed as a parameter to the `ofType()` 
 
 == Expressions
 
-FHIRPath expressions can consist of _paths_, _literal_, _operators_, and _function invocations_, and these elements can be chained together, so that the output of one operation or function is the input to the next. This is the core of the _fluent_ syntactic style and allows complex paths and expressions to be built up from simpler components.
+FHIRPath expressions can consist of _paths_, _literals_, _operators_, and _function invocations_, and these elements can be chained together, so that the output of one operation or function is the input to the next. This is the core of the _fluent_ syntactic style and allows complex paths and expressions to be built up from simpler components.
 
 === Literals
 
@@ -161,7 +161,7 @@ In addition to paths, FHIRPath expressions may contain _literals_, _operators_, 
 Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
 Integer: 0, 45
-Decimal: 0.0, 3.141592653589793236
+Decimal: 0.0, 3.14159265
 Date: @2015-02-04 (@ followed by ISO8601 compliant date)
 DateTime: @2015-02-04T14:34:28Z (@ followed by ISO8601 compliant date/time)
 Time: @T14:34:28+09:00 (@ followed by ISO8601 compliant time beginning with `T`)
@@ -220,7 +220,7 @@ The `Decimal` type represents real values in the range (-10^28^+1)/10^8^ to (10^
 [source]
 ----
 0.0
-3.141592653589793236
+3.14159265
 ----
 
 Note that decimal literals cannot use exponential notation. There is enough additional complexity associated with enabling exponential notation that this is outside the scope of what FHIRPath is intended to support (namely graph traversal).
@@ -229,8 +229,9 @@ Note that decimal literals cannot use exponential notation. There is enough addi
 
 The `Date` type represents date and partial date values in the range @0001-01-01 to @9999-12-31 with a 1 day step size.
 
-The `Date` literal is a subset of ISO8601 <<ISO8601>>:
+The `Date` literal is a subset of <<ISO8601>>:
 
+* A date literal begins with an `@`
 * It uses the `YYYY-MM-DD` format, though month and day parts are optional
 * Week dates and ordinal dates are not allowed
 * Years must be present (`-MM-DD` is not a valid Date in FHIRPath)
@@ -252,10 +253,10 @@ Consult the formal grammar for more details.
 
 The `Time` type represents time-of-day and partial time-of-day values in the range @T00:00:00.0 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. Implementations can provide support for higher precision, but must provide at least the range and precision defined here.
 
-The `Time` literal uses a subset of ISO8601 <<ISO8601>>:
+The `Time` literal uses a subset of <<ISO8601>>:
 
 * A time begins with a `@T`
-* It uses the `Thh:mm:ss.fff±hh:mm` format, though minute, second, millisecond parts are optional
+* It uses the `Thh:mm:ss.fff±hh:mm` format, though minute, second, and millisecond parts are optional
 * Timezone offset is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
 * `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
 
@@ -273,8 +274,9 @@ Consult the formal grammar for more details.
 
 The `DateTime` type represents date/time and partial date/time values in the range `@0001-01-01T00:00:00.0 to @9999-12-31T23:59:59.999` with a 1 millisecond step size. This range is defined based on a survey of datetime implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger ranges and higher precision, but must provide at least the range and precision defined here.
 
-The `DateTime` literal combines the `Date` and `Time` literals and is a subset of ISO8601 <<ISO8601>>:
+The `DateTime` literal combines the `Date` and `Time` literals and is a subset of <<ISO8601>>:
 
+* A datetime literal begins with an `@`
 * It uses the `YYYY-MM-DDThh:mm:ss.fff±hh:mm` format
 
 The following example illustrates the use of the `DateTime` literal:
@@ -288,9 +290,9 @@ Consult the formal grammar for more details.
 
 ==== Quantity
 
-The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be a valid UCUM <<UCUM>> unit.
+The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be a valid Unified Code for Units of Measure <<UCUM>> unit.
 
-The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid http://unitsofmeasure.org/trac[Unified Code for Units of Measure (UCUM)] unit. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
+The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid Unified Code for Units of Measure <<UCUM>> unit. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
 
 [source]
 ----
@@ -300,7 +302,7 @@ The `Quantity` literal is a number (integer or decimal), followed by a (single-q
 
 ____
 
-Note: When using UCUM <<UCUM>> units within FHIRPath, implementations shall use case-sensitive comparisons.
+Note: When using <<UCUM>> units within FHIRPath, implementations shall use case-sensitive comparisons.
 
 ____
 
@@ -316,7 +318,7 @@ For date/time units, an alternative representation may be used (note that both a
 
 ____
 
-Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>.
+Note: Although <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in <<ISO8601>>.
 
 ____
 
@@ -803,7 +805,7 @@ The following table describes the possible values convertible to an Boolean:
 |Type |Representation |Result
 
 |*String* |`'true'`, `'t'`, `'yes'`, `'y'`, `'1'`, `'1.0'` |`true`
-| |`'false'`, `'f'`, `'no'`, `'n'`, '`0`', '`0.0`' |`false`
+| |`'false'`, `'f'`, `'no'`, `'n'`, `'0'`, `'0.0'` |`false`
 | *Integer* |`1` |`true`
 | |`0` |`false`
 | *Decimal* |`1.0` |`true`
@@ -944,7 +946,7 @@ If the input collection contains a single item, this function will return true i
 * the item is a String that is convertible to a quantity
 * the item is a Boolean
 
-If the item is not one of the above types, or is not convertible to a quantity (using the regex format `(\\+|-)?\d+(.\d+)? &#39;&lt;unit&gt;&#39;`), the result is false.
+If the item is not one of the above types, or is not convertible to a quantity (using the regex format `(\\+|-)?\d+(.\d+)? &#39;.*&#39;`), the result is false.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -956,12 +958,12 @@ If the input collection contains a single item, this function will return a sing
 
 * the item is an Integer, or Decimal, where the resulting quantity will have the default unit (`&#39;1&#39;`)
 * the item is a Quantity
-* the item is a String and is convertible to a decimal
+* the item is a String and is convertible to a quantity
 * the item is a Boolean, where `true` results in the quantity `1.0 &#39;1&#39;`, and `false` results in the quantity `0.0 &#39;1&#39;`
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a quantity (using the regex format `(\\+|-)?\d+('.' \d+)?` &#39;&lt;unit&gt;&#39;`), the result is empty.
+If the item is a String, but the string is not convertible to a quantity (using the regex format `(\\+|-)?\d+(.\d+)? &#39;.*&#39;`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1000,7 +1002,7 @@ The String representation uses the following formats:
 |*Boolean* |`true` or `false`
 |*Integer* |`(\\+\|-)?\d+`
 |*Decimal* |`(\\+\|-)?\d+(.\d+)?`
-|*Quantity* |`(\\+\|-)?\d+(.\d+)? &#39;&lt;unit&gt;&#39;`
+|*Quantity* |`(\\+\|-)?\d+(.\d+)? &#39;.*&#39;`
 |*Date* |`YYYY-MM-DD`
 |*DateTime* |`YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`
 |*Time* |`Thh:mm:ss.fff(+/-)hh:mm`
@@ -1155,7 +1157,7 @@ This example of `replaceMatches()` will convert a string with a date formatted a
 
 ____
 
-Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the dialect defined by as part of https://www.w3.org/TR/xmlschema11-2/#regexs[XML Schema 1.1] as the dialect most likely to be broadly supported and understood.
+Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the dialect defined by as part of XML Schema 1.1 <<XMLRE>> as the dialect most likely to be broadly supported and understood.
 
 ____
 
@@ -1253,11 +1255,11 @@ When comparing quantities for equality, the dimensions of each quantity must be 
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by UCUM <<UCUM>>.
+Implementations that do support units SHALL do so as specified by <<UCUM>>.
 
 ____
 
-Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
+Note: Although <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in <<ISO8601>>. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
 
 ____
 
@@ -1291,7 +1293,7 @@ Returns `true` if the collections are the same. In particular, comparing empty c
 If both operands are collections with a single item, they must be of the same type, and:
 
 * For primitives
-** `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace<<string-equivalence>>.
+** `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see <<string-equivalence>> for more details).
 ** `Integer`: exactly equal
 ** `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes are ignored in determining precision.
 ** `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).
@@ -1309,11 +1311,11 @@ When comparing quantities for equivalence, the dimensions of each quantity must 
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by UCUM <<UCUM>>.
+Implementations that do support units SHALL do so as specified by <<UCUM>>.
 
 ____
 
-Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
+Note: Although <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in <<ISO8601>>. For comparisons involving durations (where no anchor to a calendar is available), the duration of a year is 365 days, and the duration of a month is 30 days.
 
 ____
 
@@ -1353,7 +1355,7 @@ When comparing quantities, the dimensions of each quantity must be the same, but
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by UCUM <<UCUM>>.
+Implementations that do support units SHALL do so as specified by <<UCUM>>.
 
 For partial date/time values, the comparison is performed to the highest precision specified in both values.
 
@@ -1544,7 +1546,7 @@ When operating on quantities, the dimensions of each quantity must be the same, 
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by UCUM <<UCUM>>.
+Implementations that do support units SHALL do so as specified by <<UCUM>>.
 
 ==== * (multiplication)
 
@@ -1661,7 +1663,7 @@ Calculations involving weeks are equivalent to multiplying the number of weeks b
 
 ____
 
-Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>.
+Note: Although <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in <<ISO8601>>.
 
 ____
 
@@ -1688,7 +1690,7 @@ Calculations involving weeks are equivalent to multiplying the number of weeks b
 
 ____
 
-Note: Although UCUM <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in ISO8601 <<ISO8601>>.
+Note: Although <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a year, calculations involving durations shall round using calendar semantics as specified in <<ISO8601>>.
 
 ____
 
@@ -1770,7 +1772,7 @@ FHIRPath defines the following lexical elements:
 |===
 
 === Whitespace
-FHIRPath defines _tab_, _space_, and _return_ as _whitespace_, meaning they are only used to separate other tokens within the language. Any number of whitespace characters can appear, and the language does not use whitespace for anything other than delimiting tokens.
+FHIRPath defines _tab_ (`\t`), _space_ (` `), _line feed_ (`\n`) and _carriage return_ (`\r`) as _whitespace_, meaning they are only used to separate other tokens within the language. Any number of whitespace characters can appear, and the language does not use whitespace for anything other than delimiting tokens.
 
 === Comments
 FHIRPath defines two styles of comments, _single-line_, and _multi-line_. A single-line comment consists of two forward slashes, followed by any text up to the end of the line:
@@ -1821,7 +1823,7 @@ Literals provide for the representation of values within FHIRPath. The following
 |The at-symbol (`@`) followed by a time (Thh:mm:ss.fff(+/-)hh:mm)
 
 |*Quantity*
-|An integer or decimal literal followed by a datetime precision specifier, or a UCUM <<UCUM>> unit specifier
+|An integer or decimal literal followed by a datetime precision specifier, or a <<UCUM>> unit specifier
 |===
 
 For a more detailed discussion of the use and semantics of literals within expressions, refer to the Expressions section above.
@@ -1925,7 +1927,7 @@ The following environmental values are set for all contexts:
 [source]
 ----
 %ucum       // (string) url for UCUM
-%context	// The original node that was passed to the evaluation engine before starting evaluation
+%context    // The original node that was passed to the evaluation engine before starting evaluation
 ----
 
 Implementers should note that using additional environment variables is a formal extension point for the language. Various usages of FHIRPath may define their own externals, and implementers should provide some appropriate configuration framework to allow these constants to be provided to the evaluation engine at run-time. E.g.:
@@ -2287,7 +2289,7 @@ http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 - [[[ISO8601]]] Date and time format - ISO 8601. https://www.iso.org/iso-8601-date-and-time-format.html
 - [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.3. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
 - [[[MOF]]] Meta Object Facility. https://www.omg.org/spec/MOF/, version 2.5.1, November 2016
-- [[[XMLRE]]] Regular Expressions. https://www.w3.org/TR/xmlschema11-2/#regexs
+- [[[XMLRE]]] Regular Expressions. XML Schema 1.1. https://www.w3.org/TR/xmlschema11-2/#regexs
 - [[[PCRE]]] Pearl-Compatible Regular Expressions. http://www.pcre.org/
 - [[[UCUM]]] Unified Code for Units of Measure (UCUM) http://unitsofmeasure.org/ucum.html, Version 2.1, Revision 442 (2017-11-21)
 
