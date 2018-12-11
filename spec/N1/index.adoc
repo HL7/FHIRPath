@@ -463,33 +463,75 @@ generalPractitioner.all($this is Practitioner)
 
 Takes a collection of Boolean values and returns `true` if all the items are `true`. If any items are `false`, the result is `false`. If the input is empty (`{ }`), the result is `true`.
 
+The following example returns `true` if all of the components of the Observation have a value greater than 90 mm[Hg]:
+
+[source]
+----
+Observation.select(component.value > 90 'mm[Hg]').allTrue()
+----
+
 ==== anyTrue() : Boolean
 
 Takes a collection of Boolean values and returns `true` if any of the items are `true`. If all the items are `false`, or if the input is empty (`{ }`), the result is `false`.
+
+The following example returns `true` if any of the components of the Observation have a value greater than 90 mm[Hg]:
+
+[source]
+----
+Observation.select(component.value > 90 'mm[Hg]').anyTrue()
+----
 
 ==== allFalse() : Boolean
 
 Takes a collection of Boolean values and returns `true` if all the items are `false`. If any items are `true`, the result is `false`. If the input is empty (`{ }`), the result is `true`.
 
+The following example returns `true` if none of the components of the Observation have a value greater than 90 mm[Hg]:
+
+[source]
+----
+Observation.select(component.value > 90 'mm[Hg]').allFalse()
+----
+
 ==== anyFalse() : Boolean
 
 Takes a collection of Boolean values and returns `true` if any of the items are `false`. If all the items are `true`, or if the input is empty (`{ }`), the result is `false`.
 
+The following example returns `true` if any of the components of the Observation have a value that is not greater than 90 mm[Hg]:
+
+[source]
+----
+Observation.select(component.value > 90 'mm[Hg]').anyFalse()
+----
+
 ==== subsetOf(other : collection) : Boolean
 
-Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the equals (`=`) operation (see below).
+Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the <<equals>> (`=`) operation.
 
 Conceptually, this function is evaluated by testing each element in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
 
+The following example returns true if the tags defined in any contained resource are a subset of the tags defined in the MedicationRequest resource:
+
+[source]
+----
+MedicationRequest.contained.meta.tag.subsetOf(MedicationRequest.meta.tag)
+----
+
 ==== supersetOf(other : collection) : Boolean
 
-Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the equals (`=`) operation (see below).
+Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the <<equals>> (`=`) operation.
 
 Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
 
+The following example returns true if the tags defined in any contained resource are a superset of the tags defined in the MedicationRequest resource:
+
+[source]
+----
+MedicationRequest.contained.meta.tag.supersetOf(MedicationRequest.meta.tag)
+----
+
 ==== isDistinct() : Boolean
 
-Returns `true` if all the items in the input collection are distinct. To determine whether two items are distinct, the equals (`=`) operator is used, as defined below.
+Returns `true` if all the items in the input collection are distinct. To determine whether two items are distinct, the <<equals>> (`=`) operator is used, as defined below.
 
 Conceptually, this function is shorthand for a comparison of the `count()` of the input collection against the `count()` of the `distinct()` of the input collection:
 
@@ -502,11 +544,18 @@ This means that if the input collection is empty (`{ }`), the result is true.
 
 ==== distinct() : collection
 
-Returns a collection containing only the unique items in the input collection. To determine whether two items are the same, the equals (`=`) operator is used, as defined below.
+Returns a collection containing only the unique items in the input collection. To determine whether two items are the same, the <<equals>> (`=`) operator is used, as defined below.
 
 If the input collection is empty (`{ }`), the result is empty.
 
 Note that the order of elements in the input collection is not guaranteed to be preserved in the result.
+
+The following example returns the distinct list of tags on the given Patient:
+
+[source]
+----
+Patient.meta.tag.distinct()
+----
 
 ==== count() : Integer
 
@@ -519,6 +568,13 @@ Returns a collection with a single value which is the integer count of the numbe
 Returns a collection containing only those elements in the input collection for which the stated `criteria` expression evaluates to `true`. Elements for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
 
 If the input collection is emtpy (`{ }`), the result is empty.
+
+The following example returns the list of `telecom` elements that have a `use` element with the value of `'official'`:
+
+[source]
+----
+Patient.telecom.where(use = 'official')
+----
 
 ==== select(projection: expression) : collection
 
@@ -545,7 +601,7 @@ Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
 
 ==== repeat(projection: expression) : collection
 
-A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the equals (`=`) operator).
+A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the <<equals>> (`=`) operator).
 
 This function can be used to traverse a tree and selecting only specific children:
 
@@ -595,7 +651,7 @@ Note: Unless specified otherwise by the underlying Object Model, the first item 
 
 ____
 
-Example:
+The following example returns the 0th `name` of the Patient:
 
 [source]
 ----
@@ -606,9 +662,16 @@ Patient.name[0]
 
 Will return the single item in the input if there is just one item. If the input collection is empty (`{ }`), the result is empty. If there are multiple items, an error is signaled to the evaluation environment. This function is useful for ensuring that an error is returned if an assumption about cardinality is violated at run-time.
 
+The following example returns the name of the Patient if there is one. If there are no names, an empty collection, and if there are multiple names, an error is signaled to the evaluation environment:
+
+[source]
+----
+Patient.name.single()
+----
+
 ==== first() : collection
 
-Returns a collection containing only the first item in the input collection. This function is equivalent to `item(0)`, so it will return an empty collection if the input collection has no items.
+Returns a collection containing only the first item in the input collection. This function is equivalent to `item[0]`, so it will return an empty collection if the input collection has no items.
 
 ==== last() : collection
 
@@ -640,7 +703,7 @@ e.g. Patient.children().exclude(name|birthDate) would return all the properties 
 
 ==== union(other : collection)
 
-Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
+Merge the two collections into a single collection, eliminating any duplicate values (using <<equals>> (`=`) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
 
 This function can also be invoked using the `|` operator.
 
@@ -1371,13 +1434,27 @@ Observation.component.where((value as Quantity) > 30 'mg')
 === Collections
 
 ==== | (union collections)
-Merge the two collections into a single collection, eliminating any duplicate values (using equals (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
+Merge the two collections into a single collection, eliminating any duplicate values (using <<equals>> (`=`)) to determine equality). Unioning an empty collection to a non-empty collection will return the non-empty collection with duplicates eliminated. There is no expectation of order in the resulting collection.
 
 ==== in (membership)
 If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
 
+The following example returns true if 'Joe' is in the list of given names for the Patient:
+
+[source]
+----
+'Joe' in Patient.name.given
+----
+
 ==== contains (containership)
 If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. This is the converse operation of in.
+
+The following example returns true if the list of given names for the Patient has 'Joe' in it:
+
+[source]
+----
+Patient.name.given contains 'Joe'
+----
 
 === Boolean logic
 For all boolean operators, the collections passed as operands are first evaluated as Booleans (as described in <<Singleton Evaluation of Collections>>). The operators then use three-valued logic to propagate empty operands.
