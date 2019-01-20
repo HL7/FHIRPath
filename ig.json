@@ -13,7 +13,7 @@
 	"resources": {
 	},
 	"canonicalBase": "http://hl7.org/fhirpath",
-	"version": "3.6.0",
+	"version": "4.0.0",
 	"source": "ig.xml",
   "license" : "CC0-1.0",
   "npm-name" : "fhirpath"
