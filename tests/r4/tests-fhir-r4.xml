@@ -249,7 +249,7 @@
 		<test name="testLiteralEmptyCollection" inputfile="patient-example.xml"><expression>Patient.name.given.empty().not()</expression><output type="boolean">true</output></test>
 		<test name="testLiteralEmptyCollection" inputfile="patient-example.xml"><expression>Patient.name.given != {}</expression></test>
 
-		<test name="testExpressions" inputfile="patient-example.xml"><expression>Patient.name.select(given | family).distinct()</expression>
+		<test name="testExpressions" inputfile="patient-example.xml" ordered="false"><expression>Patient.name.select(given | family).distinct()</expression>
       <output type="string">Peter</output>
       <output type="string">James</output>
       <output type="string">Chalmers</output>
