@@ -896,8 +896,8 @@
 
 	<group name="testConcatenate">
 		<test inputfile="patient-example.xml"><expression>'a' &amp; 'b' = 'ab'</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>'1' &amp; {} = '1'</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>{} &amp; 'b' = 'b'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>('1' &amp; {}).empty()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>({} &amp; 'b').empty()</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression invalid="semantic">(1 | 2 | 3) &amp; 'b' = '1,2,3b'</expression></test>
 	</group>
 
@@ -952,12 +952,12 @@
 		<test inputfile="patient-example.xml"><expression>%sct = 'http://snomed.info/sct'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>%loinc = 'http://loinc.org'</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>%ucum = 'http://unitsofmeasure.org'</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>%"vs-administrative-gender" = 'http://hl7.org/fhir/ValueSet/administrative-gender'</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>%`vs-administrative-gender` = 'http://hl7.org/fhir/ValueSet/administrative-gender'</expression><output type="boolean">true</output></test>
 	</group>
 
 	<group name="testExtension">
 		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime').exists()</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension(%"ext-patient-birthTime").exists()</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension(%`ext-patient-birthTime`).exists()</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime1').empty()</expression><output type="boolean">true</output></test>
 	</group>
 
@@ -981,10 +981,10 @@
     <test inputfile="patient-example.xml"><expression>Patient.is(Patient)</expression><output type="boolean">true</output></test>
     <test inputfile="patient-example.xml"><expression>Patient.is(FHIR.Patient)</expression><output type="boolean">true</output></test>
     <test inputfile="patient-example.xml"><expression>Patient.is(FHIR.`Patient`)</expression><output type="boolean">true</output></test>
-    <test inputfile="patient-example.xml"><expression>Patient.ofType(Patient)</expression><output type="boolean">true</output></test>
-    <test inputfile="patient-example.xml"><expression>Patient.ofType(FHIR.Patient)</expression><output type="boolean">true</output></test>
-    <test inputfile="patient-example.xml"><expression>Patient.ofType(System.Patient).not()</expression><output type="boolean">true</output></test>
-    <test inputfile="patient-example.xml"><expression>Patient.ofType(FHIR.`Patient`)</expression><output type="boolean">true</output></test>
+    <test inputfile="patient-example.xml"><expression>Patient.ofType(Patient).type().name</expression><output type="string">Patient</output></test>
+    <test inputfile="patient-example.xml"><expression>Patient.ofType(FHIR.Patient).type().name</expression><output type="string">Patient</output></test>
+    <test inputfile="patient-example.xml"><expression>Patient.is(System.Patient).not()</expression><output type="boolean">true</output></test>
+    <test inputfile="patient-example.xml"><expression>Patient.ofType(FHIR.`Patient`).type().name</expression><output type="string">Patient</output></test>
 	</group>
   
   <group name="testConformsTo">
