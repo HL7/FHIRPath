@@ -90,7 +90,7 @@ FHIRPath allows navigation through the tree by composing a path of concatenated 
 name.given
 ----
 
-This would result in a collection of nodes, one with the value "Wouter" and one with the value "Gert". In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The input collection at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step.
+This would result in a collection of nodes, one with the value `'Wouter'` and one with the value `'Gert'`. In fact, each step in such a path results in a collection of nodes by selecting nodes with the given label from the step before it. The input collection at the beginning of the evaluation contained all elements from Patient, and the path `name` selected just those named `name`. Since the `name` element repeats, the next step `given` along the path, will contain all nodes labeled `given` from all nodes `name` in the preceding step.
 
 The path may start with the type of the root node (which otherwise does not have a name), but this is optional. To illustrate this point, the path `name.given` above can be evaluated as an expression on a set of data of any type. However the expression may be prefixed with the name of the type of the root:
 
@@ -164,7 +164,7 @@ Integer: 0, 45
 Decimal: 0.0, 3.14159265
 Date: @2015-02-04 (@ followed by ISO8601 compliant date)
 DateTime: @2015-02-04T14:34:28Z (@ followed by ISO8601 compliant date/time)
-Time: @T14:34:28+09:00 (@ followed by ISO8601 compliant time beginning with `T`)
+Time: @T14:34:28+09:00 (@ followed by ISO8601 compliant time beginning with T)
 Quantity: 10 'mg', 4 days
 ----
 
@@ -182,18 +182,21 @@ false
 
 ==== String
 
-The `String` type represents string values up to `2^31-1` characters in length. String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
+The `String` type represents string values up to 2^31^-1 characters in length. String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
 
-* Unicode characters may be escaped using `\u` followed by four hex digits.
-* Additional escapes are those supported in JSON:
-** `\\` (backslash),
-** `\/` (slash),
-** `\f` (form feed - \u000c),
-** `\n` (newline - \u000a),
-** `\r` (carriage return - \u000d),
-** `\t` (tab - \u0009)
-** `\`` (backtick)
-** `\'` (single-quote)
+|===
+|Escape|Character
+
+|`\'`|Single-quote
+|`\"`|Double-quote
+|`\``|Backtick
+|`\r`|Carriage Return
+|`\n`|Line Feed
+|`\t`|Tab
+|`\f`|Form Feed
+|`\\`|Backslash
+|`\uXXXX`|Unicode character, where XXXX is the hexadecimal representation of the character
+|===
 
 Note that Unicode is supported in both string literals and delimited identifiers. 
 
@@ -211,7 +214,10 @@ The `Integer` type represents whole numbers in the range -2^31^ to 2^31^-1.
 ----
 0
 45
+-5
 ----
+
+Note that the minus sign (`-`) in the representation of a negative integer is not part of the literal, it is the unary negation operator defined as part of FHIRPath syntax.
 
 ==== Decimal
 
@@ -1230,7 +1236,7 @@ If both operands are collections with a single item, they must be of the same ty
 * For primitives:
 ** `String`: comparison is based on Unicode values
 ** `Integer`: values must be exactly equal
-** `Decimal`: values must be equal, trailing zeroes are ignored
+** `Decimal`: values must be equal, trailing zeroes after the decimal are ignored
 ** `Boolean`: values must be the same
 ** `Date`: must be exactly the same
 ** `DateTime`: must be exactly the same, respecting the timezone offset (though +24:00 = +00:00 = Z)
@@ -1772,7 +1778,7 @@ FHIRPath defines the following lexical elements:
 |===
 
 === Whitespace
-FHIRPath defines _tab_ (`\t`), _space_ (` `), _line feed_ (`\n`) and _carriage return_ (`\r`) as _whitespace_, meaning they are only used to separate other tokens within the language. Any number of whitespace characters can appear, and the language does not use whitespace for anything other than delimiting tokens.
+FHIRPath defines _tab_ (`\t`), _space_ (`` ``), _line feed_ (`\n`) and _carriage return_ (`\r`) as _whitespace_, meaning they are only used to separate other tokens within the language. Any number of whitespace characters can appear, and the language does not use whitespace for anything other than delimiting tokens.
 
 === Comments
 FHIRPath defines two styles of comments, _single-line_, and _multi-line_. A single-line comment consists of two forward slashes, followed by any text up to the end of the line:
@@ -1805,10 +1811,10 @@ Literals provide for the representation of values within FHIRPath. The following
 |The boolean literals (`true` and `false`)
 
 |*Integer*
-|Sequences of digits in the range 0-2^32-1
+|Sequences of digits in the range 0..2^32^-1
 
 |*Decimal*
-|Sequences of digits with a decimal point, in the range 0.0..10^28-10^-8
+|Sequences of digits with a decimal point, in the range 0.0..10^28^-1/10^8^
 
 |*String*
 |Strings of any character enclosed within single-ticks (`'`)
@@ -1897,21 +1903,7 @@ A delimited identifier is any sequence of characters enclosed in backticks (`` `
 
 The use of backticks allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have property or type names that are not valid simple identifiers.
 
-FHIRPath escape sequences for strings also work for delimited identifiers:
-
-
-|===
-|Escape|Character
-
-|`\'`|Single-quote
-|`\``|Backtick
-|`\r`|Carriage Return
-|`\n`|Line Feed
-|`\t`|Tab
-|`\f`|Form Feed
-|`\\`|Backslash
-|`\uXXXX`|Unicode character, where XXXX is the hexadecimal representation of the character
-|===
+FHIRPath <<string,escape sequences>> for strings also work for delimited identifiers.
 
 When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
 
