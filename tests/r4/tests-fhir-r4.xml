@@ -230,7 +230,7 @@
 		<test name="testLiteralDecimal" inputfile="observation-example.xml"><expression invalid="semantic">Observation.value.value &lt; 'test'</expression><!-- no output - empty set --></test>
 
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate = @1974-12-25</expression><output type="boolean">true</output></test>
-		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00</expression><output type="boolean">true</output></test>
+		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00</expression></test>
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00-10:00</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00+10:00</expression><output type="boolean">true</output></test>
 		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>Patient.birthDate != @1974-12-25T12:34:00Z</expression><output type="boolean">true</output></test>
