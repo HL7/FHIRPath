@@ -261,11 +261,11 @@
 		<test name="testEmpty" inputfile="patient-example.xml"><expression>Patient.name.empty().not()</expression><output type="boolean">true</output></test>
 		<test name="testEmpty" inputfile="patient-example.xml"><expression>Patient.link.empty()</expression><output type="boolean">true</output></test>
 
-		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>true.not() = false</expression><output type="boolean">true</output></test>
-		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>false.not() = true</expression><output type="boolean">true</output></test>
-		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>(0).not() = false</expression><output type="boolean">true</output></test>
-		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>(1).not() = false</expression><output type="boolean">true</output></test>
-		<test name="testLiteralDate" inputfile="patient-example.xml"><expression>(1|2).not() = false</expression><output type="boolean">true</output></test>
+		<test name="testNot" inputfile="patient-example.xml"><expression>true.not() = false</expression><output type="boolean">true</output></test>
+		<test name="testNot" inputfile="patient-example.xml"><expression>false.not() = true</expression><output type="boolean">true</output></test>
+		<test name="testNot" inputfile="patient-example.xml"><expression>(0).not() = true</expression><output type="boolean">true</output></test>
+		<test name="testNot" inputfile="patient-example.xml"><expression>(1).not() = false</expression><output type="boolean">true</output></test>
+		<test name="testNot" inputfile="patient-example.xml"><expression invalid="semantic">(1|2).not() = false</expression></test>
 	</group>
 
   <group name="testTypes">
@@ -394,7 +394,7 @@
   </group>
 
   <group name="testCollectionBoolean">
-    <test inputfile="patient-example.xml"><expression>iif(1 | 2 | 3, true, false)</expression><output type="boolean">true</output></test>
+    <test inputfile="patient-example.xml"><expression invalid="semantic">iif(1 | 2 | 3, true, false)</expression></test>
     <test inputfile="patient-example.xml"><expression>iif({}, true, false)</expression><output type="boolean">false</output></test>
     <test inputfile="patient-example.xml"><expression>iif(true, true, false)</expression><output type="boolean">true</output></test>
     <test inputfile="patient-example.xml"><expression>iif({} | true, true, false)</expression><output type="boolean">true</output></test>
