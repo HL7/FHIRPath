@@ -794,16 +794,16 @@ In all other cases, the function will return an empty collection.
 
 ==== toBoolean() : Boolean
 
-If the input collection contains a single item, this function will return a single integer if:
+If the input collection contains a single item, this function will return a single boolean if:
 
-* the item is an Boolean
+* the item is a Boolean
 * the item is an Integer and is convertible to a Boolean using one of the possible integer representations of Boolean values
 * the item is a Decimal and is convertible to a Boolean using one of the possible decimal representation of Boolean values
 * the item is a String and is convertible to a Boolean using one of the possible string representations of Boolean values
 
 If the item is not one the above types, or the item is a String or Integer, but is not one of the possible values convertible to a Boolean, the result is empty.
 
-If the item is a String, but the string is not convertible to an integer (using the regex format `(\\+|-)?\d+`), the result is empty.
+If the item is a String, but the string is not convertible to a boolean (using one of the possible string representations of Boolean values), the result is empty.
 
 The following table describes the possible values convertible to an Boolean:
 
@@ -1239,8 +1239,8 @@ If both operands are collections with a single item, they must be of the same ty
 ** `Decimal`: values must be equal, trailing zeroes after the decimal are ignored
 ** `Boolean`: values must be the same
 ** `Date`: must be exactly the same
-** `DateTime`: must be exactly the same, respecting the timezone offset (though +24:00 = +00:00 = Z)
-** `Time`: must be exactly the same, respecting the timezone offset (though +24:00 = +00:00 = Z)
+** `DateTime`: must be exactly the same, respecting the timezone offset (though +00:00 = -00:00 = Z)
+** `Time`: must be exactly the same, respecting the timezone offset (though +00:00 = -00:00 = Z)
 ** If a time or date/time has no timezone offset, the timezone offset of the evaluating machine is assumed.
 * For complex types, equality requires all child properties to be equal, recursively.
 
@@ -1269,7 +1269,7 @@ Note: Although <<UCUM>> identifies 'a' as 365.25 days, and 'mo' as 1/12 of a yea
 
 ____
 
-For `Date`, `DateTime` and `Time` equality, the comparison is performed at the unit with the most precision of either input. If the input values have the same level of precision, the result is `true` if the values are the same, and `false` otherwise. If the input values have different levels of precision, the result is empty (`{ }`).
+For `Date`, `DateTime` and `Time` equality, the comparison is performed by considering each precision in order, beginning with years (or hours for time values), and respecting timezone offsets. If the values are the same, comparison proceeds to the next precision; if the values are different, the comparison stops and the result is `false`. If one input has a value for the precision and the other does not, the comparison stops and the result is empty (`{ }`); if neither input has a value for the precision, or the last precision has been reached, the comparison stops and the result is `true`.
 
 For example:
 
@@ -1301,7 +1301,7 @@ If both operands are collections with a single item, they must be of the same ty
 * For primitives
 ** `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see <<string-equivalence>> for more details).
 ** `Integer`: exactly equal
-** `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes are ignored in determining precision.
+** `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision.
 ** `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).
 ** `Boolean`: the values must be the same
 * For complex types, equivalence requires all child properties to be equivalent, recursively.
@@ -1311,9 +1311,9 @@ If both operands are collections with multiple items:
 * Each item must be equivalent
 * Comparison is not order dependent
 
-Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
+Note that this implies that if the collections have a different number of items to compare, or if one input is a value and the other is empty (`{ }`), the result will be `false`.
 
-When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in `false`.
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
