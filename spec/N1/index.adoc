@@ -2240,7 +2240,7 @@ Same as the last, but pick out just the MR value
 
 [source]
 ----
-Message.group(`PATIENT`).group(`PATIENT_OBSERVATION`).item.ofType(Segment)
+Message.group('PATIENT').group('PATIENT_OBSERVATION').item.ofType(Segment)
   .where(code = 'OBX' and elements(2).any(components(2) = 'LN')))
 ----
 
