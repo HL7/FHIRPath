@@ -1,4 +1,4 @@
-= FHIRPath (3rd Normative Ballot)
+= FHIRPath (Normative Release)
 :page-layout: normative3release
 :backend: xhtml
 :sectnums:
@@ -2212,7 +2212,7 @@ Some example queries:
 
 [source]
 ----
-Message.segment.where(code = 'PID').field[3].element.first.simple()
+Message.segment.where(code = 'PID').field[3].element.first().simple()
 ----
 
 Get the value of the first component in the first repeat of PID-3
