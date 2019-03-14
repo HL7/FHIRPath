@@ -1252,8 +1252,7 @@ If both operands are collections with a single item, they must be of the same ty
 ** `Boolean`: values must be the same
 ** `Date`: must be exactly the same
 ** `DateTime`: must be exactly the same, respecting the timezone offset (though +00:00 = -00:00 = Z)
-** `Time`: must be exactly the same, respecting the timezone offset (though +00:00 = -00:00 = Z)
-** If a time or date/time has no timezone offset, the timezone offset of the evaluating machine is assumed.
+** `Time`: must be exactly the same
 * For complex types, equality requires all child properties to be equal, recursively.
 
 If both operands are collections with multiple items:
@@ -1283,6 +1282,8 @@ ____
 
 For `Date`, `DateTime` and `Time` equality, the comparison is performed by considering each precision in order, beginning with years (or hours for time values), and respecting timezone offsets. If the values are the same, comparison proceeds to the next precision; if the values are different, the comparison stops and the result is `false`. If one input has a value for the precision and the other does not, the comparison stops and the result is empty (`{ }`); if neither input has a value for the precision, or the last precision has been reached, the comparison stops and the result is `true`.
 
+For `DateTime` values that do not have a timezone offsets, whether or not to provide a default timezone offset is a policy decision. In the simplest case, no default timezone offset is provided, but some implementations may use the client's or the evaluating system's timezone offset.
+
 For example:
 
 [source]
@@ -1292,7 +1293,7 @@ For example:
 @2012-01 = @2012 // returns empty ({ })
 ----
 
-Note that for Date, Time, and DateTime values, the specification is not prescriptive about how implementations "respect" timezone offsets, but the following examples illustrate expected behavior:
+Note that for DateTime values, the specification is not prescriptive about how implementations "respect" timezone offsets, but the following examples illustrate expected behavior:
 
 [source]
 ----
