@@ -1,5 +1,5 @@
-= FHIRPath (Normative Release)
-:page-layout: normative3release
+= FHIRPath (3rd Normative Ballot)
+:page-layout: normative3ballot
 :backend: xhtml
 :sectnums:
 :sectanchors:
@@ -163,8 +163,8 @@ String: 'test string', 'urn:oid:3.4.5.6.7.8'
 Integer: 0, 45
 Decimal: 0.0, 3.14159265
 Date: @2015-02-04 (@ followed by ISO8601 compliant date)
-DateTime: @2015-02-04T14:34:28Z (@ followed by ISO8601 compliant date/time)
-Time: @T14:34:28+09:00 (@ followed by ISO8601 compliant time beginning with T)
+DateTime: @2015-02-04T14:34:28+09:00 (@ followed by ISO8601 compliant date/time)
+Time: @T14:34:28 (@ followed by ISO8601 compliant time beginning with T, no timezone offset)
 Quantity: 10 'mg', 4 days
 ----
 
@@ -257,21 +257,19 @@ Consult the formal grammar for more details.
 
 ==== Time
 
-The `Time` type represents time-of-day and partial time-of-day values in the range @T00:00:00.0 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. Implementations can provide support for higher precision, but must provide at least the range and precision defined here.
+The `Time` type represents time-of-day and partial time-of-day values in the range @T00:00:00.0 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. Implementations can provide support for higher precision, but must provide at least the range and precision defined here. Time values in FHIRPath do not have a timezone or timezone offset.
 
 The `Time` literal uses a subset of <<ISO8601>>:
 
 * A time begins with a `@T`
-* It uses the `Thh:mm:ss.fff±hh:mm` format, though minute, second, and millisecond parts are optional
-* Timezone offset is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
-* `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
+* It uses the `Thh:mm:ss.fff` format
 
 The following examples illustrate the use of the `Time` literal:
 
 [source]
 ----
-@T12:00:00.0Z
-@T14:30:14.559-07:00
+@T12:00
+@T14:30:14.559
 ----
 
 Consult the formal grammar for more details.
@@ -284,12 +282,15 @@ The `DateTime` literal combines the `Date` and `Time` literals and is a subset o
 
 * A datetime literal begins with an `@`
 * It uses the `YYYY-MM-DDThh:mm:ss.fff±hh:mm` format
+* Timezone offset is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
+* `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
 
 The following example illustrates the use of the `DateTime` literal:
 
 [source]
 ----
 @2014-01-25T14:30:14.559
+@2014-03-25T
 ----
 
 Consult the formal grammar for more details.
