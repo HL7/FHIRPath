@@ -639,9 +639,9 @@ which would find *any* descendants called `group` or `question`, not just the on
 
 The order of items returned by the `repeat()` function is undefined.
 
-==== ofType(type : identifier) : collection
+==== ofType(type : TypeInfo) : collection
 
-Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty.
+Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty. The `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat is a type specifier rather than an identifier expression:
 
 [source]
 ----
@@ -1451,6 +1451,21 @@ Patient.contained.all($this is Patient implies age > 10)
 
 This example returns true if for all the contained resources, if the contained resource is of type `Patient`, then the `age` is greater than ten.
 
+==== is(type : TypeInfo)
+
+The `is()` function is supported for backwards compatibility with previous implementations of FHIRPath. Just as with the `is` keyword, the `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat is a type specifier rather than an identifier expression:
+
+[source]
+----
+Patient.contained.all($this.is(Patient) implies age > 10)
+----
+
+____
+
+Note: The `is()` function is defined for backwards compatibility only and may be deprecated in a future release.
+
+____
+
 ==== as _type specifier_
 
 If the left operand is a collection with a single item and the second operand is an identifier, this operator returns the value of the left operand if it is of the type specified in the second operand, or a subclass thereof. If the identifier cannot be resolved to a valid type identifier, the evaluator will throw an error. If there is more than one item in the input collection, the evaluator will throw an error. Otherwise, this operator returns the empty collection.
@@ -1459,8 +1474,23 @@ A _type specifier_ is an identifier that must resolve to the name of a type in a
 
 [source]
 ----
-Observation.component.where((value as Quantity) > 30 'mg')
+Observation.component.where(value as Quantity > 30 'mg')
 ----
+
+==== as(type : TypeInfo)
+
+The `as()` function is supported for backwards compatibility with previous implementations of FHIRPath. Just as with the `as` keyword, the `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat is a type specifier rather than an identifier expression:
+
+[source]
+----
+Observation.component.where(value.as(Quantity) > 30 'mg')
+----
+
+____
+
+Note: The `as()` function is defined for backwards compatibility only and may be deprecated in a future release.
+
+____
 
 === Collections
 
