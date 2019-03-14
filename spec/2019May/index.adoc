@@ -1012,7 +1012,7 @@ The String representation uses the following formats:
 |*Quantity* |`(\\+\|-)?\d+(.\d+)? &#39;.*&#39;`
 |*Date* |`YYYY-MM-DD`
 |*DateTime* |`YYYY-MM-DDThh:mm:ss.fff(+/-)hh:mm`
-|*Time* |`Thh:mm:ss.fff(+/-)hh:mm`
+|*Time* |`hh:mm:ss.fff(+/-)hh:mm`
 |===
 
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
@@ -1028,7 +1028,7 @@ If the input collection contains a single item, this function will return true i
 * the item is a Time
 * the item is a String and is convertible to a Time
 
-If the item is not one of the above types, or is not convertible to a Time (using the format `Thh:mm:ss.fff(+/-)hh:mm`), the result is false.
+If the item is not one of the above types, or is not convertible to a Time (using the format `hh:mm:ss.fff(+/-)hh:mm`), the result is false.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1043,7 +1043,7 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a Time (using the format `Thh:mm:ss.fff(+/-)hh:mm`), the result is empty.
+If the item is a String, but the string is not convertible to a Time (using the format `hh:mm:ss.fff(+/-)hh:mm`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
