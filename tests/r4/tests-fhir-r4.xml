@@ -753,6 +753,12 @@
 		<test inputfile="patient-example.xml"><expression>@T12:00:01 &lt; @T12:00:00</expression><output type="boolean">false</output></test>
 	
     <test inputfile="observation-example.xml"><expression>Observation.value &lt; 200 '[lb_av]'</expression><output type="boolean">true</output></test>
+
+		<test inputfile="patient-example.xml"><expression>@2018-03 < @2018-03-01</expression></test>
+		<test inputfile="patient-example.xml"><expression>@2018-03-01T10 < @2018-03-01T10:30</expression></test>
+		<test inputfile="patient-example.xml"><expression>@T10 < @T10:30</expression></test>
+		<test inputfile="patient-example.xml"><expression>@2018-03-01T10:30:00 < @2018-03-01T10:30:00.0</expression><output type="boolean">false</output></test>
+		<test inputfile="patient-example.xml"><expression>@T10:30:00 < @T10:30:00.0</expression><output type="boolean">false</output></test>
   </group>
 
 	<group name="testLessOrEqual">
@@ -780,6 +786,12 @@
 		<test inputfile="patient-example.xml"><expression>@2014-12-13T12:00:01 &lt;= @2014-12-13T12:00:00</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>@T12:00:01 &lt;= @T12:00:00</expression><output type="boolean">false</output></test>
     <test inputfile="observation-example.xml"><expression>Observation.value &lt;= 200 '[lb_av]'</expression><output type="boolean">true</output></test>
+
+		<test inputfile="patient-example.xml"><expression>@2018-03 <= @2018-03-01</expression></test>
+		<test inputfile="patient-example.xml"><expression>@2018-03-01T10 <= @2018-03-01T10:30</expression></test>
+		<test inputfile="patient-example.xml"><expression>@T10 <= @T10:30</expression></test>
+		<test inputfile="patient-example.xml"><expression>@2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>@T10:30:00 <= @T10:30:00.0</expression><output type="boolean">true</output></test>
   </group>
 
 	<group name="testGreatorOrEqual">
@@ -808,6 +820,11 @@
 		<test inputfile="patient-example.xml"><expression>@T12:00:01 >= @T12:00:00</expression><output type="boolean">true</output></test>
     <test inputfile="observation-example.xml"><expression>Observation.value &gt;= 100 '[lb_av]'</expression><output type="boolean">true</output></test>
 	
+		<test inputfile="patient-example.xml"><expression>@2018-03 >= @2018-03-01</expression></test>
+		<test inputfile="patient-example.xml"><expression>@2018-03-01T10 >= @2018-03-01T10:30</expression></test>
+		<test inputfile="patient-example.xml"><expression>@T10 >= @T10:30</expression></test>
+		<test inputfile="patient-example.xml"><expression>@2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>@T10:30:00 >= @T10:30:00.0</expression><output type="boolean">true</output></test>
   </group>
 
 	<group name="testGreaterThan">
@@ -835,6 +852,12 @@
 		<test inputfile="patient-example.xml"><expression>@2014-12-13T12:00:01 > @2014-12-13T12:00:00</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>@T12:00:01 > @T12:00:00</expression><output type="boolean">true</output></test>
 	  <test inputfile="observation-example.xml"><expression>Observation.value &gt; 100 '[lb_av]'</expression><output type="boolean">true</output></test>
+
+		<test inputfile="patient-example.xml"><expression>@2018-03 > @2018-03-01</expression></test>
+		<test inputfile="patient-example.xml"><expression>@2018-03-01T10 > @2018-03-01T10:30</expression></test>
+		<test inputfile="patient-example.xml"><expression>@T10 > @T10:30</expression></test>
+		<test inputfile="patient-example.xml"><expression>@2018-03-01T10:30:00 > @2018-03-01T10:30:00.0</expression><output type="boolean">false</output></test>
+		<test inputfile="patient-example.xml"><expression>@T10:30:00 > @T10:30:00.0</expression><output type="boolean">false</output></test>
   </group>
 
 	<group name="testUnion">

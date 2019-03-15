@@ -1639,7 +1639,7 @@ Implementations are not required to fully support operations on units, but they 
 
 Implementations that do support units SHALL do so as specified by <<UCUM>>.
 
-For partial date/time values, the comparison is performed to the highest precision specified in both values.
+For partial Date, DateTime, and Time values, the comparison is performed by comparing the values at each precision, beginning with years, and proceeding to the finest precision specified in either input, and respecting timezone offsets. If one value is specified to a different level of precision than the other, the result is empty (`{ }`) to indicate that the result of the comparison is unknown. As with equality and equivalence, the second and millisecond precisions are considered a single precision using a decimal, with decimal comparison semantics.
 
 ==== &gt; (Greater Than)
 
@@ -1651,6 +1651,14 @@ The greater than operator (`>`) returns true if the first operand is strictly gr
 10 > 5.0 // true; note the 10 is converted to a decimal to perform the comparison
 'abc' > 'ABC' // true
 4 'm' > 4 'cm' // true (or { } if the implementation does not support unit conversion)
+@2018-03-01 > @2018-01-01 // true
+@2018-03 > @2018-03-01 // empty ({ })
+@2018-03-01T10:30:00 > @2018-03-01T10:00:00 // true
+@2018-03-01T10 > @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10:30:00 > @2018-03-01T10:30:00.0 // false
+@T10:30:00 > @T10:00:00 // true
+@T10 > @T10:30 // empty ({ })
+@T10:30:00 > @T10:30:00.0 // false
 ----
 
 ==== &lt; (Less Than)
@@ -1663,6 +1671,14 @@ The less than operator (`<`) returns true if the first operand is strictly less 
 10 < 5.0 // false; note the 10 is converted to a decimal to perform the comparison
 'abc' < 'ABC' // false
 4 'm' < 4 'cm' // false (or { } if the implementation does not support unit conversion)
+@2018-03-01 < @2018-01-01 // false
+@2018-03 < @2018-03-01 // empty ({ })
+@2018-03-01T10:30:00 < @2018-03-01T10:00:00 // false
+@2018-03-01T10 < @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10:30:00 < @2018-03-01T10:30:00.0 // false
+@T10:30:00 < @T10:00:00 // false
+@T10 < @T10:30 // empty ({ })
+@T10:30:00 < @T10:30:00.0 // false
 ----
 
 ==== &lt;= (Less or Equal)
@@ -1675,6 +1691,14 @@ The less or equal operator (`\<=`) returns true if the first operand is less tha
 10 <= 5.0 // true; note the 10 is converted to a decimal to perform the comparison
 'abc' <= 'ABC' // true
 4 'm' <= 4 'cm' // false (or { } if the implementation does not support unit conversion)
+@2018-03-01 <= @2018-01-01 // false
+@2018-03 <= @2018-03-01 // empty ({ })
+@2018-03-01T10:30:00 <= @2018-03-01T10:00:00 // false
+@2018-03-01T10 <= @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0 // true
+@T10:30:00 <= @T10:00:00 // false
+@T10 <= @T10:30 // empty ({ })
+@T10:30:00 <= @T10:30:00.0 // true
 ----
 
 ==== &gt;= (Greater or Equal)
@@ -1687,6 +1711,14 @@ The greater or equal operator (`>=`) returns true if the first operand is greate
 10 >= 5.0 // false; note the 10 is converted to a decimal to perform the comparison
 'abc' >= 'ABC' // false
 4 'm' >= 4 'cm' // true (or { } if the implementation does not support unit conversion)
+@2018-03-01 >= @2018-01-01 // true
+@2018-03 >= @2018-03-01 // empty ({ })
+@2018-03-01T10:30:00 >= @2018-03-01T10:00:00 // true
+@2018-03-01T10 >= @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0 // true
+@T10:30:00 >= @T10:00:00 // true
+@T10 >= @T10:30 // empty ({ })
+@T10:30:00 >= @T10:30:00.0 // true
 ----
 
 === Types
