@@ -805,7 +805,7 @@ Possible values for Integer, Decimal, and String are described in the toBoolean(
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== toBoolean() : Boolean
 
@@ -837,7 +837,7 @@ Note for the purposes of string representations, case is ignored (so that both `
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== convertsToInteger() : Boolean
 
@@ -851,7 +851,7 @@ If the item is not one of the above types, or the item is a String, but is not c
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== toInteger() : Integer
 
@@ -867,7 +867,7 @@ If the item is a String, but the string is not convertible to an integer (using 
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== convertsToDate() : Boolean
 
@@ -881,7 +881,7 @@ If the item is not one of the above types, or is not convertible to a Date (usin
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== toDate() : Date
 
@@ -897,7 +897,7 @@ If the item is a String, but the string is not convertible to a Date (using the 
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== convertsToDateTime() : Boolean
 
@@ -911,7 +911,7 @@ If the item is not one of the above types, or is not convertible to a DateTime (
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== toDateTime() : DateTime
 
@@ -927,7 +927,7 @@ If the item is a String, but the string is not convertible to a DateTime (using 
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== convertsToDecimal() : Boolean
 
@@ -941,7 +941,7 @@ If the item is not one of the above types, or is not convertible to a decimal (u
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== toDecimal() : Decimal
 
@@ -957,7 +957,7 @@ If the item is a String, but the string is not convertible to a decimal (using t
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== convertsToQuantity([unit : String]) : Boolean
 
@@ -969,11 +969,9 @@ If the input collection contains a single item, this function will return true i
 
 If the item is not one of the above types, or is not convertible to a quantity (using the regex format `(?&#39;value&#39;(\\+|-)?\d+(\.\d+)?)\s*((&#39;(?&#39;unit&#39;[^\&#39;]+)&#39;)|(?&#39;time&#39;[a-zA-Z]+))?`), the result is false.
 
-
-
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 If the `unit` argument is provided, it must be the string representation of a UCUM code, and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
 
@@ -998,7 +996,7 @@ If the item is a String, but the string is not convertible to a quantity (using 
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-If all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 If the `unit` argument is provided, it must be the string representation of a UCUM code, and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
 
@@ -1021,7 +1019,7 @@ If the item is not one of the above types, the result is false.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== toString() : String
 
@@ -1051,7 +1049,7 @@ Note that for partial dates and times, the result will only be specified to the 
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== convertsToTime() : Boolean
 
@@ -1064,7 +1062,7 @@ If the item is not one of the above types, or is not convertible to a Time (usin
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 ==== toTime() : Time
 
@@ -1079,7 +1077,7 @@ If the item is a String, but the string is not convertible to a Time (using the 
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-In all other cases, the function will return an empty collection.
+If the input collection is empty, the result is empty.
 
 === String Manipulation
 
