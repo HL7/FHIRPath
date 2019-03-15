@@ -1448,7 +1448,7 @@ Returns a collection with all descendant nodes of all items in the input collect
 
 ____
 
-Note: Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See section 8 for more information about type safe use of FHIRPath expressions.
+Note: Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See <<type-safety-and-strict-evaluation,Type safety and strict evaluation>> for more information about type safe use of FHIRPath expressions.
 
 ____
 
