@@ -2291,6 +2291,8 @@ Note that the identifier portion of the token is allowed to be either a simple i
 
 Note also that these tokens are not restricted to simple types, and they may have values that are not defined fixed values known prior to evaluation at run-time, though there is no way to define these kind of values in implementation guides.
 
+Attempting to access an undefined environment variable will result in an error, but accessing a defined environment variable that does not have a value specified results in empty (`{ }`).
+
 ____
 
 Note: For backwards compatibility with some existing implementations, the token for an environment variable may also be a string, as in `%'us-zip'`.
