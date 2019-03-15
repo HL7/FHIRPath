@@ -2571,7 +2571,7 @@ ____
 FHIRPath can be used against HL7 V2 messages. This UML diagram summarises the 
 object model on which the FHIRPath statements are written:
 
-image:v2-object-model.png["Object Model for HL7 V2",height="456",width="760"]
+image:v2-class-model.png["Class Model for HL7 V2",height="456",width="760"]
 
 In this Object Model:
 
@@ -2619,7 +2619,7 @@ Same as the last, but pick out just the MR value
 [source]
 ----
 Message.group('PATIENT').group('PATIENT_OBSERVATION').item.ofType(Segment)
-  .where(code = 'OBX' and elements(2).any(components(2) = 'LN')))
+  .where(code = 'OBX' and elements(2).exists(components(2) = 'LN')))
 ----
 
 return any OBXs from the patient observations (and ignore others e.g. in a R01 message) segments that have LOINC codes.
