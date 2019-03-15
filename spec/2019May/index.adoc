@@ -297,6 +297,8 @@ The following example illustrates the use of the `DateTime` literal:
 @2014T // A partial DateTime with only the year
 ----
 
+The suffix `T` is allowed after a year, year-month, or year-month-day literal because without it, there would be no way to specify a partial DateTime with only a year, month, or day; the literal would always result in a Date value.
+
 Consult the formal grammar for more details.
 
 ==== Quantity
