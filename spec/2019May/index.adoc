@@ -1892,6 +1892,8 @@ Implementations are not required to fully support operations on units, but they 
 
 Implementations that do support units SHALL do so as specified by <<UCUM>>.
 
+Operations that cause arithmetic overflow or underflow will result in empty (`{ }`).
+
 ==== * (multiplication)
 
 Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have the appropriate unit:
@@ -1906,11 +1908,14 @@ Multiplies both arguments (supported for Integer, Decimal, and Quantity). For mu
 
 Divides the left operand by the right operand (supported for Integer, Decimal, and Quantity). The result of a division is always Decimal, even if the inputs are both Integer. For integer division, use the `div` operator.
 
+If an attempt is made to divide by zero, the result is empty.
+
 For division involving quantities, the resulting quantity will have the appropriate unit:
 
 [source]
 ----
 12 'cm2' / 3 'cm' // 4.0 'cm'
+12 / 0 // empty ({ })
 ----
 
 ==== + (addition)
@@ -1943,6 +1948,7 @@ Performs truncated division of the left operand by the right operand (supported 
 ----
 5 div 2 // 2
 5.5 div 0.7 // 7
+5 div 0 // empty ({ })
 ----
 
 ==== mod
@@ -1953,6 +1959,7 @@ Computes the remainder of the truncated division of its arguments (supported for
 ----
 5 mod 2 // 1
 5.5 mod 0.7 // 0.6
+5 mod 0 // empty ({ })
 ----
 
 ==== &amp; (String concatenation)

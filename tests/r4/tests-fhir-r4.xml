@@ -973,7 +973,7 @@
 		<test inputfile="patient-example.xml"><expression>1 - 1 = 0</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>1 - 0 = 1</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>1.8 - 1.2 = 0.6</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml"><expression  invalid="semantic">'a'-'b' = 'ab'</expression></test>
+		<test inputfile="patient-example.xml"><expression invalid="semantic">'a'-'b' = 'ab'</expression></test>
 	</group>
 
 	<group name="testMultiply">
@@ -987,15 +987,16 @@
 		<test inputfile="patient-example.xml"><expression>4 / 2 = 2</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>4.0 / 2.0 = 2.0</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>1 / 2 = 0.5</expression><output type="boolean">true</output></test>
-  <test inputfile="patient-example.xml"><expression>1.2 / 1.8 = 0.67</expression><output type="boolean">true</output></test>
+    <test inputfile="patient-example.xml"><expression>1.2 / 1.8 = 0.67</expression><output type="boolean">true</output></test>
+    <test inputfile="patient-example.xml"><expression>1 / 0</expression></test>
 	</group>
 
 	<group name="testDiv">
 		<test inputfile="patient-example.xml"><expression>1 div 1 = 1</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>4 div 2 = 2</expression><output type="boolean">true</output></test>
-
 		<test inputfile="patient-example.xml"><expression>5 div 2 = 2</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>2.2 div 1.8 = 1</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>5 div 0</expression></test>
 	</group>
 
 	<group name="testMod">
@@ -1003,6 +1004,7 @@
 		<test inputfile="patient-example.xml"><expression>4 mod 2 = 0</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>5 mod 2 = 1</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>2.2 mod 1.8 = 0.4</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>5 mod 0</expression></test>
 	</group>
   
   <group name="testRound">
