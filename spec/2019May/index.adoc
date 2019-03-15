@@ -951,7 +951,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 In all other cases, the function will return an empty collection.
 
-==== convertsToQuantity() : Boolean
+==== convertsToQuantity([unit : String]) : Boolean
 
 If the input collection contains a single item, this function will return true if:
 
@@ -965,7 +965,15 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 In all other cases, the function will return an empty collection.
 
-==== toQuantity() : Quantity
+If the `unit` argument is provided, it must be the string representation of a UCUM code, and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
+
+____
+
+Note: Implementations are not required to support a complete UCUM implementation, and are free to return false when the `unit` argument is used and it is different than the input quantity unit.
+
+____
+
+==== toQuantity([unit : String]) : Quantity
 
 If the input collection contains a single item, this function will return a single quantity if:
 
@@ -981,6 +989,14 @@ If the item is a String, but the string is not convertible to a quantity (using 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If all other cases, the function will return an empty collection.
+
+If the `unit` argument is provided, it must be the string representation of a UCUM code, and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
+
+____
+
+Note: Implementations are not required to support a complete UCUM implementation, and are free to return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
+
+____
 
 ==== convertsToString() : String
 
