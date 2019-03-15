@@ -989,9 +989,54 @@
   
   <group name="testSqrt">
 		<test inputfile="patient-example.xml"><expression>81.sqrt() = 9.0</expression><output type="boolean">true</output></test>
-		<test inputfile="patient-example.xml" invalid="semantic"><expression>(-1).sqrt() = -1</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(-1).sqrt()</expression></test>
   </group>
 
+  <group name="testAbs">
+		<test inputfile="patient-example.xml"><expression>(-5).abs() = 5</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(-5.5).abs() = 5.5</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(-5.5 'mg').abs() = 5.5 'mg'</expression><output type="boolean">true</output></test>
+  </group>
+
+  <group name="testCeiling">
+		<test inputfile="patient-example.xml"><expression>1.ceiling() = 1</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>1.1.ceiling() = 2</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(-1.1).ceiling() = -1</expression><output type="boolean">true</output></test>
+  </group>
+
+  <group name="testExp">
+		<test inputfile="patient-example.xml"><expression>0.exp() = 1</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(-0.0).exp() = 1</expression><output type="boolean">true</output></test>
+  </group>
+
+  <group name="testFloor">
+		<test inputfile="patient-example.xml"><expression>1.floor() = 1</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>2.1.floor() = 2</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(-2.1).floor() = -3</expression><output type="boolean">true</output></test>
+  </group>
+
+  <group name="testLn">
+		<test inputfile="patient-example.xml"><expression>1.ln() = 0.0</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>1.0.ln() = 0.0</expression><output type="boolean">true</output></test>
+  </group>
+
+  <group name="testLog">
+		<test inputfile="patient-example.xml"><expression>16.log(2) = 4.0</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>100.0.log(10.0) = 2.0</expression><output type="boolean">true</output></test>
+  </group>
+
+  <group name="testLog">
+		<test inputfile="patient-example.xml"><expression>2.power(3) = 8</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>2.5.power(2) = 6.25</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(-1).power(0.5)</expression></test>
+  </group>
+  
+  <group name="testLog">
+		<test inputfile="patient-example.xml"><expression>101.truncate() = 101</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>1.00000001.truncate() = 1</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>(-1.56).truncate() = -1</expression><output type="boolean">true</output></test>
+  </group>
+  
 	<group name="testPrecedence">
     <test name="testUnaryPrecedence" inputfile="patient-example.xml">
       <expression invalid="semantic">-1.convertsToInteger()</expression>
