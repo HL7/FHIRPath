@@ -788,6 +788,8 @@ If `criterion` is true, the function returns the value of `true-result` paramete
 
 If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
 
+Note that short-circuit behavior is expected in this function. In other words, `true-result` should only be evaluated if the `criterion` evaluates to true, and `otherwise-result` should only be evaluated otherwise. For implementations, this means delaying evaluation of the arguments.
+
 ==== convertsToBoolean() : Boolean
 
 If the input collection contains a single item, this function will return true if:
@@ -1807,7 +1809,7 @@ For all boolean operators, the collections passed as operands are first evaluate
 
 ____
 
-Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If a condition is needed to ensure correct evaluation of a subsequent expression, the `iif()` function should be used to guarantee that the condition determines whether evaluation of an expression will occur at run-time.
+Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the `iff()` function.
 
 ____
 
@@ -1877,6 +1879,8 @@ The implies operator is useful for testing conditionals. For example, if a given
 ----
 Patient.name.given.exists() implies Patient.name.family.exists()
 ----
+
+Note that implies may use short-circuit evaluation in the case that the first operand evaluates to false.
 
 === Math
 
