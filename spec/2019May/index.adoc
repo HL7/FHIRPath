@@ -786,7 +786,7 @@ This example returns a collection containing the first character of all the give
 
 If `criterion` is true, the function returns the value of `true-result` parameter.
 
-If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-expression` is not given, in which case the function returns an empty collection.
+If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
 
 ==== convertsToBoolean() : Boolean
 
