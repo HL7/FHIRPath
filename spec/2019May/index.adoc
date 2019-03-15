@@ -284,13 +284,17 @@ The `DateTime` literal combines the `Date` and `Time` literals and is a subset o
 * It uses the `YYYY-MM-DDThh:mm:ss.fff±hh:mm` format
 * Timezone offset is optional, but if present the notation `±hh:mm` is used (so must include both minutes and hours)
 * `Z` is allowed as a synonym for the zero (+00:00) UTC offset.
+* A `T` can be used at the end of any date (year, year-month, or year-month-day) to indicate a partial DateTime.
 
 The following example illustrates the use of the `DateTime` literal:
 
 [source]
 ----
 @2014-01-25T14:30:14.559
-@2014-03-25T
+@2014-01-25T14:30 // A partial DateTime with year, month, day, hour, and minute
+@2014-03-25T // A partial DateTime with year, month, and day
+@2014-01T // A partial DateTime with year and month
+@2014T // A partial DateTime with only the year
 ----
 
 Consult the formal grammar for more details.

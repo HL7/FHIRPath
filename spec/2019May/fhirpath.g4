@@ -119,7 +119,7 @@ DATETIME
                 (
                     '-'[0-9][0-9] // day
                     (
-                        'T' TIMEFORMAT
+                        'T' TIMEFORMAT?
                     )?
                  )?
              )?
