@@ -986,6 +986,11 @@
 		<test inputfile="patient-example.xml"><expression>1.round() = 1</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>3.14159.round(3) = 2</expression><output type="boolean">true</output></test>
   </group>
+  
+  <group name="testSqrt">
+		<test inputfile="patient-example.xml"><expression>81.sqrt() = 9.0</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml" invalid="semantic"><expression>(-1).sqrt() = -1</expression><output type="boolean">true</output></test>
+  </group>
 
 	<group name="testPrecedence">
     <test name="testUnaryPrecedence" inputfile="patient-example.xml">

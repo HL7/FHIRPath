@@ -1233,6 +1233,22 @@ If the input collection contains multiple items, the evaluation of the expressio
 3.14159.round(3) // 3.142
 ----
 
+==== sqrt()
+
+If the input collection contains a single item of type Integer or Decimal, this function will return the square root of the number as a Decimal.
+
+If the square root cannot be represented (such as the square root of -1), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+Note that this function is equivalent to raising a number of the power of 0.5 using the power() function.
+
+[source]
+----
+81.sqrt() // 9.0
+(-1).sqrt() // empty
+----
+
 === Tree navigation
 
 ==== children() : collection
