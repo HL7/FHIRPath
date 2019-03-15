@@ -154,7 +154,7 @@
 		</test>
 
 		<!-- testWrong(patient(), "Patient.children().skip(1)"); -->
-    <test name="testDollarOrderNotAllowed" inputfile="patient-example.xml" mode="strict">
+    <test name="testDollarOrderNotAllowed" inputfile="patient-example.xml" mode="strict" checkOrderedFunctions="true">
 			<expression invalid="semantic">Patient.children().skip(1)</expression>
 		</test>
 	</group>

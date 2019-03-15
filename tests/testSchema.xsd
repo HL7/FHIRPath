@@ -21,6 +21,7 @@
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="inputfile" type="xs:string"/>
 		<xs:attribute name="predicate" type="xs:boolean"/>
+    <xs:attribute name="checkOrderedFunctions" type="xs:boolean"/>
 	</xs:complexType>
 	<xs:complexType name="Expression">
 		<xs:simpleContent>
