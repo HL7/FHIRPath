@@ -1242,7 +1242,7 @@ This example of `replaceMatches()` will convert a string with a date formatted a
 
 ____
 
-Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the dialect defined by as part of XML Schema 1.1 <<XMLRE>> as the dialect most likely to be broadly supported and understood.
+Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the <<PCRE>> flavor as the dialect most likely to be broadly supported and understood.
 
 ____
 
