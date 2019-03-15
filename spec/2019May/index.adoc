@@ -1553,7 +1553,7 @@ For example:
 
 For `DateTime` values that do not have a timezone offsets, whether or not to provide a default timezone offset is a policy decision. In the simplest case, no default timezone offset is provided, but some implementations may use the client's or the evaluating system's timezone offset.
 
-Note that for DateTime values, the specification is not prescriptive about how implementations "respect" timezone offsets, but the following examples illustrate expected behavior:
+To support comparison of DateTime values, either both values have no timezone offset specified, or both values are converted to a common timezone offset. The timezone offset to use is an implementation decision. In the simplest case, it's the timezone offset of the local server. The following examples illustrate expected behavior:
 
 [source]
 ----
@@ -1563,7 +1563,7 @@ Note that for DateTime values, the specification is not prescriptive about how i
 @2017-11-05T01:30:00.0-04:00 = @2017-11-05T00:30:00.0-05:00 // true
 ----
 
-The exact details of the date comparison are difficult to characterize; additional functions to support more sophisticated timezone offset comparison (such as .toUTC()) may be defined in a future version.
+Additional functions to support more sophisticated timezone offset comparison (such as .toUTC()) may be defined in a future version.
 
 ==== ~ (Equivalent)
 
@@ -1642,6 +1642,8 @@ Implementations are not required to fully support operations on units, but they 
 Implementations that do support units SHALL do so as specified by <<UCUM>>.
 
 For partial Date, DateTime, and Time values, the comparison is performed by comparing the values at each precision, beginning with years, and proceeding to the finest precision specified in either input, and respecting timezone offsets. If one value is specified to a different level of precision than the other, the result is empty (`{ }`) to indicate that the result of the comparison is unknown. As with equality and equivalence, the second and millisecond precisions are considered a single precision using a decimal, with decimal comparison semantics.
+
+See the <<equals, Equals>> operator for discussion on respecting timezone offsets in comparison operations.
 
 ==== &gt; (Greater Than)
 
