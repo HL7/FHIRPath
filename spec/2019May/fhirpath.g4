@@ -1,7 +1,7 @@
 grammar fhirpath;
 
 // Grammar rules
-// [FHIRPath](http://hl7.org/fhirpath) Normative Release 1
+// [FHIRPath](http://hl7.org/fhirpath/2019May) Normative Ballot 3
 
 //prog: line (line)*;
 //line: ID ( '(' expr ')') ':' expr '\r'? '\n';
@@ -42,7 +42,7 @@ literal
         ;
 
 externalConstant
-        : '%' identifier
+        : '%' ( identifier | STRING )
         ;
 
 invocation                          // Terms that can be used after the function/member invocation '.'
