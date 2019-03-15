@@ -92,6 +92,7 @@ identifier
         | DELIMITEDIDENTIFIER
         | 'as'
         | 'contains'
+        | 'in'
         | 'is'
         ;
 
