@@ -2276,7 +2276,7 @@ The following environmental values are set for all contexts:
 
 [source]
 ----
-%ucum       // (string) url for UCUM
+%ucum       // (string) url for UCUM (http://unitsofmeasure.org, per http://hl7.org/fhir/ucum.html)
 %context    // The original node that was passed to the evaluation engine before starting evaluation
 ----
 
