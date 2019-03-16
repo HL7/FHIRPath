@@ -16,5 +16,5 @@
 	"version": "4.0.0",
 	"source": "ig.xml",
   "license" : "CC0-1.0",
-  "npm-name" : "fhirpath"
+  "npm-name" : "hl7.fhirpath"
 }

@@ -4,15 +4,18 @@
   <id value="ig"/>
   <url value="http://hl7.org/fhirpath/ImplementationGuide/ig"/>
   <version value="1.1.0"/>
-  <name value="Implementation Guide (stub, for building FHIRPath)"/>
+  <name value="FHIRPath"/>
+  <title value="FHIRPath Specification"/>
   <status value="draft"/>
   <experimental value="false"/>
   <publisher value="FHIR Project"/>
+  <packageId value="hl7.fhirpath"/>
+  <fhirVersion value="4.0.0"/>
   <definition>
-  <page>
-    <nameUrl value="index.html"/>
-    <title value="FHIRPath Specification"/>
-    <generation value="html"/>
-  </page>
+    <page>
+      <nameUrl value="index.html"/>
+      <title value="FHIRPath Specification"/>
+      <generation value="html"/>
+    </page>
   </definition>
 </ImplementationGuide>
