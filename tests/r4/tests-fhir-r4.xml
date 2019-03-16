@@ -677,6 +677,8 @@
 		<test inputfile="patient-example.xml"><expression>name != name</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>name.take(2) != name.take(2).first() | name.take(2).last()</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>name.take(2) != name.take(2).last() | name.take(2).first()</expression><output type="boolean">true</output></test>
+    <test inputfile="patient-example.xml"><expression>1.2 / 1.8 != 0.6666667</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>1.2 / 1.8 != 0.67</expression><output type="boolean">true</output></test>
     <test inputfile="observation-example.xml"><expression>Observation.value != 185 'kg'</expression><output type="boolean">true</output></test>
   </group>
 
@@ -691,6 +693,7 @@
 		<test inputfile="patient-example.xml"><expression>1.1 ~ 1.1</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>1.1 ~ 1.2</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>1.10 ~ 1.1</expression><output type="boolean">true</output></test>
+		<test inputfile="patient-example.xml"><expression>1.2 / 1.8 ~ 0.67</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>0 ~ 0</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>0.0 ~ 0</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>@2012-04-15 ~ @2012-04-15</expression><output type="boolean">true</output></test>
@@ -717,6 +720,7 @@
 		<test inputfile="patient-example.xml"><expression>1.10 !~ 1.1</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>0 !~ 0</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>0.0 !~ 0</expression><output type="boolean">false</output></test>
+		<test inputfile="patient-example.xml"><expression>1.2 / 1.8 !~ 0.6</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>@2012-04-15 !~ @2012-04-15</expression><output type="boolean">false</output></test>
 		<test inputfile="patient-example.xml"><expression>@2012-04-15 !~ @2012-04-16</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>@2012-04-15 !~ @2012-04-15T10:00:00</expression><output type="boolean">true</output></test>
@@ -989,7 +993,7 @@
 		<test inputfile="patient-example.xml"><expression>4 / 2 = 2</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>4.0 / 2.0 = 2.0</expression><output type="boolean">true</output></test>
 		<test inputfile="patient-example.xml"><expression>1 / 2 = 0.5</expression><output type="boolean">true</output></test>
-    <test inputfile="patient-example.xml"><expression>1.2 / 1.8 = 0.67</expression><output type="boolean">true</output></test>
+    <test inputfile="patient-example.xml"><expression>1.2 / 1.8 = 0.66666667</expression><output type="boolean">true</output></test>
     <test inputfile="patient-example.xml"><expression>1 / 0</expression></test>
 	</group>
 
