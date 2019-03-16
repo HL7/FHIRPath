@@ -635,19 +635,19 @@ Will repeat finding children called `contains`, until no new nodes are found.
 
 [source]
 ----
-Questionnaire.repeat(group | question).question
+Questionnaire.repeat(item)
 ----
 
-Will repeat finding children called `group` or `question`, until no new nodes are found.
+Will repeat finding children called `item`, until no new nodes are found.
 
 Note that this is slightly different from:
 
 [source]
 ----
-Questionnaire.descendants().select(group | question)
+Questionnaire.descendants().select(item)
 ----
 
-which would find *any* descendants called `group` or `question`, not just the ones nested inside other `group` or `question` elements.
+which would find *any* descendants called `item`, not just the ones nested inside other `item` elements.
 
 The order of items returned by the `repeat()` function is undefined.
 
