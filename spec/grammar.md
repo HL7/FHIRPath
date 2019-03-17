@@ -1,5 +1,5 @@
 ---
-layout: stu1release
+layout: current
 title: FluentPath Grammar
 ---
 

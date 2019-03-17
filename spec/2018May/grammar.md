@@ -1,5 +1,5 @@
 ---
-layout: current
+layout: stu11ballot
 title: FHIRPath Grammar
 ---
 

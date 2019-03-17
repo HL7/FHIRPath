@@ -12,6 +12,11 @@
   <packageId value="hl7.fhirpath"/>
   <fhirVersion value="4.0.0"/>
   <definition>
+    <resource>
+      <reference>
+        <reference value="Binary/binary-grammar"/>
+      </reference>
+    </resource>
     <page>
       <nameUrl value="index.html"/>
       <title value="FHIRPath Specification"/>

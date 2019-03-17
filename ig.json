@@ -11,6 +11,9 @@
 	"sct-edition": "http://snomed.info/sct/731000124108",
 	"tool": "jekyll",
 	"resources": {
+    "Binary/binary-grammar": {
+      "source": "binary-grammar.json"
+    }
 	},
 	"canonicalBase": "http://hl7.org/fhirpath",
 	"version": "4.0.0",
