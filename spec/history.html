@@ -116,11 +116,23 @@ The following versions of FHIRPath are available:
     <td colspan="3" style="background: #EFEFEF"><b>Normative sequence</b></td>
   </tr>
   <tr>
-    <td><a href="2019May/index.html">March 2019</a></td>
+    <td><a href="2019May/index.html">May 2019</a></td>
     <td>1.3.0</td>
     <td>3rd Normative Ballot. Changes:<br/>
       <ul>
-        <li>TODO</li>
+        <li>Removed timezone offset from Time values (still present on DateTime values)</li>
+        <li>Corrected convertsToTime to not require the 'T' prefix</li>
+        <li>Marked Aggregate and Reflection sections as STU</li>
+        <li>Defined seconds as a decimal rather than having a separate millisecond precision for comparison</li>
+        <li>Added .is() and .as() functions for backwards compatibility</li>
+        <li>Allowed strings to be used for environment variables for backwards compability</li>
+        <li>Added literal notation for parital datetimes</li>
+        <li>Added quantity conversion functions</li>
+        <li>Added contains as a keyword to the grammar</li>
+        <li>Added Math functions (as STU): .round(), .sqrt(), .log(), .exp(), .ln(), .power(), .flooor(), .ceiling(), .truncate(), and .abs()</li>
+        <li>Added an optional argument to trace() to allow logged content to be shaped</li>
+        <li>Clarified today() and now() semantics and added timeOfDay()</li>
+        <li>Various errata and clarifications throughout.)</li>
       </ul>
     </td>
   </tr>
