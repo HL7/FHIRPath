@@ -471,6 +471,8 @@ generalPractitioner.exists($this is Practitioner)
 
 The function can also take an optional criteria to be applied to the collection prior to the determination of the exists. In this case, the function is shorthand for `where(criteria).exists()`.
 
+Note that a common term for this function is _any_.
+
 ==== all(criteria : expression) : Boolean
 
 Returns `true` if for every element in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
