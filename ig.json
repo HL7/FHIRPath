@@ -7,7 +7,7 @@
 		"output": "output",
 		"txCache": "txCache",
 		"qa": "qa",
-		"history": "history.html"
+		"history": "http://hl7.org/fhirpath/history.html"
 	},
 	"sct-edition": "http://snomed.info/sct/731000124108",
 	"tool": "jekyll",
