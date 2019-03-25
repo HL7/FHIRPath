@@ -1,0 +1,70 @@
+{
+   "package-id": "hl7.fhirpath",
+   "title": "FHIRPath Specification",
+   "canonical": "http://hl7.org/fhirpath",
+   "introduction": "FHIRPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources (FHIR) and HL7 Clinical Quality Language (CQL).",
+   "list": [
+      {
+         "version": "current",
+         "desc": "Continuous Integration Build (latest in version control)",
+         "path": "http://build.fhir.org/ig/HL7/FHIRPath",
+         "status": "ci-build",
+         "current": true
+      },
+      {
+         "version": "1.3.0",
+         "date": "2019-03-24",
+         "desc": "3rd Normative Ballot",
+         "changes": "history.html",
+         "path": "http://hl7.org/fhirpath/2019May/index.html",
+         "status": "ballot",
+         "sequence": "Normative"
+      },
+      {
+         "version": "1.2.0",
+         "date": "2018-08-21",
+         "desc": "2nd Normative Ballot",
+         "changes": "history.html",
+         "path": "http://hl7.org/fhirpath/2018Sep/index.html",
+         "status": "ballot",
+         "sequence": "Normative"
+      },
+      {
+         "version": "1.1.0",
+         "date": "2018-03-31",
+         "desc": "1st Normative Ballot",
+         "changes": "history.html",
+         "path": "http://hl7.org/fhirpath/2018May/index.html",
+         "status": "ballot",
+         "sequence": "Normative"
+      },
+      {
+         "version": "1.0.0",
+         "date": "2016-12-06",
+         "desc": "STU1 Release",
+         "changes": "history.html",
+         "path": "http://hl7.org/fhirpath/2017Jan/index.html",
+         "status": "trial-use",
+         "sequence": "STU1",
+         "current": true
+      },
+      {
+         "version": "0.3.0",
+         "date": "2016-08-11",
+         "desc": "STU1 Ballot",
+         "changes": "history.html",
+         "path": "http://hl7.org/fhirpath/2016Sept/index.html",
+         "status": "ballot",
+         "sequence": "STU1"
+      },
+      {
+         "version": "0.2.0",
+         "date": "2015-03-31",
+         "desc": "STU1 Draft",
+         "changes": "history.html",
+         "path": "http://hl7.org/fhirpath/2016May/index.html",
+         "status": "ballot",
+         "sequence": "STU1"
+      }
+   ]
+}
