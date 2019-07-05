@@ -1,7 +1,7 @@
 grammar fhirpath;
 
 // Grammar rules
-// [FHIRPath](http://hl7.org/fhirpath) Normative Release 1
+// [FHIRPath](http://hl7.org/fhirpath/N1) Normative Release
 
 //prog: line (line)*;
 //line: ID ( '(' expr ')') ':' expr '\r'? '\n';
@@ -42,7 +42,7 @@ literal
         ;
 
 externalConstant
-        : '%' identifier
+        : '%' ( identifier | STRING )
         ;
 
 invocation                          // Terms that can be used after the function/member invocation '.'
@@ -92,6 +92,7 @@ identifier
         | DELIMITEDIDENTIFIER
         | 'as'
         | 'contains'
+        | 'in'
         | 'is'
         ;
 
@@ -115,15 +116,19 @@ DATETIME
         : '@'
             [0-9][0-9][0-9][0-9] // year
             (
-                '-'[0-9][0-9] // month
                 (
-                    '-'[0-9][0-9] // day
+                    '-'[0-9][0-9] // month
                     (
-                        'T' TIMEFORMAT
+                        (
+                            '-'[0-9][0-9] // day
+                            ('T' TIMEFORMAT?)?
+                        )
+                        | 'T'
                     )?
-                 )?
-             )?
-             'Z'? // UTC specifier
+                )
+                | 'T'
+            )?
+            ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone offset
         ;
 
 TIME
@@ -131,9 +136,7 @@ TIME
         ;
 
 fragment TIMEFORMAT
-        :
-            [0-9][0-9] (':'[0-9][0-9] (':'[0-9][0-9] ('.'[0-9]+)?)?)?
-            ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone
+        : [0-9][0-9] (':'[0-9][0-9] (':'[0-9][0-9] ('.'[0-9]+)?)?)?
         ;
 
 IDENTIFIER
