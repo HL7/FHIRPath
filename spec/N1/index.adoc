@@ -974,7 +974,14 @@ If the input collection contains a single item, this function will return true i
 * the item is a String that is convertible to a Quantity
 * the item is a Boolean
 
-If the item is not one of the above types, or is not convertible to a Quantity (using the regex format `(?&#39;value&#39;(\+|-)?\d+(\.\d+)?)\s*((&#39;(?&#39;unit&#39;[^&#39;]+)&#39;)|(?&#39;time&#39;[a-zA-Z]+))?`), the result is false.
+If the item is not one of the above types, or is not convertible to a Quantity using the following regex format:
+
+[source]
+----
+(?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
+----
+
+then the result is false.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -999,7 +1006,14 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a Quantity (using the regex format `(?&#39;value&#39;(\+|-)?\d+(\.\d+)?)\s*((&#39;(?&#39;unit&#39;[^&#39;]+)&#39;)|(?&#39;time&#39;[a-zA-Z]+))?`), the result is empty.
+If the item is a String, but the string is not convertible to a Quantity using the following regex format:
+
+[source]
+----
+(?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
+----
+
+then the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
