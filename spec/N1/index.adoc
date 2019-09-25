@@ -77,13 +77,13 @@ Formatting strings for Date, Time, and DateTime values are described using the f
 
 == Navigation model
 
-FHIRPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FHIRPath query is run. This way, FHIRPath can be used on in-memory Java POJOs, XML data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FHIRPath operates on a directed acyclic graph of classes as defined by a MOF-equivalent <<MOF>> type system.
+FHIRPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FHIRPath query is run. This way, FHIRPath can be used on in-memory Java POJOs, XML data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FHIRPath operates on a directed acyclic graph of classes as defined by a MOF-equivalent <<MOF>> type system. In this specification, the structures on which FHIRPath operates are referred to as the Object Model.
 
 Data are represented as a tree of labelled nodes, where each node may optionally carry a primitive value and have child nodes. Nodes need not have a unique label, and leaf nodes must carry a primitive value. For example, a (partial) representation of a FHIR Patient resource in this model looks like this:
 
 image:treestructure.png["Tree representation of a Patient",height="375",width="500"]
 
-The diagram shows a tree with a repeating `name` node, which represents repeating members of the FHIR object model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
+The diagram shows a tree with a repeating `name` node, which represents repeating members of the FHIR Object Model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
 
 FHIRPath expressions are then _evaluated_ with respect to a specific instance, such as the Patient one described above. This instance is referred to as the _context_ (also called the _root_) and paths within the expression are evaluated in terms of this instance.
 
@@ -122,11 +122,11 @@ Within FHIRPath, a collection is:
 
 * Ordered - The order of items in the collection is important and is preserved through operations as much as possible. Operators and functions that do not preserve order will note that in their documentation.
 * Non-Unique - Duplicate elements are allowed within a collection. Some operations and functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
-* Indexed - Each item in a collection can be addressed by it's index, i.e. ordinal position within the collection. 
+* Indexed - Each item in a collection can be addressed by its index, i.e. ordinal position within the collection (e.g. `a[2]`). 
 * Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 * Countable - The number of items in a given collection can always be determined using the `count()` function
 
-Note that the outcome of functions like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the logical order implied by the data model, and some may not, and some may be different depending on the underlying source. Implementations may decide to return an error if an attempt is made to perform an order-dependent operation on a list whose order is undefined.
+Note that the outcome of functions like `children()` and `descendants()` cannot be assumed to be in any meaningful order, and `first()`, `last()`, `tail()`, `skip()` and `take()` should not be used on collections derived from these paths. Note that some implementations may follow the logical order implied by the object model, and some may not, and some may be different depending on the underlying source. Implementations may decide to return an error if an attempt is made to perform an order-dependent operation on a list whose order is undefined.
 
 === Paths and polymorphic items
 
@@ -152,7 +152,7 @@ The `as` operator can be used to treat a value as a specific type:
 Observation.value as Quantity // returns value as a Quantity if it is of type Quantity, and an empty result otherwise
 ----
 
-The list of available types that can be passed as a parameter to the `ofType()` function and `is` and `as` operators is determined by the underlying data model. Within FHIRPath, they are just identifiers, either delimited or simple.
+The list of available types that can be passed as a parameter to the `ofType()` function and `is` and `as` operators is determined by the underlying object model. Within FHIRPath, they are just identifiers, either delimited or simple.
 
 == Expressions
 
@@ -1013,7 +1013,13 @@ If the item is a String, but the string is not convertible to a Quantity using t
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ----
 
-then the result is empty.
+then the result is empty. For example, the following are valid quantity strings:
+
+[source]
+----
+'4 days'
+'10 \'mg[Hg]\''
+----
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -2539,7 +2545,7 @@ which would return a collection of concatenated first and last names, one for ea
 Patient.name.first().select(given.first() + ' ' + family.first())
 ----
 
-It is clear that, although more robust, the last expression is also much more elaborate, certainly in situations where, because of external constraints, the author is sure names will not repeat, even if the unconstrained data model allows repetition.
+It is clear that, although more robust, the last expression is also much more elaborate, certainly in situations where, because of external constraints, the author is sure names will not repeat, even if the unconstrained object model allows repetition.
 
 Apart from throwing exceptions, unexpected outcomes may result because of the way the equality operators are defined. The expression
 
@@ -2626,7 +2632,7 @@ ____
 
 
 FHIRPath can be used against HL7 V2 messages. This UML diagram summarises the 
-object model on which the FHIRPath statements are written:
+Object Model on which the FHIRPath statements are written:
 
 image:v2-class-model.png["Class Model for HL7 V2",height="456",width="760"]
 
