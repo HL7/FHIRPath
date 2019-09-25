@@ -174,7 +174,7 @@ Time: @T14:34:28 (@ followed by ISO8601 compliant time beginning with T, no time
 Quantity: 10 'mg', 4 days
 ----
 
-For each type of literal, FHIRPath defines a named system type to allow operations and functions to be defined. For example, the multiplication operator (`*`) is defined for the numeric types Integer and Decimal, as well as the Quantity type. See the discussion on <<Models>> for a more detailed discussion of how these types are used within evaluation contexts.
+For each type of literal, FHIRPath defines a named system type to allow operations and functions to be defined, as well as an ultimate root type, `System.Any`. For example, the multiplication operator (`*`) is defined for the numeric types Integer and Decimal, as well as the Quantity type. See the discussion on <<Models>> for a more detailed discussion of how these types are used within evaluation contexts.
 
 ==== Boolean
 
@@ -1246,7 +1246,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 ==== replace(pattern : String, substitution : String) : String
 
-Returns the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string (`''`), instances of `pattern` are removed from the result. If `pattern` is the empty string (`''`), every character in the input string is surrounded by the substitution, e.g. `&#39;abc&#39;.replace(&#39;&#39;,&#39;x&#39;)` becomes `&#39;xaxbxcx&#39;`.
+Returns the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string (`&#39;&#39;`), instances of `pattern` are removed from the result. If `pattern` is the empty string (`&#39;&#39;`), every character in the input string is surrounded by the substitution, e.g. `&#39;abc&#39;.replace(&#39;&#39;,&#39;x&#39;)` becomes `&#39;xaxbxcx&#39;`.
 
 If the input collection, `pattern`, or `substitution` are empty, the result is empty (`{ }`).
 
@@ -1547,7 +1547,7 @@ Returns `true` if the left collection is equal to the right collection:
 
 As noted above, if either operand is an empty collection, the result is an empty collection. Otherwise:
 
-If both operands are collections with a single item, they must be of the same type, and:
+If both operands are collections with a single item, they must be of the same type (or be implicitly convertible to the same type), and:
 
 * For primitives:
 ** `String`: comparison is based on Unicode values
@@ -1618,7 +1618,7 @@ Additional functions to support more sophisticated timezone offset comparison (s
 
 Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }` will result in `true`.
 
-If both operands are collections with a single item, they must be of the same type, and:
+If both operands are collections with a single item, they must be of the same type (or implicitly convertible to the same type), and:
 
 * For primitives
 ** `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see <<string-equivalence>> for more details).
@@ -1680,7 +1680,7 @@ The converse of the equivalent operator.
 * The comparison operators are defined for strings, integers, decimals, quantities, dates, datetimes and times.
 * If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
 * Both arguments must be collections with single values, and the evaluator will throw an error if either collection has more than one item.
-* Both arguments must be of the same type, and the evaluator will throw an error if the types differ.
+* Both arguments must be of the same type (or implicitly convertible to the same type), and the evaluator will throw an error if the types differ.
 * When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible.
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
 
@@ -2064,6 +2064,14 @@ For partial date/time values, the operation is performed by converting the time-
 ----
 
 This expression will evaluate to the value `@2016` even though the date/time value is not specified to the level of precision of the time-valued quantity.
+
+[source]
+----
+@2014 + 23 months
+@2016 + 365 days
+----
+
+The first example above returns @2015, because 23 months only constitutes one year. The second example returns 2017 because even though 2016 is a leap-year, the time-valued quantity (`365 days`) is converted to `1 year`, a standard calendar year of 365 days.
 
 Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
 
