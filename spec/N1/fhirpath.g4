@@ -101,16 +101,11 @@ identifier
     Lexical rules
 *****************************************************************/
 
-// Not sure why, but with these as lexical rules, when the grammar is imported into CQL, they are not correctly recognized
-// Moving the same rules into the literal production rule above corrects the issue
-//EMPTY
-//        : '{' '}'
-//        ;                      // To create an empty array (and avoid a NULL literal)
-
-//BOOL
-//        : 'true'
-//        | 'false'
-//        ;
+/*
+NOTE: The goal of these rules in the grammar is to provide a date
+token to the parser. As such it is not attempting to validate that
+the date is a correct date, that task is for the parser or interpreter.
+*/
 
 DATETIME
         : '@'
