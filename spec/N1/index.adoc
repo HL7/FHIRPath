@@ -369,6 +369,7 @@ For time-valued quantities, in addition to the definite duration UCUM units, FHI
 
 |===
 |Calendar Duration |UCUM Annotation |Relationship to Definite Duration UCUM Unit
+
 |`year`/`years` |`'{year}'` |`~ 1 'a'`
 |`month`/`months` |`'{month}'` |`~ 1 'mo'`
 |`week`/`weeks` |`'{week}'` |`~ 1 'wk'`
@@ -377,6 +378,7 @@ For time-valued quantities, in addition to the definite duration UCUM units, FHI
 |`minute`/`minutes` |`'{minute}'` |`~ 1 'min'`
 |`second`/`seconds` |`'{second}'` |`= 1 's'`
 |`millisecond`/`milliseconds` |`'{millisecond}'` |`= 1 'ms'`
+|===
 
 For example, the following quantities are _calendar duration_ quantities:
 
