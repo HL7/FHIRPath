@@ -2461,7 +2461,22 @@ Keywords are tokens that are recognized by the parser and used to build the vari
 |`days` |`millisecond` |`seconds` |
 |===
 
-In general, keywords within FHIRPath are also considered _reserved_ words, meaning that it is illegal to use them as identifiers. If necessary, identifiers that clash with a reserved word can be delimited using a backtick (`` ` ``).
+In general, keywords within FHIRPath are also considered _reserved_ words, meaning that it is illegal to use them as identifiers. FHIRPath keywords are reserved words, with the exception of the following keywords that may also be used as identifiers:
+
+|===
+
+|`as` |`contains`
+|`is` |`is`
+|===
+
+If necessary, identifiers that clash with a reserved word can be delimited using a backtick (`` ` ``):
+
+[source, java]
+----
+Patient.text.`div`.empty()
+----
+
+The `div` element of the `Patient.text` must be offset with backticks (`` ` ``) because `div` is both a keyword and a reserved word.
 
 === Identifiers
 Identifiers are used as labels to allow expressions to reference elements such as model types and properties. FHIRPath supports two types of identifiers, _simple_ and _delimited_.
@@ -2521,7 +2536,7 @@ Attempting to access an undefined environment variable will result in an error, 
 
 ____
 
-Note: For backwards compatibility with some existing implementations, the token for an environment variable may also be a string, as in `%'us-zip'`.
+Note: For backwards compatibility with some existing implementations, the token for an environment variable may also be a string, as in `%'us-zip'`, with no difference in semantics.
 
 ____
 
@@ -2646,7 +2661,7 @@ For example:
 
 [source,java]
 ----
-Patient.contact.type()
+Patient.contact.single().type()
 ----
 
 Results in:
