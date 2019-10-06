@@ -2407,10 +2407,10 @@ Literals provide for the representation of values within FHIRPath. The following
 |The at-symbol (`@`) followed by a date (**YYYY-MM-DD**)
 
 |*<<DateTime>>*
-|The at-symbol (`@`) followed by a datetime (**YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm**)
+|The at-symbol (`@`) followed by a datetime (**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**)
 
 |*<<Time>>*
-|The at-symbol (`@`) followed by a time (**Thh:mm:ss.fff(+|-)hh:mm**)
+|The at-symbol (`@`) followed by a time (**Thh:mm:ss.fff(+\|-)hh:mm**)
 
 |*<<Quantity>>*
 |An integer or decimal literal followed by a datetime precision specifier, or a <<UCUM>> unit specifier
