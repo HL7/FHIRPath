@@ -3,18 +3,59 @@
 <ImplementationGuide xmlns="http://hl7.org/fhir">
   <id value="ig"/>
   <url value="http://hl7.org/fhirpath/ImplementationGuide/ig"/>
-  <version value="1.1.0"/>
+  <version value="2.0.0"/>
   <name value="FHIRPath"/>
   <title value="FHIRPath Specification"/>
   <status value="draft"/>
   <experimental value="false"/>
-  <publisher value="FHIR Project"/>
+  <publisher value="Implementable Technology Specifications WG"/>
+  <contact>
+    <telecom>
+      <system value="url"/>
+      <value value="http://www.hl7.org/Special/committees/xml/index.cfm"/>
+    </telecom>
+  </contact>
   <packageId value="hl7.fhirpath"/>
   <fhirVersion value="4.0.0"/>
   <definition>
     <resource>
       <reference>
         <reference value="Binary/binary-grammar"/>
+      </reference>
+    </resource>
+    <resource>
+      <reference>
+        <reference value="Binary/binary-modelinfoschema"/>
+      </reference>
+    </resource>
+    <resource>
+      <reference>
+        <reference value="Binary/binary-tests"/>
+      </reference>
+    </resource>
+    <resource>
+      <reference>
+        <reference value="Binary/binary-testschema"/>
+      </reference>
+    </resource>
+    <resource>
+      <reference>
+        <reference value="Observation/example"/>
+      </reference>
+    </resource>
+    <resource>
+      <reference>
+        <reference value="Patient/example"/>
+      </reference>
+    </resource>
+    <resource>
+      <reference>
+        <reference value="Questionnaire/3141"/>
+      </reference>
+    </resource>
+    <resource>
+      <reference>
+        <reference value="ValueSet/example-expansion"/>
       </reference>
     </resource>
     <page>

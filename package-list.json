@@ -11,6 +11,15 @@
          "status": "ci-build",
          "current": true
       },
+			{
+				"version": "2.0.0",
+				"date": "2019-10-06",
+				"desc": "Normative Release",
+				"changes": "history.html",
+				"path": "http://hl7.org/fhirpath/N1/index.html",
+				"status": "normative",
+				"sequence": "Normative"
+			},
       {
          "version": "1.3.0",
          "date": "2019-03-24",

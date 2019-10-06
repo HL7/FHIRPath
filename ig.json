@@ -14,7 +14,28 @@
 	"resources": {
     "Binary/binary-grammar": {
       "source": "binary-grammar.json"
-    }
+    },
+		"Binary/binary-modelinfoschema": {
+			"source": "binary-modelinfoschema.json"
+		},
+		"Binary/binary-tests": {
+			"source": "binary-tests.json"
+		},
+		"Binary/binary-testschema": {
+			"source": "binary-testschema.json"
+		},
+		"Observation/example": {
+			"source": "observation-example.xml"
+		},
+		"Patient/example": {
+			"source": "patient-example.xml"
+		},
+		"Questionnaire/3141": {
+			"source": "questionnaire-example.xml"
+		},
+		"ValueSet/example-expansion": {
+			"source": "valueset-example-expansion.xml"
+		}
 	},
 	"canonicalBase": "http://hl7.org/fhirpath",
 	"version": "4.0.0",
