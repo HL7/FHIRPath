@@ -396,7 +396,7 @@ Whereas the following quantities are _definite duration_ quantities:
 4 'd'
 ----
 
-The table above defines the equality/equivalence relationship between calendar and definite duration quantities. For example, `1 year` is not equal to `1 'a'`, but it is equivalent to `1 'a'`. See <<date-time-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
+The table above defines the equality/equivalence relationship between calendar and definite duration quantities. For example, `1 year` is not equal to `1 'a'`, but it is equivalent to `1 'a'`. See <<datetime-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
 
 === Operators
 
@@ -1110,7 +1110,7 @@ For calendar durations, FHIRPath defines the following conversion factors:
 |`1 second` |`1 's'`
 |===
 
-Note that calendar duration conversion factors are only used when time-valued quantities appear in unanchored calculations. See <<date-time-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
+Note that calendar duration conversion factors are only used when time-valued quantities appear in unanchored calculations. See <<datetime-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
 
 ____
 
