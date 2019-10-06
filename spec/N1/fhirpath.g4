@@ -107,31 +107,28 @@ token to the parser. As such it is not attempting to validate that
 the date is a correct date, that task is for the parser or interpreter.
 */
 
+DATE
+        : '@' DATEFORMAT
+        ;
+
 DATETIME
-        : '@'
-            [0-9][0-9][0-9][0-9] // year
-            (
-                (
-                    '-'[0-9][0-9] // month
-                    (
-                        (
-                            '-'[0-9][0-9] // day
-                            ('T' TIMEFORMAT?)?
-                        )
-                        | 'T'
-                    )?
-                )
-                | 'T'
-            )?
-            ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])? // timezone offset
+        : '@' DATEFORMAT 'T' (TIMEFORMAT TIMEZONEOFFSETFORMAT?)?
         ;
 
 TIME
         : '@' 'T' TIMEFORMAT
         ;
 
+fragment DATEFORMAT
+        : [0-9][0-9][0-9][0-9] ('-'[0-9][0-9] ('-'[0-9][0-9])?)?
+        ;
+
 fragment TIMEFORMAT
         : [0-9][0-9] (':'[0-9][0-9] (':'[0-9][0-9] ('.'[0-9]+)?)?)?
+        ;
+
+fragment TIMEZONEOFFSETFORMAT
+        : ('Z' | ('+' | '-') [0-9][0-9]':'[0-9][0-9])
         ;
 
 IDENTIFIER

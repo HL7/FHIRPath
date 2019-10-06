@@ -335,7 +335,7 @@ The following example illustrates the use of the `DateTime` literal:
 
 The suffix `T` is allowed after a year, year-month, or year-month-day literal because without it, there would be no way to specify a partial DateTime with only a year, month, or day; the literal would always result in a Date value.
 
-Consult the link:grammar.thml[formal grammar] for more details.
+Consult the link:grammar.html[formal grammar] for more details.
 
 ==== Quantity
 
@@ -351,13 +351,34 @@ The `Quantity` literal is a number (integer or decimal), followed by a (single-q
 
 ____
 
-Note: When using <<UCUM>> units within FHIRPath, implementations shall use case-sensitive comparisons.
+Implementations must respect UCUM units, meaning that they must not ignore UCUM units in calculations involving quantities, including comparison, conversion, and arithmetic operations. For implementations that do not support unit conversion, this means that the calculation need only be supported if the units are the same value, case-sensitively.
+
+When using <<UCUM>> units within FHIRPath, implementations shall use case-sensitive comparisons.
+
+Implementations shall support comparison and arithmetic operations on quantities with units where the units are the same.
+
+Implementations should support other unit functionality as specified by UCUM, including unit conversion.
+
+Implementations that do not support complete UCUM functionality may return empty (`{ }`) for calculations involving quantities with units where the units are different.
 
 ____
 
-For date/time units, an alternative representation may be used (note that both a plural and singular version exist):
+===== Time-valued Quantities
 
-* `year`/`years`, `month`/`months`, `week`/`weeks`, `day`/`days`, `hour`/`hours`, `minute`/`minutes`, `second`/`seconds`, `millisecond`/`milliseconds`
+For time-valued quantities, in addition to the definite duration UCUM units, FHIRPath defines calendar duration keywords, and corresponding UCUM unit annotations, for calendar duration units:
+
+|===
+|Calendar Duration |UCUM Annotation |Relationship to Definite Duration UCUM Unit
+|`year`/`years` |`'{year}'` |`~ 1 'a'`
+|`month`/`months` |`'{month}'` |`~ 1 'mo'`
+|`week`/`weeks` |`'{week}'` |`~ 1 'wk'`
+|`day`/`days` |`'{day}'` |`~ 1 'd'`
+|`hour`/`hours` |`'{hour}'` |`~ 1 'h'`
+|`minute`/`minutes` |`'{minute}'` |`~ 1 'min'`
+|`second`/`seconds` |`'{second}'` |`= 1 's'`
+|`millisecond`/`milliseconds` |`'{millisecond}'` |`= 1 'ms'`
+
+For example, the following quantities are _calendar duration_ quantities:
 
 [source,java]
 ----
@@ -365,11 +386,15 @@ For date/time units, an alternative representation may be used (note that both a
 4 days
 ----
 
-____
+Whereas the following quantities are _definite duration_ quantities:
 
-Although <<UCUM>> defines definite quantities for 'a' and 'mo', it does not specify how those values should be applied in date/time arithmetic calculations. Within FHIRPath, calculations involving date/times and durations shall use calendar semantics as specified in <<ISO8601>>.
+[source,java]
+----
+1 'a'
+4 'd'
+----
 
-____
+The table above defines the equality/equivalence relationship between calendar and definite duration quantities. For example, `1 year` is not equal to `1 'a'`, but it is equivalent to `1 'a'`. See <<date-time-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
 
 === Operators
 
@@ -709,7 +734,7 @@ which would find *any* descendants called `item`, not just the ones nested insid
 
 The order of items returned by the `repeat()` function is undefined.
 
-==== ofType(type : TypeInfo) : collection
+==== ofType(type : _type specifier_) : collection
 
 Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty. The `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat it as type specifier rather than an identifier expression:
 
@@ -814,7 +839,7 @@ Merge the input and other collections into a single collection without eliminati
 
 === Conversion
 
-FHIRPath defines both _implicit_ and _explicit_ conversion. Implicit conversions occur automatically, as opposed to explicit conversions that requires the function be called explicitly. Implicit conversion is performed when an operator or function is used with a compatible type. For example:
+FHIRPath defines both _implicit_ and _explicit_ conversion. Implicit conversions occur automatically, as opposed to explicit conversions that require the function be called explicitly. Implicit conversion is performed when an operator or function is used with a compatible type. For example:
 
 [source,java]
 ----
@@ -1068,11 +1093,26 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
-If the `unit` argument is provided, it must be the string representation of a UCUM code, and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
+If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword that can be represented as a UCUM annotation), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
+
+For calendar durations, FHIRPath defines the following conversion factors:
+
+|===
+|Calendar duration |Conversion factor
+
+|`1 year` |`12 months` or `365 days`
+|`1 month` |`30 days`
+|`1 day` |`24 hours`
+|`1 hour` |`60 minutes`
+|`1 minute` |`60 seconds`
+|`1 second` |`1 's'`
+|===
+
+Note that calendar duration conversion factors are only used when time-valued quantities appear in unanchored calculations. See <<date-time-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
 
 ____
 
-Note: Implementations are not required to support a complete UCUM implementation, and are free to return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
+Implementations are not required to support a complete UCUM implementation, and may return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
 
 ____
 
@@ -1097,11 +1137,11 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
-If the `unit` argument is provided, it must be the string representation of a UCUM code, and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
+If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword that can be represented as a UCUM annotation), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
 
 ____
 
-Note: Implementations are not required to support a complete UCUM implementation, and are free to return false when the `unit` argument is used and it is different than the input quantity unit.
+Implementations are not required to support a complete UCUM implementation, and may return false when the `unit` argument is used and it is different than the input quantity unit.
 
 ____
 
@@ -1645,17 +1685,23 @@ Typically, this operator is used with single fixed values as operands. This mean
 
 If one or both of the operands is the empty collection, this operation returns an empty collection.
 
+===== Quantity Equality
+
 When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+For time-valued quantities, note that calendar durations and definite quantity durations above seconds are considered unequal:
+
+[source,java]
+----
+1 year = 1 'a' // false
+1 second = 1 's' // true
+----
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by <<UCUM>>.
+Implementations that do support units shall do so as specified by <<UCUM>>, augmented for calendar durations as defined in the toQuantity function.
 
-____
-
-Although <<UCUM>> defines definite quantities for 'a' and 'mo', it does not specify how those values should be applied in date/time arithmetic calculations. Within FHIRPath, calculations involving date/times and durations shall use calendar semantics as specified in <<ISO8601>>.
-
-____
+===== Date/Time Equality
 
 For `Date`, `DateTime` and `Time` equality, the comparison is performed by considering each precision in order, beginning with years (or hours for time values), and respecting timezone offsets. If the values are the same, comparison proceeds to the next precision; if the values are different, the comparison stops and the result is `false`. If one input has a value for the precision and the other does not, the comparison stops and the result is empty (`{ }`); if neither input has a value for the precision, or the last precision has been reached, the comparison stops and the result is `true`. For the purposes of comparison, seconds and milliseconds are considered a single precision using a decimal, with decimal equality semantics.
 
@@ -1708,17 +1754,23 @@ If both operands are collections with multiple items:
 
 Note that this implies that if the collections have a different number of items to compare, or if one input is a value and the other is empty (`{ }`), the result will be `false`.
 
+===== Quantity Equivalence
+
 When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in `false`.
+
+For time-valued quantities, calendar durations and definite quantity durations are considered equivalent:
+
+[source,java]
+----
+1 year ~ 1 'a' // true
+1 second ~ 1 's' // true
+----
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by <<UCUM>>.
+Implementations that do support units shall do so as specified by <<UCUM>>, augmented for calendar durations as defined in the toQuantity function.
 
-____
-
-Although <<UCUM>> defines definite quantities for 'a' and 'mo', it does not specify how those values should be applied in date/time arithmetic calculations. Within FHIRPath, calculations involving date/times and durations shall use calendar semantics as specified in <<ISO8601>>.
-
-____
+===== Date/Time Equivalence
 
 For `Date`, `DateTime` and `Time` equivalence, the comparison is the same as for equality, with the exception that if the input values have different levels of precision, the result is `false`, rather than empty (`{ }`). As with equality, the second and millisecond precisions are considered a single precision using a decimal, with decimal equivalence semantics.
 
@@ -1759,9 +1811,17 @@ The converse of the equivalent operator, returning `true` if equivalent returns 
 
 When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
 
+For time-valued quantities, calendar durations and definite quantity durations above seconds are considered un-comparable:
+
+[source, java]
+----
+1 year > 1 `a` // { } (empty)
+10 seconds > 1 's' // true
+----
+
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by <<UCUM>>.
+Implementations that do support units shall do so as specified by <<UCUM>>, augmented for calendar durations as defined in the toQuantity function.
 
 For partial Date, DateTime, and Time values, the comparison is performed by comparing the values at each precision, beginning with years, and proceeding to the finest precision specified in either input, and respecting timezone offsets. If one value is specified to a different level of precision than the other, the result is empty (`{ }`) to indicate that the result of the comparison is unknown. As with equality and equivalence, the second and millisecond precisions are considered a single precision using a decimal, with decimal comparison semantics.
 
@@ -1862,7 +1922,7 @@ Patient.contained.all($this is Patient implies age > 10)
 
 This example returns true if for all the contained resources, if the contained resource is of type `Patient`, then the `age` is greater than ten.
 
-==== is(type : TypeInfo)
+==== is(type : _type specifier_)
 
 The `is()` function is supported for backwards compatibility with previous implementations of FHIRPath. Just as with the `is` keyword, the `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat it as a type specifier rather than an identifier expression:
 
@@ -1888,7 +1948,7 @@ A _type specifier_ is an identifier that must resolve to the name of a type in a
 Observation.component.where(value as Quantity > 30 'mg')
 ----
 
-==== as(type : TypeInfo)
+==== as(type : _type specifier_)
 
 The `as()` function is supported for backwards compatibility with previous implementations of FHIRPath. Just as with the `as` keyword, the `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat is a type specifier rather than an identifier expression:
 
@@ -2022,7 +2082,7 @@ When operating on quantities, the dimensions of each quantity must be the same, 
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units SHALL do so as specified by <<UCUM>>.
+Implementations that do support units shall do so as specified by <<UCUM>>, augmented for calendar durations as defined in the toQuantity function.
 
 Operations that cause arithmetic overflow or underflow will result in empty (`{ }`).
 
@@ -2110,14 +2170,29 @@ For strings, will concatenate the strings, where an empty operand is taken to be
 
 Date and time arithmetic operators are used to add time-valued quantities to date/time values. The left operand must be a `Date`, `DateTime`, or `Time` value, and the right operand must be a `Quantity` with a time-valued unit:
 
-* `year`, `years`, or `&#39;a&#39;`
-* `month`, `months`, or `&#39;mo&#39;`
-* `week`, `weeks` or `&#39;wk&#39;`
-* `day`, `days`, or `&#39;d&#39;`
-* `hour`, `hours`, or `&#39;h&#39;`
-* `minute`, `minutes`, or `&#39;min&#39;`
+* `year`, `years`
+* `month`, `months`
+* `week`, `weeks`
+* `day`, `days`
+* `hour`, `hours`
+* `minute`, `minutes`
 * `second`, `seconds`, or `&#39;s&#39;`
 * `millisecond`, `milliseconds`, or `&#39;ms&#39;`
+
+To avoid the potential confusion of calendar-based date/time arithmetic with definite duration date/time arithmetic, FHIRPath defines definite-duration date/time arithmetic for seconds and below, and calendar-based date/time arithmetic for seconds and above. At the second, calendar-based and definite-duration-based date/time arithmetic are identical. If a definite-quantity duration above seconds appears in a date/time arithmetic calculation, the evaluation will end and signal an error to the calling environment.
+
+Within FHIRPath, calculations involving date/times and calendar durations shall use calendar semantics as specified in <<ISO8601>>. Specifically:
+
+|===
+|year |The year, positive or negative, is added to the year component of the date or time value. If the resulting year is out of range, an error is thrown. If the month and day of the date or time value is not a valid date in the resulting year, the last day of the calendar month is used.
+|month |The month, positive or negative is divided by 12, and the integer portion of the result is added to the year component. The remaining portion of months is added to the month component. If the resulting date is not a valid date in the resulting year, the last day of the resulting calendar month is used.
+|week |The week, positive or negative, is multiplied by 7, and the resulting value is added to the day component, respecting calendar month and calendar year lengths.
+|day |The day, positive or negative, is added to the day component, respecting calendar month and calendar year lengths.
+|hour |The hours, positive or negative, are added to the hour component, with each 24 hour block counting as a calendar day, and respecting calendar month and calendar year lengths.
+|minute |The minutes, positive or negative, are added to the minute component, with each 60 minute block counting as an hour, and respecting calendar month and calendar year lengths.
+|second |The seconds, positive or negative, are added to the second component, with each 60 second block counting as a minute, and respecting calendar month and calendar year lengths.
+|millisecond |The milliseconds, positive or negative, are added to the millisecond component, with each 1000 millisecond block counting as a second, and respecting calendar month and calendar year lengths.
+|===
 
 If there is more than one item, or an item of an incompatible type, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -2155,12 +2230,6 @@ The first example above returns @2015, because 23 months only constitutes one ye
 
 Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
 
-____
-
-Although <<UCUM>> defines definite quantities for 'a' and 'mo', it does not specify how those values should be applied in date/time arithmetic calculations. Within FHIRPath, calculations involving date/times and durations shall use calendar semantics as specified in <<ISO8601>>.
-
-____
-
 ==== - (subtraction)
 
 Returns the value of the given `Date`, `DateTime`, or `Time`, decremented by the time-valued quantity, respecting variable length periods for calendar years and months.
@@ -2184,12 +2253,6 @@ For partial date/time values where the time-valued quantity is more precise than
 The first example above will evaluate to the value `@2012` even though the date/time value is not specified to the level of precision of the time-valued quantity. The second example will evaluate to `@2017-03-01`.
 
 Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
-
-____
-
-Although <<UCUM>> defines definite quantities for 'a' and 'mo', it does not specify how those values should be applied in date/time arithmetic calculations. Within FHIRPath, calculations involving date/times and durations shall use calendar semantics as specified in <<ISO8601>>.
-
-____
 
 === Operator precedence
 
