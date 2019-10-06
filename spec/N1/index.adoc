@@ -78,6 +78,15 @@ Throughout this specification, formatting patterns for Date, Time, and DateTime 
 
 These formatting patterns are set in **bold** to distinguish them typographically from literals or code and to make clear that they are not intended to be formally interpreted as regex patterns.
 
+==== Conformance Language
+
+This specification uses the conformance verbs SHALL, MUST, SHOULD, and MAY as defined in link:https://www.ietf.org/rfc/rfc2119.txt[RFC 2119]. Unlike RFC 2119, however, this specification allows that different applications might not be able to interoperate because of how they use optional features. In particular:
+
+* SHALL/MUST: An absolute requirement for all implementations
+* SHALL/MUST NOT: An absolute prohibition against inclusion for all implementations
+* SHOULD/SHOULD NOT: A best practice or recommendation to be considered by implementers within the context of their particular implementation; there may be valid resons to ignore an item, but the full implications must be understood and carefully weighed before choosing a different course
+* MAY: This is truly optional language for an implementation; can be inluced or omitted as the implementer decides with no implications.
+
 == Navigation model
 
 FHIRPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FHIRPath query is run. This way, FHIRPath can be used on in-memory Plain Old Java Objects (POJOs), XML data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FHIRPath operates on a directed acyclic graph of classes as defined by a Meta Object Facility (MOF)-equivalent <<MOF>> type system. In this specification, the structures on which FHIRPath operates are referred to as the Object Model.
@@ -473,7 +482,7 @@ Correspondingly, arguments to the functions can be any FHIRPath expression, thou
 
 The following sections describe the functions supported in FHIRPath, detailing the expected types of parameters and type of collection returned by the function:
 
-* If the function expects a parameter to be a single value (e.g. `item(index: Integer)`) and it is passed an argument that evaluates to a collection with multiple items, or to a collection with an item that is not of the required type (or cannot be converted to the required type), the evaluation of the expression will end and an error will be signaled to the calling environment.
+* If the function expects a parameter to be a single value (e.g. `startsWith(prefix: String)`) and it is passed an argument that evaluates to a collection with multiple items, or to a collection with an item that is not of the required type (or cannot be converted to the required type), the evaluation of the expression will end and an error will be signaled to the calling environment.
 * If the function takes an `expression` as a parameter, the function will evaluate this parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` and `$index` elements, which represent the item from the input collection currently under evaluation, and its index in the collection, respectively. For example, in `name.given.where($this > 'ba' and $this < 'bc')` the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
 
 For the <<aggregates,aggregate>> function, expressions may also refer to the special `$total` element, representing the result of the aggregation.
@@ -1733,11 +1742,11 @@ For strings, equivalence returns true if the strings are the same value while ig
 
 ==== != (Not Equals)
 
-The converse of the equals operator.
+The converse of the equals operator, returning `true` if equal returns `false`; `false` if equal returns `true`; and empty (`{ }`) if equal returns empty. In other words, `A != B` is short-hand for `(A = B).not()`.
 
 ==== !~ (Not Equivalent)
 
-The converse of the equivalent operator.
+The converse of the equivalent operator, returning `true` if equivalent returns `false` and `false` is equivalent returns `true`. In other words, `A !~ B` is short-hand for `(A ~ B).not()`.
 
 === Comparison
 
@@ -2124,14 +2133,17 @@ For `DateTime` values, the quantity unit must be one of: `years`, `months`, `wee
 
 For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
 
-For partial date/time values, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value. For example:
+For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
+
+For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value. For example:
 
 [source,java]
 ----
 @2014 + 24 months
+@2019-03-01 + 24 months // @2021-03-01
 ----
 
-This expression will evaluate to the value `@2016` even though the date/time value is not specified to the level of precision of the time-valued quantity.
+The first example above will evaluate to the value `@2016` even though the date/time value is not specified to the level of precision of the time-valued quantity. The second example will evaluate to `@2021-03-01`.
 
 [source,java]
 ----
@@ -2155,18 +2167,21 @@ Returns the value of the given `Date`, `DateTime`, or `Time`, decremented by the
 
 For `Date` values, the quantity unit must be one of: `years`, `months`, `weeks`, or `days`
 
-For `DateTime` values, the quantity unit must be one of: `years`, `months`, `weeks`, `days`, `hours`, `minutes`, `seconds`, `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
+For `DateTime` values, the quantity unit must be one of: `years`, `months`, `weeks`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
 
 For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
 
-For partial date/time values, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then subtracting from the date/time value. For example:
+For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
+
+For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then subtracting from the date/time value. For example:
 
 [source,java]
 ----
 @2014 - 24 months
+@2019-03-01 - 24 months // @2017-03-01
 ----
 
-This expression will evaluate to the value `@2012` even though the date/time value is not specified to the level of precision of the time-valued quantity.
+The first example above will evaluate to the value `@2012` even though the date/time value is not specified to the level of precision of the time-valued quantity. The second example will evaluate to `@2017-03-01`.
 
 Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
 
@@ -2197,7 +2212,28 @@ Precedence of operations, in order from high to low:
 #13: implies
 ----
 
-As customary, expressions may be grouped by parenthesis (`()`).
+As customary, precedence may be established explicitly using parentheses (`( )`).
+
+As an example, consider the following expression:
+
+[source,java]
+----
+-7.combine(3)
+----
+
+Because the invocation operator (`.`) has a higher precedence than the unary negation (`-`), the unary negation will be applied to the result of the combine of 7 and 3, resulting in an error (because unary negation cannot be applied to a list):
+
+[source,java]
+----
+-(7.combine(3)) // ERROR
+----
+
+Use parentheses to ensure the unary negation applies to the `7`:
+
+[source,java]
+----
+(-7).combine(3) // { -7, 3 }
+----
 
 == Aggregates
 
@@ -2761,7 +2797,7 @@ Note that if the parser cannot properly parse the Abstract Message Syntax, group
 
 This section lists known tooling and implementation projects for the FHIRPath language:
 
-* JavaScript: http://niquola.github.io/fhirpath-demo/#/
+* JavaScript: https://github.com/HL7/fhirpath.js/
 * Java RI: In the FHIR build tooling at org.hl7.fhir.dstu3.utils.FHIRPathEngine
 * Pascal RI: https://github.com/grahamegrieve/fhirserver/blob/master/library/r3/FHIR.R3.PathEngine.pas
 * .NET RI: https://github.com/ewoutkramer/fhir-net-fhirpath
