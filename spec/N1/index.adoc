@@ -1429,6 +1429,15 @@ The functions in this section operate on collections with a single item. Unless 
 
 Note also that although all functions return collections, if a given function is defined to return a single element, the return type in the description of the function is simplified to just the type of the single element, rather than the list type.
 
+The math functions in this section enable FHIRPath to be used not only for path selection, but for providing a platform-independent representation of calculation logic in artifacts such as questionnaires and documentation templates. For example:
+
+[source,java]
+----
+(%weight/(%height.power(2))).round(1)
+----
+
+This example from a questionnaire calculates the Body Mass Index (BMI) based on the responses to the weight and height elements. For more information on the use of FHIRPath in questionnaires, see the [Structured Data Capture](http://hl7.org/fhir/uv/sdc/) (SDC) implementation guide.
+
 ==== abs() : Integer | Decimal | Quantity
 
 Returns the absolute value of the input. When taking the absolute value of a quantity, the unit is unchanged.
