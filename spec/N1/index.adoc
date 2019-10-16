@@ -339,9 +339,9 @@ Consult the link:grammar.html[formal grammar] for more details.
 
 ==== Quantity
 
-The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be a valid Unified Code for Units of Measure <<UCUM>> unit.
+The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be either a valid Unified Code for Units of Measure <<UCUM>> unit or one of the calendar duration keywords, singular or plural.
 
-The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid Unified Code for Units of Measure <<UCUM>> unit. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
+The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid Unified Code for Units of Measure <<UCUM>> unit or calendar duration keyword. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
 
 [source,java]
 ----
@@ -365,19 +365,19 @@ ____
 
 ===== Time-valued Quantities
 
-For time-valued quantities, in addition to the definite duration UCUM units, FHIRPath defines calendar duration keywords, and corresponding UCUM unit annotations, for calendar duration units:
+For time-valued quantities, in addition to the definite duration UCUM units, FHIRPath defines calendar duration keywords for calendar duration units:
 
 |===
-|Calendar Duration |UCUM Annotation |Relationship to Definite Duration UCUM Unit
+|Calendar Duration |Unit Representation |Relationship to Definite Duration UCUM Unit
 
-|`year`/`years` |`'{year}'` |`~ 1 'a'`
-|`month`/`months` |`'{month}'` |`~ 1 'mo'`
-|`week`/`weeks` |`'{week}'` |`~ 1 'wk'`
-|`day`/`days` |`'{day}'` |`~ 1 'd'`
-|`hour`/`hours` |`'{hour}'` |`~ 1 'h'`
-|`minute`/`minutes` |`'{minute}'` |`~ 1 'min'`
-|`second`/`seconds` |`'{second}'` |`= 1 's'`
-|`millisecond`/`milliseconds` |`'{millisecond}'` |`= 1 'ms'`
+|`year`/`years` |`'year'` |`~ 1 'a'`
+|`month`/`months` |`'month'` |`~ 1 'mo'`
+|`week`/`weeks` |`'week'` |`~ 1 'wk'`
+|`day`/`days` |`'day'` |`~ 1 'd'`
+|`hour`/`hours` |`'hour'` |`~ 1 'h'`
+|`minute`/`minutes` |`'minute'` |`~ 1 'min'`
+|`second`/`seconds` |`'second'` |`= 1 's'`
+|`millisecond`/`milliseconds` |`'millisecond'` |`= 1 'ms'`
 |===
 
 For example, the following quantities are _calendar duration_ quantities:
@@ -1095,7 +1095,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
-If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword that can be represented as a UCUM annotation), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
+If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
 
 For calendar durations, FHIRPath defines the following conversion factors:
 
@@ -1139,7 +1139,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
-If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword that can be represented as a UCUM annotation), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
+If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
 
 ____
 
@@ -1710,7 +1710,7 @@ For time-valued quantities, note that calendar durations and definite quantity d
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by <<UCUM>>, augmented for calendar durations as defined in the toQuantity function.
+Implementations that do support units shall do so as specified by <<UCUM>>, as well as the calendar durations as defined in the toQuantity function.
 
 ===== Date/Time Equality
 
@@ -1779,7 +1779,7 @@ For time-valued quantities, calendar durations and definite quantity durations a
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by <<UCUM>>, augmented for calendar durations as defined in the toQuantity function.
+Implementations that do support units shall do so as specified by <<UCUM>> as well as the calendar durations as defined in the toQuantity function.
 
 ===== Date/Time Equivalence
 
@@ -1832,7 +1832,7 @@ For time-valued quantities, calendar durations and definite quantity durations a
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by <<UCUM>>, augmented for calendar durations as defined in the toQuantity function.
+Implementations that do support units shall do so as specified by <<UCUM>> as well as the calendar durations as defined in the toQuantity function.
 
 For partial Date, DateTime, and Time values, the comparison is performed by comparing the values at each precision, beginning with years, and proceeding to the finest precision specified in either input, and respecting timezone offsets. If one value is specified to a different level of precision than the other, the result is empty (`{ }`) to indicate that the result of the comparison is unknown. As with equality and equivalence, the second and millisecond precisions are considered a single precision using a decimal, with decimal comparison semantics.
 
@@ -2093,7 +2093,7 @@ When operating on quantities, the dimensions of each quantity must be the same, 
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by <<UCUM>>, augmented for calendar durations as defined in the toQuantity function.
+Implementations that do support units shall do so as specified by <<UCUM>> as well as the calendar durations as defined in the toQuantity function.
 
 Operations that cause arithmetic overflow or underflow will result in empty (`{ }`).
 
