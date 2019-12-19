@@ -134,7 +134,7 @@ Within FHIRPath, a collection is:
 
 * Ordered - The order of items in the collection is important and is preserved through operations as much as possible. Operators and functions that do not preserve order will note that in their documentation.
 * Non-Unique - Duplicate elements are allowed within a collection. Some operations and functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
-* Indexed - Each item in a collection can be addressed by its index, i.e. ordinal position within the collection (e.g. `a[2]`). 
+* Indexed - Each item in a collection can be addressed by its index, i.e. ordinal position within the collection (e.g. `a[2]`).
 * Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 * Countable - The number of items in a given collection can always be determined using the `count()` function
 
@@ -218,7 +218,7 @@ The `String` type represents string values up to 2^31^-1 characters in length. S
 
 No other escape sequences besides those listed above are recognized.
 
-Note that Unicode is supported in both string literals and delimited <<identifiers>>. 
+Note that Unicode is supported in both string literals and delimited <<identifiers>>.
 
 [source,java]
 ----
@@ -396,7 +396,7 @@ Whereas the following quantities are _definite duration_ quantities:
 4 'd'
 ----
 
-The table above defines the equality/equivalence relationship between calendar and definite duration quantities. For example, `1 year` is not equal to `1 'a'`, but it is equivalent to `1 'a'`. See <<date-time-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
+The table above defines the equality/equivalence relationship between calendar and definite duration quantities. For example, `1 year` is not equal to `1 'a'`, but it is equivalent to `1 'a'`. See <<datetime-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
 
 === Operators
 
@@ -1112,7 +1112,7 @@ For calendar durations, FHIRPath defines the following conversion factors:
 |`1 second` |`1 's'`
 |===
 
-Note that calendar duration conversion factors are only used when time-valued quantities appear in unanchored calculations. See <<date-time-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
+Note that calendar duration conversion factors are only used when time-valued quantities appear in unanchored calculations. See <<datetime-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
 
 ____
 
@@ -1243,7 +1243,7 @@ This example returns a collection containing the first character of all the give
 
 ==== indexOf(substring : String) : Integer
 
-Returns the 0-based index of the first position `substring` is found in the input string, or -1 if it is not found. 
+Returns the 0-based index of the first position `substring` is found in the input string, or -1 if it is not found.
 
 If `substring` is an empty string (`''`), the function returns 0.
 
@@ -1280,7 +1280,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 ==== startsWith(prefix : String) : Boolean
 
-Returns `true` when the input string starts with the given `prefix`. 
+Returns `true` when the input string starts with the given `prefix`.
 
 If `prefix` is the empty string (`''`), the result is `true`.
 
@@ -1296,7 +1296,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 ==== endsWith(suffix : String) : Boolean
 
-Returns `true` when the input string ends with the given `suffix`. 
+Returns `true` when the input string ends with the given `suffix`.
 
 If `suffix` is the empty string (`''`), the result is `true`.
 
@@ -1312,7 +1312,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 ==== contains(substring : String) : Boolean
 
-Returns `true` when the given `substring` is a substring of the input string. 
+Returns `true` when the given `substring` is a substring of the input string.
 
 If `substring` is the empty string (`''`), the result is `true`.
 
@@ -1981,7 +1981,7 @@ ____
 ==== | (union collections)
 Merge the two collections into a single collection, eliminating any duplicate values (using <<equals>> (`=`)) to determine equality). There is no expectation of order in the resulting collection.
 
-See the <<union-other-collection,union>> function for more detail.
+See the <<unionother-collection,union>> function for more detail.
 
 ==== in (membership)
 If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
@@ -2593,7 +2593,7 @@ Results in:
 
 [source,java]
 ----
-{ 
+{
   SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' },
   SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' }
 }
@@ -2826,7 +2826,7 @@ ____
 == Use of FHIRPath on HL7 Version 2 messages
 
 
-FHIRPath can be used against HL7 V2 messages. This UML diagram summarises the 
+FHIRPath can be used against HL7 V2 messages. This UML diagram summarises the
 Object Model on which the FHIRPath statements are written:
 
 image:v2-class-model.png["Class Model for HL7 V2",height="456",width="760"]
@@ -2924,6 +2924,3 @@ http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 - link:grammar.html[grammar.html]
 - link:modelinfo.xsd[modelinfo.xsd]
 - [[[Fluent]]] Fluent interface pattern. https://en.wikipedia.org/wiki/Fluent_interface
-
-
-

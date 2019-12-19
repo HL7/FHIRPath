@@ -9,6 +9,7 @@
          "desc": "Continuous Integration Build (latest in version control)",
          "path": "http://build.fhir.org/ig/HL7/FHIRPath",
          "status": "ci-build",
+         "fhirversion": "4.0.1",
          "current": true
       },
 			{
@@ -18,6 +19,7 @@
 				"changes": "history.html",
 				"path": "http://hl7.org/fhirpath/N1/index.html",
 				"status": "normative",
+        "fhirversion": "4.0.1",
 				"sequence": "Normative"
 			},
       {
@@ -26,6 +28,7 @@
          "desc": "3rd Normative Ballot",
          "changes": "history.html",
          "path": "http://hl7.org/fhirpath/2019May/index.html",
+         "fhirversion": "4.0.1",
          "status": "ballot",
          "sequence": "Normative"
       },
@@ -35,6 +38,7 @@
          "desc": "2nd Normative Ballot",
          "changes": "history.html",
          "path": "http://hl7.org/fhirpath/2018Sep/index.html",
+         "fhirversion": "4.0.1",
          "status": "ballot",
          "sequence": "Normative"
       },
@@ -45,6 +49,7 @@
          "changes": "history.html",
          "path": "http://hl7.org/fhirpath/2018May/index.html",
          "status": "ballot",
+         "fhirversion": "4.0.1",
          "sequence": "Normative"
       },
       {
@@ -55,6 +60,7 @@
          "path": "http://hl7.org/fhirpath/2017Jan/index.html",
          "status": "trial-use",
          "sequence": "STU1",
+         "fhirversion": "4.0.1",
          "current": true
       },
       {
@@ -64,6 +70,7 @@
          "changes": "history.html",
          "path": "http://hl7.org/fhirpath/2016Sept/index.html",
          "status": "ballot",
+         "fhirversion": "4.0.1",
          "sequence": "STU1"
       },
       {
@@ -73,6 +80,7 @@
          "changes": "history.html",
          "path": "http://hl7.org/fhirpath/2016May/index.html",
          "status": "ballot",
+         "fhirversion": "4.0.1",
          "sequence": "STU1"
       }
    ]
