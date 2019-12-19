@@ -64,16 +64,29 @@ tr {
 	vertical-align: top;
 	text-align: left;
 }
-table.cols {
+
+table.colstu {
 	width: 100%;
 }
 
-table.cols td {
+table.colstu td {
   border: 1px grey solid;
 	border-spacing: 0;
 	padding: 5px;
 	border-collapse: collapse;
-	background-color: #ffffe6;
+	background-color: #fff5e6;
+}
+
+table.colsd {
+	width: 100%;
+}
+
+table.colsd td {
+  border: 1px grey solid;
+	border-spacing: 0;
+	padding: 5px;
+	border-collapse: collapse;
+	background-color: #efefef;
 }
 
 table.colsn {
@@ -86,6 +99,30 @@ table.colsn td {
 	padding: 5px;
 	border-collapse: collapse;
 	background-color: #e6ffe6;
+}
+
+table.colse {
+	width: 100%;
+}
+
+table.colse td {
+  border: 1px grey solid;
+	border-spacing: 0;
+	padding: 5px;
+	border-collapse: collapse;
+	background-color: #e6e6e6;
+}
+
+table.colsi {
+	width: 100%;
+}
+
+table.colsi td {
+  border: 1px grey solid;
+	border-spacing: 0;
+	padding: 5px;
+	border-collapse: collapse;
+	background-color: #ffffe6;
 }
 
 table.list td {
@@ -156,7 +193,7 @@ table.grid{
 	margin-bottom: 10px;
         border: 1px black solid;
         margin-right: auto;
-	
+
 }
 
 table.grid th {
@@ -239,13 +276,13 @@ div.content {
 
 div.use {
 	border: 1px solid #dcdcdc;
-        background: #EEEEEE ; 
+        background: #EEEEEE ;
 	padding: 5px;
 }
 
 div.mapping {
 	border: 1px solid #dcdcdc;
-        background: #e4dbf9 ; 
+        background: #e4dbf9 ;
 	padding: 5px;
 	margin-bottom: 10px;
 	font-size: 0.75em;
@@ -255,7 +292,7 @@ div.mapping {
 
 div.example {
 	border: 1px solid #dcdcdc;
-        background: #FFECDD ; 
+        background: #FFECDD ;
 	padding: 5px;
 	margin-bottom: 10px;
 	font-size: 0.75em;
@@ -287,14 +324,14 @@ div.sidebar ul {
 	padding: 0px;
 	margin-left: 6px;
 	font-size: 11px;
-	line-height: 2.125em; 
+	line-height: 2.125em;
 }
 
 div.sidebar li {
 	margin: 0px 0px 0px 6px;
 	padding: 0px;
 	font-size: 11px;
-	line-height: 2.125m; 
+	line-height: 2.125m;
 }
 
 div.sidebar {
@@ -309,7 +346,7 @@ div.sidebar {
 pre.spec             {
 	border: 1px solid #dcdcdc;
  	font-size: 11px;
-        background: #FFFFE0 ; 
+        background: #FFFFE0 ;
 	padding: 5px;
 	width: 650px;
 }
@@ -317,7 +354,7 @@ pre.spec             {
 pre.json             {
 	border: 1px solid #dcdcdc;
  	font-size: 11px;
-        background: #EFFFEF ; 
+        background: #EFFFEF ;
 	padding: 5px;
 	width: 650px;
 }
@@ -326,7 +363,7 @@ pre.xml              {
 	font-family: 'Courier New';
  	font-size: 9pt;
         padding: 2px;
-        background: #F0FFFF ; 
+        background: #F0FFFF ;
 	width: 650px;
 }
 
@@ -378,7 +415,7 @@ pre a {
 	.page-break	{ display:block; page-break-before:always; }
 }
 
-ul.navtop 
+ul.navtop
 {
   list-style: none outside none;
   display: block;
@@ -387,7 +424,7 @@ ul.navtop
   padding:0px;
 }
 
-li.selected 
+li.selected
 {
   white-space: nowrap;
   display: inline-block;
@@ -397,7 +434,7 @@ li.selected
   padding: 0px;
 }
 
-li.spacerleft 
+li.spacerleft
 {
   white-space: nowrap;
   display: inline-block;
@@ -419,7 +456,7 @@ li.spacerright
   width: 160px;
 }
 
-li.nselected 
+li.nselected
 {
   white-space: nowrap;
   display: inline-block;
@@ -432,7 +469,7 @@ li.nselected
   background-repeat: x-repeat;
 }
 
-li.wiki 
+li.wiki
 {
   white-space: nowrap;
   display: inline-block;
@@ -443,13 +480,13 @@ li.wiki
 }
 
 
-div.navtop 
+div.navtop
 {
   margin: 0px;
   padding: 0px;
 }
 
-ul.navtop a 
+ul.navtop a
 {
   margin: 0px;
   padding: 0px;
@@ -466,7 +503,7 @@ ul.navtop span
   font-size: 10px;
 }
 
-span.forprint 
+span.forprint
 {
   display: none;
 }
@@ -479,7 +516,7 @@ p.status
 }
 
 
-div.sidebar p.note  
+div.sidebar p.note
 {
   color: maroon;
   font-size: 10px;
@@ -545,9 +582,9 @@ x-margin-right: 30px;
 }
 
 .diagram-class-title {
-	font-size: 1em; 
-	text-anchor: middle; 
-	font-family: OpenSansCondensedLight; 
+	font-size: 1em;
+	text-anchor: middle;
+	font-family: OpenSansCondensedLight;
 	font-weight: regular;
 }
 
@@ -557,9 +594,9 @@ x-margin-right: 30px;
 }
 
 .diagram-class-title-link {
-	font-size: .9em; 
-	text-anchor: middle; 
-	font-family: OpenSansCondensedLight; 
+	font-size: .9em;
+	text-anchor: middle;
+	font-family: OpenSansCondensedLight;
 	font-weight: regular;
 }
 
@@ -568,16 +605,16 @@ x-margin-right: 30px;
 }
 
 .diagram-class-detail {
-	font-size: .8em; 
-	text-anchor: left; 
-	font-family: OpenSansCondensedLight; 
+	font-size: .8em;
+	text-anchor: left;
+	font-family: OpenSansCondensedLight;
 	font-weight: regular;
 }
 
 .diagram-class-linkage {
-	font-size: .9em; 
-	text-anchor: middle; 
-	font-family: OpenSansCondensedLight; 
+	font-size: .9em;
+	text-anchor: middle;
+	font-family: OpenSansCondensedLight;
 	font-weight: regular;
 	opacity: 1;
 }
@@ -605,30 +642,30 @@ img.hierarchy {
   background-color: white;
 }
 
-.linecounter { 
-  counter-reset: listing 
+.linecounter {
+  counter-reset: listing
 }
 
 
-code { 
-  counter-increment: listing; 
+code {
+  counter-increment: listing;
 }
 
-.linecounter  i:before { 
-  content: counter(listing) ". "; color: black; 
+.linecounter  i:before {
+  content: counter(listing) ". "; color: black;
 }
 
-.linecounter i { 
-  float: left; 
-  clear: both; 
-  min-width: 2.5em; 
+.linecounter i {
+  float: left;
+  clear: both;
+  min-width: 2.5em;
 }
 
-.linecounter code:before { 
-  content: counter(listing) ". "; 
-  color: black; 
-  display: inline-block; 
-  min-width: 2.5em; 
+.linecounter code:before {
+  content: counter(listing) ". ";
+  color: black;
+  display: inline-block;
+  min-width: 2.5em;
 }
 
 div.warning {
