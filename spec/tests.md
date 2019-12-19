@@ -1,9 +1,9 @@
 ---
-layout: current
-title: FluentPath Tests
+layout: normativerelease
+title: FHIRPath Tests
 ---
 
-A set of tests for FHIR are attached to this page. The tests include operational tests for FHIR DSTU2 and STU3.
+A set of tests for FHIR are attached to this page. The tests include operational tests for FHIR R4.
 
 <a href="tests.zip">Test Source</a>.
 

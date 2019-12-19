@@ -16,7 +16,7 @@
     </telecom>
   </contact>
   <packageId value="hl7.fhirpath"/>
-  <fhirVersion value="4.0.0"/>
+  <fhirVersion value="4.0.1"/>
   <definition>
     <resource>
       <reference>
