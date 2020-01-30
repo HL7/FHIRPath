@@ -12,6 +12,16 @@ Looking for implementations? See http://wiki.hl7.org/index.php?title=FHIRPath_Im
 
 Version: 2.0.0 Public Domain (http://creativecommons.org/publicdomain/zero/1.0/[Creative Commons 0])
 
+image:dist/ansi-approved.gif[]
+
+|===
+|Formal Name: |HL7 Cross-Paradigm Specification: FHIRPath, Release 1
+|ANSI Designation: |ANSI/HL7 NMN R1-2020
+|Date of Approval: |2020-01-16
+|===
+
+FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions of this specification marked Normative have met its requirements for development of a formal standard.
+
 ____
 
 Note: The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
