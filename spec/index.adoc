@@ -1471,6 +1471,18 @@ The escape function takes a singleton string and escapes it for a given target, 
 |json |The string is escaped such that it can appear as a valid JSON string (quotes (`"`) are escaped as (`\"`)); additional escape characters are described in the <<string, String>> escape section
 |===
 
+If the input is empty, the result is empty.
+
+If no target is specified, the result is empty.
+
+==== unescape(target : String) : String
+
+The unescape function takes a singleton string and unescapes it for a given target. The available targets are specified in the escape function description.
+
+If the input is empty, the result is empty.
+
+If no target is specified, the result is empty.
+
 ==== trim() : String
 
 The trim function trims whitespace characters from the beginning and ending of the input string, with whitespace characters as defined in the <<whitespace, Whitespace>> lexical category.
