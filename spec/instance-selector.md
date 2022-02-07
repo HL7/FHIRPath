@@ -98,7 +98,8 @@ CodeableConcept {
 Note that to really make practical use of this with FHIR, the syntax allows for anonymous tuples and lists as well:
 
 ```fhirpath
-{ 1, 2, 3, 4, 5 }
+{ 1, 2, 3, 4, 5 } // List of integers
+List<String> { } // Empty list of strings
 
 {
   low: Quantity {
@@ -113,14 +114,14 @@ Note that to really make practical use of this with FHIR, the syntax allows for 
     code: 'g/dL',
     system: 'http://unitsofmeasure.org'
   }
-}
+} // Anonymous tuple with low: Quantity, high: Quantity elements
 ```
 
 And empty instances and tuples:
 
 ```fhirpath
-{ : }
-Coding { : }
+{ : } // Empty anonymous tuple
+Coding { : } // Empty Coding instance
 ```
 
 The `:` ensures that the empty list selector `{ }` remains unambiguous (though this does require 1 look-ahead in the parser)
