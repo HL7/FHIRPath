@@ -97,6 +97,25 @@ CodeableConcept {
 
 Note that to really make practical use of this with FHIR, the syntax allows for anonymous tuples and lists as well:
 
+```fhirpath
+{ 1, 2, 3, 4, 5 }
+
+{
+  low: Quantity {
+    value: 16.5,
+    unit: 'g/dL',
+    code: 'g/dL',
+    system: 'http://unitsofmeasure.org'
+  },
+  high: Quantity {
+    value: 21.5,
+    unit: 'g/dL',
+    code: 'g/dL',
+    system: 'http://unitsofmeasure.org'
+  }
+}
+```
+
 And empty instances and tuples:
 
 ```fhirpath
