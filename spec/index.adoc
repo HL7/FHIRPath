@@ -1,4 +1,4 @@
-= FHIRPath (Normative Release)
+= FHIRPath (Continuous Build)
 :page-layout: current
 :source-highlighter: highlightjs
 :backend: xhtml
@@ -29,6 +29,7 @@ Note: The following sections of this specification have not received significant
 * Aggregates
 * Types - Reflection
 * Functions - Math
+* Functions - String (additional functions, marked as appropriate)
 
 In addition, the appendices are included as additional documentation and are informative content.
 
@@ -1427,6 +1428,97 @@ Returns the list of characters in the input string. If the input collection is e
 [source,java]
 ----
 'abc'.toChars() // { 'a', 'b', 'c' }
+----
+
+=== Additional String Functions
+
+____
+
+Note: the contents of this section are Standard for Trial Use (STU)
+
+____
+
+==== encode(format : String) : String
+
+The encode function takes a singleton string and returns the result of encoding that string in the given format. The format parameter defines the encoding format. Available formats are:
+
+|===
+|hex |The string is encoded using hexadecimal characters (base 16)
+|base64 |The string is encoded using standard base64 encoding, using A-Z, a-z, 0-9, +, and /, output padded with =)
+|urlbase64 |The string is encoded using url base 64 encoding, using A-Z, a-z, 0-9, -, and _, output padded with =)
+|===
+
+Base64 encodings are described in link:https://tools.ietf.org/html/rfc4648#section-4[RFC4648].
+
+If the input is empty, the result is empty.
+
+If no format is specified, the result is empty.
+
+==== decode(format : String) : String
+
+The decode function takes a singleton encoded string and returns the result of decoding that string according to the given format. The format parameter defines the encoding format. Available formats are listed in the encode function.
+
+If the input is empty, the result is empty.
+
+If no format is specified, the result is empty.
+
+==== escape(target : String) : String
+
+The escape function takes a singleton string and escapes it for a given target, as specified in the following table:
+
+|===
+|html |The string is escaped such that it can appear as valid HTML content (at least open bracket (`<`), ampersand (`&`), and quotes (`"`), but ideally anything with a character encoding above 127)
+|json |The string is escaped such that it can appear as a valid JSON string (quotes (`"`) are escaped as (`\"`)); additional escape characters are described in the <<string, String>> escape section
+|===
+
+If the input is empty, the result is empty.
+
+If no target is specified, the result is empty.
+
+==== unescape(target : String) : String
+
+The unescape function takes a singleton string and unescapes it for a given target. The available targets are specified in the escape function description.
+
+If the input is empty, the result is empty.
+
+If no target is specified, the result is empty.
+
+==== trim() : String
+
+The trim function trims whitespace characters from the beginning and ending of the input string, with whitespace characters as defined in the <<whitespace, Whitespace>> lexical category.
+
+If the input is empty, the result is empty.
+
+==== split(separator: String) : collection
+
+The split function splits a singleton input string into a list of strings, using the given separator.
+
+If the input is empty, the result is empty.
+
+If the input string does not contain any appearances of the separator, the result is the input string.
+
+The following example illustrates the behavior of the `.split` operator:
+
+[source,java]
+----
+('A,B,C').split(',') // { 'A', 'B', 'C' }
+('ABC').split(',') // { 'ABC' }
+----
+
+==== join([separator: String]) : String
+
+The join function takes a collection of strings and _joins_ them into a single string, optionally using the given separator.
+
+If the input is empty, the result is empty.
+
+If no separator is specified, the strings are directly concatenated.
+
+The following example illustrates the behavior of the `.join` operator:
+
+[source,java]
+----
+('A' | 'B' | 'C').join() // 'ABC'
+('A' | 'B' | 'C').join(',') // 'A,B,C'
 ----
 
 === Math
