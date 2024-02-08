@@ -25,6 +25,7 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 > * Functions - String (additional functions, marked as appropriate)
 > 
 > In addition, the appendices are included as additional documentation and are informative content.
+{: .stu-note }
 
 
 ## Background
@@ -1327,6 +1328,7 @@ Returns the list of characters in the input string. If the input collection is e
 ### Additional String Functions
 
 > Note: the contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 #### encode(format : String) : String
 
@@ -1412,6 +1414,7 @@ The following example illustrates the behavior of the `.join` operator:
 ### Math
 
 > Note: the contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 The functions in this section operate on collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -2235,6 +2238,7 @@ Use parentheses to ensure the unary negation applies to the `7`:
 ## Aggregates
 
 > Note: the contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed:
 
@@ -2305,7 +2309,7 @@ Literals provide for the representation of values within FHIRPath. The following
 |**<<String>>**|Strings of any character enclosed within single-ticks (`'`)|
 |**<<Date>>**|The at-symbol (`@`) followed by a date (**YYYY-MM-DD**)|
 |**<<DateTime>>**|The at-symbol (`@`) followed by a datetime (**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**) |
-|*<<Time>>*|The at-symbol (`@`) followed by a time (**Thh:mm:ss.fff(+\|-)hh:mm**) |
+|**<<Time>>**|The at-symbol (`@`) followed by a time (**Thh:mm:ss.fff(+\|-)hh:mm**) |
 |**<<Quantity>>**|An integer or decimal literal followed by a datetime precision specifier, or a <<UCUM>> unit specifier|
 {: .grid}
 
@@ -2423,6 +2427,7 @@ When resolving an identifier that is also the root of a FHIRPath expression, it 
 ### Reflection
 
 > Note: The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 FHIRPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection, using one of the following concrete subtypes of `TypeInfo`:
 
@@ -2628,11 +2633,15 @@ As discussed in the section on case-sensitivity, each model used within FHIRPath
 ### URI and Media Types
 To uniquely identify the FHIRPath language, the following URI is defined:
 
+``` txt
 http://hl7.org/fhirpath
+```
 
 In addition, a media type is defined to support describing FHIRPath content:
 
+``` txt
 text/fhirpath
+```
 
 > Note: The appendices are included for informative purposes and are not a normative part of the specification.
 
