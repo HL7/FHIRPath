@@ -2750,6 +2750,10 @@ http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
   .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
     background: unset;
   }
+
+  table.grid th {
+    background-color: #D9E6FC;
+  }  
 </style>
 <script>
   // Script to perform syntax highlighting of the FHIRPath grammar
