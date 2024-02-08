@@ -91,7 +91,7 @@ This specification uses the conformance verbs SHALL, MUST, SHOULD, and MAY as de
 
 ## Navigation model
 
-FHIRPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FHIRPath query is run. This way, FHIRPath can be used on in-memory Plain Old Java Objects (POJOs), XML data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FHIRPath operates on a directed acyclic graph of classes as defined by a Meta Object Facility (MOF)-equivalent <<MOF>> type system. In this specification, the structures on which FHIRPath operates are referred to as the Object Model.
+FHIRPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FHIRPath query is run. This way, FHIRPath can be used on in-memory Plain Old Java Objects (POJOs), XML data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FHIRPath operates on a directed acyclic graph of classes as defined by a Meta Object Facility (MOF)-equivalent [\[MOF\]](#MOF) type system. In this specification, the structures on which FHIRPath operates are referred to as the Object Model.
 
 Data are represented as a tree of labelled nodes, where each node may optionally carry a primitive value and have child nodes. Nodes need not have a unique label, and leaf nodes must carry a primitive value. For example, a (partial) representation of a FHIR Patient resource in this model looks like this:
 
@@ -255,7 +255,7 @@ Decimal literals cannot use exponential notation. There is enough additional com
 
 The `Date` type represents date and partial date values in the range @0001-01-01 to @9999-12-31 with a 1 day step size.
 
-The `Date` literal is a subset of <<ISO8601>>:
+The `Date` literal is a subset of [\[ISO8601\]](#ISO8601):
 
 * A date literal begins with an `@`
 * It uses the format **YYYY-MM-DD** format, though month and day parts are optional, and a separator is required between provided components
@@ -278,7 +278,7 @@ Consult the [formal grammar](grammar.html) for more details.
 
 The `Time` type represents time-of-day and partial time-of-day values in the range @T00:00:00.000 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. Implementations can provide support for higher precision, but must provide at least the range and precision defined here. Time values in FHIRPath do not have a timezone or timezone offset.
 
-The `Time` literal uses a subset of <<ISO8601>>:
+The `Time` literal uses a subset of [\[ISO8601\]](#ISO8601):
 
 * A time begins with a `@T`
 * It uses the **Thh:mm:ss.fff** format
@@ -296,7 +296,7 @@ Consult the [formal grammar](grammar.html) for more details.
 
 The `DateTime` type represents date/time and partial date/time values in the range `@0001-01-01T00:00:00.000 to @9999-12-31T23:59:59.999` with a 1 millisecond step size. This range is defined based on a survey of datetime implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger ranges and higher precision, but must provide at least the range and precision defined here.
 
-The `DateTime` literal combines the `Date` and `Time` literals and is a subset of <<ISO8601>>:
+The `DateTime` literal combines the `Date` and `Time` literals and is a subset of [\[ISO8601\]](#ISO8601):
 
 * A datetime literal begins with an `@`
 * It uses the **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm** format
@@ -2126,7 +2126,7 @@ Date and time arithmetic operators are used to add time-valued quantities to dat
 
 To avoid the potential confusion of calendar-based date/time arithmetic with definite duration date/time arithmetic, FHIRPath defines definite-duration date/time arithmetic for seconds and below, and calendar-based date/time arithmetic for seconds and above. At the second, calendar-based and definite-duration-based date/time arithmetic are identical. If a definite-quantity duration above seconds appears in a date/time arithmetic calculation, the evaluation will end and signal an error to the calling environment.
 
-Within FHIRPath, calculations involving date/times and calendar durations shall use calendar semantics as specified in <<ISO8601>>. Specifically:
+Within FHIRPath, calculations involving date/times and calendar durations shall use calendar semantics as specified in [\[ISO8601\]](#ISO8601). Specifically:
 
 |year |The year, positive or negative, is added to the year component of the date or time value. If the resulting year is out of range, an error is thrown. If the month and day of the date or time value is not a valid date in the resulting year, the last day of the calendar month is used. |
 | = |
@@ -2729,21 +2729,21 @@ For the most current listing of known implementations, refer to the HL7 wiki:
 
 http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 
-[appendix]
 ## References
 
-[bibliography]
-- [[[ANTLR]]] Another Tool for Language Recognition (ANTLR) http://www.antlr.org/
-- [[[ISO8601]]] Date and time format - ISO 8601. https://www.iso.org/iso-8601-date-and-time-format.html
-- [[[CQL]]] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.3. http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400
-- [[[MOF]]] Meta Object Facility. https://www.omg.org/spec/MOF/, version 2.5.1, November 2016
-- [[[XMLRE]]] Regular Expressions. XML Schema 1.1. https://www.w3.org/TR/xmlschema11-2/#regexs
-- [[[PCRE]]] Pearl-Compatible Regular Expressions. http://www.pcre.org/
-- [[[UCUM]]] Unified Code for Units of Measure (UCUM) http://unitsofmeasure.org/ucum.html, Version 2.1, Revision 442 (2017-11-21)
-- [[[FHIR]]] HL7 Fast Healthcare Interoperability Resources http://hl7.org/fhir
+<a name="bibliography"></a>
+- <a name="ANTLR"></a>[ANTLR] Another Tool for Language Recognition (ANTLR) <http://www.antlr.org/>
+- <a name="ISO8601"></a>[ISO8601] Date and time format - ISO 8601. <https://www.iso.org/iso-8601-date-and-time-format.html>
+- <a name="CQL"></a>[CQL] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.3. <http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400>
+- <a name="MOF"></a>[MOF] Meta Object Facility. <https://www.omg.org/spec/MOF/>, version 2.5.1, November 2016
+- <a name="XMLRE"></a>[XMLRE] Regular Expressions. XML Schema 1.1. <https://www.w3.org/TR/xmlschema11-2/#regexs>
+- <a name="PCRE"></a>[PCRE] Pearl-Compatible Regular Expressions. <http://www.pcre.org/>
+- <a name="UCUM"></a>[UCUM] Unified Code for Units of Measure (UCUM) <http://unitsofmeasure.org/ucum.html>, Version 2.1, Revision 442 (2017-11-21)
+- <a name="FHIR"></a>[FHIR] HL7 Fast Healthcare Interoperability Resources <http://hl7.org/fhir>
 - [grammar.html](grammar.html)
 - [modelinfo.xsd](modelinfo.xsd)
-- [[[Fluent]]] Fluent interface pattern. https://en.wikipedia.org/wiki/Fluent_interface
+- <a name="fluent"></a>[Fluent] Fluent interface pattern. <https://en.wikipedia.org/wiki/Fluent_interface>
+
 
 <style type="text/css">
   pre.language-fhirpath {
@@ -2767,6 +2767,7 @@ http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 </style>
 <script>
   // Script to perform syntax highlighting of the FHIRPath grammar
+  // https://prismjs.com/extending.html#language-definitions
   Prism.languages['fhirpath'] = {
 	'property': {
 		pattern: /(^|[^\\])`(?:\\.|[^\\`\r\n])*`(?=\s*:)/,
