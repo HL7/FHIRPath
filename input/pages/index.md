@@ -1334,7 +1334,7 @@ Returns the list of characters in the input string. If the input collection is e
 
 The encode function takes a singleton string and returns the result of encoding that string in the given format. The format parameter defines the encoding format. Available formats are:
 
-|hex |The string is encoded using hexadecimal characters (base 16) |
+|hex |The string is encoded using hexadecimal characters (base 16) in lowercase |
 |=|=|
 |base64 |The string is encoded using standard base64 encoding, using A-Z, a-z, 0-9, +, and /, output padded with =) |
 |urlbase64 |The string is encoded using url base 64 encoding, using A-Z, a-z, 0-9, -, and _, output padded with =) |
