@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--Hidden IG for de facto IG publishing-->
 <ImplementationGuide xmlns="http://hl7.org/fhir">
-  <id value="ig"/>
+  <id value="hl7.fhir.uv.fhirpath"/>
   <url value="http://hl7.org/fhirpath/ImplementationGuide/ig"/>
   <version value="2.0.0"/>
   <name value="FHIRPath"/>
@@ -15,7 +15,7 @@
       <value value="http://www.hl7.org/Special/committees/xml/index.cfm"/>
     </telecom>
   </contact>
-  <packageId value="hl7.fhirpath"/>
+  <packageId value="hl7.other.uv.fhirpath"/>
   <fhirVersion value="4.0.1"/>
   <definition>
     <resource>
@@ -59,9 +59,32 @@
       </reference>
     </resource>
     <page>
-      <nameUrl value="index.html"/>
-      <title value="FHIRPath Specification"/>
+      <nameUrl value="toc.html"/>
+      <title value="Table of contents"/>
       <generation value="html"/>
+      <page>
+        <nameUrl value="index.html"/>
+        <title value="FHIRPath Specification"/>
+        <generation value="markdown"/>
+      </page>
+      <page>
+        <nameUrl value="grammar.html"/>
+        <title value="FHIRPath Antlr 4.0 Grammar"/>
+        <generation value="markdown"/>
+      </page>
+      <page>
+        <nameUrl value="tests.html"/>
+        <title value="Fhirpath Tests"/>
+        <generation value="markdown"/>
+      </page>
     </page>
+    <!-- <parameter>
+      <code value="path-pages"/>
+      <value value="spec"/>
+    </parameter>
+    <parameter>
+      <code value="path-resource"/>
+      <value value="resources"/>
+    </parameter> -->
   </definition>
 </ImplementationGuide>
