@@ -2609,7 +2609,7 @@ In cases where a compiler finds places where a collection of multiple items can 
 
 ### Formal Syntax
 
-The formal syntax for FHIRPath is specified as an http://www.antlr.org/[Antlr 4.0] grammar file (g4) and included in this specification at the following link:
+The formal syntax for FHIRPath is specified as an [Antlr 4.0](http://www.antlr.org/) grammar file (g4) and included in this specification at the following link:
 
 [grammar.html](grammar.html)
 
@@ -2621,7 +2621,7 @@ The model information returned by the reflection function `type()`  is specified
 
 [modelinfo.xsd](modelinfo.xsd)
 
-> Note: The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the http://github.com/cqframework/clinical_quality_language[Clinical Quality Framework Tooling] and is included for reference as a simple formalism that meets the requirements described in the normative <<reflection,Reflection>> section above.
+> Note: The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the normative <<reflection,Reflection>> section above.
 
 As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and tooling should respect the case-sensitive settings for each model.
 
