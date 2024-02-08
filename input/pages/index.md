@@ -199,7 +199,7 @@ The `String` type represents string values up to 2<sup>31</sup>-1 characters in 
 | - | - |
 | `\'` | Single-quote |
 | `\"` | Double-quote |
-| `` ` `` | Backtick |
+| `` \` `` | Backtick |
 | `\r` | Carriage Return |
 | `\n` | Line Feed |
 | `\t` | Tab |
@@ -298,8 +298,8 @@ The `DateTime` type represents date/time and partial date/time values in the ran
 The `DateTime` literal combines the `Date` and `Time` literals and is a subset of <<ISO8601>>:
 
 * A datetime literal begins with an `@`
-* It uses the **YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm** format
-* Timezone offset is optional, but if present the notation **(+|-)hh:mm** is used (so must include both minutes and hours)
+* It uses the **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm** format
+* Timezone offset is optional, but if present the notation **(+\|-)hh:mm** is used (so must include both minutes and hours)
 * **Z** is allowed as a synonym for the zero (+00:00) UTC offset.
 * A `T` can be used at the end of any date (year, year-month, or year-month-day) to indicate a partial DateTime.
 
@@ -793,20 +793,20 @@ The following table lists the possible conversions supported, and whether the co
 
 |From\To |Boolean |Integer |Decimal |Quantity |String |Date |DateTime |Time |
 |- |- |- |- |- |- |- |- |- | 
-|*Boolean* |N/A |Explicit |Explicit |- |Explicit |- |- |- |
-|*Integer* |Explicit |N/A |Implicit |Implicit |Explicit |- |- |- |
-|*Decimal* |Explicit |- |N/A |Implicit |Explicit |- |- |- |
-|*Quantity* |- |- |- |N/A |Explicit |- |- |- |
-|*String* |Explicit |Explicit |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
-|*Date* |- |- |- |- |Explicit |N/A |Implicit |- |
-|*DateTime* |- |- |- |- |Explicit |Explicit |N/A |- |
-|*Time* |- |- |- |- |Explicit |- |- |N/A |
+|**Boolean** |N/A |Explicit |Explicit |- |Explicit |- |- |- |
+|**Integer** |Explicit |N/A |Implicit |Implicit |Explicit |- |- |- |
+|**Decimal** |Explicit |- |N/A |Implicit |Explicit |- |- |- |
+|**Quantity** |- |- |- |N/A |Explicit |- |- |- |
+|**String** |Explicit |Explicit |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
+|**Date** |- |- |- |- |Explicit |N/A |Implicit |- |
+|**DateTime** |- |- |- |- |Explicit |Explicit |N/A |- |
+|**Time** |- |- |- |- |Explicit |- |- |N/A |
 {: .grid}
 
 * Implicit - Values of the type in the From column will be implicitly converted to values of the type in the To column when necessary
 * Explicit - Values of the type in the From column can be explicitly converted using a function defined in this section
 * N/A - Not applicable
-* - No conversion is defined
+* \- No conversion is defined
 
 The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -839,11 +839,11 @@ The following table describes the possible values convertible to an Boolean:
 
 | Type | Representation | Result |
 | -| - | - |
-| *String* | `'true'`, `'t'`, `'yes'`, `'y'`, `'1'`, `'1.0'` | `true` |
+| **String** | `'true'`, `'t'`, `'yes'`, `'y'`, `'1'`, `'1.0'` | `true` |
 | | `'false'`, `'f'`, `'no'`, `'n'`, `'0'`, `'0.0'` | `false` |
-| *Integer* | `1` | `true` |
+| **Integer** | `1` | `true` |
 | | `0` | `false` |
-| *Decimal* | `1.0` |`true` |
+| **Decimal** | `1.0` |`true` |
 | | `0.0` | `false` |
 {: .grid}
 
@@ -948,7 +948,7 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm**), the result is empty.
+If the item is a String, but the string is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**), the result is empty.
 
 If the item contains a partial datetime (e.g. `'2012-01-01T10:00'`), the result is a partial datetime.
 
@@ -964,7 +964,7 @@ If the input collection contains a single item, this function will return true i
 * the item is a Date
 * the item is a String and is convertible to a DateTime
 
-If the item is not one of the above types, or is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm**), the result is false.
+If the item is not one of the above types, or is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**), the result is false.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1008,10 +1008,10 @@ If the input collection is empty, the result is empty.
 
 If the input collection contains a single item, this function will return a single quantity if:
 
-* the item is an Integer, or Decimal, where the resulting quantity will have the default unit (`&#39;1&#39;`)
+* the item is an Integer, or Decimal, where the resulting quantity will have the default unit (`'1'`)
 * the item is a Quantity
 * the item is a String and is convertible to a Quantity
-* the item is a Boolean, where `true` results in the quantity `1.0 &#39;1&#39;`, and `false` results in the quantity `0.0 &#39;1&#39;`
+* the item is a Boolean, where `true` results in the quantity `1.0 '1'`, and `false` results in the quantity `0.0 '1'`
 
 If the item is not one of the above types, the result is empty.
 
@@ -1082,7 +1082,7 @@ If the input collection contains a single item, this function will return a sing
 
 * the item in the input collection is a String
 * the item in the input collection is an Integer, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation
-* the item is a Boolean, where `true` results in `&#39;true&#39;` and `false` in `&#39;false&#39;`.
+* the item is a Boolean, where `true` results in `'true'` and `false` in `'false'`.
 
 If the item is not one of the above types, the result is false.
 
@@ -1090,13 +1090,13 @@ The String representation uses the following formats:
 
 |Type |Representation|
 |-|-|
-|*Boolean* |`true` or `false`|
-|*Integer* |`(\\+\|-)?\d+`|
-|*Decimal* |`(\\+\|-)?\d+(.\d+)?`|
-|*Quantity* |`(\\+\|-)?\d+(.\d+)? &#39;.*&#39;`|
-|*Date* |**YYYY-MM-DD**|
-|*DateTime* |**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**|
-|*Time* |**hh:mm:ss.fff(+\|-)hh:mm**|
+|**Boolean** |`true` or `false`|
+|**Integer** |`(\\+|-)?\d+`|
+|**Decimal** |`(\\+|-)?\d+(.\d+)?`|
+|**Quantity** |`(\\+|-)?\d+(.\d+)? '.*'`|
+|**Date** |**YYYY-MM-DD**|
+|**DateTime** |**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**|
+|**Time** |**hh:mm:ss.fff(+\|-)hh:mm**|
 {:.grid}
 
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
@@ -1131,7 +1131,7 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a Time (using the format **hh:mm:ss.fff(+|-)hh:mm**), the result is empty.
+If the item is a String, but the string is not convertible to a Time (using the format **hh:mm:ss.fff(+\|-)hh:mm**), the result is empty.
 
 If the item contains a partial time (e.g. `'10:00'`), the result is a partial time.
 
@@ -1146,7 +1146,7 @@ If the input collection contains a single item, this function will return true i
 * the item is a Time
 * the item is a String and is convertible to a Time
 
-If the item is not one of the above types, or is not convertible to a Time (using the format **hh:mm:ss.fff(+|-)hh:mm**), the result is false.
+If the item is not one of the above types, or is not convertible to a Time (using the format **hh:mm:ss.fff(+\|-)hh:mm**), the result is false.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1275,7 +1275,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 #### replace(pattern : String, substitution : String) : String
 
-Returns the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string (`&#39;&#39;`), instances of `pattern` are removed from the result. If `pattern` is the empty string (`&#39;&#39;`), every character in the input string is surrounded by the substitution, e.g. `&#39;abc&#39;.replace(&#39;&#39;,&#39;x&#39;)` becomes `&#39;xaxbxcx&#39;`.
+Returns the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string (`''`), instances of `pattern` are removed from the result. If `pattern` is the empty string (`''`), every character in the input string is surrounded by the substitution, e.g. `'abc'.replace('','x')` becomes `'xaxbxcx'`.
 
 If the input collection, `pattern`, or `substitution` are empty, the result is empty (`{ }`).
 
@@ -1663,13 +1663,13 @@ Otherwise, equals returns `false`.
 
 Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
 
-Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = &#39;phone&#39;` will result in an error if there is more than one `telecom` with a `use`. Typically, you'd want `Patient.telecom.where(system = 'phone')`
+Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = 'phone'` will result in an error if there is more than one `telecom` with a `use`. Typically, you'd want `Patient.telecom.where(system = 'phone')`
 
 If one or both of the operands is the empty collection, this operation returns an empty collection.
 
 ##### Quantity Equality
 
-When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
 
 For time-valued quantities, note that calendar durations and definite quantity durations above seconds are considered unequal:
 
@@ -1735,7 +1735,7 @@ Note that this implies that if the collections have a different number of items 
 
 ##### Quantity Equivalence
 
-When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in `false`.
+When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in `false`.
 
 For time-valued quantities, calendar durations and definite quantity durations are considered equivalent:
 
@@ -1786,7 +1786,7 @@ The converse of the equivalent operator, returning `true` if equivalent returns 
 * When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible.
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
 
-When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
 
 For time-valued quantities, calendar durations and definite quantity durations above seconds are considered un-comparable:
 
@@ -1933,7 +1933,7 @@ See the <<unionother-collection,union>> function for more detail.
 #### in (membership)
 If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
 
-The following example returns true if 'Joe' is in the list of given names for the Patient:
+The following example returns true if `'Joe'` is in the list of given names for the Patient:
 
 ``` fhirpath
 'Joe' in Patient.name.given
@@ -1942,7 +1942,7 @@ The following example returns true if 'Joe' is in the list of given names for th
 #### contains (containership)
 If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is false. This is the converse operation of in.
 
-The following example returns true if the list of given names for the Patient has 'Joe' in it:
+The following example returns true if the list of given names for the Patient has `'Joe'` in it:
 
 ``` fhirpath
 Patient.name.given contains 'Joe'
@@ -1959,9 +1959,9 @@ Returns `true` if both operands evaluate to `true`, `false` if either operand ev
 
 |and |true |false |empty |
 | - | - | - | - |
-|*true* |`true` |`false` |empty (`{ }`) |
-|*false* |`false` |`false` |`false` |
-|*empty* |empty (`{ }`) |`false` |empty (`{ }`) |
+|**true** |`true` |`false` |empty (`{ }`) |
+|**false** |`false` |`false` |`false` |
+|**empty** |empty (`{ }`) |`false` |empty (`{ }`) |
 {:.grid}
 
 #### or
@@ -1970,9 +1970,9 @@ Returns `false` if both operands evaluate to `false`, `true` if either operand e
 
 |or |true |false |empty |
 | - | - | - | - |
-|*true* |`true` |`true` |`true` |
-|*false* |`true` |`false` |empty (`{ }`) |
-|*empty* |`true` |empty (`{ }`) |empty (`{ }`) |
+|**true** |`true` |`true` |`true` |
+|**false** |`true` |`false` |empty (`{ }`) |
+|**empty** |`true` |empty (`{ }`) |empty (`{ }`) |
 {:.grid}
 
 #### not() : Boolean
@@ -1981,9 +1981,9 @@ Returns `true` if the input collection evaluates to `false`, and `false` if it e
 
 |not |
 |-|
-|*true* |`false` |
-|*false* |`true` |
-|*empty* |empty (`{ }`) |
+|**true** |`false` |
+|**false** |`true` |
+|**empty** |empty (`{ }`) |
 {:.grid}
 
 #### xor
@@ -1992,9 +1992,9 @@ Returns `true` if exactly one of the operands evaluates to `true`, `false` if ei
 
 |xor |true |false |empty |
 | - | - | - | - |
-|*true* |`false` |`true` |empty (`{ }`) |
-|*false* |`true` |`false` |empty (`{ }`) |
-|*empty* |empty (`{ }`) |empty (`{ }`) |empty (`{ }`) |
+|**true** |`false` |`true` |empty (`{ }`) |
+|**false** |`true` |`false` |empty (`{ }`) |
+|**empty** |empty (`{ }`) |empty (`{ }`) |empty (`{ }`) |
 {:.grid}
 
 #### implies
@@ -2003,9 +2003,9 @@ If the left operand evaluates to `true`, this operator returns the boolean evalu
 
 |implies |true |false |empty |
 | - | - | - | - |
-|*true* |`true` |`false` |empty (`{ }`) |
-|*false* |`true` |`true` |`true` |
-|*empty* |`true` |empty (`{ }`) |empty (`{ }`) |
+|**true** |`true` |`false` |empty (`{ }`) |
+|**false** |`true` |`true` |`true` |
+|**empty** |`true` |empty (`{ }`) |empty (`{ }`) |
 {:.grid}
 
 The implies operator is useful for testing conditionals. For example, if a given name is present, then a family name must be as well:
@@ -2026,7 +2026,7 @@ If there is more than one item, or an incompatible item, the evaluation of the e
 
 As with the other operators, the math operators will return an empty collection if one or both of the operands are empty.
 
-When operating on quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of 'cm' and 'm' can be compared, but units of 'cm2' and  'cm' cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+When operating on quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and  `'cm'` cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
@@ -2266,12 +2266,12 @@ FHIRPath defines the following lexical elements:
 
 |Element|Description|
 |-|-|
-|*Whitespace*|Whitespace defines the separation between tokens in the language|
-|*Comment*|Comments are ignored by the language, allowing for descriptive text|
-|*Literal*|Literals allow basic values to be represented within the language|
-|*Symbol* |Symbols such as `+`, `-`, `*`, and `/` |
-|*Keyword* |Grammar-recognized tokens such as `and`, `or` and `in` |
-|*Identifier* |Labels such as type names and property names |
+|**Whitespace**|Whitespace defines the separation between tokens in the language|
+|**Comment**|Comments are ignored by the language, allowing for descriptive text|
+|**Literal**|Literals allow basic values to be represented within the language|
+|**Symbol** |Symbols such as `+`, `-`, `*`, and `/` |
+|**Keyword** |Grammar-recognized tokens such as `and`, `or` and `in` |
+|**Identifier** |Labels such as type names and property names |
 {:.grid}
 
 ### Whitespace
@@ -2298,15 +2298,15 @@ Literals provide for the representation of values within FHIRPath. The following
 
 |Literal|Description |
 |-|-|
-|*Empty* (`{ }`)|The empty collection|
-|*<<Boolean>>*|The boolean literals (`true` and `false`)|
-|*<<Integer>>*|Sequences of digits in the range 0..2<sup>32</sup>-1|
-|*<<Decimal>>*|Sequences of digits with a decimal point, in the range (-10<sup>28</sup>+1)/10<sup>8</sup>..(10<sup>28</sup>-1)/10<sup>8</sup>|
-|*<<String>>*|Strings of any character enclosed within single-ticks (`'`)|
-|*<<Date>>*|The at-symbol (`@`) followed by a date (**YYYY-MM-DD**)|
-|*<<DateTime>>*|The at-symbol (`@`) followed by a datetime (**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**) |
+|**Empty** (`{ }`)|The empty collection|
+|**<<Boolean>>**|The boolean literals (`true` and `false`)|
+|**<<Integer>>**|Sequences of digits in the range 0..2<sup>32</sup>-1|
+|**<<Decimal>>**|Sequences of digits with a decimal point, in the range (-10<sup>28</sup>+1)/10<sup>8</sup>..(10<sup>28</sup>-1)/10<sup>8</sup>|
+|**<<String>>**|Strings of any character enclosed within single-ticks (`'`)|
+|**<<Date>>**|The at-symbol (`@`) followed by a date (**YYYY-MM-DD**)|
+|**<<DateTime>>**|The at-symbol (`@`) followed by a datetime (**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**) |
 |*<<Time>>*|The at-symbol (`@`) followed by a time (**Thh:mm:ss.fff(+\|-)hh:mm**) |
-|*<<Quantity>>*|An integer or decimal literal followed by a datetime precision specifier, or a <<UCUM>> unit specifier|
+|**<<Quantity>>**|An integer or decimal literal followed by a datetime precision specifier, or a <<UCUM>> unit specifier|
 {: .grid}
 
 For a more detailed discussion of the semantics of each type, refer to the link for each type.
@@ -2656,7 +2656,7 @@ In this Object Model:
 * A "cell" can be either an Element, a Component or a Sub-Components. Elements can contain Components, which can contain Sub-Components. Sub-Sub-Components are not allowed.
 * Calls may have a simple text content, or a series of (sub-)components. The simple() function returns either the text, if it exists, or the return value of simple() from the first component
 * A V2 data type (e.g. ST, SN, CE etc) is a profile on Cell that specifies whether it has simple content, or complex content.
-* todo: this object model doesn't make provision for non-syntax escapes in the simple content (e.g. \.b\).
+* todo: this object model doesn't make provision for non-syntax escapes in the simple content (e.g. `\.b\`).
 * all the lists are 1 based. That means the first item in the list is numbered 1, not 0.
 
 Some example queries:
@@ -2677,7 +2677,7 @@ Get a collection  with is the string values of all the repeats in the the 3rd el
 Message.segment.where(code = 'PID').field[3].element.where(component[4].value = 'MR').simple()
 ```
 
-Pick out the MR number from PID-3 (assuming, in this case, that there's only one PID segment in the message. No good for an A17). Note that this returns the whole Cell - e.g. |value^^^^MR|, though often more components will be present)
+Pick out the MR number from PID-3 (assuming, in this case, that there's only one PID segment in the message. No good for an A17). Note that this returns the whole Cell - e.g. `|value^^^^MR|`, though often more components will be present)
 
 ``` fhirpath
 Message.segment.where(code = 'PID').elements(3).where(component[4].value = 'MR').component[1].text
