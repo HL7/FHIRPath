@@ -1394,6 +1394,7 @@ The following example illustrates the behavior of the `.split` operator:
 ``` fhirpath
 ('A,B,C').split(',') // { 'A', 'B', 'C' }
 ('ABC').split(',') // { 'ABC' }
+'A,,C'.split(',') // { 'A', '', 'C' }
 ```
 
 #### join([separator: String]) : String
