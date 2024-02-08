@@ -321,9 +321,9 @@ Consult the [formal grammar](grammar.html) for more details.
 
 #### Quantity
 
-The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be either a valid Unified Code for Units of Measure <<UCUM>> unit or one of the calendar duration keywords, singular or plural.
+The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be either a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or one of the calendar duration keywords, singular or plural.
 
-The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid Unified Code for Units of Measure <<UCUM>> unit or calendar duration keyword. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
+The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or calendar duration keyword. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
 
 ``` fhirpath
 4.5 'mg'
@@ -332,7 +332,7 @@ The `Quantity` literal is a number (integer or decimal), followed by a (single-q
 
 > Implementations must respect UCUM units, meaning that they must not ignore UCUM units in calculations involving quantities, including comparison, conversion, and arithmetic operations. For implementations that do not support unit conversion, this means that the calculation need only be supported if the units are the same value, case-sensitively.
 >
-> When using <<UCUM>> units within FHIRPath, implementations shall use case-sensitive comparisons.
+> When using [\[UCUM\]](#UCUM) units within FHIRPath, implementations shall use case-sensitive comparisons.
 >
 > Implementations shall support comparison and arithmetic operations on quantities with units where the units are the same.
 >
@@ -1311,7 +1311,7 @@ This example of `replaceMatches()` will convert a string with a date formatted a
        '${day}-${month}-${year}')
 ```
 
-> Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the <<PCRE>> flavor as the dialect most likely to be broadly supported and understood.
+> Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the [\[PCRE\]](#PCRE) flavor as the dialect most likely to be broadly supported and understood.
 
 #### length() : Integer
 
@@ -1684,7 +1684,7 @@ For time-valued quantities, note that calendar durations and definite quantity d
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by <<UCUM>>, as well as the calendar durations as defined in the toQuantity function.
+Implementations that do support units shall do so as specified by [\[UCUM\]](#UCUM), as well as the calendar durations as defined in the toQuantity function.
 
 ##### Date/Time Equality
 
@@ -1750,7 +1750,7 @@ For time-valued quantities, calendar durations and definite quantity durations a
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by <<UCUM>> as well as the calendar durations as defined in the toQuantity function.
+Implementations that do support units shall do so as specified by [\[UCUM\]](#UCUM) as well as the calendar durations as defined in the toQuantity function.
 
 ##### Date/Time Equivalence
 
@@ -1801,7 +1801,7 @@ For time-valued quantities, calendar durations and definite quantity durations a
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by <<UCUM>> as well as the calendar durations as defined in the toQuantity function.
+Implementations that do support units shall do so as specified by [\[UCUM\]](#UCUM) as well as the calendar durations as defined in the toQuantity function.
 
 For partial Date, DateTime, and Time values, the comparison is performed by comparing the values at each precision, beginning with years, and proceeding to the finest precision specified in either input, and respecting timezone offsets. If one value is specified to a different level of precision than the other, the result is empty (`{ }`) to indicate that the result of the comparison is unknown. As with equality and equivalence, the second and millisecond precisions are considered a single precision using a decimal, with decimal comparison semantics.
 
@@ -2034,7 +2034,7 @@ When operating on quantities, the dimensions of each quantity must be the same, 
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by <<UCUM>> as well as the calendar durations as defined in the toQuantity function.
+Implementations that do support units shall do so as specified by [\[UCUM\]](#UCUM) as well as the calendar durations as defined in the toQuantity function.
 
 Operations that cause arithmetic overflow or underflow will result in empty (`{ }`).
 
@@ -2311,7 +2311,7 @@ Literals provide for the representation of values within FHIRPath. The following
 |**<<Date>>**|The at-symbol (`@`) followed by a date (**YYYY-MM-DD**)|
 |**<<DateTime>>**|The at-symbol (`@`) followed by a datetime (**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**) |
 |**<<Time>>**|The at-symbol (`@`) followed by a time (**Thh:mm:ss.fff(+\|-)hh:mm**) |
-|**<<Quantity>>**|An integer or decimal literal followed by a datetime precision specifier, or a <<UCUM>> unit specifier|
+|**<<Quantity>>**|An integer or decimal literal followed by a datetime precision specifier, or a [\[UCUM\]](#UCUM) unit specifier|
 {: .grid}
 
 For a more detailed discussion of the semantics of each type, refer to the link for each type.
@@ -2687,7 +2687,7 @@ Get a collection  with is the string values of all the repeats in the the 3rd el
 Message.segment.where(code = 'PID').field[3].element.where(component[4].value = 'MR').simple()
 ```
 
-Pick out the MR number from PID-3 (assuming, in this case, that there's only one PID segment in the message. No good for an A17). Note that this returns the whole Cell - e.g. `|value^^^^MR|`, though often more components will be present)
+Pick out the MR number from PID-3 (assuming, in this case, that there's only one PID segment in the message. No good for an A17). Note that this returns the whole Cell - e.g. `|value^^MR|`, though often more components will be present)
 
 ``` fhirpath
 Message.segment.where(code = 'PID').elements(3).where(component[4].value = 'MR').component[1].text
