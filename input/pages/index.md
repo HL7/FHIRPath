@@ -1723,7 +1723,7 @@ Returns `true` if the collections are the same. In particular, comparing empty c
 If both operands are collections with a single item, they must be of the same type (or implicitly convertible to the same type), and:
 
 * For primitives
-  * `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see [string-equivalence](#string-equivalence) for more details).
+  * `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see [String Equivalence](#string-equivalence) for more details).
   * `Integer`: exactly equal
   * `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision.
   * `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).
