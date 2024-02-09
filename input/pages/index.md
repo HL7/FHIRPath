@@ -58,7 +58,7 @@ In both FHIR and CQL, the model independence of FHIRPath means that expressions 
 
 The expressions can in theory be converted to equivalent expressions in XPath, OCL, or another similarly expressive language.
 
-FHIRPath can be used against many other graphs as well. For example, <<hl7v2>> describes how FHIRPath is used in HL7 V2.
+FHIRPath can be used against many other graphs as well. For example, [Use of FHIRPath on HL7 Version 2 messages](#hl7v2) describes how FHIRPath is used in HL7 V2.
 
 ### Conventions
 
@@ -164,7 +164,7 @@ The list of available types that can be passed as an argument to the `ofType()` 
 
 ## Expressions
 
-FHIRPath expressions can consist of _paths_, _literals_, _operators_, and _function invocations_, and these elements can be chained together, so that the output of one operation or function is the input to the next. This is the core of the _fluent_ <<Fluent>> syntactic style and allows complex paths and expressions to be built up from simpler components.
+FHIRPath expressions can consist of _paths_, _literals_, _operators_, and _function invocations_, and these elements can be chained together, so that the output of one operation or function is the input to the next. This is the core of the _fluent_ [\[Fluent\]](#fluent) syntactic style and allows complex paths and expressions to be built up from simpler components.
 
 ### Literals
 
@@ -181,7 +181,7 @@ Time: @T14:34:28 (@ followed by ISO8601 compliant time beginning with T, no time
 Quantity: 10 'mg', 4 days
 ```
 
-For each type of literal, FHIRPath defines a named system type to allow operations and functions to be defined, as well as an ultimate root type, `System.Any`. For example, the multiplication operator (`*`) is defined for the numeric types Integer and Decimal, as well as the Quantity type. See the discussion on <<Models>> for a more detailed discussion of how these types are used within evaluation contexts.
+For each type of literal, FHIRPath defines a named system type to allow operations and functions to be defined, as well as an ultimate root type, `System.Any`. For example, the multiplication operator (`*`) is defined for the numeric types Integer and Decimal, as well as the Quantity type. See the discussion on [Models](#models) for a more detailed discussion of how these types are used within evaluation contexts.
 
 #### Boolean
 
@@ -211,7 +211,7 @@ The `String` type represents string values up to 2<sup>31</sup>-1 characters in 
 
 No other escape sequences besides those listed above are recognized.
 
-Note that Unicode is supported in both string literals and delimited <<identifiers>>.
+Note that Unicode is supported in both string literals and delimited [Identifiers](#identifiers).
 
 ``` fhirpath
 'test string'
@@ -371,7 +371,7 @@ Whereas the following quantities are _definite duration_ quantities:
 4 'd'
 ```
 
-The table above defines the equality/equivalence relationship between calendar and definite duration quantities. For example, `1 year` is not equal to `1 'a'`, but it is equivalent to `1 'a'`. See <<datetime-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
+The table above defines the equality/equivalence relationship between calendar and definite duration quantities. For example, `1 year` is not equal to `1 'a'`, but it is equivalent to `1 'a'`. See [Date/Time Arithmetic](#datetime-arithmetic) for more information on using time-valued quantities in FHIRPath.
 
 ### Operators
 
@@ -384,7 +384,7 @@ name.given | name.family // union of given and family names
 'sir ' + name.given
 ```
 
-Operators available in FHIRPath are covered in detail in the <<Operations>> section.
+Operators available in FHIRPath are covered in detail in the [Operations](#operations) section.
 
 ### Function Invocations
 
@@ -409,7 +409,7 @@ In general, functions in FHIRPath operate on collections and return new collecti
 Patient.telecom.where(use = 'official').union(Patient.contact.telecom.where(use = 'official')).exists().not()
 ```
 
-For a complete listing of the functions defined in FHIRPath, refer to the <<Functions>> section.
+For a complete listing of the functions defined in FHIRPath, refer to the [Functions](#functions) section.
 
 ### Null and empty
 
@@ -479,7 +479,7 @@ The following sections describe the functions supported in FHIRPath, detailing t
 * If the function expects the argument passed to a parameter to be a single value (e.g. `startsWith(prefix: String)`) and it is passed an argument that evaluates to a collection with multiple items, or to a collection with an item that is not of the required type (or cannot be converted to the required type), the evaluation of the expression will end and an error will be signaled to the calling environment.
 * If the function takes an `expression` as a parameter, the function will evaluate the expression passed for the parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` and `$index` elements, which represent the item from the input collection currently under evaluation, and its index in the collection, respectively. For example, in `name.given.where($this > 'ba' and $this < 'bc')` the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
 
-For the <<aggregates,aggregate>> function, expressions may also refer to the special `$total` element, representing the result of the aggregation.
+For the [aggregate](#aggregates) function, expressions may also refer to the special `$total` element, representing the result of the aggregation.
 
 Note that the bracket notation in function signatures indicates optional parameters.
 
@@ -569,7 +569,7 @@ Observation.select(component.value > 90 'mm[Hg]').anyFalse()
 
 #### subsetOf(other : collection) : Boolean
 
-Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the <<equals>> (`=`) operation.
+Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the [equals](#equals) (`=`) operation.
 
 Conceptually, this function is evaluated by testing each element in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
 
@@ -581,7 +581,7 @@ MedicationRequest.contained.meta.tag.subsetOf(MedicationRequest.meta.tag)
 
 #### supersetOf(other : collection) : Boolean
 
-Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the <<equals>> (`=`) operation.
+Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the [equals](#equals) (`=`) operation.
 
 Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
 
@@ -597,7 +597,7 @@ Returns the integer count of the number of items in the input collection. Return
 
 #### distinct() : collection
 
-Returns a collection containing only the unique items in the input collection. To determine whether two items are the same, the <<equals>> (`=`) operator is used, as defined below.
+Returns a collection containing only the unique items in the input collection. To determine whether two items are the same, the [equals](#equals) (`=`) operator is used, as defined below.
 
 If the input collection is empty (`{ }`), the result is empty.
 
@@ -611,7 +611,7 @@ Patient.meta.tag.distinct()
 
 #### isDistinct() : Boolean
 
-Returns `true` if all the items in the input collection are distinct. To determine whether two items are distinct, the <<equals>> (`=`) operator is used, as defined below.
+Returns `true` if all the items in the input collection are distinct. To determine whether two items are distinct, the [equals](#equals) (`=`) operator is used, as defined below.
 
 Conceptually, this function is shorthand for a comparison of the `count()` of the input collection against the `count()` of the `distinct()` of the input collection:
 
@@ -661,7 +661,7 @@ This example returns a collection containing, for each "usual" name for the Pati
 
 #### repeat(projection: expression) : collection
 
-A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the <<equals>> (`=`) operator).
+A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the [equals](#equals) (`=`) operator).
 
 This function can be used to traverse a tree and selecting only specific children:
 
@@ -753,9 +753,9 @@ e.g. `(1 | 2 | 3).exclude(2)` returns `(1 | 3)`.
 
 ### Combining
 
-#### union(other : collection)
+#### <a name="unionother-collection"></a>union(other : collection)
 
-Merge the two collections into a single collection, eliminating any duplicate values (using <<equals>> (`=`) to determine equality). There is no expectation of order in the resulting collection.
+Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`) to determine equality). There is no expectation of order in the resulting collection.
 
 In other words, this function returns the distinct list of elements from both inputs. For example, consider two lists of integers `A: 1, 1, 2, 3` and `B: 2, 3`:
 
@@ -1047,7 +1047,7 @@ For calendar durations, FHIRPath defines the following conversion factors:
 | `1 second` | `1 's'` |
 {: .grid}
 
-Note that calendar duration conversion factors are only used when time-valued quantities appear in unanchored calculations. See <<datetime-arithmetic,Date/Time Arithmetic>> for more information on using time-valued quantities in FHIRPath.
+Note that calendar duration conversion factors are only used when time-valued quantities appear in unanchored calculations. See [Date/Time Arithmetic](#datetime-arithmetic) for more information on using time-valued quantities in FHIRPath.
 
 > Implementations are not required to support a complete UCUM implementation, and may return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
 
@@ -1360,7 +1360,7 @@ The escape function takes a singleton string and escapes it for a given target, 
 
 |html |The string is escaped such that it can appear as valid HTML content (at least open bracket (`<`), ampersand (`&`), and quotes (`"`), but ideally anything with a character encoding above 127) |
 |=|=|
-|json |The string is escaped such that it can appear as a valid JSON string (quotes (`"`) are escaped as (`\"`)); additional escape characters are described in the <<string, String>> escape section|
+|json |The string is escaped such that it can appear as a valid JSON string (quotes (`"`) are escaped as (`\"`)); additional escape characters are described in the [String](#string) escape section|
 {:.grid}
 
 If the input is empty, the result is empty.
@@ -1377,7 +1377,7 @@ If no target is specified, the result is empty.
 
 #### trim() : String
 
-The trim function trims whitespace characters from the beginning and ending of the input string, with whitespace characters as defined in the <<whitespace, Whitespace>> lexical category.
+The trim function trims whitespace characters from the beginning and ending of the input string, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
 
 If the input is empty, the result is empty.
 
@@ -1592,7 +1592,7 @@ Returns a collection with all immediate child nodes of all items in the input co
 
 Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
 
-> Note: Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See <<type-safety-and-strict-evaluation,Type safety and strict evaluation>> for more information about type safe use of FHIRPath expressions.
+> Note: Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
 
 ### Utility functions
 
@@ -1640,7 +1640,7 @@ all result in `{}`.
 
 ### Equality
 
-#### = (Equals)
+#### <a name="equals"></a>= (Equals)
 
 Returns `true` if the left collection is equal to the right collection:
 
@@ -1723,7 +1723,7 @@ Returns `true` if the collections are the same. In particular, comparing empty c
 If both operands are collections with a single item, they must be of the same type (or implicitly convertible to the same type), and:
 
 * For primitives
-  * `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see <<string-equivalence>> for more details).
+  * `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see [string-equivalence](#string-equivalence) for more details).
   * `Integer`: exactly equal
   * `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision.
   * `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).
@@ -1771,7 +1771,7 @@ For example:
 
 ##### String Equivalence
 
-For strings, equivalence returns true if the strings are the same value while ignoring case and locale, and normalizing whitespace. Normalizing whitespace means that all whitespace characters are treated as equivalent, with whitespace characters as defined in the <<whitespace, Whitespace>> lexical category.
+For strings, equivalence returns true if the strings are the same value while ignoring case and locale, and normalizing whitespace. Normalizing whitespace means that all whitespace characters are treated as equivalent, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
 
 #### != (Not Equals)
 
@@ -1805,7 +1805,7 @@ Implementations that do support units shall do so as specified by [\[UCUM\]](#UC
 
 For partial Date, DateTime, and Time values, the comparison is performed by comparing the values at each precision, beginning with years, and proceeding to the finest precision specified in either input, and respecting timezone offsets. If one value is specified to a different level of precision than the other, the result is empty (`{ }`) to indicate that the result of the comparison is unknown. As with equality and equivalence, the second and millisecond precisions are considered a single precision using a decimal, with decimal comparison semantics.
 
-See the <<equals, Equals>> operator for discussion on respecting timezone offsets in comparison operations.
+See the [Equals](#equals) operator for discussion on respecting timezone offsets in comparison operations.
 
 #### &gt; (Greater Than)
 
@@ -1930,9 +1930,9 @@ Observation.component.where(value.as(Quantity) > 30 'mg')
 ### Collections
 
 #### | (union collections)
-Merge the two collections into a single collection, eliminating any duplicate values (using <<equals>> (`=`)) to determine equality). There is no expectation of order in the resulting collection.
+Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`)) to determine equality). There is no expectation of order in the resulting collection.
 
-See the <<unionother-collection,union>> function for more detail.
+See the [union](#unionother-collection) function for more detail.
 
 #### in (membership)
 If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
@@ -1953,7 +1953,7 @@ Patient.name.given contains 'Joe'
 ```
 
 ### Boolean logic
-For all boolean operators, the collections passed as operands are first evaluated as Booleans (as described in <<Singleton Evaluation of Collections>>). The operators then use three-valued logic to propagate empty operands.
+For all boolean operators, the collections passed as operands are first evaluated as Booleans (as described in [Singleton Evaluation of Collections](#singleton-evaluation-of-collections)). The operators then use three-valued logic to propagate empty operands.
 
 > Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the `iif()` function.
 
@@ -2304,14 +2304,14 @@ Literals provide for the representation of values within FHIRPath. The following
 |Literal|Description |
 |-|-|
 |**Empty** (`{ }`)|The empty collection|
-|**<<Boolean>>**|The boolean literals (`true` and `false`)|
-|**<<Integer>>**|Sequences of digits in the range 0..2<sup>32</sup>-1|
-|**<<Decimal>>**|Sequences of digits with a decimal point, in the range (-10<sup>28</sup>+1)/10<sup>8</sup>..(10<sup>28</sup>-1)/10<sup>8</sup>|
-|**<<String>>**|Strings of any character enclosed within single-ticks (`'`)|
-|**<<Date>>**|The at-symbol (`@`) followed by a date (**YYYY-MM-DD**)|
-|**<<DateTime>>**|The at-symbol (`@`) followed by a datetime (**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**) |
-|**<<Time>>**|The at-symbol (`@`) followed by a time (**Thh:mm:ss.fff(+\|-)hh:mm**) |
-|**<<Quantity>>**|An integer or decimal literal followed by a datetime precision specifier, or a [\[UCUM\]](#UCUM) unit specifier|
+|**[Boolean](#boolean)**|The boolean literals (`true` and `false`)|
+|**[Integer](#integer)**|Sequences of digits in the range 0..2<sup>32</sup>-1|
+|**[Decimal](#decimal)**|Sequences of digits with a decimal point, in the range (-10<sup>28</sup>+1)/10<sup>8</sup>..(10<sup>28</sup>-1)/10<sup>8</sup>|
+|**[String](#string)**|Strings of any character enclosed within single-ticks (`'`)|
+|**[Date](#date)**|The at-symbol (`@`) followed by a date (**YYYY-MM-DD**)|
+|**[DateTime](#datetime)**|The at-symbol (`@`) followed by a datetime (**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**) |
+|**[Time](#time)**|The at-symbol (`@`) followed by a time (**Thh:mm:ss.fff(+\|-)hh:mm**) |
+|**[Quantity](#quantity)**|An integer or decimal literal followed by a datetime precision specifier, or a [\[UCUM\]](#UCUM) unit specifier|
 {: .grid}
 
 For a more detailed discussion of the semantics of each type, refer to the link for each type.
@@ -2381,7 +2381,7 @@ A delimited identifier is any sequence of characters enclosed in backticks (`` `
 
 The use of backticks allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have property or type names that are not valid simple identifiers.
 
-FHIRPath <<string,escape sequences>> for strings also work for delimited identifiers.
+FHIRPath [escape sequences](#string) for strings also work for delimited identifiers.
 
 When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context. If the identifier cannot be resolved, the evaluation will end and signal an error to the calling environment.
 
@@ -2421,7 +2421,7 @@ Because FHIRPath is defined to work in multiple contexts, each context provides 
 
 To allow type names to be referenced in expressions such as the `is` and `as` operators, the language includes a _type specifier_, an optionally qualified identifier that must resolve to the name of a model type.
 
-When resolving a type name, the context-specific model is searched first. If no match is found, the `System` model (containing only the built-in types defined in the <<Literals>> section) is searched.
+When resolving a type name, the context-specific model is searched first. If no match is found, the `System` model (containing only the built-in types defined in the [Literals](#literals) section) is searched.
 
 When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
 
@@ -2627,7 +2627,7 @@ The model information returned by the reflection function `type()`  is specified
 
 [modelinfo.xsd](modelinfo.xsd)
 
-> Note: The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the normative <<reflection,Reflection>> section above.
+> Note: The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the normative [Reflection](#reflection) section above.
 
 As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and tooling should respect the case-sensitive settings for each model.
 
@@ -2646,8 +2646,7 @@ text/fhirpath
 
 > Note: The appendices are included for informative purposes and are not a normative part of the specification.
 
-[[hl7v2]]
-[appendix]
+<a name="hl7v2"></a>
 ## Use of FHIRPath on HL7 Version 2 messages
 
 
