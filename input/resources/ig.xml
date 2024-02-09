@@ -15,48 +15,43 @@
       <value value="http://www.hl7.org/Special/committees/xml/index.cfm"/>
     </telecom>
   </contact>
-  <packageId value="hl7.other.uv.fhirpath"/>
+  <jurisdiction>
+    <coding>
+      <system value="http://unstats.un.org/unsd/methods/m49/m49.htm"/>
+      <code value="001"/>
+      <display value="World"/>
+    </coding>
+  </jurisdiction>
+  <packageId value="hl7.fhir.uv.fhirpath"/>
   <fhirVersion value="4.0.1"/>
   <definition>
     <resource>
       <reference>
         <reference value="Binary/binary-grammar"/>
       </reference>
+      <name value="Grammar"/>
+      <description value="FHIRPath Antlr 4.0 Grammar"/>
     </resource>
     <resource>
       <reference>
         <reference value="Binary/binary-modelinfoschema"/>
       </reference>
+      <name value="ModelInfoSchema"/>
+      <description value="Model Info Schema"/>
     </resource>
     <resource>
       <reference>
         <reference value="Binary/binary-tests"/>
       </reference>
+      <name value="Tests"/>
+      <description value="Test Suite"/>
     </resource>
     <resource>
       <reference>
         <reference value="Binary/binary-testschema"/>
       </reference>
-    </resource>
-    <resource>
-      <reference>
-        <reference value="Observation/example"/>
-      </reference>
-    </resource>
-    <resource>
-      <reference>
-        <reference value="Patient/example"/>
-      </reference>
-    </resource>
-    <resource>
-      <reference>
-        <reference value="Questionnaire/3141"/>
-      </reference>
-    </resource>
-    <resource>
-      <reference>
-        <reference value="ValueSet/example-expansion"/>
-      </reference>
+      <name value="TestSchema"/>
+      <description value="Test Schema"/>
     </resource>
     <page>
       <nameUrl value="toc.html"/>
@@ -78,13 +73,13 @@
         <generation value="markdown"/>
       </page>
     </page>
-    <!-- <parameter>
-      <code value="path-pages"/>
-      <value value="spec"/>
+    <parameter>
+      <code value="autoload-resources"/>
+      <value value="false"/>
     </parameter>
     <parameter>
-      <code value="path-resource"/>
-      <value value="resources"/>
-    </parameter> -->
+      <code value="shownav"/>
+      <value value="false"/>
+    </parameter>
   </definition>
 </ImplementationGuide>

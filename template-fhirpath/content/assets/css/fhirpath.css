@@ -1,0 +1,111 @@
+/* Custom formatting for the code blocks */
+pre.language-fhirpath {
+    background-color: #eee;
+    text-shadow: unset;
+}
+
+pre.language-fhirpath code.language-fhirpath {
+    white-space: pre-wrap;
+    text-shadow: unset;
+}
+
+pre.language-txt {
+    border-radius: 0;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+    background: unset;
+}
+
+code[class*="language-"],
+pre[class*="language-"] {
+    /* font-size: 12px; */
+}
+
+/* Include a color on the table headers as was in the original normative release */
+table.grid th {
+    background-color: #D9E6FC;
+}
+
+table.grid {
+    min-width: 70vw;
+}
+
+
+/* overload the section numbering to be consistent with the original published version of the specification */
+body {
+    counter-reset: section appendix
+}
+
+h2:before {
+    color: silver;
+    counter-increment: section;
+    content: counter(section) ". ";
+}
+
+h3:before {
+    color: silver;
+    counter-increment: sub-section;
+    content: counter(section) "." counter(sub-section) ". ";
+}
+
+h4:before {
+    color: silver;
+    counter-increment: composite;
+    content: counter(section) "." counter(sub-section) "." counter(composite) ". ";
+}
+
+h5:before {
+    color: silver;
+    counter-increment: detail;
+    content: counter(section) "." counter(sub-section) "." counter(composite) "." counter(detail) ". ";
+}
+
+h6:before {
+    color: silver;
+    counter-increment: more-detail;
+    content: counter(section) "." counter(sub-section) "." counter(composite) "." counter(detail) "." counter(more-detail) ". ";
+}
+
+h2.appendix {
+    counter-reset: sub-section;
+    counter-increment: appendix;
+}
+
+h3.appendix {
+    counter-reset: composite
+}
+
+h2.appendix:before {
+    color: silver;
+    counter-increment: section;
+    content: "Appendix " counter(appendix, upper-alpha) ": ";
+}
+
+h3.appendix:before {
+    color: silver;
+    counter-increment: sub-section;
+    content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) ": ";
+}
+
+h4.appendix:before {
+    color: silver;
+    counter-increment: composite;
+    content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) "." counter(composite) ": ";
+}
+
+h5.appendix:before {
+    color: silver;
+    counter-increment: detail;
+    content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) "." counter(composite) "." counter(detail) ": ";
+}
+
+h6.appendix:before {
+    color: silver;
+    counter-increment: more-detail;
+    content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) "." counter(composite) "." counter(detail) "." counter(more-detail) ": ";
+}

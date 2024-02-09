@@ -1,0 +1,34 @@
+{% include fragment-pagebegin.html %}
+<div class="col-12">
+  <!--ReleaseHeader--><p id="publish-box">Publish Box goes here</p><!--EndReleaseHeader-->
+
+  {% assign path = page.path | split: '.html' %}
+
+{% capture toc-content %} <!-- white space is critical inside of capture -->
+<div class="markdown-toc" markdown="1">
+{:toc}
+* This will not be displayed
+</div>
+{% include {{path}}.md %}
+{% endcapture %}
+
+{% include fragment-pageTable.html %}
+
+{% capture no-toc-content %} <!-- white space is critical inside of capture -->
+<div>
+<!-- do not remove - needed to prevent Jekyll from adding a p tag to any non block level element in the markdown.-->
+</div>
+{% include {{path}}.md %}
+{% endcapture %}
+
+{% assign teststring  = no-toc-content | markdownify | remove: '###### ' | remove: '##### '| remove: '#### ' | replace: "<h3", "### " | remove_first: '### ' %}
+{% assign h3headers = "### " %}
+
+{% if teststring contains h3headers %}
+    {{ toc-content | markdownify }}
+{% else %}
+    {{ no-toc-content | markdownify }}
+{% endif %}
+
+</div>
+{% include fragment-pageend.html %}

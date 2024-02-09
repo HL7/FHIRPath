@@ -1,3 +1,7 @@
+---
+standards-status: normative
+---
+
 # FHIRPath (Continuous Build)
 
 FHIRPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources ([FHIR](http://hl7.org/fhir)) and HL7 Clinical Quality Language ([CQL](http://cql.hl7.org/03-developersguide.html#using-fhirpath)).
@@ -2648,7 +2652,7 @@ text/fhirpath
 
 <a name="hl7v2"></a>
 ## Use of FHIRPath on HL7 Version 2 messages
-
+{: .appendix }
 
 FHIRPath can be used against HL7 V2 messages. This UML diagram summarises the
 Object Model on which the FHIRPath statements are written:
@@ -2702,8 +2706,8 @@ Message.group('PATIENT').group('PATIENT_OBSERVATION').item.ofType(Segment)
 Return any OBXs from the patient observations (and ignore others e.g. in a R01 message) segments that have LOINC codes.
 Note that if the parser cannot properly parse the Abstract Message Syntax, group() must fail with an error message.
 
-[appendix]
 ## FHIRPath Tooling and Implementation
+{: .appendix }
 
 This section lists known tooling and implementation projects for the FHIRPath language:
 
@@ -2729,6 +2733,7 @@ For the most current listing of known implementations, refer to the HL7 wiki:
 http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 
 ## References
+{: .appendix }
 
 <a name="bibliography"></a>
 - <a name="ANTLR"></a>[ANTLR] Another Tool for Language Recognition (ANTLR) <http://www.antlr.org/>
@@ -2742,53 +2747,3 @@ http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 - [grammar.html](grammar.html)
 - [modelinfo.xsd](modelinfo.xsd)
 - <a name="fluent"></a>[Fluent] Fluent interface pattern. <https://en.wikipedia.org/wiki/Fluent_interface>
-
-
-<style type="text/css">
-  pre.language-fhirpath {
-    background-color: #eee;
-    text-shadow: unset;
-  }
-  pre.language-fhirpath code.language-fhirpath {
-    white-space: pre-wrap;
-    text-shadow: unset;
-  }
-  pre.language-txt {
-    border-radius: 0;
-  }
-  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
-    background: unset;
-  }
-
-  table.grid th {
-    background-color: #D9E6FC;
-  }  
-</style>
-<script>
-  // Script to perform syntax highlighting of the FHIRPath grammar
-  // https://prismjs.com/extending.html#language-definitions
-  Prism.languages['fhirpath'] = {
-	'property': {
-		pattern: /(^|[^\\])`(?:\\.|[^\\`\r\n])*`(?=\s*:)/,
-		lookbehind: true,
-		greedy: true
-	},
-	'string': {
-		pattern: /(^|[^\\])'(?:\\.|[^\\'\r\n])*'(?!\s*:)/,
-		lookbehind: true,
-		greedy: true
-	},
-	'comment': {
-		pattern: /\/\/.*|\/\*[\s\S]*?(?:\*\/|$)/,
-		greedy: true
-	},
-	'number': /-?\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b/i,
-	'punctuation': /[{}[\],]/,
-	'operator': /:/,
-	'boolean': /\b(?:false|true)\b/,
-	'null': {
-		pattern: /\bnull\b/,
-		alias: 'keyword'
-	}
-};
-</script>
