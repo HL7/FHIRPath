@@ -888,7 +888,7 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to an integer (using the regex format `(\\+|-)?\d+`), the result is empty.
+If the item is a String, but the string is not convertible to an integer (using the regex format `(\+|-)?\d+`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -902,7 +902,7 @@ If the input collection contains a single item, this function will return true i
 * the item is a String and is convertible to an Integer
 * the item is a Boolean
 
-If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\\+|-)?\d+`), the result is false.
+If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is false.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -988,7 +988,7 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a Decimal (using the regex format `(\\+|-)?\d+(\.\d+)?`), the result is empty.
+If the item is a String, but the string is not convertible to a Decimal (using the regex format `(\+|-)?\d+(\.\d+)?`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1002,7 +1002,7 @@ If the input collection contains a single item, this function will true if:
 * the item is a String and is convertible to a Decimal
 * the item is a Boolean
 
-If the item is not one of the above types, or is not convertible to a Decimal (using the regex format `(\\+|-)?\d+(\.\d+)?`), the result is false.
+If the item is not one of the above types, or is not convertible to a Decimal (using the regex format `(\+|-)?\d+(\.\d+)?`), the result is false.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1097,9 +1097,9 @@ The String representation uses the following formats:
 |Type |Representation|
 |-|-|
 |**Boolean** |`true` or `false`|
-|**Integer** |`(\\+|-)?\d+`|
-|**Decimal** |`(\\+|-)?\d+(.\d+)?`|
-|**Quantity** |`(\\+|-)?\d+(.\d+)? '.*'`|
+|**Integer** |`(\+|-)?\d+`|
+|**Decimal** |`(\+|-)?\d+(.\d+)?`|
+|**Quantity** |`(\+|-)?\d+(.\d+)? '.*'`|
 |**Date** |**YYYY-MM-DD**|
 |**DateTime** |**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**|
 |**Time** |**hh:mm:ss.fff(+\|-)hh:mm**|
