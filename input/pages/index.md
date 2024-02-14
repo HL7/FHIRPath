@@ -440,7 +440,7 @@ When functions or operators behave differently from these general principles, (f
 In general, when a collection is passed as an argument to a function or operator that expects a single item as input, the collection is implicitly converted to a singleton as follows:
 
 ``` txt
-IF the collection contains a single node AND the node's value can be converted to the expected input type THEN
+IF the collection contains a single node AND the node's value can be implicitly converted to the expected input type THEN
   The collection evaluates to the value of that single node
 ELSE IF the collection contains a single node AND the expected input type is Boolean THEN
   The collection evaluates to true
