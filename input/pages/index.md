@@ -474,7 +474,7 @@ Patient.active and Patient.gender and Patient.telecom.count() = 1
 
 ## Functions
 
-Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more arguments. Throughout this specification, the word _parameter_ is used to refer to the definition of a parameter as part of the function definition, while the word _argument_ is used to refer to the values passed as part of a function invocation. With a few minor exceptions (e.g. the `today()` function), functions in FHIRPath always operate on a collection of values (referred to as the _input collection_) and produce another collection as output (referred to as the _output collection_), even though these may be collections of just a single item.
+Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more arguments. Throughout this specification, the word _parameter_ is used to refer to the definition of a parameter as part of the function definition, while the word _argument_ is used to refer to the values passed as part of a function invocation. With a few minor exceptions (e.g. [current date and time functions](#current-date-and-time-functions)), functions in FHIRPath operate on a collection of values (referred to as the _input collection_) and produce another collection as output (referred to as the _output collection_). However, for many functions, passing an input collection with more than one item is defined as an error condition. Each function definition should define its behavior for input collections of any cardinality (0, 1, or many).
 
 Correspondingly, arguments to the functions can be any FHIRPath expression, though functions taking a single item as input require these expressions to evaluate to a collection containing a single item of a specific type. This approach allows functions to be chained, successively operating on the results of the previous function in order to produce the desired final result.
 
@@ -1322,9 +1322,13 @@ This example of `replaceMatches()` will convert a string with a date formatted a
 
 Returns the length of the input string. If the input collection is empty (`{ }`), the result is empty.
 
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
 #### toChars() : collection
 
 Returns the list of characters in the input string. If the input collection is empty (`{ }`), the result is empty.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 ``` fhirpath
 'abc'.toChars() // { 'a', 'b', 'c' }
