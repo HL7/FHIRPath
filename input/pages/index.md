@@ -1231,7 +1231,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 ``` fhirpath
 'abcdefg'.endsWith('efg') // true
-'abcdefg'.ednsWith('abc') // false
+'abcdefg'.endsWith('abc') // false
 ```
 
 #### contains(substring : String) : Boolean
