@@ -2251,7 +2251,8 @@ FHIRPath supports a general-purpose aggregate function to enable the calculation
 ### aggregate(aggregator : expression [, init : value]) : value
 Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
 
-The value of the `$total` variable is set to `init`, or empty (`{ }`) if no `init` value is supplied, and is set to the result of the aggregator expression after every iteration.
+The value of the `$total` variable is set to `init`, or empty (`{ }`) if no `init` value is supplied, and is set to the result of the aggregator expression after every iteration.<br/>
+The result of the aggregate function is the value of `$total` after the last iteration.
 
 Using this function, sum can be expressed as:
 
