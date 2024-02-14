@@ -395,7 +395,7 @@ Operators available in FHIRPath are covered in detail in the [Operations](#opera
 Finally, FHIRPath supports the notion of functions, which operate on a collection of values (referred to as the _input collection_), optionally taking arguments, and return another collection (referred to as the _output collection_). For example:
 
 ``` fhirpath
-(name.given | name.family).substring(0,4)
+name.given.substring(0,4)
 identifier.where(use = 'official')
 ```
 
