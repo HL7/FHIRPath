@@ -6,6 +6,10 @@ grammar fhirpath;
 //prog: line (line)*;
 //line: ID ( '(' expr ')') ':' expr '\r'? '\n';
 
+entireExpression
+        : expression EOF
+        ;
+        
 expression
         : term                                                      #termExpression
         | expression '.' invocation                                 #invocationExpression
