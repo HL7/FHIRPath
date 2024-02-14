@@ -526,7 +526,7 @@ And finally, the fourth example returns `true` if the `Patient` has any `general
 Returns `true` if for every element in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
 
 ``` fhirpath
-generalPractitioner.all($this is Practitioner)
+generalPractitioner.all($this.resolve() is Practitioner)
 ```
 
 This example returns true if all of the `generalPractitioner` elements are of type `Practitioner`.
