@@ -815,6 +815,7 @@ The following table lists the possible conversions supported, and whether the co
 
 The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
 
+<a name="iif"></a>
 #### iif(criterion: expression, true-result: collection [, otherwise-result: collection]) : collection
 
 The `iif` function in FHIRPath is an _immediate if_, also known as a conditional operator (such as C's `? :` operator).
@@ -1959,7 +1960,7 @@ Patient.name.given contains 'Joe'
 ### Boolean logic
 For all boolean operators, the collections passed as operands are first evaluated as Booleans (as described in [Singleton Evaluation of Collections](#singleton-evaluation-of-collections)). The operators then use three-valued logic to propagate empty operands.
 
-> Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the `iif()` function.
+> Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the [`iif()`](#iif) function.
 
 #### and
 
