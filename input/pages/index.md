@@ -1312,7 +1312,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 This example of `replaceMatches()` will convert a string with a date formatted as MM/dd/yy to dd-MM-yy:
 
 ``` fhirpath
-'11/30/1972'.replace('\\b(?<month>\\d{1,2})/(?<day>\\d{1,2})/(?<year>\\d{2,4})\\b',
+'11/30/1972'.replaceMatches('\\b(?<month>\\d{1,2})/(?<day>\\d{1,2})/(?<year>\\d{2,4})\\b',
        '${day}-${month}-${year}')
 ```
 
