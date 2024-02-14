@@ -35,6 +35,16 @@ table.grid {
     min-width: 70vw;
 }
 
+/* inline fhirpath code blocks used in examples */
+:not(pre) > code.fhirpath {
+    background-color: #eee;
+    padding: 1px 4px;
+    border: 1px solid #cccccc;
+    font-size: 1em;
+    display: inline-block;
+    margin: 2px 0;
+    text-shadow: unset;
+}
 
 /* overload the section numbering to be consistent with the original published version of the specification */
 body {

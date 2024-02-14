@@ -417,7 +417,7 @@ For a complete listing of the functions defined in FHIRPath, refer to the [Funct
 
 ### Null and empty
 
-There is no literal representation for _null_ in FHIRPath. This means that when, in an underlying data object (i.e. they physical data on which the implementation is operating) a member is null or missing, there will simply be no corresponding node for that member in the tree, e.g. `Patient.name` will return an empty collection (not null) if there are no name elements in the instance.
+There is no literal representation for _null_ in FHIRPath. This means that when, in an underlying data object (i.e. they physical data on which the implementation is operating) a member is null or missing, there will simply be no corresponding node for that member in the tree, e.g. `Patient.name`{:.fhirpath} will return an empty collection (not null) if there are no name elements in the instance.
 
 In expressions, the empty collection is represented as `{ }`.
 
@@ -481,7 +481,7 @@ Correspondingly, arguments to the functions can be any FHIRPath expression, thou
 The following sections describe the functions supported in FHIRPath, detailing the expected types of parameters and type of collection returned by the function:
 
 * If the function expects the argument passed to a parameter to be a single value (e.g. `startsWith(prefix: String)`) and it is passed an argument that evaluates to a collection with multiple items, or to a collection with an item that is not of the required type (or cannot be converted to the required type), the evaluation of the expression will end and an error will be signaled to the calling environment.
-* If the function takes an `expression` as a parameter, the function will evaluate the expression passed for the parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` and `$index` elements, which represent the item from the input collection currently under evaluation, and its index in the collection, respectively. For example, in `name.given.where($this > 'ba' and $this < 'bc')` the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
+* If the function takes an `expression` as a parameter, the function will evaluate the expression passed for the parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` and `$index` elements, which represent the item from the input collection currently under evaluation, and its index in the collection, respectively. For example, in `name.given.where($this > 'ba' and $this < 'bc')`{:.fhirpath} the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
 
 For the [aggregate](#aggregates) function, expressions may also refer to the special `$total` element, representing the result of the aggregation.
 
@@ -753,7 +753,7 @@ Returns the set of elements that are in both collections. Duplicate items will b
 
 Returns the set of elements that are not in the `other` collection. Duplicate items will not be eliminated by this function, and order will be preserved.
 
-e.g. `(1 | 2 | 3).exclude(2)` returns `(1 | 3)`.
+e.g. `(1 | 2 | 3).exclude(2)`{:.fhirpath} returns `(1 | 3)`.
 
 ### Combining
 
@@ -1281,7 +1281,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 #### replace(pattern : String, substitution : String) : String
 
-Returns the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string (`''`), instances of `pattern` are removed from the result. If `pattern` is the empty string (`''`), every character in the input string is surrounded by the substitution, e.g. `'abc'.replace('','x')` becomes `'xaxbxcx'`.
+Returns the input string with all instances of `pattern` replaced with `substitution`. If the substitution is the empty string (`''`), instances of `pattern` are removed from the result. If `pattern` is the empty string (`''`), every character in the input string is surrounded by the substitution, e.g. `'abc'.replace('','x')`{:.fhirpath} becomes `'xaxbxcx'`.
 
 If the input collection, `pattern`, or `substitution` are empty, the result is empty (`{ }`).
 
@@ -1676,7 +1676,7 @@ Otherwise, equals returns `false`.
 
 Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
 
-Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = 'phone'` will result in an error if there is more than one `telecom` with a `use`. Typically, you'd want `Patient.telecom.where(system = 'phone')`
+Typically, this operator is used with single fixed values as operands. This means that `Patient.telecom.system = 'phone'`{:.fhirpath} will result in an error if there is more than one `telecom` with a `use`. Typically, you'd want `Patient.telecom.where(system = 'phone')`{:.fhirpath}
 
 If one or both of the operands is the empty collection, this operation returns an empty collection.
 
@@ -1727,7 +1727,7 @@ Additional functions to support more sophisticated timezone offset comparison (s
 
 #### ~ (Equivalent)
 
-Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }` will result in `true`.
+Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }`{:.fhirpath} will result in `true`.
 
 If both operands are collections with a single item, they must be of the same type (or implicitly convertible to the same type), and:
 
@@ -1784,11 +1784,11 @@ For strings, equivalence returns true if the strings are the same value while ig
 
 #### != (Not Equals)
 
-The converse of the equals operator, returning `true` if equal returns `false`; `false` if equal returns `true`; and empty (`{ }`) if equal returns empty. In other words, `A != B` is short-hand for `(A = B).not()`.
+The converse of the equals operator, returning `true` if equal returns `false`; `false` if equal returns `true`; and empty (`{ }`) if equal returns empty. In other words, `A != B`{:.fhirpath} is short-hand for `(A = B).not()`{:.fhirpath}.
 
 #### !~ (Not Equivalent)
 
-The converse of the equivalent operator, returning `true` if equivalent returns `false` and `false` is equivalent returns `true`. In other words, `A !~ B` is short-hand for `(A ~ B).not()`.
+The converse of the equivalent operator, returning `true` if equivalent returns `false` and `false` is equivalent returns `true`. In other words, `A !~ B`{:.fhirpath} is short-hand for `(A ~ B).not()`{:.fhirpath}.
 
 ### Comparison
 
