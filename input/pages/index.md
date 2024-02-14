@@ -1897,17 +1897,17 @@ If the left operand is a collection with a single item and the second operand is
 A _type specifier_ is an identifier that must resolve to the name of a type in a model. Type specifiers can have qualifiers, e.g. `FHIR.Patient`, where the qualifier is the name of the model.
 
 ``` fhirpath
-Patient.contained.all($this is Patient implies age > 10)
+Bundle.entry.resource.all($this is Observation implies status = 'finished')
 ```
 
-This example returns true if for all the contained resources, if the contained resource is of type `Patient`, then the `age` is greater than ten.
+This example returns `true` if all Observation resources in the bundle have a status of finished.
 
 #### is(type : _type specifier_)
 
 The `is()` function is supported for backwards compatibility with previous implementations of FHIRPath. Just as with the `is` keyword, the `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat it as a type specifier rather than an identifier expression:
 
 ``` fhirpath
-Patient.contained.all($this.is(Patient) implies age > 10)
+Bundle.entry.resource.all($this.is(Observation) implies status = 'finished')
 ```
 
 > Note: The `is()` function is defined for backwards compatibility only and may be deprecated in a future release.
