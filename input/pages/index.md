@@ -764,20 +764,20 @@ Merge the two collections into a single collection, eliminating any duplicate va
 In other words, this function returns the distinct list of elements from both inputs. For example, consider two lists of integers `A: 1, 1, 2, 3` and `B: 2, 3`:
 
 ``` fhirpath
-A union B // 1, 2, 3
-A union { } // 1, 2, 3
+A.union( B ) // 1, 2, 3
+A.union( { } ) // 1, 2, 3
 ```
 
 This function can also be invoked using the `|` operator.
 
 ``` fhirpath
-a.union(b)
+A.union(B)
 ```
 
 is synonymous with
 
 ``` fhirpath
-a | b
+A | B
 ```
 
 #### combine(other : collection) : collection
