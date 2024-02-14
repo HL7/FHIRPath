@@ -2352,8 +2352,7 @@ Keywords are tokens that are recognized by the parser and used to build the vari
 In general, keywords within FHIRPath are also considered _reserved_ words, meaning that it is illegal to use them as identifiers. FHIRPath keywords are reserved words, with the exception of the following keywords that may also be used as identifiers:
 
 |`as` |`contains` |
-|=|=|
-|`is` |`is` |
+|`is` | |
 {:.grid}
 
 If necessary, identifiers that clash with a reserved word can be delimited using a backtick (`` ` ``):
