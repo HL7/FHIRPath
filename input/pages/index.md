@@ -2414,7 +2414,7 @@ Implementers should note that using additional environment variables is a formal
 %`us-zip` = '[0-9]{5}(-[0-9]{4}){0,1}'
 ```
 
-Note that the identifier portion of the token is allowed to be either a simple identifier (as in `%ucum`), or a delimited identifier to allow for alternative characters (as in `%`us-zip``).
+Note that the identifier portion of the token is allowed to be either a simple identifier (as in `%ucum`), or a delimited identifier to allow for alternative characters (as in ``%`us-zip` ``).
 
 Note also that these tokens are not restricted to simple types, and they may have values that are not defined fixed values known prior to evaluation at run-time, though there is no way to define these kind of values in implementation guides.
 
