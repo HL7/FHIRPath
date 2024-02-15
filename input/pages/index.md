@@ -148,8 +148,8 @@ Note that the outcome of functions like `children()` and `descendants()` cannot 
 In the underlying representation of data, nodes may be typed and represent polymorphic items. Paths may either ignore the type of a node, and continue along the path or may be explicit about the expected node and filter the set of nodes by type before navigating down child nodes:
 
 ``` fhirpath
-Observation.value.unit - all kinds of value
-Observation.value.ofType(Quantity).unit - only values that are of type Quantity
+Observation.value.unit // all kinds of value
+Observation.value.ofType(Quantity).unit // only values that are of type Quantity
 ```
 
 The `is` operator can be used to determine whether or not a given value is of a given type:
