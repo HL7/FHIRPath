@@ -25,6 +25,7 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 > 
 > * [Functions - String (additional functions, marked as appropriate)](#additional-string-functions)
 > * [Functions - Math](#math)
+> * [Functions - Utility defineVariable](#definevariable)
 > * [Types - Reflection](#reflection)
 > * [Aggregates](#aggregates)
 > 
@@ -1714,6 +1715,40 @@ contained.where(criteria).trace('unmatched', id).empty()
 ```
 
 The above example traces only the id elements of the result of the where.
+
+<a name="definevariable"></a>
+### defineVariable(name: String [, expr: expression])
+> Note: The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Defines a variable named `name` that is accessible in subsequent expressions and has the value of `expr` if present, otherwise the value of the input collection. In either case the function does not change the input and the output is the same as the input collection.
+{:.stu}
+
+If the name already exists in the current expression scope, the evaluation will end and signal an error to the calling environment. Note that functions that take an `expression` as an argument establish a scope for the iteration variables ($this and $index). If a variable is defined within such an expression, it is only available within that expression scope.
+{:.stu}
+
+
+Example:
+{:.stu}
+``` fhirpath
+group.select(
+  defineVariable('grp')
+  .select(
+    element.select(
+      defineVariable('src')
+      .target.select(
+        %grp.source & '#' & %src.code
+        & ' ' & equivalence & ' '
+        & %grp.target & '#' & code
+      )
+    )
+  )
+)
+```
+{:.stu}
+
+> Note: this would be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
+{:.stu}
 
 #### Current date and time functions
 
