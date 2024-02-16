@@ -23,10 +23,10 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 
 > Note: The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
 > 
-> * Aggregates
-> * Types - Reflection
-> * Functions - Math
-> * Functions - String (additional functions, marked as appropriate)
+> * [Functions - String (additional functions, marked as appropriate)](#additional-string-functions)
+> * [Functions - Math](#math)
+> * [Types - Reflection](#reflection)
+> * [Aggregates](#aggregates)
 > 
 > In addition, the appendices are included as additional documentation and are informative content.
 {: .stu-note }
@@ -1340,86 +1340,120 @@ If the input collection contains multiple items, the evaluation of the expressio
 {: .stu-note }
 
 #### encode(format : String) : String
+{:.stu}
 
 The encode function takes a singleton string and returns the result of encoding that string in the given format. The format parameter defines the encoding format. Available formats are:
+{:.stu}
 
 |hex |The string is encoded using hexadecimal characters (base 16) in lowercase |
 |=|=|
 |base64 |The string is encoded using standard base64 encoding, using A-Z, a-z, 0-9, +, and /, output padded with =) |
 |urlbase64 |The string is encoded using url base 64 encoding, using A-Z, a-z, 0-9, -, and _, output padded with =) |
 {:.grid}
+{:.stu}
 
 Base64 encodings are described in [RFC4648](https://tools.ietf.org/html/rfc4648#section-4).
+{:.stu}
 
 If the input is empty, the result is empty.
+{:.stu}
 
 If no format is specified, the result is empty.
+{:.stu}
 
 #### decode(format : String) : String
+{:.stu}
 
 The decode function takes a singleton encoded string and returns the result of decoding that string according to the given format. The format parameter defines the encoding format. Available formats are listed in the encode function.
+{:.stu}
 
 If the input is empty, the result is empty.
+{:.stu}
 
 If no format is specified, the result is empty.
+{:.stu}
 
 #### escape(target : String) : String
+{:.stu}
 
 The escape function takes a singleton string and escapes it for a given target, as specified in the following table:
+{:.stu}
 
 |html |The string is escaped such that it can appear as valid HTML content (at least open bracket (`<`), ampersand (`&`), and quotes (`"`), but ideally anything with a character encoding above 127) |
 |=|=|
 |json |The string is escaped such that it can appear as a valid JSON string (quotes (`"`) are escaped as (`\"`)); additional escape characters are described in the [String](#string) escape section|
 {:.grid}
+{:.stu}
 
 If the input is empty, the result is empty.
+{:.stu}
 
 If no target is specified, the result is empty.
+{:.stu}
 
 #### unescape(target : String) : String
+{:.stu}
 
 The unescape function takes a singleton string and unescapes it for a given target. The available targets are specified in the escape function description.
+{:.stu}
 
 If the input is empty, the result is empty.
+{:.stu}
 
 If no target is specified, the result is empty.
+{:.stu}
 
 #### trim() : String
+{:.stu}
 
 The trim function trims whitespace characters from the beginning and ending of the input string, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
+{:.stu}
 
 If the input is empty, the result is empty.
+{:.stu}
 
 #### split(separator: String) : collection
+{:.stu}
 
 The split function splits a singleton input string into a list of strings, using the given separator.
+{:.stu}
 
 If the input is empty, the result is empty.
+{:.stu}
 
 If the input string does not contain any appearances of the separator, the result is the input string.
+{:.stu}
 
 The following example illustrates the behavior of the `.split` operator:
+{:.stu}
 
 ``` fhirpath
 ('A,B,C').split(',') // { 'A', 'B', 'C' }
 ('ABC').split(',') // { 'ABC' }
 'A,,C'.split(',') // { 'A', '', 'C' }
 ```
+{:.stu}
 
 #### join([separator: String]) : String
+{:.stu}
 
 The join function takes a collection of strings and _joins_ them into a single string, optionally using the given separator.
+{:.stu}
 
 If the input is empty, the result is empty.
+{:.stu}
 
 If no separator is specified, the strings are directly concatenated.
+{:.stu}
 
 The following example illustrates the behavior of the `.join` operator:
+{:.stu}
 
 ``` fhirpath
 ('A' | 'B' | 'C').join() // 'ABC'
 ('A' | 'B' | 'C').join(',') // 'A,B,C'
 ```
+{:.stu}
 
 ### Math
 
@@ -1427,169 +1461,233 @@ The following example illustrates the behavior of the `.join` operator:
 {: .stu-note }
 
 The functions in this section operate on collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 Note also that although all functions return collections, if a given function is defined to return a single element, the return type in the description of the function is simplified to just the type of the single element, rather than the list type.
+{:.stu}
 
 The math functions in this section enable FHIRPath to be used not only for path selection, but for providing a platform-independent representation of calculation logic in artifacts such as questionnaires and documentation templates. For example:
+{:.stu}
 
 ``` fhirpath
 (%weight/(%height.power(2))).round(1)
 ```
+{:.stu}
 
 This example from a questionnaire calculates the Body Mass Index (BMI) based on the responses to the weight and height elements. For more information on the use of FHIRPath in questionnaires, see the [Structured Data Capture](http://hl7.org/fhir/uv/sdc/) (SDC) implementation guide.
+{:.stu}
 
 #### abs() : Integer | Decimal | Quantity
+{:.stu}
 
 Returns the absolute value of the input. When taking the absolute value of a quantity, the unit is unchanged.
+{:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 ``` fhirpath
 (-5).abs() // 5
 (-5.5).abs() // 5.5
 (-5.5 'mg').abs() // 5.5 'mg'
 ```
+{:.stu}
 
 #### ceiling() : Integer
+{:.stu}
 
 Returns the first integer greater than or equal to the input.
+{:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 ``` fhirpath
 1.ceiling() // 1
 1.1.ceiling() // 2
 (-1.1).ceiling() // -1
 ```
+{:.stu}
 
 #### exp() : Decimal
+{:.stu}
 
 Returns _e_ raised to the power of the input.
+{:.stu}
 
 If the input collection contains an Integer, it will be implicitly converted to a Decimal and the result will be a Decimal.
+{:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 ``` fhirpath
 0.exp() // 1.0
 (-0.0).exp() // 1.0
 ```
+{:.stu}
 
 #### floor() : Integer
+{:.stu}
 
 Returns the first integer less than or equal to the input.
+{:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 ``` fhirpath
 1.floor() // 1
 2.1.floor() // 2
 (-2.1).floor() // -3
 ```
+{:.stu}
 
 #### ln() : Decimal
+{:.stu}
 
 Returns the natural logarithm of the input (i.e. the logarithm base _e_).
+{:.stu}
 
 When used with an Integer, it will be implicitly converted to a Decimal.
+{:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 ``` fhirpath
 1.ln() // 0.0
 1.0.ln() // 0.0
 ```
+{:.stu}
 
 #### log(base : Decimal) : Decimal
+{:.stu}
 
 Returns the logarithm base `base` of the input number.
+{:.stu}
 
 When used with Integers, the arguments will be implicitly converted to Decimal.
+{:.stu}
 
 If `base` is empty, the result is empty.
+{:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 ``` fhirpath
 16.log(2) // 4.0
 100.0.log(10.0) // 2.0
 ```
+{:.stu}
 
 #### power(exponent : Integer | Decimal) : Integer | Decimal
+{:.stu}
 
 Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer. If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal.
+{:.stu}
 
 If the power cannot be represented (such as the -1 raised to the 0.5), the result is empty.
+{:.stu}
 
 If the input is empty, or exponent is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 ``` fhirpath
 2.power(3) // 8
 2.5.power(2) // 6.25
 (-1).power(0.5) // empty ({ })
 ```
+{:.stu}
 
 #### round([precision : Integer]) : Decimal
+{:.stu}
 
 Rounds the decimal to the nearest whole number using a traditional round (i.e. 0.5 or higher will round to 1). If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
+{:.stu}
 
 If specified, the number of digits of precision must be >= 0 or the evaluation will end and signal an error to the calling environment.
+{:.stu}
 
 If the input collection contains a single item of type Integer, it will be implicitly converted to a Decimal.
+{:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 ``` fhirpath
 1.round() // 1
 3.14159.round(3) // 3.142
 ```
+{:.stu}
 
 #### sqrt() : Decimal
+{:.stu}
 
 Returns the square root of the input number as a Decimal.
+{:.stu}
 
 If the square root cannot be represented (such as the square root of -1), the result is empty.
+{:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 Note that this function is equivalent to raising a number of the power of 0.5 using the power() function.
+{:.stu}
 
 ``` fhirpath
 81.sqrt() // 9.0
 (-1).sqrt() // empty
 ```
+{:.stu}
 
 #### truncate() : Integer
+{:.stu}
 
 Returns the integer portion of the input.
+{:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
 
 ``` fhirpath
 101.truncate() // 101
 1.00000001.truncate() // 1
 (-1.56).truncate() // -1
 ```
+{:.stu}
 
 ### Tree navigation
 
@@ -2251,30 +2349,40 @@ Use parentheses to ensure the unary negation applies to the `7`:
 {: .stu-note }
 
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed:
+{:.stu}
 
 ### aggregate(aggregator : expression [, init : value]) : value
+{:.stu}
 Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
+{:.stu}
 
 The value of the `$total` variable is set to `init`, or empty (`{ }`) if no `init` value is supplied, and is set to the result of the aggregator expression after every iteration.<br/>
 The result of the aggregate function is the value of `$total` after the last iteration.
+{:.stu}
 
 Using this function, sum can be expressed as:
+{:.stu}
 
 ``` fhirpath
 value.aggregate($this + $total, 0)
 ```
+{:.stu}
 
 Min can be expressed as:
+{:.stu}
 
 ``` fhirpath
 value.aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))
 ```
+{:.stu}
 
 and average would be expressed as:
+{:.stu}
 
 ``` fhirpath
 value.aggregate($total + $this, 0) / value.count()
 ```
+{:.stu}
 
 ## Lexical Elements
 FHIRPath defines the following lexical elements:
@@ -2440,45 +2548,59 @@ When resolving an identifier that is also the root of a FHIRPath expression, it 
 {: .stu-note }
 
 FHIRPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection, using one of the following concrete subtypes of `TypeInfo`:
+{:.stu}
 
 #### Primitive Types
+{:.stu}
 
 For primitive types such as `String` and `Integer`, the result is a `SimpleTypeInfo`:
+{:.stu}
 
 ``` typescript
 SimpleTypeInfo { namespace: string, name: string, baseType: TypeSpecifier }
 ```
+{:.stu}
 
 For example:
+{:.stu}
 
 ``` fhirpath
 ('John' | 'Mary').type()
 ```
+{:.stu}
 
 Results in:
+{:.stu}
 ``` typescript
 {
   SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' },
   SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' }
 }
 ```
+{:.stu}
 
 #### Class Types
+{:.stu}
 
 For class types, the result is a `ClassInfo`:
+{:.stu}
 
 ``` typescript
 ClassInfoElement { name: string, type: TypeSpecifier, isOneBased: Boolean }
 ClassInfo { namespace: string, name: string, baseType: TypeSpecifier, element: List<ClassInfoElement> }
 ```
+{:.stu}
 
 For example:
+{:.stu}
 
 ``` fhirpath
 Patient.maritalStatus.type()
 ```
+{:.stu}
 
 Results in:
+{:.stu}
 
 ``` typescript
 {
@@ -2493,43 +2615,57 @@ Results in:
   }
 }
 ```
+{:.stu}
 
 #### Collection Types
+{:.stu}
 
 For collection types, the result is a `ListTypeInfo`:
+{:.stu}
 
 ``` typescript
 ListTypeInfo { elementType: TypeSpecifier }
 ```
+{:.stu}
 
 For example:
+{:.stu}
 
 ``` fhirpath
 Patient.address.type()
 ```
+{:.stu}
 
 Results in:
+{:.stu}
 ``` typescript
 {
   ListTypeInfo { elementType: 'FHIR.Address' }
 }
 ```
+{:.stu}
 
 #### Anonymous Types
+{:.stu}
 
 Anonymous types are structured types that have no associated name, only the elements of the structre. For example, in FHIR, the `Patient.contact` element has multiple sub-elements, but is not explicitly named. For types such as this, the result is a `TupleTypeInfo`:
+{:.stu}
 
 ``` typescript
 TupleTypeInfoElement { name: string, type: TypeSpecifier, isOneBased: Boolean }
 TupleTypeInfo { element: List<TupleTypeInfoElement> }
 ```
+{:.stu}
 
 For example:
+{:.stu}
 ``` fhirpath
 Patient.contact.single().type()
 ```
+{:.stu}
 
 Results in:
+{:.stu}
 ``` typescript
 {
   TupleTypeInfo {
@@ -2545,8 +2681,10 @@ Results in:
   }
 }
 ```
+{:.stu}
 
 > Note: These structures are a subset of the abstract metamodel used by the [Clinical Quality Language Tooling](https://github.com/cqframework/clinical_quality_language).
+{:.stu}
 
 ## Type safety and strict evaluation
 

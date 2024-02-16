@@ -26,6 +26,59 @@ pre[class*="language-"] {
     /* font-size: 12px; */
 }
 
+.stu {
+    /* border-left: 5px solid #2196F3;
+    background-color: #e7f3fe;*/
+    padding-left: 20px; 
+    position: relative;
+}
+
+.stu:after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: -4px;
+    bottom: -6px;
+    width: 4px;
+    border-left: 5px solid var(--stu-note-border-left-color);
+    /* background-color: #e7f3fe;
+    background: linear-gradient(90deg, rgba(255,160,255,1) 0%, rgba(255,255,255,1) 100%); */
+}
+
+pre.language-fhirpath.stu {
+    margin-left: 20px;
+    overflow: unset;
+}
+pre.language-fhirpath.stu:after {
+    left: -15.5px;
+}
+
+table.stu {
+    margin-left: 20px;
+}
+
+table.stu:after {
+    left: -15.5px;
+}
+
+blockquote.stu {
+    padding-left: 32px;
+    position: relative;
+    margin-left: 20px;
+}
+
+blockquote.stu:after {
+    left: -19.5px;
+}
+
+blockquote.stu:before {
+    left: 0.5px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    position: absolute;
+}
+
 /* Include a color on the table headers as was in the original normative release */
 table.grid th {
     background-color: #D9E6FC;
