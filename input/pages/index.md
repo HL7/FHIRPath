@@ -1100,7 +1100,7 @@ The String representation uses the following formats:
 |**Boolean** |`true` or `false`|
 |**Integer** |`(\+|-)?\d+`|
 |**Decimal** |`(\+|-)?\d+(.\d+)?`|
-|**Quantity** |`(\+|-)?\d+(.\d+)? '.*'`|
+|**Quantity** |`(\+|-)?\d+(.\d+)? '.*'`    e.g. `(4 days).toString()`{:.fhirpath} returns `4 'd'` because the FHIRPath literal temporal units are short-hands for the UCUM equivalents. |
 |**Date** |**YYYY-MM-DD**|
 |**DateTime** |**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**|
 |**Time** |**hh:mm:ss.fff(+\|-)hh:mm**|
