@@ -687,6 +687,8 @@ This example returns a collection containing, for each "usual" name for the Pati
 
 A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
 
+This can be evaluated by adding all elements in the input collection to an input queue, then for each item in the input queue evaluate the repeat expression. If the result of the repeat expression is not in the output collection, add it to both the output collection and also the input queue. Processing continues until the input queue is empty.
+
 This function can be used to traverse a tree and selecting only specific children:
 
 ``` fhirpath
