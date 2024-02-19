@@ -685,7 +685,7 @@ This example returns a collection containing, for each "usual" name for the Pati
 
 #### repeat(projection: expression) : collection
 
-A version of `select` that will repeat the `projection` and add it to the output collection, as long as the projection yields new items (as determined by the [equals](#equals) (`=`) operator).
+A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
 
 This function can be used to traverse a tree and selecting only specific children:
 
