@@ -1114,6 +1114,11 @@ For calendar durations, FHIRPath defines the following conversion factors:
 
 Note that calendar duration conversion factors are only used when time-valued quantities appear in unanchored calculations. See [Date/Time Arithmetic](#datetime-arithmetic) for more information on using time-valued quantities in FHIRPath.
 
+If `q` is a Quantity of `'kg'` and one wants to convert to a Quantity in `'g'` (grams):
+``` fhirpath
+q.toQuantity('g') // changes the value and units in the quantity according to UCUM conversion rules
+```
+
 > Implementations are not required to support a complete UCUM implementation, and may return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
 
 ##### convertsToQuantity([unit : String]) : Boolean
