@@ -1783,7 +1783,7 @@ contained.where(criteria).trace('unmatched', id).empty()
 The above example traces only the id elements of the result of the where.
 
 <a name="definevariable"></a>
-### defineVariable(name: String [, expr: expression])
+#### defineVariable(name: String [, expr: expression])
 > Note: The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
