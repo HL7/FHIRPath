@@ -53,6 +53,11 @@
       <name value="TestSchema"/>
       <description value="Test Schema"/>
     </resource>
+    <resource>
+      <reference>
+        <reference value="CodeSystem/calendar-units"/>
+      </reference>
+    </resource>
     <page>
       <nameUrl value="toc.html"/>
       <title value="Table of contents"/>
