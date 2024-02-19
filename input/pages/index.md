@@ -790,15 +790,9 @@ A.union( { } ) // 1, 2, 3
 
 This function can also be invoked using the `|` operator.
 
-``` fhirpath
-A.union(B)
-```
+e.g. `x.union(y)`{:.fhirpath} is synonymous with `x | y`{:.fhirpath}
 
-is synonymous with
-
-``` fhirpath
-A | B
-```
+e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name property.
 
 #### combine(other : collection) : collection
 
