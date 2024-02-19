@@ -28,6 +28,7 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 > * [Functions - String (additional functions, marked as appropriate)](#additional-string-functions)
 > * [Functions - Math](#math)
 > * [Functions - Utility defineVariable, lowBoundary, highBoundary, precision](#definevariable)
+> * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
 > * [Types - Reflection](#reflection)
 > * [Aggregates](#aggregates)
 > 
@@ -1929,6 +1930,190 @@ For Date and DateTime values, the function returns the number of digits of preci
 @T10:30.precision() // 4
 @T10:30:00.000.precision() // 9
 ```
+{:.stu}
+
+#### Extract Date/DateTime/Time components
+> Note: The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+##### yearOf(): Integer
+{:.stu}
+If the input collection contains a single Date or DateTime, this function will return the year component.
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2014-01-05T10:30:00.000.yearOf() // 2014
+```
+{:.stu}
+
+##### monthOf(): Integer
+{:.stu}
+
+If the input collection contains a single Date or DateTime, this function will return the month component.
+{:.stu}
+
+If the input collection is empty, or the month is not present in the value, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2014-01-05T10:30:00.000.monthOf() // 1
+```
+{:.stu}
+
+If the component isn't present in the value, then the result is empty
+{:.stu}
+``` fhirpath
+@2012.monthOf() // {} an empty collection
+```
+{:.stu}
+
+##### dayOf(): Integer
+{:.stu}
+
+If the input collection contains a single Date or DateTime, this function will return the day component.
+{:.stu}
+
+If the input collection is empty, or the day is not present in the value, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2014-01-05T10:30:00.000.dayOf() // 5
+```
+{:.stu}
+
+##### hourOf(): Integer
+{:.stu}
+
+If the input collection contains a single Date, DateTime or Time, this function will return the hour component.
+{:.stu}
+
+If the input collection is empty, or the hour is not present in the value, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2012-01-01T03:30:40.002-07:00.hourOf() // 3
+@2012-01-01T16:30:40.002-07:00.hourOf() // 16
+```
+{:.stu}
+
+##### minuteOf(): Integer
+{:.stu}
+
+If the input collection contains a single Date, DateTime or Time, this function will return the minute component.
+{:.stu}
+
+If the input collection is empty, or the minute is not present in the value, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2012-01-01T12:30:40.002-07:00.minuteOf() // 30
+```
+{:.stu}
+
+##### secondOf(): Integer
+{:.stu}
+
+If the input collection contains a single Date, DateTime or Time, this function will return the second component.
+{:.stu}
+
+If the input collection is empty, or the second is not present in the value, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2012-01-01T12:30:40.002-07:00.secondOf() // 40
+```
+{:.stu}
+
+##### millisecondOf(): Integer
+{:.stu}
+
+If the input collection contains a single Date, DateTime or Time, this function will return the millisecond component.
+{:.stu}
+
+If the input collection is empty, or the millisecond is not present in the value, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2012-01-01T12:30:00.002-07:00.millisecondOf() // 2
+```
+{:.stu}
+
+##### timezoneOffsetOf(): Decimal
+{:.stu}
+
+If the input collection contains a single DateTime, this function will return the timezone offset component.
+{:.stu}
+
+If the input collection is empty, or the timezone offset is not present in the value, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2012-01-01T12:30:00.000-07:00.timezoneOffsetOf() // -7.0
+```
+{:.stu}
+
+##### dateOf(): Date
+{:.stu}
+
+If the input collection contains a single Date or DateTime, this function will return the date component (up to the precision present in the input value).
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2012-01-01T12:30:00.000-07:00.dateOf() // @2012-01-01
+```
+{:.stu}
+
+##### timeOf(): Time
+{:.stu}
+
+If the input collection contains a single DateTime, this function will return the time component.
+{:.stu}
+
+If the input collection is empty, or the time is not present in the value, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+@2012-01-01T12:30:00.000-07:00.timeOf() // @T12:30:00.000
+```
+{:.stu}
+
+> Note: The CQL Time component has timezones, where the fhirpath time doesn't
 {:.stu}
 
 ## Operations
