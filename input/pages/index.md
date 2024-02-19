@@ -1787,6 +1787,24 @@ contained.where(criteria).trace('unmatched', id).empty()
 
 The above example traces only the id elements of the result of the where.
 
+#### Current date and time functions
+
+The following functions return the current date and time. The timestamp that these functions use is an implementation decision, and implementations should consider providing options appropriate for their environment. In the simplest case, the local server time is used as the timestamp for these function.
+
+To ensure deterministic evaluation, these operators should return the same value regardless of how many times they are evaluated within any given expression (i.e. now() should always return the same DateTime in a given expression, timeOfDay() should always return the same Time in a given expression, and today() should always return the same Date in a given expression.)
+
+##### now() : DateTime
+
+Returns the current date and time, including timezone offset.
+
+##### timeOfDay() : Time
+
+Returns the current time.
+
+##### today() : Date
+
+Returns the current date.
+
 <a name="definevariable"></a>
 #### defineVariable(name: String [, expr: expression])
 > Note: The contents of this section are Standard for Trial Use (STU)
@@ -1820,24 +1838,6 @@ group.select(
 
 > Note: this would be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
 {:.stu}
-
-#### Current date and time functions
-
-The following functions return the current date and time. The timestamp that these functions use is an implementation decision, and implementations should consider providing options appropriate for their environment. In the simplest case, the local server time is used as the timestamp for these function.
-
-To ensure deterministic evaluation, these operators should return the same value regardless of how many times they are evaluated within any given expression (i.e. now() should always return the same DateTime in a given expression, timeOfDay() should always return the same Time in a given expression, and today() should always return the same Date in a given expression.)
-
-##### now() : DateTime
-
-Returns the current date and time, including timezone offset.
-
-##### timeOfDay() : Time
-
-Returns the current time.
-
-##### today() : Date
-
-Returns the current date.
 
 ## Operations
 
