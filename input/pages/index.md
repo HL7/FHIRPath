@@ -1887,7 +1887,7 @@ If one or both of the operands is the empty collection, this operation returns a
 
 When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
 
-For time-valued quantities, note that calendar durations and definite quantity durations above seconds are considered unequal:
+For time-valued quantities, note that calendar durations and definite quantity durations above days (and weeks) are considered un-comparable:
 
 ``` fhirpath
 1 year = 1 'a' // false
@@ -2004,7 +2004,7 @@ The converse of the equivalent operator, returning `true` if equivalent returns 
 
 When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
 
-For time-valued quantities, calendar durations and definite quantity durations above seconds are considered un-comparable:
+For time-valued quantities, note that calendar durations and definite quantity durations above days (and weeks) are considered un-comparable:
 
 ``` fhirpath
 1 year > 1 `a` // { } (empty)
