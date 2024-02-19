@@ -27,7 +27,7 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 > * [Conversions - toLong](#tolong--long)
 > * [Functions - String (additional functions, marked as appropriate)](#additional-string-functions)
 > * [Functions - Math](#math)
-> * [Functions - Utility defineVariable](#definevariable)
+> * [Functions - Utility defineVariable, lowBoundary, highBoundary, precision](#definevariable)
 > * [Types - Reflection](#reflection)
 > * [Aggregates](#aggregates)
 > 
@@ -1837,6 +1837,98 @@ group.select(
 {:.stu}
 
 > Note: this would be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
+{:.stu}
+
+#### lowBoundary([precision: Integer]): Decimal | Date | DateTime | Time
+{:.stu}
+
+The least possible value of the input to the specified precision.
+{:.stu}
+
+The function can only be used with Decimal, Date, DateTime, and Time values, and returns the same type as the value in the input collection.
+{:.stu}
+
+If no precision is specified, the greatest precision of the type of the input value is used (i.e. at least 8 for Decimal, 4 for Date, at least 17 for DateTime, and at least 9 for Time).
+{:.stu}
+
+If the precision is greater than the maximum possible precision of the implementation, the result is empty *(CQL returns null)*.
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+1.587.lowBoundary(8) // 1.58700000
+@2014.lowBoundary(6) // @2014-01
+@2014-01-01T08.lowBoundary(17) // @2014-01-01T08:00:00.000
+@T10:30.lowBoundary(9) // @T10:30:00.000
+```
+{:.stu}
+
+#### highBoundary([precision: Integer]): Decimal | Date | DateTime | Time
+{:.stu}
+
+The greatest possible value of the input to the specified precision.
+{:.stu}
+
+The function can only be used with Decimal, Date, DateTime, and Time values, and returns the same type as the value in the input collection.
+{:.stu}
+
+If no precision is specified, the greatest precision of the type of the input value is used (i.e. at least 8 for Decimal, 4 for Date, at least 17 for DateTime, and at least 9 for Time).
+{:.stu}
+
+If the precision is greater than the maximum possible precision of the implementation, the result is empty *(CQL returns null)*.
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+1.587.highBoundary(8) // 1.58799999
+@2014.highBoundary(6) // @2014-12
+@2014-01-01T08.highBoundary(17) // @2014-01-01T08:59:59.999
+@T10:30.highBoundary(9) // @T10:30:59.999
+```
+{:.stu}
+
+#### precision() : Integer
+{:.stu}
+
+If the input collection contains a single item, this function will return the number of digits of precision.
+{:.stu}
+
+The function can only be used with Decimal, Date, DateTime, and Time values.
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+For Decimal values, the function returns the number of digits of precision after the decimal place in the input value.
+{:.stu}
+
+``` fhirpath
+1.58700.precision() // 5
+```
+{:.stu}
+
+For Date and DateTime values, the function returns the number of digits of precision in the input value.
+{:.stu}
+
+``` fhirpath
+@2014.precision() // 4
+@2014-01-05T10:30:00.000.precision() // 17
+@T10:30.precision() // 4
+@T10:30:00.000.precision() // 9
+```
 {:.stu}
 
 ## Operations
