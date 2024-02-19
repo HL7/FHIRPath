@@ -79,6 +79,21 @@ blockquote.stu:before {
     position: absolute;
 }
 
+ul.stu {
+    padding-left: 32px;
+}
+
+table.grid th:has(.stu-bg),
+th:has(.stu-bg),
+td:has(.stu-bg) {
+    background-color: var(--stu-note-background-color);
+}
+
+/* STU background */
+.stu-bg {
+    background-color: var(--stu-note-background-color);
+}
+
 /* Include a color on the table headers as was in the original normative release */
 table.grid th {
     background-color: #D9E6FC;

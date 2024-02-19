@@ -149,8 +149,9 @@ STRING
         ;
 
 // Also allows leading zeroes now (just like CQL and XSD)
+// Also allows the trailing L for Long (STU)
 NUMBER
-        : [0-9]+('.' [0-9]+)?
+        : [0-9]+('.' [0-9]+)? | [0-9]+ 'L'?
         ;
 
 // Pipe whitespace to the HIDDEN channel to support retrieving source text through the parser.

@@ -23,6 +23,8 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 
 > Note: The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
 > 
+> * [Literals - Long](#long)
+> * [Conversions - toLong](#tolong--long)
 > * [Functions - String (additional functions, marked as appropriate)](#additional-string-functions)
 > * [Functions - Math](#math)
 > * [Functions - Utility defineVariable](#definevariable)
@@ -179,6 +181,7 @@ In addition to paths, FHIRPath expressions may contain _literals_, _operators_, 
 Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
 Integer: 0, 45
+Long: 0L, 45L    // Long is defined as STU
 Decimal: 0.0, 3.14159265
 Date: @2015-02-04 (@ followed by ISO8601 compliant date)
 DateTime: @2015-02-04T14:34:28+09:00 (@ followed by ISO8601 compliant date/time)
@@ -244,6 +247,22 @@ The `Integer` type represents whole numbers in the range -2<sup>31</sup> to 2<su
 ```
 
 > Note that the minus sign (`-`) in the representation of a negative integer is not part of the literal, it is the unary negation operator defined as part of FHIRPath syntax.
+
+##### Long
+> Note: the contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+The `Long` type represents whole numbers in the range -2<sup>63</sup> to 2<sup>63</sup>-1.
+{:.stu}
+``` fhirpath
+0L
+45L
+-5L
+```
+{:.stu}
+
+This type corresponds to System.Long
+{:.stu}
 
 #### Decimal
 
@@ -797,16 +816,17 @@ In the above expression, the addition operator expects either two Integers, or t
 
 The following table lists the possible conversions supported, and whether the conversion is implicit or explicit:
 
-|From\To |Boolean |Integer |Decimal |Quantity |String |Date |DateTime |Time |
-|- |- |- |- |- |- |- |- |- | 
-|**Boolean** |N/A |Explicit |Explicit |- |Explicit |- |- |- |
-|**Integer** |Explicit |N/A |Implicit |Implicit |Explicit |- |- |- |
-|**Decimal** |Explicit |- |N/A |Implicit |Explicit |- |- |- |
-|**Quantity** |- |- |- |N/A |Explicit |- |- |- |
-|**String** |Explicit |Explicit |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
-|**Date** |- |- |- |- |Explicit |N/A |Implicit |- |
-|**DateTime** |- |- |- |- |Explicit |Explicit |N/A |- |
-|**Time** |- |- |- |- |Explicit |- |- |N/A |
+|From\To |Boolean |Integer |Long *(STU)*{:.stu-bg} |Decimal |Quantity |String |Date |DateTime |Time |
+|- |- |- |- |- |- |- |- |- | - |
+|**Boolean** |N/A |Explicit | *Explicit*{:.stu-bg} |Explicit |- |Explicit |- |- |- |
+|**Integer** |Explicit |N/A | *Implicit*{:.stu-bg} |Implicit |Implicit |Explicit |- |- |- |
+|**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*-*{:.stu-bg} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
+|**Decimal** |Explicit |- | *-*{:.stu-bg} |N/A |Implicit |Explicit |- |- |- |
+|**Quantity** |- |- | *-*{:.stu-bg} |- |N/A |Explicit |- |- |- |
+|**String** |Explicit |Explicit | *Explicit*{:.stu-bg} |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
+|**Date** |- |- | *-*{:.stu-bg} |- |- |Explicit |N/A |Implicit |- |
+|**DateTime** |- |- | *-*{:.stu-bg} |- |- |Explicit |Explicit |N/A |- |
+|**Time** |- |- | *-*{:.stu-bg} |- |- |Explicit |- |- |N/A |
 {: .grid}
 
 * Implicit - Values of the type in the From column will be implicitly converted to values of the type in the To column when necessary
@@ -908,6 +928,49 @@ If the item is not one of the above types, or the item is a String, but is not c
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
+
+##### toLong() : Long
+> Note: the contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+If the input collection contains a single item, this function will return a single integer if:
+{:.stu}
+* the item is an Integer or Long
+* the item is a String and is convertible to a 64 bit integer
+* the item is a Boolean, where `true` results in a 1 and `false` results in a 0.
+{:.stu}
+
+If the item is not one the above types, the result is empty.
+{:.stu}
+
+If the item is a String, but the string is not convertible to a 64 bit integer (using the regex format `(\+|-)?\d+`), the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
+
+##### convertsToLong() : Boolean
+{:.stu}
+
+If the input collection contains a single item, this function will return true if:
+{:.stu}
+
+* the item is an Integer or Long
+* the item is a String and is convertible to a Long
+* the item is a Boolean
+{:.stu}
+
+If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is false.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
 
 #### Date Conversion Functions
 
@@ -2789,7 +2852,7 @@ There are a few constructs in the FHIRPath language where the compiler cannot de
 
 * The `children()` and `descendants()` functions
 * The `resolve()` function
-* A member which is polymorphic (e.g. a choice[x] type in FHIR)
+* A member which is polymorphic (e.g. a `choice[x]` type in FHIR)
 
 Note that the `resolve()` function is defined by the FHIR context, it is not part of FHIRPath directly. For more information see the [FHIRPath](https://hl7.org/fhir/fhirpath.html#functions) section of the FHIR specification.
 
