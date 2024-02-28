@@ -2113,9 +2113,6 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-> Note: The CQL Time component has timezones, where the fhirpath time doesn't
-{:.stu}
-
 ## Operations
 
 Operators are allowed to be used between any kind of path expressions (e.g. expr op expr). Like functions, operators will generally propagate an empty collection in any of their operands. This is true even when comparing two empty collections using the equality operators, e.g.
