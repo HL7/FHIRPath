@@ -2165,7 +2165,7 @@ When comparing quantities for equality, the dimensions of each quantity must be 
 For time-valued quantities, note that calendar durations and definite quantity durations above days (and weeks) are considered un-comparable:
 
 ``` fhirpath
-1 year = 1 'a' // false
+1 year = 1 'a' // {} an empty collection
 1 second = 1 's' // true
 ```
 
