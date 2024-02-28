@@ -3,7 +3,7 @@
 	<url value="http://hl7.org/fhirpath/CodeSystem/calendar-units"/>
 	<version value="5.0.0"/>
 	<name value="CalendarUnits"/>
-	<title value="Calendar Duration Units"/>
+	<title value="Calendar Duration Units CodeSystem"/>
 	<status value="active"/>
 	<experimental value="false"/>
 	<date value="2024-02-15"/>
@@ -21,7 +21,7 @@
 	<concept>
 		<code value="millisecond"/>
 		<display value="Millisecond"/>
-		<definition value="A calendar millisecond - 1/1000 of a calendar second"/>
+		<definition value="One millisecond - 1/1000 of a calendar second"/>
 		<designation>
 			<use>
 				<system value="http://snomed.info/sct"/>
@@ -34,7 +34,7 @@
 	<concept>
 		<code value="second"/>
 		<display value="Second"/>
-		<definition value="A calendar second"/>
+		<definition value="One second"/>
 		<designation>
 			<use>
 				<system value="http://snomed.info/sct"/>
@@ -47,7 +47,7 @@
 	<concept>
 		<code value="minute"/>
 		<display value="Minute"/>
-		<definition value="A calendar minute - excactly 60 seconds"/>
+		<definition value="One minute - excactly 60 seconds"/>
 		<designation>
 			<use>
 				<system value="http://snomed.info/sct"/>
@@ -60,7 +60,7 @@
 	<concept>
 		<code value="hour"/>
 		<display value="Hour"/>
-		<definition value="A calendar hour - exactly 60 minutes"/>
+		<definition value="One hour - exactly 60 minutes"/>
 		<designation>
 			<use>
 				<system value="http://snomed.info/sct"/>
@@ -73,7 +73,7 @@
 	<concept>
 		<code value="day"/>
 		<display value="Day"/>
-		<definition value="A calendar day - exactly 24 hours"/>
+		<definition value="One day - exactly 24 hours"/>
 		<designation>
 			<use>
 				<system value="http://snomed.info/sct"/>
@@ -86,7 +86,7 @@
 	<concept>
 		<code value="week"/>
 		<display value="Week"/>
-		<definition value="A calendar week - 7 days exactly"/>
+		<definition value="One week - exactly 7 days"/>
 		<designation>
 			<use>
 				<system value="http://snomed.info/sct"/>

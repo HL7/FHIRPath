@@ -57,13 +57,11 @@
       <reference>
         <reference value="CodeSystem/calendar-units"/>
       </reference>
-      <description value="Calendar Duration Units CodeSystem"/>
     </resource>
     <resource>
       <reference>
         <reference value="ValueSet/calendar-units"/>
       </reference>
-      <description value="Calendar Duration Units ValueSet"/>
     </resource>
     <page>
       <nameUrl value="toc.html"/>
