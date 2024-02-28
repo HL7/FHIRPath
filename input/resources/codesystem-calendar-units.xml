@@ -99,7 +99,7 @@
 	<concept>
 		<code value="month"/>
 		<display value="Month"/>
-		<definition value="A calendar month"/>
+		<definition value="A calendar month - Month is not a fixed size in days"/>
 		<designation>
 			<use>
 				<system value="http://snomed.info/sct"/>
@@ -112,7 +112,7 @@
 	<concept>
 		<code value="year"/>
 		<display value="Year"/>
-		<definition value="A calendar year"/>
+		<definition value="A calendar year - exactly 12 months"/>
 		<designation>
 			<use>
 				<system value="http://snomed.info/sct"/>
