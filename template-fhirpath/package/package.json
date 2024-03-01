@@ -1,0 +1,13 @@
+{
+    "name": "hl7.fhirpath.template",
+    "version": "0.0.1",
+    "type": "fhir.template",
+    "license": "CC0-1.0",
+    "description": "HL7 FHIRPath Template - for use with the HL7 FHIRPath IG",
+    "author": "http://hl7.org/fhir",
+    "canonical": "http://github.com/HL7/ig-template-fhirpath",
+    "base": "hl7.fhir.template",
+    "dependencies": {
+      "hl7.fhir.template": "current"
+    }
+  }

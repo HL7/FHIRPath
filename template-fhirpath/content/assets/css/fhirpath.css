@@ -1,0 +1,189 @@
+/* Custom formatting for the code blocks */
+pre.language-fhirpath {
+    background-color: #eee;
+    text-shadow: unset;
+}
+
+pre.language-fhirpath code.language-fhirpath {
+    white-space: pre-wrap;
+    text-shadow: unset;
+}
+
+pre.language-txt {
+    border-radius: 0;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+    background: unset;
+}
+
+code[class*="language-"],
+pre[class*="language-"] {
+    /* font-size: 12px; */
+}
+
+.stu {
+    /* border-left: 5px solid #2196F3;
+    background-color: #e7f3fe;*/
+    padding-left: 20px; 
+    position: relative;
+}
+
+.stu:after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: -4px;
+    bottom: -6px;
+    width: 4px;
+    border-left: 5px solid var(--stu-note-border-left-color);
+    /* background-color: #e7f3fe;
+    background: linear-gradient(90deg, rgba(255,160,255,1) 0%, rgba(255,255,255,1) 100%); */
+}
+
+pre.language-fhirpath.stu {
+    margin-left: 20px;
+    overflow: unset;
+}
+pre.language-fhirpath.stu:after {
+    left: -15.5px;
+}
+
+table.stu {
+    margin-left: 20px;
+}
+
+table.stu:after {
+    left: -15.5px;
+}
+
+blockquote.stu {
+    padding-left: 32px;
+    position: relative;
+    margin-left: 20px;
+}
+
+blockquote.stu:after {
+    left: -19.5px;
+}
+
+blockquote.stu:before {
+    left: 0.5px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    position: absolute;
+}
+
+ul.stu {
+    padding-left: 32px;
+}
+
+table.grid th:has(.stu-bg),
+th:has(.stu-bg),
+td:has(.stu-bg) {
+    background-color: var(--stu-note-background-color);
+}
+
+/* STU background */
+.stu-bg {
+    background-color: var(--stu-note-background-color);
+}
+
+/* Include a color on the table headers as was in the original normative release */
+table.grid th {
+    background-color: #D9E6FC;
+}
+
+table.grid {
+    min-width: 70vw;
+}
+
+/* inline fhirpath code blocks used in examples */
+:not(pre) > code.fhirpath {
+    background-color: #eee;
+    padding: 1px 4px;
+    border: 1px solid #cccccc;
+    font-size: 1em;
+    display: inline-block;
+    margin: 2px 0;
+    text-shadow: unset;
+}
+
+/* overload the section numbering to be consistent with the original published version of the specification */
+body {
+    counter-reset: section appendix
+}
+
+h2:before {
+    color: silver;
+    counter-increment: section;
+    content: counter(section) ". ";
+}
+
+h3:before {
+    color: silver;
+    counter-increment: sub-section;
+    content: counter(section) "." counter(sub-section) ". ";
+}
+
+h4:before {
+    color: silver;
+    counter-increment: composite;
+    content: counter(section) "." counter(sub-section) "." counter(composite) ". ";
+}
+
+h5:before {
+    color: silver;
+    counter-increment: detail;
+    content: counter(section) "." counter(sub-section) "." counter(composite) "." counter(detail) ". ";
+}
+
+h6:before {
+    color: silver;
+    counter-increment: more-detail;
+    content: counter(section) "." counter(sub-section) "." counter(composite) "." counter(detail) "." counter(more-detail) ". ";
+}
+
+h2.appendix {
+    counter-reset: sub-section;
+    counter-increment: appendix;
+}
+
+h3.appendix {
+    counter-reset: composite
+}
+
+h2.appendix:before {
+    color: silver;
+    counter-increment: section;
+    content: "Appendix " counter(appendix, upper-alpha) ": ";
+}
+
+h3.appendix:before {
+    color: silver;
+    counter-increment: sub-section;
+    content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) ": ";
+}
+
+h4.appendix:before {
+    color: silver;
+    counter-increment: composite;
+    content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) "." counter(composite) ": ";
+}
+
+h5.appendix:before {
+    color: silver;
+    counter-increment: detail;
+    content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) "." counter(composite) "." counter(detail) ": ";
+}
+
+h6.appendix:before {
+    color: silver;
+    counter-increment: more-detail;
+    content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) "." counter(composite) "." counter(detail) "." counter(more-detail) ": ";
+}

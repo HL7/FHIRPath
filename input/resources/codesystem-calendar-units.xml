@@ -1,0 +1,125 @@
+<CodeSystem xmlns="http://hl7.org/fhir">
+	<id value="calendar-units"/>
+	<url value="http://hl7.org/fhirpath/CodeSystem/calendar-units"/>
+	<version value="5.0.0"/>
+	<name value="CalendarUnits"/>
+	<title value="Calendar Duration Units CodeSystem"/>
+	<status value="active"/>
+	<experimental value="false"/>
+	<date value="2024-02-15"/>
+	<publisher value="HL7 International"/>
+	<contact>
+		<name value="FHIR project team"/>
+		<telecom>
+			<system value="url"/>
+			<value value="http://hl7.org/fhir"/>
+		</telecom>
+	</contact>
+	<description value="Calendar Duration Units - which are disctinct to the UCUM units"/>
+	<caseSensitive value="true"/>
+	<content value="complete"/>
+	<concept>
+		<code value="millisecond"/>
+		<display value="Millisecond"/>
+		<definition value="One millisecond - 1/1000 of a calendar second"/>
+		<designation>
+			<use>
+				<system value="http://snomed.info/sct"/>
+				<code value="900000000000013009"/>
+				<display value="Synonym"/>
+			</use>
+			<value value="Milliseconds"/>
+		</designation>
+	</concept>
+	<concept>
+		<code value="second"/>
+		<display value="Second"/>
+		<definition value="One second"/>
+		<designation>
+			<use>
+				<system value="http://snomed.info/sct"/>
+				<code value="900000000000013009"/>
+				<display value="Synonym"/>
+			</use>
+			<value value="Seconds"/>
+		</designation>
+	</concept>
+	<concept>
+		<code value="minute"/>
+		<display value="Minute"/>
+		<definition value="One minute - excactly 60 seconds"/>
+		<designation>
+			<use>
+				<system value="http://snomed.info/sct"/>
+				<code value="900000000000013009"/>
+				<display value="Synonym"/>
+			</use>
+			<value value="Minutes"/>
+		</designation>
+	</concept>
+	<concept>
+		<code value="hour"/>
+		<display value="Hour"/>
+		<definition value="One hour - exactly 60 minutes"/>
+		<designation>
+			<use>
+				<system value="http://snomed.info/sct"/>
+				<code value="900000000000013009"/>
+				<display value="Synonym"/>
+			</use>
+			<value value="Hours"/>
+		</designation>
+	</concept>
+	<concept>
+		<code value="day"/>
+		<display value="Day"/>
+		<definition value="One day - exactly 24 hours"/>
+		<designation>
+			<use>
+				<system value="http://snomed.info/sct"/>
+				<code value="900000000000013009"/>
+				<display value="Synonym"/>
+			</use>
+			<value value="Days"/>
+		</designation>
+	</concept>
+	<concept>
+		<code value="week"/>
+		<display value="Week"/>
+		<definition value="One week - exactly 7 days"/>
+		<designation>
+			<use>
+				<system value="http://snomed.info/sct"/>
+				<code value="900000000000013009"/>
+				<display value="Synonym"/>
+			</use>
+			<value value="Weeks"/>
+		</designation>
+	</concept>
+	<concept>
+		<code value="month"/>
+		<display value="Month"/>
+		<definition value="A calendar month - Month is not a fixed size in days"/>
+		<designation>
+			<use>
+				<system value="http://snomed.info/sct"/>
+				<code value="900000000000013009"/>
+				<display value="Synonym"/>
+			</use>
+			<value value="Months"/>
+		</designation>
+	</concept>
+	<concept>
+		<code value="year"/>
+		<display value="Year"/>
+		<definition value="A calendar year - exactly 12 months"/>
+		<designation>
+			<use>
+				<system value="http://snomed.info/sct"/>
+				<code value="900000000000013009"/>
+				<display value="Synonym"/>
+			</use>
+			<value value="Years"/>
+		</designation>
+	</concept>
+</CodeSystem>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><ValueSet xmlns="http://hl7.org/fhir">
+	<id value="calendar-units"/>
+	<meta>
+		<!--    many expansions are not shareable, but this one is    -->
+		<profile value="http://hl7.org/fhir/StructureDefinition/shareablevalueset"/>
+	</meta>
+	<url value="http://hl7.org/fhirpath/ValueSet/calendar-units"/>
+	<name value="CalendarUnits"/>
+	<title value="Calendar Duration Units ValueSet"/>
+	<status value="active"/>
+	<experimental value="false"/>
+	<date value="2024-02-15"/>
+	<publisher value="FHIR Project team"/>
+	<contact>
+		<telecom>
+			<system value="url"/>
+			<value value="http://hl7.org/fhir"/>
+		</telecom>
+	</contact>
+	<description value="Calendar Duration Units - which are disctinct to the UCUM units."/>
+	<compose>
+		<include>
+			<system value="http://hl7.org/fhirpath/CodeSystem/calendar-units"/>
+		</include>
+	</compose>
+</ValueSet>

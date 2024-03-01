@@ -1,10 +1,3 @@
-cd output
-del *.* /s/ q
-cd..
-cd temp
-del *.* /s/ q
-cd..
-cd qa
-del *.* /s/ q
-cd..
-
+del output/*.* /s /q
+del temp/*.* /s /q
+del qa/*.* /s /q

@@ -1,0 +1,6 @@
+== Suppressed Messages ==
+
+# Fhirpath is not fhir dependant, hence doesn't have cross version analysis or any dependencies
+An HTML fragment from the set [cross-version-analysis.xhtml, cross-version-analysis-inline.xhtml] is not included anywhere in the produced implementation guide
+An HTML fragment from the set [dependency-table.xhtml, dependency-table-short.xhtml] is not included anywhere in the produced implementation guide
+The HTML fragment 'globals-table.xhtml' is not included anywhere in the produced implementation guide
