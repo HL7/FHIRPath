@@ -1,29 +1,15 @@
-/* Custom formatting for the code blocks */
-pre.language-fhirpath {
-    background-color: #eee;
-    text-shadow: unset;
-}
-
-pre.language-fhirpath code.language-fhirpath {
-    white-space: pre-wrap;
-    text-shadow: unset;
-}
-
 pre.language-txt {
     border-radius: 0;
-}
-
-.token.operator,
-.token.entity,
-.token.url,
-.language-css .token.string,
-.style .token.string {
-    background: unset;
 }
 
 code[class*="language-"],
 pre[class*="language-"] {
     /* font-size: 12px; */
+}
+
+blockquote.trialuse {
+    border-left: 5px solid #2196F3;
+    background-color: #e7f3fe;
 }
 
 .stu {
@@ -101,17 +87,6 @@ table.grid th {
 
 table.grid {
     min-width: 70vw;
-}
-
-/* inline fhirpath code blocks used in examples */
-:not(pre) > code.fhirpath {
-    background-color: #eee;
-    padding: 1px 4px;
-    border: 1px solid #cccccc;
-    font-size: 1em;
-    display: inline-block;
-    margin: 2px 0;
-    text-shadow: unset;
 }
 
 /* overload the section numbering to be consistent with the original published version of the specification */
