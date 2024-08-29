@@ -6,7 +6,7 @@ standards-status: normative
 
 FHIRPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources ([FHIR](http://hl7.org/fhir)) and HL7 Clinical Quality Language ([CQL](http://cql.hl7.org/03-developersguide.html#using-fhirpath)).
 
-Looking for implementations? See [FHIRPath Implementations on the HL7 wiki](http://wiki.hl7.org/index.php?title=FHIRPath_Implementations)
+Looking for implementations? See [FHIRPath Implementations on the HL7 confluence](https://confluence.hl7.org/display/FHIRI/FHIRPath+Implementations){:target="_blank"}
 
 Version: 2.0.0 Public Domain ([Creative Commons 0](http://creativecommons.org/publicdomain/zero/1.0/))
 
@@ -3251,41 +3251,21 @@ Note that if the parser cannot properly parse the Abstract Message Syntax, group
 ## FHIRPath Tooling and Implementation
 {: .appendix }
 
-This section lists known tooling and implementation projects for the FHIRPath language:
+The list of known tooling and implementation projects for the FHIRPath language has been moved to the [HL7 confluence site](https://confluence.hl7.org/display/FHIRI/FHIRPath+Implementations){:target="_blank"}
 
-* JavaScript: https://github.com/HL7/fhirpath.js/
-* Java RI: In the FHIR build tooling at org.hl7.fhir.dstu3.utils.FHIRPathEngine
-* Pascal RI: https://github.com/grahamegrieve/fhirserver/blob/master/library/r3/FHIR.R3.PathEngine.pas
-* .NET RI: https://github.com/ewoutkramer/fhir-net-fhirpath
-
-In addition, there is a Notepad++ FHIR Plugin that enables evaluation of FHIRPath expressions:
-
-http://www.healthintersections.com.au/?p=2386
-
-There is a test harness for FHIRPath here:
-
-https://github.com/brianpos/FhirPathTester
-
-The CQL-to-ELM translator that is maintained as part of the tooling for Clinical Quality Language supports FHIRPath:
-
-https://github.com/cqframework/clinical_quality_language
-
-For the most current listing of known implementations, refer to the HL7 wiki:
-
-http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 
 ## References
 {: .appendix }
 
 <a name="bibliography"></a>
-- <a name="ANTLR"></a>[ANTLR] Another Tool for Language Recognition (ANTLR) <http://www.antlr.org/>
-- <a name="ISO8601"></a>[ISO8601] Date and time format - ISO 8601. <https://www.iso.org/iso-8601-date-and-time-format.html>
-- <a name="CQL"></a>[CQL] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.3. <http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400>
-- <a name="MOF"></a>[MOF] Meta Object Facility. <https://www.omg.org/spec/MOF/>, version 2.5.1, November 2016
-- <a name="XMLRE"></a>[XMLRE] Regular Expressions. XML Schema 1.1. <https://www.w3.org/TR/xmlschema11-2/#regexs>
-- <a name="PCRE"></a>[PCRE] Pearl-Compatible Regular Expressions. <http://www.pcre.org/>
-- <a name="UCUM"></a>[UCUM] Unified Code for Units of Measure (UCUM) <http://unitsofmeasure.org/ucum.html>, Version 2.1, Revision 442 (2017-11-21)
-- <a name="FHIR"></a>[FHIR] HL7 Fast Healthcare Interoperability Resources <http://hl7.org/fhir>
+- <a name="ANTLR"></a>[ANTLR] Another Tool for Language Recognition (ANTLR) <http://www.antlr.org/>{:target="_blank"}
+- <a name="ISO8601"></a>[ISO8601] Date and time format - ISO 8601. <https://www.iso.org/iso-8601-date-and-time-format.html>{:target="_blank"}
+- <a name="CQL"></a>[CQL] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.3. <http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400>{:target="_blank"}
+- <a name="MOF"></a>[MOF] Meta Object Facility. <https://www.omg.org/spec/MOF/>{:target="_blank"}, version 2.5.1, November 2016
+- <a name="XMLRE"></a>[XMLRE] Regular Expressions. XML Schema 1.1. <https://www.w3.org/TR/xmlschema11-2/#regexs>{:target="_blank"}
+- <a name="PCRE"></a>[PCRE] Pearl-Compatible Regular Expressions. <http://www.pcre.org/>{:target="_blank"}
+- <a name="UCUM"></a>[UCUM] Unified Code for Units of Measure (UCUM) <http://unitsofmeasure.org/ucum.html>{:target="_blank"}, Version 2.1, Revision 442 (2017-11-21)
+- <a name="FHIR"></a>[FHIR] HL7 Fast Healthcare Interoperability Resources <http://hl7.org/fhir>{:target="_blank"}
 - [grammar.html](grammar.html)
 - [modelinfo.xsd](modelinfo.xsd)
-- <a name="fluent"></a>[Fluent] Fluent interface pattern. <https://en.wikipedia.org/wiki/Fluent_interface>
+- <a name="fluent"></a>[Fluent] Fluent interface pattern. <https://en.wikipedia.org/wiki/Fluent_interface>{:target="_blank"}
