@@ -94,8 +94,8 @@ This specification uses the conformance verbs SHALL, MUST, SHOULD, and MAY as de
 
 * SHALL/MUST: An absolute requirement for all implementations
 * SHALL/MUST NOT: An absolute prohibition against inclusion for all implementations
-* SHOULD/SHOULD NOT: A best practice or recommendation to be considered by implementers within the context of their particular implementation; there may be valid resons to ignore an item, but the full implications must be understood and carefully weighed before choosing a different course
-* MAY: This is truly optional language for an implementation; can be inluced or omitted as the implementer decides with no implications.
+* SHOULD/SHOULD NOT: A best practice or recommendation to be considered by implementers within the context of their particular implementation; there may be valid reasons to ignore an item, but the full implications must be understood and carefully weighed before choosing a different course
+* MAY: This is truly optional language for an implementation; can be included or omitted as the implementer decides with no implications.
 
 ## Navigation model
 
@@ -487,7 +487,7 @@ Patient.active and Patient.gender and Patient.telecom
 
 Assuming the `Patient` instance has an `active` value of `true`, a `gender` of `female` and a single `telecom` element, this expression will result in true. However, consider a different instance of `Patient` that has an `active` value of `true`, a `gender` of `male`, and multiple `telecom` elements, then this expression will result in an error because of the multiple telecom elements.
 
-Note that for repeating elements like `telecom` in the above example, the logic _looks_ like an existence check. To avoid confusion and reduce unintended errors, authors should use the explicit form of these checks when appropriate. For example, a more explicit rendering of the same logic that more clearly indicates the actual intent and avoids the run-time rror is:
+Note that for repeating elements like `telecom` in the above example, the logic _looks_ like an existence check. To avoid confusion and reduce unintended errors, authors should use the explicit form of these checks when appropriate. For example, a more explicit rendering of the same logic that more clearly indicates the actual intent and avoids the run-time error is:
 
 ``` fhirpath
 Patient.active and Patient.gender and Patient.telecom.count() = 1
@@ -538,7 +538,7 @@ The first example returns `true` if the `Patient` has any `name` elements.
 
 The second example returns `true` if the `Patient` has any `identifier` elements that have a `use` element equal to `'official'`.
 
-The third example retruns `true` if the `Patient` has any `telecom` elements that have a `system` element equal to `'phone'` and a `use` element equal to `'mobile'`.
+The third example returns `true` if the `Patient` has any `telecom` elements that have a `system` element equal to `'phone'` and a `use` element equal to `'mobile'`.
 
 And finally, the fourth example returns `true` if the `Patient` has any `generalPractitioner` elements of type `Practitioner`.
 
@@ -2504,7 +2504,7 @@ The implies operator is useful for testing conditionals. For example, if a given
 ``` fhirpath
 Patient.name.given.exists() implies Patient.name.family.exists()
 CareTeam.onBehalfOf.exists() implies (CareTeam.member.resolve() is Practitioner)
-StructrureDefinition.contextInvariant.exists() implies StructureDefinition.type = 'Extension'
+StructureDefinition.contextInvariant.exists() implies StructureDefinition.type = 'Extension'
 ```
 
 Note that implies may use short-circuit evaluation in the case that the first operand evaluates to false.
@@ -3028,7 +3028,7 @@ Results in:
 #### Anonymous Types
 {:.stu}
 
-Anonymous types are structured types that have no associated name, only the elements of the structre. For example, in FHIR, the `Patient.contact` element has multiple sub-elements, but is not explicitly named. For types such as this, the result is a `TupleTypeInfo`:
+Anonymous types are structured types that have no associated name, only the elements of the structure. For example, in FHIR, the `Patient.contact` element has multiple sub-elements, but is not explicitly named. For types such as this, the result is a `TupleTypeInfo`:
 {:.stu}
 
 ``` typescript
@@ -3177,7 +3177,7 @@ text/fhirpath
 ## Use of FHIRPath on HL7 Version 2 messages
 {: .appendix }
 
-FHIRPath can be used against HL7 V2 messages. This UML diagram summarises the
+FHIRPath can be used against HL7 V2 messages. This UML diagram summarizes the
 Object Model on which the FHIRPath statements are written:
 
 ![Class Model for HL7 V2](v2-class-model.png){: height="456",width="760"}
@@ -3207,7 +3207,7 @@ Get the value of the first component in the first repeat of PID-3
 Message.segment[2].elements(3).simple()
 ```
 
-Get a collection  with is the string values of all the repeats in the the 3rd element of the 2nd segement. Typically, this assumes that there is no repeats, and so this is a simple value
+Get a collection  with is the string values of all the repeats in the the 3rd element of the 2nd segment. Typically, this assumes that there is no repeats, and so this is a simple value
 
 ``` fhirpath
 Message.segment.where(code = 'PID').field[3].element.where(component[4].value = 'MR').simple()
