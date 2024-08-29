@@ -730,7 +730,7 @@ In the above example, the symbol `Patient` must be treated as a type identifier 
 
 The indexer operation returns a collection with only the `index`-th item (0-based index). If the input collection is empty (`{ }`), or the index lies outside the boundaries of the input collection, an empty collection is returned.
 
-> Note: Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
+> **Note:** Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 
 The following example returns the element in the `name` collection of the Patient with index 0:
 
@@ -1317,7 +1317,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abc'.contains('d') // false
 ```
 
-> Note: The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the `contains` operator, which is a list operator that looks for an element in a list.
+> **Note:** The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the `contains` operator, which is a list operator that looks for an element in a list.
 
 #### upper() : String
 
@@ -1389,7 +1389,7 @@ This example of `replaceMatches()` will convert a string with a date formatted a
        '${day}-${month}-${year}')
 ```
 
-> Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the [\[PCRE\]](#PCRE) flavor as the dialect most likely to be broadly supported and understood.
+> **Note:** Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the [\[PCRE\]](#PCRE) flavor as the dialect most likely to be broadly supported and understood.
 
 #### length() : Integer
 
@@ -1409,7 +1409,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 ### Additional String Functions
 
-> Note: the contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 #### encode(format : String) : String
@@ -1772,7 +1772,7 @@ Returns a collection with all immediate child nodes of all items in the input co
 
 Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
 
-> Note: Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
+> **Note:** Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
 
 ### Utility functions
 
@@ -1808,7 +1808,7 @@ Returns the current date.
 
 <a name="definevariable"></a>
 #### defineVariable(name: String [, expr: expression])
-> Note: The contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 Defines a variable named `name` that is accessible in subsequent expressions and has the value of `expr` if present, otherwise the value of the input collection. In either case the function does not change the input and the output is the same as the input collection.
@@ -1837,7 +1837,7 @@ group.select(
 ```
 {:.stu}
 
-> Note: this would be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
+> **Note:** this would be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
 {:.stu}
 
 #### lowBoundary([precision: Integer]): Decimal | Date | DateTime | Time
@@ -1933,7 +1933,7 @@ For Date and DateTime values, the function returns the number of digits of preci
 {:.stu}
 
 #### Extract Date/DateTime/Time components
-> Note: The contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 ##### yearOf(): Integer
@@ -2392,7 +2392,7 @@ The `is()` function is supported for backwards compatibility with previous imple
 Bundle.entry.resource.all($this.is(Observation) implies status = 'finished')
 ```
 
-> Note: The `is()` function is defined for backwards compatibility only and may be deprecated in a future release.
+> **Note:** The `is()` function is defined for backwards compatibility only and may be deprecated in a future release.
 
 #### as _type specifier_
 
@@ -2412,7 +2412,7 @@ The `as()` function is supported for backwards compatibility with previous imple
 Observation.component.where(value.as(Quantity) > 30 'mg')
 ```
 
-> Note: The `as()` function is defined for backwards compatibility only and may be deprecated in a future release.
+> **Note:** The `as()` function is defined for backwards compatibility only and may be deprecated in a future release.
 
 ### Collections
 
@@ -2442,7 +2442,7 @@ Patient.name.given contains 'Joe'
 ### Boolean logic
 For all boolean operators, the collections passed as operands are first evaluated as Booleans (as described in [Singleton Evaluation of Collections](#singleton-evaluation-of-collections)). The operators then use three-valued logic to propagate empty operands.
 
-> Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the [`iif()`](#iif) function.
+> **Note:** To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the [`iif()`](#iif) function.
 
 #### and
 
@@ -2908,7 +2908,7 @@ Note also that these tokens are not restricted to simple types, and they may hav
 
 Attempting to access an undefined environment variable will result in an error, but accessing a defined environment variable that does not have a value specified results in empty (`{ }`).
 
-> Note: For backwards compatibility with some existing implementations, the token for an environment variable may also be a string, as in `%'us-zip'`, with no difference in semantics.
+> **Note:** For backwards compatibility with some existing implementations, the token for an environment variable may also be a string, as in `%'us-zip'`, with no difference in semantics.
 
 ## Types and Reflection
 
@@ -2924,7 +2924,7 @@ When resolving an identifier that is also the root of a FHIRPath expression, it 
 
 ### Reflection
 
-> Note: The contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 FHIRPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection, using one of the following concrete subtypes of `TypeInfo`:
@@ -3063,7 +3063,7 @@ Results in:
 ```
 {:.stu}
 
-> Note: These structures are a subset of the abstract metamodel used by the [Clinical Quality Language Tooling](https://github.com/cqframework/clinical_quality_language).
+> **Note:** These structures are a subset of the abstract metamodel used by the [Clinical Quality Language Tooling](https://github.com/cqframework/clinical_quality_language).
 {:.stu}
 
 ## Type safety and strict evaluation
@@ -3146,7 +3146,7 @@ The formal syntax for FHIRPath is specified as an [Antlr 4.0](http://www.antlr.o
 
 [grammar.html](grammar.html)
 
-> Note: If there are discrepancies between this documentation and the grammar included at the above link, the grammar is considered the source of truth.
+> **Note:** If there are discrepancies between this documentation and the grammar included at the above link, the grammar is considered the source of truth.
 
 ### Model Information
 
@@ -3154,7 +3154,7 @@ The model information returned by the reflection function `type()`  is specified
 
 [modelinfo.xsd](modelinfo.xsd)
 
-> Note: The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the normative [Reflection](#reflection) section above.
+> **Note:** The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the normative [Reflection](#reflection) section above.
 
 As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and tooling should respect the case-sensitive settings for each model.
 
@@ -3171,7 +3171,7 @@ In addition, a media type is defined to support describing FHIRPath content:
 text/fhirpath
 ```
 
-> Note: The appendices are included for informative purposes and are not a normative part of the specification.
+> **Note:** The appendices are included for informative purposes and are not a normative part of the specification.
 
 <a name="hl7v2"></a>
 ## Use of FHIRPath on HL7 Version 2 messages
