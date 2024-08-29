@@ -12,6 +12,39 @@ blockquote.trialuse {
     background-color: #e7f3fe;
 }
 
+.stu-note.normative::before {
+    content: "Proposed Normative Content\A ";
+    display: flex;
+    padding: 4px 0;
+    margin-bottom: 4px;
+    background-color: unset;
+}
+
+.stu-note::before {
+    display: flex;
+    padding: 4px;
+    margin-bottom: 4px;
+}
+
+.stu-note.normative {
+    border-left-color: green;
+    background-color: #e0ffe0;
+}
+
+.stu.normative:after {
+    border-left-color: green;
+}
+
+.stu-bg.normative {
+    background-color: #e0ffe0;
+}
+
+table.grid th:has(.stu-bg.normative),
+th:has(.stu-bg.normative),
+td:has(.stu-bg.normative) {
+    background-color: #e0ffe0;
+}
+
 .stu {
     /* border-left: 5px solid #2196F3;
     background-color: #e7f3fe;*/
@@ -36,7 +69,7 @@ pre.language-fhirpath.stu {
     overflow: unset;
 }
 pre.language-fhirpath.stu:after {
-    left: -15.5px;
+    left: -16px;
 }
 
 table.stu {
@@ -54,7 +87,7 @@ blockquote.stu {
 }
 
 blockquote.stu:after {
-    left: -19.5px;
+    left: -20px;
 }
 
 blockquote.stu:before {

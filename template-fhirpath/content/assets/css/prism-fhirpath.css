@@ -23,7 +23,7 @@ pre.language-fhirpath.stu {
     overflow: unset;
 }
 pre.language-fhirpath.stu:after {
-    left: -15.5px;
+    left: -16px;
 }
 
 /* inline fhirpath code blocks used in examples */
