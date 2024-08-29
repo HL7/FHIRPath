@@ -33,6 +33,7 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 
 > **Note:** The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
 > 
+> * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
 > * [Functions - String (encode, decode, escape, unescape)](#additional-string-functions)
 > * [Functions - Math (round - due to edge cases)](#roundprecision--integer--decimal)
@@ -1262,6 +1263,31 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abcdefg'.indexOf('x') // -1
 'abcdefg'.indexOf('abcdefg') // 0
 ```
+
+#### lastIndexOf(substring : String) : Integer
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns the 0-based index of the last position `substring` is found in the input string, or -1 if it is not found.
+{:.stu}
+
+If `substring` is an empty string (`''`), the function returns 0.
+{:.stu}
+
+If the input or `substring` is empty (`{ }`), the result is empty (`{ }`).
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+'abcdefg'.lastIndexOf('bc') // 1
+'abcdefg'.lastIndexOf('x') // -1
+'abcdefg'.lastIndexOf('abcdefg') // 0
+'abc abc'.lastIndexOf('a') // 4
+```
+{:.stu}
 
 #### substring(start : Integer [, length : Integer]) : String
 
