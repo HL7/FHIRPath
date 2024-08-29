@@ -195,3 +195,9 @@ h6.appendix:before {
     counter-increment: more-detail;
     content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) "." counter(composite) "." counter(detail) "." counter(more-detail) ": ";
 }
+
+/* override the fhir label formatting inside the ANTLR code formatted block */
+.language-antlr4 .token.label {
+    font-size: unset;
+    background-color: unset;
+}
