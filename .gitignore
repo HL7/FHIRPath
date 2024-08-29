@@ -3,3 +3,5 @@ qa/
 temp/
 template/
 input-cache/
+template-fhirpath/**/.index.db
+template-fhirpath/**/.index.json
