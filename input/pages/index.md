@@ -33,6 +33,7 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 
 > **Note:** The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
 > 
+> * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
 > * [Functions - String (encode, decode, escape, unescape)](#additional-string-functions)
 > * [Functions - Math (round - due to edge cases)](#roundprecision--integer--decimal)
 > * [Functions - Utility (defineVariable, lowBoundary, highBoundary)](#definevariable)
@@ -1383,6 +1384,29 @@ If the input collection contains multiple items, the evaluation of the expressio
 'N8000123123'.matches('^N[0-9]{8}$') // returns false as the string is not an 8 char number (it has 10)
 'N8000123123'.matches('N[0-9]{8}') // returns true as the string has an 8 number sequence in it starting with `N`
 ```
+
+#### matchesFull(regex : String) : Boolean
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns `true` when the value completely matches the given regular expression (implying that the start/end of line markers `^`, `$` are always surrounding the regex expression provided).
+{:.stu}
+Regular expressions should function consistently, regardless of any culture- and locale-specific settings in the environment, should be case-sensitive, use 'single line' mode and allow Unicode characters.
+{:.stu}
+
+If the input collection or `regex` are empty, the result is empty (`{ }`).
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matchesFull('Library') // returns false
+'N8000123123'.matchesFull('N[0-9]{8}') // returns false as the string is not an 8 char number (it has 10)
+'N8000123123'.matchesFull('N[0-9]{10}') // returns true as the string has an 10 number sequence in it starting with `N`
+```
+{:.stu}
 
 #### replaceMatches(regex : String, substitution: String) : String
 
