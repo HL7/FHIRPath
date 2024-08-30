@@ -3280,7 +3280,7 @@ Get the value of the first component in the first repeat of PID-3
 Message.segment[2].elements(3).simple()
 ```
 
-Get a collection  with is the string values of all the repeats in the the 3rd element of the 2nd segment. Typically, this assumes that there is no repeats, and so this is a simple value
+Get a collection  with is the string values of all the repeats in the 3rd element of the 2nd segment. Typically, this assumes that there are no repeats, and so this is a simple value.
 
 ``` fhirpath
 Message.segment.where(code = 'PID').field[3].element.where(component[4].value = 'MR').simple()
