@@ -23,8 +23,6 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 
 > **Note:** The following sections of this specification are proposed to be updated to normative in the next release:
 > 
-> * [Literals - Long](#long)
-> * [Conversions - toLong](#tolong--long)
 > * [Functions - String (trim, split, join)](#trim--string)
 > * [Functions - Math (except for round)](#math)
 > * [Functions - Utility (precision)](#precision--integer)
@@ -33,6 +31,8 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 
 > **Note:** The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
 > 
+> * [Literals - Long](#long)
+> * [Conversions - toLong](#tolong--long)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
 > * [Functions - String (encode, decode, escape, unescape)](#additional-string-functions)
@@ -259,20 +259,20 @@ The `Integer` type represents whole numbers in the range -2<sup>31</sup> to 2<su
 > Note that the minus sign (`-`) in the representation of a negative integer is not part of the literal, it is the unary negation operator defined as part of FHIRPath syntax.
 
 ##### Long
-> **Note:** although this section is recent, it has not encountered any edge cases and support has been widely accepted. It is proposed to be normative in the next release.
-{: .stu-note.normative }
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 The `Long` type represents whole numbers in the range -2<sup>63</sup> to 2<sup>63</sup>-1.
-{:.stu.normative}
+{:.stu}
 ``` fhirpath
 0L
 45L
 -5L
 ```
-{:.stu.normative}
+{:.stu}
 
 This type corresponds to System.Long
-{:.stu.normative}
+{:.stu}
 
 #### Decimal
 
@@ -822,21 +822,18 @@ In the above expression, the addition operator expects either two Integers, or t
 
 The following table lists the possible conversions supported, and whether the conversion is implicit or explicit:
 
-|From\To |Boolean |Integer |Long *(STU)*{:.stu-bg.normative} |Decimal |Quantity |String |Date |DateTime |Time |
+|From\To |Boolean |Integer |Long *(STU)*{:.stu-bg} |Decimal |Quantity |String |Date |DateTime |Time |
 |- |- |- |- |- |- |- |- |- | - |
-|**Boolean** |N/A |Explicit | *Explicit*{:.stu-bg.normative} |Explicit |- |Explicit |- |- |- |
-|**Integer** |Explicit |N/A | *Implicit*{:.stu-bg.normative} |Implicit |Implicit |Explicit |- |- |- |
-|**Long** *(STU)*{:.stu-bg.normative} |*Explicit*{:.stu-bg.normative} |*Explicit*{:.stu-bg.normative} | *N/A*{:.stu-bg.normative} |*Implicit*{:.stu-bg.normative} |*-*{:.stu-bg.normative} |*Explicit*{:.stu-bg.normative} |*-*{:.stu-bg.normative} |*-*{:.stu-bg.normative} |*-*{:.stu-bg.normative} |
-|**Decimal** |Explicit |- | *-*{:.stu-bg.normative} |N/A |Implicit |Explicit |- |- |- |
-|**Quantity** |- |- | *-*{:.stu-bg.normative} |- |N/A |Explicit |- |- |- |
-|**String** |Explicit |Explicit | *Explicit*{:.stu-bg.normative} |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
-|**Date** |- |- | *-*{:.stu-bg.normative} |- |- |Explicit |N/A |Implicit |- |
-|**DateTime** |- |- | *-*{:.stu-bg.normative} |- |- |Explicit |Explicit |N/A |- |
-|**Time** |- |- | *-*{:.stu-bg.normative} |- |- |Explicit |- |- |N/A |
+|**Boolean** |N/A |Explicit | *Explicit*{:.stu-bg} |Explicit |- |Explicit |- |- |- |
+|**Integer** |Explicit |N/A | *Implicit*{:.stu-bg} |Implicit |Implicit |Explicit |- |- |- |
+|**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*-*{:.stu-bg} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
+|**Decimal** |Explicit |- | *-*{:.stu-bg} |N/A |Implicit |Explicit |- |- |- |
+|**Quantity** |- |- | *-*{:.stu-bg} |- |N/A |Explicit |- |- |- |
+|**String** |Explicit |Explicit | *Explicit*{:.stu-bg} |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
+|**Date** |- |- | *-*{:.stu-bg} |- |- |Explicit |N/A |Implicit |- |
+|**DateTime** |- |- | *-*{:.stu-bg} |- |- |Explicit |Explicit |N/A |- |
+|**Time** |- |- | *-*{:.stu-bg} |- |- |Explicit |- |- |N/A |
 {: .grid}
-
- ***Note:*** *The `Long` datatype conversions are proposed to be normative in the next release*
-{:.stu.normative}
 
 * Implicit - Values of the type in the From column will be implicitly converted to values of the type in the To column when necessary
 * Explicit - Values of the type in the From column can be explicitly converted using a function defined in this section
@@ -939,47 +936,47 @@ If the input collection contains multiple items, the evaluation of the expressio
 If the input collection is empty, the result is empty.
 
 ##### toLong() : Long
-> **Note:** the contents of this section are proposed to be updated to normative in the next release
-{: .stu-note.normative }
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 If the input collection contains a single item, this function will return a single integer if:
-{:.stu.normative}
+{:.stu}
 * the item is an Integer or Long
 * the item is a String and is convertible to a 64 bit integer
 * the item is a Boolean, where `true` results in a 1 and `false` results in a 0.
-{:.stu.normative}
+{:.stu}
 
 If the item is not one the above types, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the item is a String, but the string is not convertible to a 64 bit integer (using the regex format `(\+|-)?\d+`), the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 ##### convertsToLong() : Boolean
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains a single item, this function will return true if:
-{:.stu.normative}
+{:.stu}
 
 * the item is an Integer or Long
 * the item is a String and is convertible to a Long
 * the item is a Boolean
-{:.stu.normative}
+{:.stu}
 
 If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is false.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 #### Date Conversion Functions
 
