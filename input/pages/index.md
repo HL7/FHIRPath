@@ -27,6 +27,8 @@ FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions 
 > * [Functions - Math (except for round)](#math)
 > * [Functions - Utility (precision)](#precision--integer)
 > * [Aggregates](#aggregates)
+>
+> ***Note:*** *The green markings are for highlight only during ballot, they will be removed when the balloted content is approved as normative. The stu markings will remain*
 {: .stu-note.normative }
 
 > **Note:** The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
