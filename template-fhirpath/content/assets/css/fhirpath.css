@@ -28,11 +28,13 @@ blockquote.trialuse {
 
 .stu-note.normative {
     border-left-color: green;
+    border-left-style: double;
     background-color: #e0ffe0;
 }
 
 .stu.normative:after {
     border-left-color: green;
+    border-left-style: double;
 }
 
 .stu-bg.normative {
@@ -200,4 +202,25 @@ h6.appendix:before {
 .language-antlr4 .token.label {
     font-size: unset;
     background-color: unset;
+}
+
+/* Accessibility tweaks */
+:root {
+    --link-color: #3470a2; /* 13. Hyperlink text color */
+    --toc-box-bg-color: #ffff8a; /* 14. Table of Contents box background color */
+    --footer-hyperlink-text-color: #94daff; /* 15. Footer hyperlink text color */
+}
+        
+a {
+    font-weight: 500;
+}
+
+code.language-typescript, code.language-regex, code.language-txt {
+    white-space: pre-wrap;
+    overflow: unset;
+    word-break: break-word;
+}
+
+.language-antlr4 .token.punctuation {
+    color: #6e6e6e;
 }
