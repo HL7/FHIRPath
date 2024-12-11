@@ -8,19 +8,6 @@ FHIRPath is a path based navigation and extraction language, somewhat like XPath
 
 Looking for implementations? See [FHIRPath Implementations on the HL7 wiki](http://wiki.hl7.org/index.php?title=FHIRPath_Implementations)
 
-Version: 2.0.0 Public Domain ([Creative Commons 0](http://creativecommons.org/publicdomain/zero/1.0/))
-
-![ANSI Approved logo](ansi-approved.gif){: style="float: unset; margin-bottom:0;" }
-
-| Formal Name: | HL7 Cross-Paradigm Specification: FHIRPath, Release 1 |
-| = | = |
-| ANSI Designation: | ANSI/HL7 FHIRPath R1-2020 (R2024) |
-| Date of Approval: | 2024-07-24 |
-{: .colsi style="width: unset;"}
-
-FHIRPath is an ANSI Normative Standard. ANSI has certificated that the portions of this specification marked Normative have met its requirements for development of a formal standard.
-
-
 > Note: The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
 > 
 > * [Literals - Long](#long)
