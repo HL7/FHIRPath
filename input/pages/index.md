@@ -8,25 +8,19 @@ FHIRPath is a path based navigation and extraction language, somewhat like XPath
 
 Looking for implementations? See [FHIRPath Implementations on the HL7 confluence](https://confluence.hl7.org/display/FHIRI/FHIRPath+Implementations){:target="_blank"}
 
-> **Note:** The following sections of this specification are proposed to be updated to normative in the next release:
-> 
-> * [Functions - String (trim, split, join)](#trim--string)
-> * [Functions - Math (except for round)](#math)
-> * [Functions - Utility (precision)](#precision--integer)
-> * [Aggregates](#aggregates)
->
-> ***Note:*** *The green markings are for highlight only during ballot, they will be removed when the balloted content is approved as normative. The stu markings will remain*
-{: .stu-note.normative }
 
 > **Note:** The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
 > 
+> * [Aggregates](#aggregates)
 > * [Literals - Long](#long)
 > * [Conversions - toLong](#tolong--long)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
+> * [Functions - String (trim, split, join)](#trim--string)
 > * [Functions - String (encode, decode, escape, unescape)](#additional-string-functions)
-> * [Functions - Math (round - due to edge cases)](#roundprecision--integer--decimal)
+> * [Functions - Math](#math)
 > * [Functions - Utility (defineVariable, lowBoundary, highBoundary)](#definevariable)
+> * [Functions - Utility (precision)](#precision--integer)
 > * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
 > * [Types - Reflection](#reflection)
 > 
@@ -1530,224 +1524,223 @@ If no target is specified, the result is empty.
 {:.stu}
 
 #### trim() : String
-> **Note:** the contents of this section are proposed to be updated to normative in the next release
-{: .stu-note.normative }
+{: .stu }
 
 The trim function trims whitespace characters from the beginning and ending of the input string, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
-{:.stu.normative}
+{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 #### split(separator: String) : collection
-{:.stu.normative}
+{:.stu}
 
 The split function splits a singleton input string into a list of strings, using the given separator.
-{:.stu.normative}
+{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input string does not contain any appearances of the separator, the result is the input string.
-{:.stu.normative}
+{:.stu}
 
 The following example illustrates the behavior of the `.split` operator:
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 ('A,B,C').split(',') // { 'A', 'B', 'C' }
 ('ABC').split(',') // { 'ABC' }
 'A,,C'.split(',') // { 'A', '', 'C' }
 ```
-{:.stu.normative}
+{:.stu}
 
 #### join([separator: String]) : String
-{:.stu.normative}
+{:.stu}
 
 The join function takes a collection of strings and _joins_ them into a single string, optionally using the given separator.
-{:.stu.normative}
+{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If no separator is specified, the strings are directly concatenated.
-{:.stu.normative}
+{:.stu}
 
 The following example illustrates the behavior of the `.join` operator:
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 ('A' | 'B' | 'C').join() // 'ABC'
 ('A' | 'B' | 'C').join(',') // 'A,B,C'
 ```
-{:.stu.normative}
+{:.stu}
 
 ### Math
 
-> **Note:** the contents of this section are proposed to be updated to normative in the next release
-{: .stu-note.normative }
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 The functions in this section operate on collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 Note also that although all functions return collections, if a given function is defined to return a single element, the return type in the description of the function is simplified to just the type of the single element, rather than the list type.
-{:.stu.normative}
+{:.stu}
 
 The math functions in this section enable FHIRPath to be used not only for path selection, but for providing a platform-independent representation of calculation logic in artifacts such as questionnaires and documentation templates. For example:
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 (%weight/(%height.power(2))).round(1)
 ```
-{:.stu.normative}
+{:.stu}
 
 This example from a questionnaire calculates the Body Mass Index (BMI) based on the responses to the weight and height elements. For more information on the use of FHIRPath in questionnaires, see the [Structured Data Capture](http://hl7.org/fhir/uv/sdc/) (SDC) implementation guide.
-{:.stu.normative}
+{:.stu}
 
 #### abs() : Integer | Decimal | Quantity
-{:.stu.normative}
+{:.stu}
 
 Returns the absolute value of the input. When taking the absolute value of a quantity, the unit is unchanged.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 (-5).abs() // 5
 (-5.5).abs() // 5.5
 (-5.5 'mg').abs() // 5.5 'mg'
 ```
-{:.stu.normative}
+{:.stu}
 
 #### ceiling() : Integer
-{:.stu.normative}
+{:.stu}
 
 Returns the first integer greater than or equal to the input.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 1.ceiling() // 1
 1.1.ceiling() // 2
 (-1.1).ceiling() // -1
 ```
-{:.stu.normative}
+{:.stu}
 
 #### exp() : Decimal
-{:.stu.normative}
+{:.stu}
 
 Returns _e_ raised to the power of the input.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains an Integer, it will be implicitly converted to a Decimal and the result will be a Decimal.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 0.exp() // 1.0
 (-0.0).exp() // 1.0
 ```
-{:.stu.normative}
+{:.stu}
 
 #### floor() : Integer
-{:.stu.normative}
+{:.stu}
 
 Returns the first integer less than or equal to the input.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 1.floor() // 1
 2.1.floor() // 2
 (-2.1).floor() // -3
 ```
-{:.stu.normative}
+{:.stu}
 
 #### ln() : Decimal
-{:.stu.normative}
+{:.stu}
 
 Returns the natural logarithm of the input (i.e. the logarithm base _e_).
-{:.stu.normative}
+{:.stu}
 
 When used with an Integer, it will be implicitly converted to a Decimal.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 1.ln() // 0.0
 1.0.ln() // 0.0
 ```
-{:.stu.normative}
+{:.stu}
 
 #### log(base : Decimal) : Decimal
-{:.stu.normative}
+{:.stu}
 
 Returns the logarithm base `base` of the input number.
-{:.stu.normative}
+{:.stu}
 
 When used with Integers, the arguments will be implicitly converted to Decimal.
-{:.stu.normative}
+{:.stu}
 
 If `base` is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 16.log(2) // 4.0
 100.0.log(10.0) // 2.0
 ```
-{:.stu.normative}
+{:.stu}
 
 #### power(exponent : Integer | Decimal) : Integer | Decimal
-{:.stu.normative}
+{:.stu}
 
 Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer. If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal.
-{:.stu.normative}
+{:.stu}
 
 If the power cannot be represented (such as the -1 raised to the 0.5), the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input is empty, or exponent is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 2.power(3) // 8
 2.5.power(2) // 6.25
 (-1).power(0.5) // empty ({ })
 ```
-{:.stu.normative}
+{:.stu}
 
 #### round([precision : Integer]) : Decimal
 
@@ -1779,48 +1772,48 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 #### sqrt() : Decimal
 
-> **Note:** the contents of this section are proposed to be updated to normative in the next release
-{: .stu-note.normative }
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 Returns the square root of the input number as a Decimal.
-{:.stu.normative}
+{:.stu}
 
 If the square root cannot be represented (such as the square root of -1), the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 Note that this function is equivalent to raising a number of the power of 0.5 using the power() function.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 81.sqrt() // 9.0
 (-1).sqrt() // empty
 ```
-{:.stu.normative}
+{:.stu}
 
 #### truncate() : Integer
-{:.stu.normative}
+{:.stu}
 
 Returns the integer portion of the input.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 101.truncate() // 101
 1.00000001.truncate() // 1
 (-1.56).truncate() // -1
 ```
-{:.stu.normative}
+{:.stu}
 
 ### Tree navigation
 
@@ -1959,32 +1952,30 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 #### precision() : Integer
-
-> **Note:** the contents of this section are proposed to be updated to normative in the next release
-{: .stu-note.normative }
+{:.stu}
 
 If the input collection contains a single item, this function will return the number of digits of precision.
-{:.stu.normative}
+{:.stu}
 
 The function can only be used with Decimal, Date, DateTime, and Time values.
-{:.stu.normative}
+{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu.normative}
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu.normative}
+{:.stu}
 
 For Decimal values, the function returns the number of digits of precision after the decimal place in the input value.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 1.58700.precision() // 5
 ```
-{:.stu.normative}
+{:.stu}
 
 For Date and DateTime values, the function returns the number of digits of precision in the input value.
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 @2014.precision() // 4
@@ -1992,11 +1983,10 @@ For Date and DateTime values, the function returns the number of digits of preci
 @T10:30.precision() // 4
 @T10:30:00.000.precision() // 9
 ```
-{:.stu.normative}
+{:.stu}
 
 #### Extract Date/DateTime/Time components
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
+{:.stu}
 
 ##### yearOf(): Integer
 {:.stu}
@@ -2787,44 +2777,44 @@ Use parentheses to ensure the unary negation applies to the `7`:
 
 ## Aggregates
 
-> **Note:** the contents of this section are proposed to be updated to normative in the next release
-{: .stu-note.normative }
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed:
-{:.stu.normative}
+{:.stu}
 
 ### aggregate(aggregator : expression [, init : value]) : value
-{:.stu.normative}
+{:.stu}
 Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
-{:.stu.normative}
+{:.stu}
 
 The value of the `$total` variable is set to `init`, or empty (`{ }`) if no `init` value is supplied, and is set to the result of the aggregator expression after every iteration.<br/>
 The result of the aggregate function is the value of `$total` after the last iteration.
-{:.stu.normative}
+{:.stu}
 
 Using this function, sum can be expressed as:
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 value.aggregate($this + $total, 0)
 ```
-{:.stu.normative}
+{:.stu}
 
 Min can be expressed as:
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 value.aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))
 ```
-{:.stu.normative}
+{:.stu}
 
 and average would be expressed as:
-{:.stu.normative}
+{:.stu}
 
 ``` fhirpath
 value.aggregate($total + $this, 0) / value.count()
 ```
-{:.stu.normative}
+{:.stu}
 
 ## Lexical Elements
 FHIRPath defines the following lexical elements:
