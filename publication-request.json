@@ -1,11 +1,11 @@
 {
-    "package-id" : "hl7.fhir.uv.fhirpath",
-    "version" : "2.1.0-ballot",
+    "package-id" : "hl7.fhirpath",
+    "version" : "3.0.0-ballot",
     "path" : "http://hl7.org/fhirpath/2025Jan",
     "mode": "working",
     "status" : "ballot",
-    "sequence" : "STU3",
-    "desc" : "STU3 Ballot (v2.1.0)",
-    "descmd" : "STU3 Ballot applying implementer feedback, additional functions and capabilities, as well as clarifications and corrections throughout.",
+    "sequence" : "R2",
+    "desc" : "R2 STU1 Ballot (v3.0.0-ballot)",
+    "descmd" : "Release 2 STU1 Ballot applying implementer feedback, additional functions and capabilities, as well as clarifications and corrections throughout.",
     "first" : false
   }

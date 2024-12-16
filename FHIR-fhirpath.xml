@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ballotUrl="http://hl7.org/fhirpath/2025Jan" ciUrl="http://build.fhir.org/ig/HL7/FHIRPath" defaultVersion="2.0.0" defaultWorkgroup="its" gitUrl="https://github.com/HL7/FHIRPath" url="http://hl7.org/fhirpath">
+<version code="current" url="http://build.fhir.org/ig/HL7/FHIRPath"/>
+<version code="3.0.0-ballot" url="http://hl7.org/fhirpath/2025Jan"/>
+<version code="2.0.0" url="http://hl7.org/fhirpath/N1/index.html"/>
+<version code="1.3.0" deprecated="true" url="http://hl7.org/fhirpath/2019May/index.html"/>
+<version code="1.2.0" deprecated="true" url="http://hl7.org/fhirpath/2018Sep/index.html"/>
+<version code="1.1.0" deprecated="true" url="http://hl7.org/fhirpath/2018May/index.html"/>
+<version code="1.0.0" url="http://hl7.org/fhirpath/2017Jan/index.html"/>
+<version code="0.3.0" deprecated="true" url="http://hl7.org/fhirpath/2016Sept/index.html"/>
+<version code="0.2.0" deprecated="true" url="http://hl7.org/fhirpath/2016May/index.html"/>
+<version code="1.0" deprecated="true"/>
+<version code="2.0" deprecated="true"/>
+<artifactPageExtension value="-definitions"/>
+<artifactPageExtension value="-examples"/>
+<artifactPageExtension value="-mappings"/>
+<artifact deprecated="true" id="Observation/example" key="Observation" name=""/>
+<artifact deprecated="true" id="Patient/example" key="Observation" name=""/>
+<artifact id="CodeSystem/calendar-units" key="CodeSystem-calendar-units" name="Calendar Duration Units CodeSystem"/>
+<artifact id="ValueSet/calendar-units" key="ValueSet-calendar-units" name="Calendar Duration Units ValueSet"/>
+<artifact id="Questionnaire/3141" key="Questionnaire-3141" name="Cancer Quality Forum Questionnaire 2012"/>
+<artifact id="Binary/binary-grammar" key="Binary-binary-grammar" name="Grammar"/>
+<artifact id="ValueSet/example-expansion" key="ValueSet-example-expansion" name="LOINC Codes for Cholesterol in Serum/Plasma"/>
+<artifact id="Binary/binary-modelinfoschema" key="Binary-binary-modelinfoschema" name="ModelInfoSchema"/>
+<artifact id="Binary/binary-testschema" key="Binary-binary-testschema" name="TestSchema"/>
+<artifact id="Binary/binary-tests" key="Binary-binary-tests" name="Tests"/>
+<page key="NA" name="(NA)"/>
+<page key="many" name="(many)"/>
+<page deprecated="true" key="profiles" name="(profiles)"/>
+<page key="artifacts" name="Artifacts Summary"/>
+<page key="changes" name="Changes"/>
+<page key="grammar" name="FHIRPath Antlr 4.0 Grammar"/>
+<page key="index" name="FHIRPath Specification"/>
+<page key="tests" name="Fhirpath Tests"/>
+<page key="toc" name="Table of contents"/>
+<page deprecated="true" key="documentation" name="documentation"/>
+<page deprecated="true" key="fluentpath" name="fluentpath"/>
+<page deprecated="true" key="narrative" name="narrative"/>
+</specification>

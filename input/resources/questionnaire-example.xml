@@ -1,22 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><Questionnaire xmlns="http://hl7.org/fhir">
   <id value="3141"/>
-  <text>
-    <status value="generated"/>
-    <div xmlns="http://www.w3.org/1999/xhtml">
-      <pre>
-            1.Comorbidity?
-              1.1 Cardial Comorbidity
-                1.1.1 Angina?
-                1.1.2 MI?
-              1.2 Vascular Comorbidity?
-              ...
-            Histopathology
-              Abdominal
-                pT category?
-              ...
-          </pre>
-    </div>
-  </text>
   <url value="http://hl7.org/fhirpath/Questionnaire/3141"/>
 	<name value="CQFQuestionnaire2012"/>
   <title value="Cancer Quality Forum Questionnaire 2012"/>

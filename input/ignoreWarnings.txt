@@ -1,6 +1,15 @@
 == Suppressed Messages ==
 
-# Fhirpath is not fhir dependant, hence doesn't have cross version analysis or any dependencies
-An HTML fragment from the set [cross-version-analysis.xhtml, cross-version-analysis-inline.xhtml] is not included anywhere in the produced implementation guide
-An HTML fragment from the set [dependency-table.xhtml, dependency-table-short.xhtml] is not included anywhere in the produced implementation guide
-The HTML fragment 'globals-table.xhtml' is not included anywhere in the produced implementation guide
+# Example code systems, intentionally not found
+WARNING: Observation/example: Observation.code.coding[3].system: A definition for CodeSystem 'http://acme.org/devices/clinical-codes' could not be found, so the code cannot be validated
+WARNING: Observation/example: Observation.code.coding[3]: A definition for CodeSystem 'http://acme.org/devices/clinical-codes' could not be found, so the code cannot be validated
+
+# Example observation used only to demonstrate test cases for FHIRPath, performer is not relevant to the example
+WARNING: Observation/example: Observation: Best Practice Recommendation: In general, all observations should have a performer
+
+# Example value set expansion used only to demonstrate test cases for FHIRPath, this ValueSet is currently a published example in the R4 specification
+ERROR: ValueSet/example-expansion: ValueSet.compose.include[0].filter[0]: The value for a filter based on property 'parent' must be a valid code from the system 'http://loinc.org', and 'LP43571-6' is not (Unknown code 'LP43571-6' in the CodeSystem 'http://loinc.org' version '2.78'). Note that this is change from the past; terminology servers are expected to still continue to support this filter
+INFORMATION: ValueSet.where(id = 'example-expansion'): The value set expansion is too large, and only a subset has been displayed
+
+# This code system is appropriately defined in FHIRPath, it is part of the FHIRPath specification. Will seek a TSMG exemption as part of ballot process
+INFORMATION: CodeSystem/calendar-units: CodeSystem: Most code systems defined in HL7 IGs will need to move to THO later during the process. Consider giving this code system a THO URL now (See https://confluence.hl7.org/display/TSMG/Terminology+Play+Book, and/or talk to TSMG)

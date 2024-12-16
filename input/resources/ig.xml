@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--Hidden IG for de facto IG publishing-->
 <ImplementationGuide xmlns="http://hl7.org/fhir">
-  <id value="hl7.fhir.uv.fhirpath"/>
-  <url value="http://hl7.org/fhirpath/ImplementationGuide/ig"/>
-  <version value="2.1.0"/>
+  <id value="hl7.fhirpath"/>
+  <url value="http://hl7.org/fhirpath/ImplementationGuide/hl7.fhirpath"/>
+  <version value="3.0.0-ballot"/>
   <name value="FHIRPath"/>
   <title value="FHIRPath Specification"/>
   <status value="draft"/>
@@ -22,7 +22,7 @@
       <display value="World"/>
     </coding>
   </jurisdiction>
-  <packageId value="hl7.fhir.uv.fhirpath"/>
+  <packageId value="hl7.fhirpath"/>
   <fhirVersion value="4.0.1"/>
   <definition>
     <resource>
@@ -60,6 +60,27 @@
     </resource>
     <resource>
       <reference>
+        <reference value="Observation/example"/>
+      </reference>
+      <name value="Example Observation"/>
+      <description value="Example observation resource to support test cases"/>
+    </resource>
+    <resource>
+      <reference>
+        <reference value="Patient/example"/>
+      </reference>
+      <name value="Example Patient"/>
+      <description value="Example patient resource to support test cases"/>
+    </resource>
+    <resource>
+      <reference>
+        <reference value="Questionnaire/3141"/>
+      </reference>
+      <name value="Example Questionnaire 3141"/>
+      <description value="Example questionnaire resource to support test cases"/>
+    </resource>
+    <resource>
+      <reference>
         <reference value="ValueSet/calendar-units"/>
       </reference>
     </resource>
@@ -82,6 +103,11 @@
         <title value="Fhirpath Tests"/>
         <generation value="markdown"/>
       </page>
+      <page>
+        <nameUrl value="changes.html"/>
+        <title value="Changes"/>
+        <generation value="markdown"/>
+      </page>
     </page>
     <parameter>
       <code value="autoload-resources"/>
@@ -90,6 +116,14 @@
     <parameter>
       <code value="shownav"/>
       <value value="false"/>
+    </parameter>
+    <parameter>
+      <code value="releaselabel"/>
+      <value value="R2 STU1"/>
+    </parameter>
+    <parameter>
+      <code value="copyrightyear"/>
+      <value value="2014+"/>
     </parameter>
   </definition>
 </ImplementationGuide>

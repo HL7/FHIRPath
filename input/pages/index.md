@@ -3302,3 +3302,19 @@ The list of known tooling and implementation projects for the FHIRPath language 
 - [grammar.html](grammar.html)
 - [modelinfo.xsd](modelinfo.xsd)
 - <a name="fluent"></a>[Fluent] Fluent interface pattern. <https://en.wikipedia.org/wiki/Fluent_interface>{:target="_blank"}
+
+## Dependencies
+
+{% include dependency-table-short.xhtml %}
+
+## Cross Version Analysis
+
+{% include cross-version-analysis-inline.xhtml %}
+
+## Global Profiles
+
+{% include globals-table.xhtml %}
+
+## IP Statements
+
+{% include ip-statements.xhtml %}
