@@ -6,18 +6,23 @@ standards-status: normative
 
 FHIRPath is a path based navigation and extraction language, somewhat like XPath. Operations are expressed in terms of the logical content of hierarchical data models, and support traversal, selection and filtering of data. Its design was influenced by the needs for path navigation, selection and formulation of invariants in both HL7 Fast Healthcare Interoperability Resources ([FHIR](http://hl7.org/fhir)) and HL7 Clinical Quality Language ([CQL](http://cql.hl7.org/03-developersguide.html#using-fhirpath)).
 
-Looking for implementations? See [FHIRPath Implementations on the HL7 wiki](http://wiki.hl7.org/index.php?title=FHIRPath_Implementations)
+Looking for implementations? See [FHIRPath Implementations on the HL7 confluence](https://confluence.hl7.org/display/FHIRI/FHIRPath+Implementations){:target="_blank"}
 
-> Note: The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
+
+> **Note:** The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
 > 
+> * [Aggregates](#aggregates)
 > * [Literals - Long](#long)
 > * [Conversions - toLong](#tolong--long)
-> * [Functions - String (additional functions, marked as appropriate)](#additional-string-functions)
+> * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
+> * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
+> * [Functions - String (trim, split, join)](#trim--string)
+> * [Functions - String (encode, decode, escape, unescape)](#additional-string-functions)
 > * [Functions - Math](#math)
-> * [Functions - Utility defineVariable, lowBoundary, highBoundary, precision](#definevariable)
+> * [Functions - Utility (defineVariable, lowBoundary, highBoundary)](#definevariable)
+> * [Functions - Utility (precision)](#precision--integer)
 > * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
 > * [Types - Reflection](#reflection)
-> * [Aggregates](#aggregates)
 > 
 > In addition, the appendices are included as additional documentation and are informative content.
 {: .stu-note }
@@ -81,8 +86,8 @@ This specification uses the conformance verbs SHALL, MUST, SHOULD, and MAY as de
 
 * SHALL/MUST: An absolute requirement for all implementations
 * SHALL/MUST NOT: An absolute prohibition against inclusion for all implementations
-* SHOULD/SHOULD NOT: A best practice or recommendation to be considered by implementers within the context of their particular implementation; there may be valid resons to ignore an item, but the full implications must be understood and carefully weighed before choosing a different course
-* MAY: This is truly optional language for an implementation; can be inluced or omitted as the implementer decides with no implications.
+* SHOULD/SHOULD NOT: A best practice or recommendation to be considered by implementers within the context of their particular implementation; there may be valid reasons to ignore an item, but the full implications must be understood and carefully weighed before choosing a different course
+* MAY: This is truly optional language for an implementation; can be included or omitted as the implementer decides with no implications.
 
 ## Navigation model
 
@@ -237,7 +242,7 @@ The `Integer` type represents whole numbers in the range -2<sup>31</sup> to 2<su
 > Note that the minus sign (`-`) in the representation of a negative integer is not part of the literal, it is the unary negation operator defined as part of FHIRPath syntax.
 
 ##### Long
-> Note: the contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 The `Long` type represents whole numbers in the range -2<sup>63</sup> to 2<sup>63</sup>-1.
@@ -474,7 +479,7 @@ Patient.active and Patient.gender and Patient.telecom
 
 Assuming the `Patient` instance has an `active` value of `true`, a `gender` of `female` and a single `telecom` element, this expression will result in true. However, consider a different instance of `Patient` that has an `active` value of `true`, a `gender` of `male`, and multiple `telecom` elements, then this expression will result in an error because of the multiple telecom elements.
 
-Note that for repeating elements like `telecom` in the above example, the logic _looks_ like an existence check. To avoid confusion and reduce unintended errors, authors should use the explicit form of these checks when appropriate. For example, a more explicit rendering of the same logic that more clearly indicates the actual intent and avoids the run-time rror is:
+Note that for repeating elements like `telecom` in the above example, the logic _looks_ like an existence check. To avoid confusion and reduce unintended errors, authors should use the explicit form of these checks when appropriate. For example, a more explicit rendering of the same logic that more clearly indicates the actual intent and avoids the run-time error is:
 
 ``` fhirpath
 Patient.active and Patient.gender and Patient.telecom.count() = 1
@@ -525,7 +530,7 @@ The first example returns `true` if the `Patient` has any `name` elements.
 
 The second example returns `true` if the `Patient` has any `identifier` elements that have a `use` element equal to `'official'`.
 
-The third example retruns `true` if the `Patient` has any `telecom` elements that have a `system` element equal to `'phone'` and a `use` element equal to `'mobile'`.
+The third example returns `true` if the `Patient` has any `telecom` elements that have a `system` element equal to `'phone'` and a `use` element equal to `'mobile'`.
 
 And finally, the fourth example returns `true` if the `Patient` has any `generalPractitioner` elements of type `Practitioner`.
 
@@ -717,7 +722,7 @@ In the above example, the symbol `Patient` must be treated as a type identifier 
 
 The indexer operation returns a collection with only the `index`-th item (0-based index). If the input collection is empty (`{ }`), or the index lies outside the boundaries of the input collection, an empty collection is returned.
 
-> Note: Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
+> **Note:** Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 
 The following example returns the element in the `name` collection of the Patient with index 0:
 
@@ -914,7 +919,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 If the input collection is empty, the result is empty.
 
 ##### toLong() : Long
-> Note: the contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 If the input collection contains a single item, this function will return a single integer if:
@@ -1239,6 +1244,31 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abcdefg'.indexOf('abcdefg') // 0
 ```
 
+#### lastIndexOf(substring : String) : Integer
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns the 0-based index of the last position `substring` is found in the input string, or -1 if it is not found.
+{:.stu}
+
+If `substring` is an empty string (`''`), the function returns 0.
+{:.stu}
+
+If the input or `substring` is empty (`{ }`), the result is empty (`{ }`).
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+'abcdefg'.lastIndexOf('bc') // 1
+'abcdefg'.lastIndexOf('x') // -1
+'abcdefg'.lastIndexOf('abcdefg') // 0
+'abc abc'.lastIndexOf('a') // 4
+```
+{:.stu}
+
 #### substring(start : Integer [, length : Integer]) : String
 
 Returns the part of the string starting at position `start` (zero-based). If `length` is given, will return at most `length` number of characters from the input string.
@@ -1249,13 +1279,20 @@ If the input or `start` is empty, the result is empty.
 
 If an empty `length` is provided, the behavior is the same as if `length` had not been provided.
 
+If a negative or zero `length` is provided, the function returns an empty string (`''`).
+
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 ``` fhirpath
 'abcdefg'.substring(3) // 'defg'
 'abcdefg'.substring(1, 2) // 'bc'
 'abcdefg'.substring(6, 2) // 'g'
-'abcdefg'.substring(7, 1) // { }
+'abcdefg'.substring(7, 1) // { } (start position is outside the string)
+'abcdefg'.substring(-1, 1) // { } (start position is outside the string,
+                           //     this can happen when the -1 was the result of a calculation rather than explicitly provided)
+'abcdefg'.substring(3, 0) // '' (empty string)
+'abcdefg'.substring(3, -1) // '' (empty string)
+'abcdefg'.substring(-1, -1) // {} (start position is outside the string)
 ```
 
 #### startsWith(prefix : String) : Boolean
@@ -1304,7 +1341,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abc'.contains('d') // false
 ```
 
-> Note: The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the `contains` operator, which is a list operator that looks for an element in a list.
+> **Note:** The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the `contains` operator, which is a list operator that looks for an element in a list.
 
 #### upper() : String
 
@@ -1361,6 +1398,29 @@ If the input collection contains multiple items, the evaluation of the expressio
 'N8000123123'.matches('N[0-9]{8}') // returns true as the string has an 8 number sequence in it starting with `N`
 ```
 
+#### matchesFull(regex : String) : Boolean
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns `true` when the value completely matches the given regular expression (implying that the start/end of line markers `^`, `$` are always surrounding the regex expression provided).
+{:.stu}
+Regular expressions should function consistently, regardless of any culture- and locale-specific settings in the environment, should be case-sensitive, use 'single line' mode and allow Unicode characters.
+{:.stu}
+
+If the input collection or `regex` are empty, the result is empty (`{ }`).
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+``` fhirpath
+'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matchesFull('Library') // returns false
+'N8000123123'.matchesFull('N[0-9]{8}') // returns false as the string is not an 8 char number (it has 10)
+'N8000123123'.matchesFull('N[0-9]{10}') // returns true as the string has an 10 number sequence in it starting with `N`
+```
+{:.stu}
+
 #### replaceMatches(regex : String, substitution: String) : String
 
 Matches the input using the regular expression in `regex` and replaces each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression.
@@ -1376,7 +1436,7 @@ This example of `replaceMatches()` will convert a string with a date formatted a
        '${day}-${month}-${year}')
 ```
 
-> Note: Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the [\[PCRE\]](#PCRE) flavor as the dialect most likely to be broadly supported and understood.
+> **Note:** Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the [\[PCRE\]](#PCRE) flavor as the dialect most likely to be broadly supported and understood.
 
 #### length() : Integer
 
@@ -1396,7 +1456,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 ### Additional String Functions
 
-> Note: the contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 #### encode(format : String) : String
@@ -1464,7 +1524,7 @@ If no target is specified, the result is empty.
 {:.stu}
 
 #### trim() : String
-{:.stu}
+{: .stu }
 
 The trim function trims whitespace characters from the beginning and ending of the input string, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
 {:.stu}
@@ -1517,7 +1577,7 @@ The following example illustrates the behavior of the `.join` operator:
 
 ### Math
 
-> Note: the contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 The functions in this section operate on collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
@@ -1683,7 +1743,11 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 #### round([precision : Integer]) : Decimal
-{:.stu}
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+>
+> [Discussion on this topic](https://chat.fhir.org/#narrow/stream/179266-fhirpath/topic/round.28.29.20for.20negative.20numbers) If you have specific proposals or feedback please log a change request.
+{: .stu-note }
 
 Rounds the decimal to the nearest whole number using a traditional round (i.e. 0.5 or higher will round to 1). If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
 {:.stu}
@@ -1707,7 +1771,9 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 #### sqrt() : Decimal
-{:.stu}
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 
 Returns the square root of the input number as a Decimal.
 {:.stu}
@@ -1759,7 +1825,7 @@ Returns a collection with all immediate child nodes of all items in the input co
 
 Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
 
-> Note: Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
+> **Note:** Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
 
 ### Utility functions
 
@@ -1795,7 +1861,7 @@ Returns the current date.
 
 <a name="definevariable"></a>
 #### defineVariable(name: String [, expr: expression])
-> Note: The contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 Defines a variable named `name` that is accessible in subsequent expressions and has the value of `expr` if present, otherwise the value of the input collection. In either case the function does not change the input and the output is the same as the input collection.
@@ -1824,7 +1890,7 @@ group.select(
 ```
 {:.stu}
 
-> Note: this would be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
+> **Note:** this would be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
 {:.stu}
 
 #### lowBoundary([precision: Integer]): Decimal | Date | DateTime | Time
@@ -1920,8 +1986,7 @@ For Date and DateTime values, the function returns the number of digits of preci
 {:.stu}
 
 #### Extract Date/DateTime/Time components
-> Note: The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
+{:.stu}
 
 ##### yearOf(): Integer
 {:.stu}
@@ -2379,7 +2444,7 @@ The `is()` function is supported for backwards compatibility with previous imple
 Bundle.entry.resource.all($this.is(Observation) implies status = 'finished')
 ```
 
-> Note: The `is()` function is defined for backwards compatibility only and may be deprecated in a future release.
+> **Note:** The `is()` function is defined for backwards compatibility only and may be deprecated in a future release.
 
 #### as _type specifier_
 
@@ -2399,7 +2464,7 @@ The `as()` function is supported for backwards compatibility with previous imple
 Observation.component.where(value.as(Quantity) > 30 'mg')
 ```
 
-> Note: The `as()` function is defined for backwards compatibility only and may be deprecated in a future release.
+> **Note:** The `as()` function is defined for backwards compatibility only and may be deprecated in a future release.
 
 ### Collections
 
@@ -2429,7 +2494,7 @@ Patient.name.given contains 'Joe'
 ### Boolean logic
 For all boolean operators, the collections passed as operands are first evaluated as Booleans (as described in [Singleton Evaluation of Collections](#singleton-evaluation-of-collections)). The operators then use three-valued logic to propagate empty operands.
 
-> Note: To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the [`iif()`](#iif) function.
+> **Note:** To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the [`iif()`](#iif) function.
 
 #### and
 
@@ -2491,7 +2556,7 @@ The implies operator is useful for testing conditionals. For example, if a given
 ``` fhirpath
 Patient.name.given.exists() implies Patient.name.family.exists()
 CareTeam.onBehalfOf.exists() implies (CareTeam.member.resolve() is Practitioner)
-StructrureDefinition.contextInvariant.exists() implies StructureDefinition.type = 'Extension'
+StructureDefinition.contextInvariant.exists() implies StructureDefinition.type = 'Extension'
 ```
 
 Note that implies may use short-circuit evaluation in the case that the first operand evaluates to false.
@@ -2712,7 +2777,7 @@ Use parentheses to ensure the unary negation applies to the `7`:
 
 ## Aggregates
 
-> Note: the contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed:
@@ -2895,7 +2960,7 @@ Note also that these tokens are not restricted to simple types, and they may hav
 
 Attempting to access an undefined environment variable will result in an error, but accessing a defined environment variable that does not have a value specified results in empty (`{ }`).
 
-> Note: For backwards compatibility with some existing implementations, the token for an environment variable may also be a string, as in `%'us-zip'`, with no difference in semantics.
+> **Note:** For backwards compatibility with some existing implementations, the token for an environment variable may also be a string, as in `%'us-zip'`, with no difference in semantics.
 
 ## Types and Reflection
 
@@ -2911,7 +2976,7 @@ When resolving an identifier that is also the root of a FHIRPath expression, it 
 
 ### Reflection
 
-> Note: The contents of this section are Standard for Trial Use (STU)
+> **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
 FHIRPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection, using one of the following concrete subtypes of `TypeInfo`:
@@ -3015,7 +3080,7 @@ Results in:
 #### Anonymous Types
 {:.stu}
 
-Anonymous types are structured types that have no associated name, only the elements of the structre. For example, in FHIR, the `Patient.contact` element has multiple sub-elements, but is not explicitly named. For types such as this, the result is a `TupleTypeInfo`:
+Anonymous types are structured types that have no associated name, only the elements of the structure. For example, in FHIR, the `Patient.contact` element has multiple sub-elements, but is not explicitly named. For types such as this, the result is a `TupleTypeInfo`:
 {:.stu}
 
 ``` typescript
@@ -3050,7 +3115,7 @@ Results in:
 ```
 {:.stu}
 
-> Note: These structures are a subset of the abstract metamodel used by the [Clinical Quality Language Tooling](https://github.com/cqframework/clinical_quality_language).
+> **Note:** These structures are a subset of the abstract metamodel used by the [Clinical Quality Language Tooling](https://github.com/cqframework/clinical_quality_language).
 {:.stu}
 
 ## Type safety and strict evaluation
@@ -3133,7 +3198,7 @@ The formal syntax for FHIRPath is specified as an [Antlr 4.0](http://www.antlr.o
 
 [grammar.html](grammar.html)
 
-> Note: If there are discrepancies between this documentation and the grammar included at the above link, the grammar is considered the source of truth.
+> **Note:** If there are discrepancies between this documentation and the grammar included at the above link, the grammar is considered the source of truth.
 
 ### Model Information
 
@@ -3141,7 +3206,7 @@ The model information returned by the reflection function `type()`  is specified
 
 [modelinfo.xsd](modelinfo.xsd)
 
-> Note: The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the normative [Reflection](#reflection) section above.
+> **Note:** The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the normative [Reflection](#reflection) section above.
 
 As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and tooling should respect the case-sensitive settings for each model.
 
@@ -3158,13 +3223,13 @@ In addition, a media type is defined to support describing FHIRPath content:
 text/fhirpath
 ```
 
-> Note: The appendices are included for informative purposes and are not a normative part of the specification.
+> **Note:** The appendices are included for informative purposes and are not a normative part of the specification.
 
 <a name="hl7v2"></a>
 ## Use of FHIRPath on HL7 Version 2 messages
 {: .appendix }
 
-FHIRPath can be used against HL7 V2 messages. This UML diagram summarises the
+FHIRPath can be used against HL7 V2 messages. This UML diagram summarizes the
 Object Model on which the FHIRPath statements are written:
 
 ![Class Model for HL7 V2](v2-class-model.png){: height="456",width="760"}
@@ -3194,7 +3259,7 @@ Get the value of the first component in the first repeat of PID-3
 Message.segment[2].elements(3).simple()
 ```
 
-Get a collection  with is the string values of all the repeats in the the 3rd element of the 2nd segement. Typically, this assumes that there is no repeats, and so this is a simple value
+Get a collection  with is the string values of all the repeats in the 3rd element of the 2nd segment. Typically, this assumes that there are no repeats, and so this is a simple value.
 
 ``` fhirpath
 Message.segment.where(code = 'PID').field[3].element.where(component[4].value = 'MR').simple()
@@ -3219,41 +3284,21 @@ Note that if the parser cannot properly parse the Abstract Message Syntax, group
 ## FHIRPath Tooling and Implementation
 {: .appendix }
 
-This section lists known tooling and implementation projects for the FHIRPath language:
+The list of known tooling and implementation projects for the FHIRPath language has been moved to the [HL7 confluence site](https://confluence.hl7.org/display/FHIRI/FHIRPath+Implementations){:target="_blank"}
 
-* JavaScript: https://github.com/HL7/fhirpath.js/
-* Java RI: In the FHIR build tooling at org.hl7.fhir.dstu3.utils.FHIRPathEngine
-* Pascal RI: https://github.com/grahamegrieve/fhirserver/blob/master/library/r3/FHIR.R3.PathEngine.pas
-* .NET RI: https://github.com/ewoutkramer/fhir-net-fhirpath
-
-In addition, there is a Notepad++ FHIR Plugin that enables evaluation of FHIRPath expressions:
-
-http://www.healthintersections.com.au/?p=2386
-
-There is a test harness for FHIRPath here:
-
-https://github.com/brianpos/FhirPathTester
-
-The CQL-to-ELM translator that is maintained as part of the tooling for Clinical Quality Language supports FHIRPath:
-
-https://github.com/cqframework/clinical_quality_language
-
-For the most current listing of known implementations, refer to the HL7 wiki:
-
-http://wiki.hl7.org/index.php?title=FHIRPath_Implementations
 
 ## References
 {: .appendix }
 
 <a name="bibliography"></a>
-- <a name="ANTLR"></a>[ANTLR] Another Tool for Language Recognition (ANTLR) <http://www.antlr.org/>
-- <a name="ISO8601"></a>[ISO8601] Date and time format - ISO 8601. <https://www.iso.org/iso-8601-date-and-time-format.html>
-- <a name="CQL"></a>[CQL] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.3. <http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400>
-- <a name="MOF"></a>[MOF] Meta Object Facility. <https://www.omg.org/spec/MOF/>, version 2.5.1, November 2016
-- <a name="XMLRE"></a>[XMLRE] Regular Expressions. XML Schema 1.1. <https://www.w3.org/TR/xmlschema11-2/#regexs>
-- <a name="PCRE"></a>[PCRE] Pearl-Compatible Regular Expressions. <http://www.pcre.org/>
-- <a name="UCUM"></a>[UCUM] Unified Code for Units of Measure (UCUM) <http://unitsofmeasure.org/ucum.html>, Version 2.1, Revision 442 (2017-11-21)
-- <a name="FHIR"></a>[FHIR] HL7 Fast Healthcare Interoperability Resources <http://hl7.org/fhir>
+- <a name="ANTLR"></a>[ANTLR] Another Tool for Language Recognition (ANTLR) <http://www.antlr.org/>{:target="_blank"}
+- <a name="ISO8601"></a>[ISO8601] Date and time format - ISO 8601. <https://www.iso.org/iso-8601-date-and-time-format.html>{:target="_blank"}
+- <a name="CQL"></a>[CQL] HL7 Cross-Paradigm Specification: Clinical Quality Language, Release 1, STU Release 1.3. <http://www.hl7.org/implement/standards/product_brief.cfm?product_id=400>{:target="_blank"}
+- <a name="MOF"></a>[MOF] Meta Object Facility. <https://www.omg.org/spec/MOF/>{:target="_blank"}, version 2.5.1, November 2016
+- <a name="XMLRE"></a>[XMLRE] Regular Expressions. XML Schema 1.1. <https://www.w3.org/TR/xmlschema11-2/#regexs>{:target="_blank"}
+- <a name="PCRE"></a>[PCRE] Pearl-Compatible Regular Expressions. <http://www.pcre.org/>{:target="_blank"}
+- <a name="UCUM"></a>[UCUM] Unified Code for Units of Measure (UCUM) <http://unitsofmeasure.org/ucum.html>{:target="_blank"}, Version 2.1, Revision 442 (2017-11-21)
+- <a name="FHIR"></a>[FHIR] HL7 Fast Healthcare Interoperability Resources <http://hl7.org/fhir>{:target="_blank"}
 - [grammar.html](grammar.html)
 - [modelinfo.xsd](modelinfo.xsd)
-- <a name="fluent"></a>[Fluent] Fluent interface pattern. <https://en.wikipedia.org/wiki/Fluent_interface>
+- <a name="fluent"></a>[Fluent] Fluent interface pattern. <https://en.wikipedia.org/wiki/Fluent_interface>{:target="_blank"}

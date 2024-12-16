@@ -1,12 +1,14 @@
 /* Custom formatting for the code blocks */
 pre.language-fhirpath {
-    background-color: #eee;
+    background-color: #fbfbfb78;
     text-shadow: unset;
 }
 
 pre.language-fhirpath code.language-fhirpath {
     white-space: pre-wrap;
     text-shadow: unset;
+    word-break: break-word;
+    overflow: unset;
 }
 
 .token.operator,
@@ -23,7 +25,7 @@ pre.language-fhirpath.stu {
     overflow: unset;
 }
 pre.language-fhirpath.stu:after {
-    left: -15.5px;
+    left: -16px;
 }
 
 /* inline fhirpath code blocks used in examples */
@@ -35,4 +37,31 @@ pre.language-fhirpath.stu:after {
     display: inline-block;
     margin: 2px 0;
     text-shadow: unset;
+}
+
+/* Color changes to improve accessibility */
+.token.atrule, .token.attr-value, .token.keyword
+{
+    color: #0071a1;
+}
+
+.token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted {
+    color: #4c7400;
+}
+
+.token.comment, .token.prolog, .token.doctype, .token.cdata {
+    color: #5f6c7a;
+}
+
+.token.regex, .token.important, .token.variable {
+    color: #925d00;
+    font-weight: bold;
+}
+
+.token.function, .token.class-name {
+    color: #bc3e58;
+}
+
+.language-typescript .nl, .language-typescript .na {
+    color: #006699;
 }

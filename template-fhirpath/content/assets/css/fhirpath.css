@@ -12,6 +12,41 @@ blockquote.trialuse {
     background-color: #e7f3fe;
 }
 
+.stu-note.normative::before {
+    content: "Proposed Normative Content\A ";
+    display: flex;
+    padding: 4px 0;
+    margin-bottom: 4px;
+    background-color: unset;
+}
+
+.stu-note::before {
+    display: flex;
+    padding: 4px;
+    margin-bottom: 4px;
+}
+
+.stu-note.normative {
+    border-left-color: green;
+    border-left-style: double;
+    background-color: #e0ffe0;
+}
+
+.stu.normative:after {
+    border-left-color: green;
+    border-left-style: double;
+}
+
+.stu-bg.normative {
+    background-color: #e0ffe0;
+}
+
+table.grid th:has(.stu-bg.normative),
+th:has(.stu-bg.normative),
+td:has(.stu-bg.normative) {
+    background-color: #e0ffe0;
+}
+
 .stu {
     /* border-left: 5px solid #2196F3;
     background-color: #e7f3fe;*/
@@ -36,7 +71,7 @@ pre.language-fhirpath.stu {
     overflow: unset;
 }
 pre.language-fhirpath.stu:after {
-    left: -15.5px;
+    left: -16px;
 }
 
 table.stu {
@@ -54,7 +89,7 @@ blockquote.stu {
 }
 
 blockquote.stu:after {
-    left: -19.5px;
+    left: -20px;
 }
 
 blockquote.stu:before {
@@ -161,4 +196,31 @@ h6.appendix:before {
     color: silver;
     counter-increment: more-detail;
     content: "Appendix " counter(appendix, upper-alpha) "." counter(sub-section) "." counter(composite) "." counter(detail) "." counter(more-detail) ": ";
+}
+
+/* override the fhir label formatting inside the ANTLR code formatted block */
+.language-antlr4 .token.label {
+    font-size: unset;
+    background-color: unset;
+}
+
+/* Accessibility tweaks */
+:root {
+    --link-color: #3470a2; /* 13. Hyperlink text color */
+    --toc-box-bg-color: #ffff8a; /* 14. Table of Contents box background color */
+    --footer-hyperlink-text-color: #94daff; /* 15. Footer hyperlink text color */
+}
+        
+a {
+    font-weight: 500;
+}
+
+code.language-typescript, code.language-regex, code.language-txt {
+    white-space: pre-wrap;
+    overflow: unset;
+    word-break: break-word;
+}
+
+.language-antlr4 .token.punctuation {
+    color: #6e6e6e;
 }
