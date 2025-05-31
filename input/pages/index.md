@@ -1148,7 +1148,7 @@ If the input collection contains a single item, this function will return a sing
 * the item in the input collection is an Integer, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation
 * the item is a Boolean, where `true` results in `'true'` and `false` in `'false'`.
 
-If the item is not one of the above types, the result is false.
+If the item is not one of the above types, the result is empty.
 
 The String representation uses the following formats:
 
