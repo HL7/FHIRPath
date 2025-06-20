@@ -828,7 +828,7 @@ The functions in this section operate on collections with a single item. If ther
 <a name="iif"></a>
 #### iif(criterion: expression, true-result: collection [, otherwise-result: collection]) : collection
 
-The `iif` function in FHIRPath is an _immediate if_, also known as a conditional operator (such as C's `? :` operator).
+The `iif` function in FHIRPath is an _immediate if_, also known as a conditional operator (such as the C programming language's `? :` operator).
 
 The `criterion` expression is expected to evaluate to a Boolean.
 
