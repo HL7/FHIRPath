@@ -2473,8 +2473,8 @@ Merge the two collections into a single collection, eliminating any duplicate va
 
 See the [union](#unionother-collection) function for more detail.
 
-#### in (membership)
-If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
+#### in (membership) : Boolean
+If the left operand is a collection with a single item, this operator returns `true` if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is `false`. If the left operand has multiple items, an exception is thrown.
 
 The following example returns true if `'Joe'` is in the list of given names for the Patient:
 
@@ -2482,8 +2482,8 @@ The following example returns true if `'Joe'` is in the list of given names for 
 'Joe' in Patient.name.given
 ```
 
-#### contains (containership)
-If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is false. This is the converse operation of in.
+#### contains (containership) : Boolean
+If the right operand is a collection with a single item, this operator returns `true` if the item is in the left operand using equality semantics. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is `false`. This is the converse operation of `in`.
 
 The following example returns true if the list of given names for the Patient has `'Joe'` in it:
 
