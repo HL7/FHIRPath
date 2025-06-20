@@ -1423,7 +1423,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 #### replaceMatches(regex : String, substitution: String) : String
 
-Matches the input using the regular expression in `regex` and replaces each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression.
+Matches the input using the regular expression in `regex` and replaces each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression, as illustrated by the example below that uses named capture groups for `month`, `day`, and `year` to perform a conversion from one date format to another.
 
 If the input collection, `regex`, or `substitution` are empty, the result is empty (`{ }`).
 
