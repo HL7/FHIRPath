@@ -477,7 +477,7 @@ As another example:
 Patient.active and Patient.gender and Patient.telecom
 ```
 
-Assuming the `Patient` instance has an `active` value of `true`, a `gender` of `female` and a single `telecom` element, this expression will result in true. However, consider a different instance of `Patient` that has an `active` value of `true`, a `gender` of `male`, and multiple `telecom` elements, then this expression will result in an error because of the multiple telecom elements.
+Assuming the `Patient` instance has an `active` value of `true`, a `gender` of `female` and a single `telecom` element, this expression will result in `true`. However, consider a different instance of `Patient` that has an `active` value of `true`, a `gender` of `male`, and multiple `telecom` elements, then this expression will result in an error because of the multiple telecom elements.
 
 Note that for repeating elements like `telecom` in the above example, the logic _looks_ like an existence check. To avoid confusion and reduce unintended errors, authors should use the explicit form of these checks when appropriate. For example, a more explicit rendering of the same logic that more clearly indicates the actual intent and avoids the run-time error is:
 
@@ -542,7 +542,7 @@ Returns `true` if for every element in the input collection, `criteria` evaluate
 generalPractitioner.all($this.resolve() is Practitioner)
 ```
 
-This example returns true if all of the `generalPractitioner` elements are of type `Practitioner`.
+This example returns `true` if all of the `generalPractitioner` elements are of type `Practitioner`.
 
 #### allTrue() : Boolean
 
@@ -590,7 +590,7 @@ Returns `true` if all items in the input collection are members of the collectio
 
 Conceptually, this function is evaluated by testing each element in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
 
-The following example returns true if the tags defined in any contained resource are a subset of the tags defined in the MedicationRequest resource:
+The following example returns `true` if the tags defined in any contained resource are a subset of the tags defined in the MedicationRequest resource:
 
 ``` fhirpath
 MedicationRequest.contained.meta.tag.subsetOf(MedicationRequest.meta.tag)
@@ -602,7 +602,7 @@ Returns `true` if all items in the collection passed as the `other` argument are
 
 Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
 
-The following example returns true if the tags defined in any contained resource are a superset of the tags defined in the MedicationRequest resource:
+The following example returns `true` if the tags defined in any contained resource are a superset of the tags defined in the MedicationRequest resource:
 
 ``` fhirpath
 MedicationRequest.contained.meta.tag.supersetOf(MedicationRequest.meta.tag)
@@ -636,7 +636,7 @@ Conceptually, this function is shorthand for a comparison of the `count()` of th
 X.count() = X.distinct().count()
 ```
 
-This means that if the input collection is empty (`{ }`), the result is true.
+This means that if the input collection is empty (`{ }`), the result is `true`.
 
 ### Filtering and projection
 
@@ -832,11 +832,11 @@ The `iif` function in FHIRPath is an _immediate if_, also known as a conditional
 
 The `criterion` expression is expected to evaluate to a Boolean.
 
-If `criterion` is true, the function returns the value of the `true-result` argument.
+If `criterion` is `true`, the function returns the value of the `true-result` argument.
 
 If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
 
-Note that short-circuit behavior is expected in this function. In other words, `true-result` should only be evaluated if the `criterion` evaluates to true, and `otherwise-result` should only be evaluated otherwise. For implementations, this means delaying evaluation of the arguments.
+Note that short-circuit behavior is expected in this function. In other words, `true-result` should only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` should only be evaluated otherwise. For implementations, this means delaying evaluation of the arguments.
 
 #### Boolean Conversion Functions
 
@@ -871,14 +871,14 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToBoolean() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a Boolean
 * the item is an Integer that is equal to one of the possible integer representations of Boolean values
 * the item is a Decimal that is equal to one of the possible decimal representations of Boolean values
 * the item is a String that is equal to one of the possible string representations of Boolean values
 
-If the item is not one of the above types, or the item is a String, Integer, or Decimal, but is not equal to one of the possible values convertible to a Boolean, the result is false.
+If the item is not one of the above types, or the item is a String, Integer, or Decimal, but is not equal to one of the possible values convertible to a Boolean, the result is `false`.
 
 Possible values for Integer, Decimal, and String are described in the toBoolean() function.
 
@@ -906,13 +906,13 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToInteger() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is an Integer
 * the item is a String and is convertible to an Integer
 * the item is a Boolean
 
-If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is false.
+If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -944,7 +944,7 @@ If the input collection is empty, the result is empty.
 ##### convertsToLong() : Boolean
 {:.stu}
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 {:.stu}
 
 * the item is an Integer or Long
@@ -952,7 +952,7 @@ If the input collection contains a single item, this function will return true i
 * the item is a Boolean
 {:.stu}
 
-If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is false.
+If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is `false`.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -981,13 +981,13 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToDate() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a Date
 * the item is a DateTime
 * the item is a String and is convertible to a Date
 
-If the item is not one of the above types, or is not convertible to a Date (using the format **YYYY-MM-DD**), the result is false.
+If the item is not one of the above types, or is not convertible to a Date (using the format **YYYY-MM-DD**), the result is `false`.
 
 If the item contains a partial date (e.g. `'2012-01'`), the result is a partial date.
 
@@ -1017,13 +1017,13 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToDateTime() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a DateTime
 * the item is a Date
 * the item is a String and is convertible to a DateTime
 
-If the item is not one of the above types, or is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**), the result is false.
+If the item is not one of the above types, or is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1049,13 +1049,13 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToDecimal() : Boolean
 
-If the input collection contains a single item, this function will true if:
+If the input collection contains a single item, this function will `true` if:
 
 * the item is an Integer or Decimal
 * the item is a String and is convertible to a Decimal
 * the item is a Boolean
 
-If the item is not one of the above types, or is not convertible to a Decimal (using the regex format `(\+|-)?\d+(\.\d+)?`), the result is false.
+If the item is not one of the above types, or is not convertible to a Decimal (using the regex format `(\+|-)?\d+(\.\d+)?`), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1116,7 +1116,7 @@ q.toQuantity('g') // changes the value and units in the quantity according to UC
 
 ##### convertsToQuantity([unit : String]) : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is an Integer, Decimal, or Quantity
 * the item is a String that is convertible to a Quantity
@@ -1128,15 +1128,15 @@ If the item is not one of the above types, or is not convertible to a Quantity u
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ```
 
-then the result is false.
+then the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
 
-If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
+If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is `true`, otherwise, the result is `false`.
 
-> Implementations are not required to support a complete UCUM implementation, and may return false when the `unit` argument is used and it is different than the input quantity unit.
+> Implementations are not required to support a complete UCUM implementation, and may return `false` when the `unit` argument is used and it is different than the input quantity unit.
 
 #### String Conversion Functions
 
@@ -1171,14 +1171,14 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToString() : String
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a String
 * the item is an Integer, Decimal, Date, Time, or DateTime
 * the item is a Boolean
 * the item is a Quantity
 
-If the item is not one of the above types, the result is false.
+If the item is not one of the above types, the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1205,12 +1205,12 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToTime() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a Time
 * the item is a String and is convertible to a Time
 
-If the item is not one of the above types, or is not convertible to a Time (using the format **hh:mm:ss.fff(+\|-)hh:mm**), the result is false.
+If the item is not one of the above types, or is not convertible to a Time (using the format **hh:mm:ss.fff(+\|-)hh:mm**), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -2310,7 +2310,7 @@ For example:
 
 ##### String Equivalence
 
-For strings, equivalence returns true if the strings are the same value while ignoring case and locale, and normalizing whitespace. Normalizing whitespace means that all whitespace characters are treated as equivalent, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
+For strings, equivalence returns `true` if the strings are the same value while ignoring case and locale, and normalizing whitespace. Normalizing whitespace means that all whitespace characters are treated as equivalent, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
 
 #### != (Not Equals)
 
@@ -2348,7 +2348,7 @@ See the [Equals](#equals) operator for discussion on respecting timezone offsets
 
 #### &gt; (Greater Than)
 
-The greater than operator (`>`) returns true if the first operand is strictly greater than the second. The operands must be of the same type, or convertible to the same type using an implicit conversion.
+The greater than operator (`>`) returns `true` if the first operand is strictly greater than the second. The operands must be of the same type, or convertible to the same type using an implicit conversion.
 
 ``` fhirpath
 10 > 5 // true
@@ -2367,7 +2367,7 @@ The greater than operator (`>`) returns true if the first operand is strictly gr
 
 #### &lt; (Less Than)
 
-The less than operator (`<`) returns true if the first operand is strictly less than the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The less than operator (`<`) returns `true` if the first operand is strictly less than the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
 
 ``` fhirpath
 10 < 5 // false
@@ -2386,7 +2386,7 @@ The less than operator (`<`) returns true if the first operand is strictly less 
 
 #### &lt;= (Less or Equal)
 
-The less or equal operator (`\<=`) returns true if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The less or equal operator (`\<=`) returns `true` if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
 
 ``` fhirpath
 10 <= 5 // true
@@ -2405,7 +2405,7 @@ The less or equal operator (`\<=`) returns true if the first operand is less tha
 
 #### &gt;= (Greater or Equal)
 
-The greater or equal operator (`>=`) returns true if the first operand is greater than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The greater or equal operator (`>=`) returns `true` if the first operand is greater than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
 
 ``` fhirpath
 10 >= 5 // false
@@ -2476,7 +2476,7 @@ See the [union](#unionother-collection) function for more detail.
 #### in (membership) : Boolean
 If the left operand is a collection with a single item, this operator returns `true` if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is `false`. If the left operand has multiple items, an exception is thrown.
 
-The following example returns true if `'Joe'` is in the list of given names for the Patient:
+The following example returns `true` if `'Joe'` is in the list of given names for the Patient:
 
 ``` fhirpath
 'Joe' in Patient.name.given
@@ -2485,7 +2485,7 @@ The following example returns true if `'Joe'` is in the list of given names for 
 #### contains (containership) : Boolean
 If the right operand is a collection with a single item, this operator returns `true` if the item is in the left operand using equality semantics. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is `false`. This is the converse operation of `in`.
 
-The following example returns true if the list of given names for the Patient has `'Joe'` in it:
+The following example returns `true` if the list of given names for the Patient has `'Joe'` in it:
 
 ``` fhirpath
 Patient.name.given contains 'Joe'
@@ -2559,7 +2559,7 @@ CareTeam.onBehalfOf.exists() implies (CareTeam.member.resolve() is Practitioner)
 StructureDefinition.contextInvariant.exists() implies StructureDefinition.type = 'Extension'
 ```
 
-Note that implies may use short-circuit evaluation in the case that the first operand evaluates to false.
+Note that implies may use short-circuit evaluation in the case that the first operand evaluates to `false`.
 
 ### Math
 
@@ -3156,7 +3156,7 @@ Apart from throwing exceptions, unexpected outcomes may result because of the wa
 Patient.name.given = 'Wouter'
 ```
 
-will return false as soon as a patient has multiple names, even though one of those may well be 'Wouter'. Again, this can be corrected:
+will return `false` as soon as a patient has multiple names, even though one of those may well be 'Wouter'. Again, this can be corrected:
 
 ``` fhirpath
 Patient.name.where(given = 'Wouter').exists()
