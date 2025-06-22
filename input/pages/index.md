@@ -789,9 +789,25 @@ e.g. `x.union(y)`{:.fhirpath} is synonymous with `x | y`{:.fhirpath}
 
 e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name property.
 
-#### combine(other : collection) : collection
+#### combine(other : collection, [preserveOrder : Boolean]) : collection
 
-Merge the input and other collections into a single collection without eliminating duplicate values. Combining an empty collection with a non-empty collection will return the non-empty collection. There is no expectation of order in the resulting collection.
+Merge the input and other collections into a single collection without eliminating duplicate values. Combining an empty collection with a non-empty collection will return the non-empty collection.
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+By default, the order of the resulting collection is not guaranteed. When the `preserveOrder` parameter is `true`, the function preserves the order of both collections by performing a list-style "append" operation instead of set-based combination.
+{: .stu}
+
+For example, considering the same two lists of integers used in the union example `A: 1, 1, 2, 3` and `B: 2, 3`:
+{: .stu}
+```fhirpath
+A.combine(B) // 1, 1, 2, 2, 3, 3 - order is not guaranteed to be preserved (could be in any order)
+A.combine(B, true) // 1, 1, 2, 3, 2, 3 - The order is preserved using the `preserveOrder` argument
+A.combine( {} ) // 1, 1, 2, 3 - combining an empty collection with a non-empty collection returns the non-empty collection
+```
+{: .stu}
+Note that the duplicate `1`s are not removed from the collection using combine, where using `union` or `|` they would have been.
+{: .stu}
 
 ### Conversion
 
