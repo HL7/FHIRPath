@@ -6,6 +6,6 @@ standards-status: informative
 
 # FHIRPath Tests
 
-A set of tests for FHIR are attached to this page. The tests include operational tests for FHIR R4.
+A thorough set of test cases for FHIRPath are located in the <a href="https://github.com/FHIR/fhir-test-cases/blob/master/r5/fhirpath/tests-fhir-r5.xml" target="_blank">FHIR-test-cases</a> GitHub repository.
 
-<a href="tests.zip">Test Source</a>.
+These tests include operational tests for FHIR R5, and reference example resources in the <a href="https://github.com/FHIR/fhir-test-cases/tree/master/r5/examples" target="_blank">examples folder</a> in that repository.
