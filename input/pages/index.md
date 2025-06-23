@@ -2372,12 +2372,12 @@ The greater than operator (`>`) returns `true` if the first operand is strictly 
 'abc' > 'ABC' // true
 4 'm' > 4 'cm' // true (or { } if the implementation does not support unit conversion)
 @2018-03-01 > @2018-01-01 // true
-@2018-03 > @2018-03-01 // empty ({ })
+@2018-03 > @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 > @2018-03-01T10:00:00 // true
-@2018-03-01T10 > @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10 > @2018-03-01T10:30 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 > @2018-03-01T10:30:00.0 // false
 @T10:30:00 > @T10:00:00 // true
-@T10 > @T10:30 // empty ({ })
+@T10 > @T10:30 // empty ({ }) - different precisions
 @T10:30:00 > @T10:30:00.0 // false
 ```
 
@@ -2391,12 +2391,12 @@ The less than operator (`<`) returns `true` if the first operand is strictly les
 'abc' < 'ABC' // false
 4 'm' < 4 'cm' // false (or { } if the implementation does not support unit conversion)
 @2018-03-01 < @2018-01-01 // false
-@2018-03 < @2018-03-01 // empty ({ })
+@2018-03 < @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 < @2018-03-01T10:00:00 // false
-@2018-03-01T10 < @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10 < @2018-03-01T10:30 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 < @2018-03-01T10:30:00.0 // false
 @T10:30:00 < @T10:00:00 // false
-@T10 < @T10:30 // empty ({ })
+@T10 < @T10:30 // empty ({ }) - different precisions
 @T10:30:00 < @T10:30:00.0 // false
 ```
 
@@ -2410,12 +2410,12 @@ The less or equal operator (`\<=`) returns `true` if the first operand is less t
 'abc' <= 'ABC' // true
 4 'm' <= 4 'cm' // false (or { } if the implementation does not support unit conversion)
 @2018-03-01 <= @2018-01-01 // false
-@2018-03 <= @2018-03-01 // empty ({ })
+@2018-03 <= @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 <= @2018-03-01T10:00:00 // false
-@2018-03-01T10 <= @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10 <= @2018-03-01T10:30 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0 // true
 @T10:30:00 <= @T10:00:00 // false
-@T10 <= @T10:30 // empty ({ })
+@T10 <= @T10:30 // empty ({ }) - different precisions
 @T10:30:00 <= @T10:30:00.0 // true
 ```
 
@@ -2429,12 +2429,12 @@ The greater or equal operator (`>=`) returns `true` if the first operand is grea
 'abc' >= 'ABC' // false
 4 'm' >= 4 'cm' // true (or { } if the implementation does not support unit conversion)
 @2018-03-01 >= @2018-01-01 // true
-@2018-03 >= @2018-03-01 // empty ({ })
+@2018-03 >= @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 >= @2018-03-01T10:00:00 // true
-@2018-03-01T10 >= @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10 >= @2018-03-01T10:30 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0 // true
 @T10:30:00 >= @T10:00:00 // true
-@T10 >= @T10:30 // empty ({ })
+@T10 >= @T10:30 // empty ({ }) - different precisions
 @T10:30:00 >= @T10:30:00.0 // true
 ```
 
