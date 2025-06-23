@@ -2708,6 +2708,13 @@ For `DateTime` values, the quantity unit must be one of: `years`, `months`, `wee
 
 For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
 
+As `Time` is cyclic, the result of overflowing the time value will be wrapped around the beginning of the day, so that adding 1 hour to `@T23:30:00` will result in `@T00:30:00` of the previous day, which is consistent with the behaviour of `DateTime` values.
+{:.stu}
+```fhirpath
+@T23:30:00 + 1 hour // @T00:30:00
+```
+{:.stu}
+
 For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
 
 For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value. For example:
@@ -2737,6 +2744,14 @@ For `Date` values, the quantity unit must be one of: `years`, `months`, `weeks`,
 For `DateTime` values, the quantity unit must be one of: `years`, `months`, `weeks`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
 
 For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
+
+As `Time` is cyclic, the result of overflowing the time value will be wrapped around the beginning of the day, so that subtracting 1 hour from `@T00:30:00` will result in `@T23:30:00` of the previous day, which is consistent with the behaviour of `DateTime` values.
+{:.stu}
+```fhirpath
+@T00:30:00 - 1 hour // @T23:30:00
+@T01:00:00 - 2 hours // @T23:00:00
+```
+{:.stu}
 
 For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
 
