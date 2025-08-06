@@ -1793,7 +1793,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 #### power(exponent : Integer | Decimal) : Integer | Decimal
 {:.stu}
 
-Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer. If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal.
+Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer (unless the exponent is negative, which can result in a decimal). If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal.
 {:.stu}
 
 If the power cannot be represented (such as the -1 raised to the 0.5), the result is empty.
