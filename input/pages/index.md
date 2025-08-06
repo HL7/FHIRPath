@@ -427,6 +427,12 @@ In general, functions in FHIRPath operate on collections and return new collecti
 Patient.telecom.where(use = 'official').union(Patient.contact.telecom.where(use = 'official')).exists().not()
 ```
 
+However not all functions support multiple items in the input collection, some expect only a single item and will be explicitly documented. Further details are available in the ["singleton evaluation of collections"](#singleton-evaluation-of-collections) section.
+{:.stu}
+
+Singleton only functions can be run on collections by using the function inside a [`select(...)`](#selectprojection-expression--collection) to evaluate the function for each item in the collection.
+{:.stu}
+
 For a complete listing of the functions defined in FHIRPath, refer to the [Functions](#functions) section.
 
 ### Null and empty
