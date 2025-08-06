@@ -1510,7 +1510,7 @@ This example of `replaceMatches()` will convert a string with a date formatted a
 
 #### length() : Integer
 
-Returns the length of the input string. If the input collection is empty (`{ }`), the result is empty.
+Returns the number of characters in the input string. If the input collection is empty (`{ }`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
