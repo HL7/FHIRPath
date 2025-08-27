@@ -2504,7 +2504,7 @@ The less than operator (`<`) returns `true` if the first operand is strictly les
 
 #### &lt;= (Less or Equal)
 
-The less or equal operator (`\<=`) returns `true` if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The less or equal operator (`<=`) returns `true` if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
 
 ``` fhirpath
 10 <= 5 // true
@@ -3014,7 +3014,7 @@ Symbols provide structure to the language and allow symbolic invocation of commo
 |`{}`|Braces for delimiting exclusively empty lists|
 |`.`|Period for qualifiers, accessors, and dot-invocation|
 |`,`|Comma for delimiting items in a syntactic list|
-|`= != \<= < > >=`|Comparison operators for comparing values|
+|`= != <= < > >=`|Comparison operators for comparing values|
 |`+ - * / \| &`|Arithmetic and other operators for performing computation|
 {:.grid}
 
