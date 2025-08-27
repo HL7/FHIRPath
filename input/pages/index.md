@@ -2649,7 +2649,8 @@ Operations that cause arithmetic overflow or underflow will result in empty (`{ 
 
 #### * (multiplication)
 
-Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have the appropriate unit:
+Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have an appropriate unit:<br/>
+*(note that systems may choose to scale responses, however conversion to different measurement systems e.g. imperial to metric would be inappropriate. Arguments should be in the same measurement system)*
 
 ``` fhirpath
 12 'cm' * 3 'cm' // 36 'cm2'
@@ -2662,7 +2663,7 @@ Divides the left operand by the right operand (supported for Integer, Decimal, a
 
 If an attempt is made to divide by zero, the result is empty.
 
-For division involving quantities, the resulting quantity will have the appropriate unit:
+For division involving quantities, the resulting quantity will have an appropriate unit:
 
 ``` fhirpath
 12 'cm2' / 3 'cm' // 4.0 'cm'
