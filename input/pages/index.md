@@ -1282,7 +1282,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
-##### convertsToString() : String
+##### convertsToString() : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
 
