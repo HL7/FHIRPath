@@ -2642,7 +2642,9 @@ If there is more than one item, or an incompatible item, the evaluation of the e
 
 As with the other operators, the math operators will return an empty collection if one or both of the operands are empty.
 
-When operating on quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and  `'cm'` cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+When operating on quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and  `'cm'` cannot. The unit of the result will be the most granular unit of either input. 
+However this is not supported with differing ["Special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the unit into base units. 
+Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
@@ -3387,6 +3389,7 @@ The list of known tooling and implementation projects for the FHIRPath language 
 - <a name="XMLRE"></a>[XMLRE] Regular Expressions. XML Schema 1.1. <https://www.w3.org/TR/xmlschema11-2/#regexs>{:target="_blank"}
 - <a name="PCRE"></a>[PCRE] Pearl-Compatible Regular Expressions. <http://www.pcre.org/>{:target="_blank"}
 - <a name="UCUM"></a>[UCUM] Unified Code for Units of Measure (UCUM) <http://unitsofmeasure.org/ucum.html>{:target="_blank"}, Version 2.1, Revision 442 (2017-11-21)
+- <a name="UCUM-special"></a>[UCUM-special] Unified Code for Units of Measure (UCUM) - Special Units on non-ratio Scales <https://ucum.org/ucum#section-Special-Units-on-non-ratio-Scales>{:target="_blank"}
 - <a name="FHIR"></a>[FHIR] HL7 Fast Healthcare Interoperability Resources <http://hl7.org/fhir>{:target="_blank"}
 - [grammar.html](grammar.html)
 - [modelinfo.xsd](modelinfo.xsd)
