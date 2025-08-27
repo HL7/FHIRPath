@@ -1145,18 +1145,15 @@ If the input collection contains a single item, this function will return a sing
 
 * the item is an Integer, or Decimal, where the resulting quantity will have the default unit (`'1'`)
 * the item is a Quantity
-* the item is a String and is convertible to a Quantity
-* the item is a Boolean, where `true` results in the quantity `1.0 '1'`, and `false` results in the quantity `0.0 '1'`
-
-If the item is not one of the above types, the result is empty.
-
-If the item is a String, but the string is not convertible to a Quantity using the following regex format:
-
+* the item is a String and is convertible to a Quantity using the regex format:
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ```
+* the item is a Boolean, where `true` results in the quantity `1.0 '1'`, and `false` results in the quantity `0.0 '1'`
 
-then the result is empty. For example, the following are valid quantity strings:
+If the item is not one of the above, the result is empty.
+
+For example, the following are valid quantity strings:
 
 ``` fhirpath
 '4 days'
@@ -1195,20 +1192,17 @@ q.toQuantity('g') // changes the value and units in the quantity according to UC
 If the input collection contains a single item, this function will return `true` if:
 
 * the item is an Integer, Decimal, or Quantity
-* the item is a String that is convertible to a Quantity
-* the item is a Boolean
-
-If the item is not one of the above types, or is not convertible to a Quantity using the following regex format:
-
+* the item is a String that is convertible to a Quantity using the regex format:
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ```
-
-then the result is `false`.
-
-If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+* the item is a Boolean
 
 If the input collection is empty, the result is empty.
+
+If the item is not one of the above, the result is `false`.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is `true`, otherwise, the result is `false`.
 
