@@ -507,7 +507,7 @@ The following sections describe the functions supported in FHIRPath, detailing t
 
 For the [aggregate](#aggregates) function, expressions may also refer to the special `$total` element, representing the result of the aggregation.
 
-Note that the bracket notation in function signatures indicates optional parameters.
+Note that the square bracket notation `[]` in function signatures indicates optional parameters.
 
 Note also that although all functions return collections, if a given function is defined to return a single element, the return type is simplified to just the type of the single element, rather than the list type.
 
