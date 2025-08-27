@@ -1322,7 +1322,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 Returns the 0-based index of the last position `substring` is found in the input string, or -1 if it is not found.
 {:.stu}
 
-If `substring` is an empty string (`''`), the function returns 0.
+If `substring` is an empty string (`''`), the function returns the length of the string.
 {:.stu}
 
 If the input or `substring` is empty (`{ }`), the result is empty (`{ }`).
@@ -1336,6 +1336,9 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abcdefg'.lastIndexOf('x') // -1
 'abcdefg'.lastIndexOf('abcdefg') // 0
 'abc abc'.lastIndexOf('a') // 4
+'0123'.lastIndexOf('') // 4
+'0'.lastIndexOf('') // 1
+''.lastIndexOf('') // 0
 ```
 {:.stu}
 
