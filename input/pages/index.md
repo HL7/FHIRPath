@@ -532,7 +532,7 @@ The following examples illustrate some potential uses of the `exists()` function
 Patient.name.exists()
 Patient.identifier.exists(use = 'official')
 Patient.telecom.exists(system = 'phone' and use = 'mobile')
-Patient.generalPractitioner.exists(resolve() is Practitioner) // this example is wrong
+Patient.generalPractitioner.exists(resolve() is Practitioner)
 ```
 
 The first example returns `true` if the `Patient` has any `name` elements.
