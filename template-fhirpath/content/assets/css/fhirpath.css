@@ -58,8 +58,8 @@ td:has(.stu-bg.normative) {
     content: '';
     position: absolute;
     left: 5px;
-    top: -4px;
-    bottom: -6px;
+    top: -5px;
+    bottom: -7px;
     width: 4px;
     border-left: 5px solid var(--stu-note-border-left-color);
     /* background-color: #e7f3fe;
@@ -80,6 +80,19 @@ table.stu {
 
 table.stu:after {
     left: -15.5px;
+}
+
+.stu.dragon {
+    padding-left: 150px;
+    margin-left: 24px;
+}
+
+.stu.dragon::before {
+    width: 150px;
+}
+
+.stu.dragon::after {
+    bottom: -18px;
 }
 
 blockquote.stu {

@@ -14,6 +14,7 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Aggregates](#aggregates)
 > * [Literals - Long](#long)
 > * [Conversions - toLong](#tolong--long)
+> * [Functions - repeatAll](#repeatallprojection-expression--collection)
 > * [Functions - coalesce](#coalesce)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
@@ -243,6 +244,7 @@ The `Integer` type represents whole numbers in the range -2<sup>31</sup> to 2<su
 > Note that the minus sign (`-`) in the representation of a negative integer is not part of the literal, it is the unary negation operator defined as part of FHIRPath syntax.
 
 ##### Long
+{:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
@@ -713,6 +715,46 @@ which would find *any* descendants called `item`, not just the ones nested insid
 
 The order of items returned by the `repeat()` function is undefined.
 
+#### repeatAll(projection: expression) : collection
+{:.stu}
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+A version of `repeat` that allows duplicate items in the output collection. Unlike `repeat`, this function does not check whether items are already present in the output collection before adding them.
+{:.stu}
+
+This can be evaluated by adding all elements in the input collection to an input queue, then for each item in the input queue evaluate the expression. The results are added to the output collection and also to a new iteration queue, regardless of whether they already exist in either collection. The input queue is then replaced by the new iteration queue and processing continues until there are no more nodes in the input queue to process.
+{:.stu}
+
+This function provides better performance than `repeat` by eliminating the equality comparisons required to check for duplicates, while still providing more targeted traversal than `descendants()`.
+{:.stu}
+
+The order of items returned by the `repeatAll()` function is undefined.
+{:.stu}
+
+> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it references a property accessor that returns child elements.
+> If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.
+{:.stu .dragon}
+
+Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference properties of the input collection and return child elements will naturally terminate when no more child elements are found.
+{:.stu}
+
+Some safe expressions:
+{:.stu}
+``` fhirpath
+ValueSet.expansion.repeatAll(contains)
+Questionnaire.repeatAll(item)
+```
+{:.stu}
+
+Some unsafe expressions:
+{:.stu}
+``` fhirpath
+Questionnaire.repeatAll('item') // this is a common mistake where the "expression" was in a string, which then just keeps getting called.
+'abc'.repeatAll(replace('a', 'A')) // does not rely on the resource structure for termination
+```
+{:.stu}
+
 #### ofType(type : _type specifier_) : collection
 
 Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty. The `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat it as type specifier rather than an identifier expression:
@@ -723,11 +765,11 @@ Bundle.entry.resource.ofType(Patient)
 
 In the above example, the symbol `Patient` must be treated as a type identifier rather than a reference to a Patient in context.
 
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 <a name="coalesce"></a>
 #### coalesce([value : collection, value : collection, ...]) : collection
 {:.stu}
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
 The `coalesce` function takes a variable number of arguments, each of which is a collection. It returns the first non-empty collection from the arguments. If all arguments are empty collections, the result is an empty collection.
 {:.stu}
 
@@ -995,6 +1037,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 If the input collection is empty, the result is empty.
 
 ##### toLong() : Long
+{:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
@@ -1315,6 +1358,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 
 #### lastIndexOf(substring : String) : Integer
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -1472,6 +1516,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 
 #### matchesFull(regex : String) : Boolean
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -1528,6 +1573,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 
 ### Additional String Functions
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -1649,6 +1695,7 @@ The following example illustrates the behavior of the `.join` operator:
 {:.stu}
 
 ### Math
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -1816,9 +1863,8 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 #### round([precision : Integer]) : Decimal
+{:.stu}
 
-> **Note:** The contents of this section are Standard for Trial Use (STU)
->
 > [Discussion on this topic](https://chat.fhir.org/#narrow/stream/179266-fhirpath/topic/round.28.29.20for.20negative.20numbers) If you have specific proposals or feedback please log a change request.
 {: .stu-note }
 
@@ -1844,9 +1890,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 #### sqrt() : Decimal
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
+{:.stu}
 
 Returns the square root of the input number as a Decimal.
 {:.stu}
@@ -1934,6 +1978,7 @@ Returns the current date.
 
 <a name="definevariable"></a>
 #### defineVariable(name: String [, expr: expression])
+{:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
@@ -2654,8 +2699,10 @@ Operations that cause arithmetic overflow or underflow will result in empty (`{ 
 
 #### * (multiplication)
 
-Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have an appropriate unit:<br/>
+Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have an appropriate unit:
+
 *(note that systems may choose to scale responses, however conversion to different measurement systems e.g. imperial to metric would be inappropriate. Arguments should be in the same measurement system)*
+{:.stu}
 
 ``` fhirpath
 12 'cm' * 3 'cm' // 36 'cm2'
@@ -3066,6 +3113,7 @@ When resolving a type name, the context-specific model is searched first. If no 
 When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
 
 ### Reflection
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
