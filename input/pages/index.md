@@ -2699,10 +2699,7 @@ Operations that cause arithmetic overflow or underflow will result in empty (`{ 
 
 #### * (multiplication)
 
-Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have an appropriate unit:
-
-*(note that systems may choose to scale responses, however conversion to different measurement systems e.g. imperial to metric would be inappropriate. Arguments should be in the same measurement system)*
-{:.stu}
+Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have an appropriate unit as determined by application of the UCUM specification:
 
 ``` fhirpath
 12 'cm' * 3 'cm' // 36 'cm2'
