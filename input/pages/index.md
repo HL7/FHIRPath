@@ -2301,6 +2301,88 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
+### Date and Time Interval Functions
+{:.stu}
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+If there is more than one input item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+#### between(value: date | datetime | time, precision: identifier): Integer
+{:.stu}
+
+Returns the number of whole calendar periods at the specified `precision` between the given input value and the `value` argument. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional periods are dropped.
+{:.stu}
+
+For input and value types of `date` values, the `precision` argument must be one of: `year`, `month`, `week`, or `day`.
+{:.stu}
+
+For input and value types of `datetime` values, the `precision` argument must be one of: `year`, `month`, `week`, `day`, `hour`, `minute`, `second`, or `millisecond`.
+{:.stu}
+
+For input and value types of `time` values, the `precision` argument must be one of: `hour`, `minute`, `second`, or `millisecond`.
+{:.stu}
+
+If the input value or `value` argument are of less precision than the specified `precision`, the result is empty.
+{:.stu}
+
+When computing the duration between DateTime values with different timezone offsets, implementations should normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.
+{:.stu}
+
+If either the input or `value` argument is empty, the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the duration function:
+{:.stu}
+
+```fhirpath
+@2025-01-02.duration(@2025-01-07, 'week') // 0 - hasn't passed 7 days duration
+@2025-01-01.duration(@2025-09-01, 'year') // 0 - baby is 9 months old
+@2024-12-01.duration(@2025-09-01, 'year') // 0 - baby is 10 months old
+```
+{:.stu}
+
+
+#### difference(value: date | datetime | time, precision: identifier): Integer
+{:.stu}
+
+Returns the number of boundaries crossed for the specified `precision` between the input value and the `value` arguments. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional boundaries are dropped.
+{:.stu}
+
+For input and value types of `date` values, the `precision` argument must be one of: `year`, `month`, `week`, or `day`.
+{:.stu}
+
+For input and value types of `datetime` values, the `precision` argument must be one of: `year`, `month`, `week`, `day`, `hour`, `minute`, `second`, or `millisecond`.
+{:.stu}
+
+For input and value types of `time` values, the `precision` argument must be one of: `hour`, `minute`, `second`, or `millisecond`.
+{:.stu}
+
+If the input value or `value` argument are of less precision than the specified `precision`, the result is empty.
+{:.stu}
+
+For calculations involving weeks, Sunday is considered to be the first day of the week for the purposes of determining the number of boundaries crossed.
+{:.stu}
+
+When computing the difference between `datetime` values with different timezone offsets, implementations should normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.
+{:.stu}
+
+If either the input or `value` argument is empty, the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the difference function:
+{:.stu}
+
+```fhirpath
+@2025-01-02.difference(@2025-01-07, 'week') // 1 - crossed a week boundary (Sunday)
+@2025-01-01.difference(@2025-09-01, 'year') // 0 - baby is 9 months old, but born this year
+@2024-12-01.difference(@2025-09-01, 'year') // 1 - baby is 10 months old, but born last year
+```
+{:.stu}
+
+
 ## Operations
 
 Operators are allowed to be used between any kind of path expressions (e.g. expr op expr). Like functions, operators will generally propagate an empty collection in any of their operands. This is true even when comparing two empty collections using the equality operators, e.g.
