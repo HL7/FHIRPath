@@ -155,7 +155,7 @@ NUMBER
         ;
 
 LONGNUMBER
-        : [0-9]+ 'L'?
+        : [0-9]+ 'L'
         ;
 
 // Pipe whitespace to the HIDDEN channel to support retrieving source text through the parser.
