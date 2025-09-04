@@ -1500,7 +1500,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abc'.replace('', 'x') // 'xaxbxcx'
 ```
 
-#### matches(regex : String) : Boolean
+#### matches(regex : String, [flags : String]) : Boolean
 
 Returns `true` when the value matches the given regular expression. Regular expressions should function consistently, regardless of any culture- and locale-specific settings in the environment, should be case-sensitive, use 'single line' mode and allow Unicode characters.
 The start/end of line markers `^`, `$` can be used to match the entire string.
@@ -1509,13 +1509,19 @@ If the input collection or `regex` are empty, the result is empty (`{ }`).
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+The optional `flags` parameter can be set to:
+{:.stu}
+* `i` to perform a case-insensitive search (otherwise is case-sensitive)
+* `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
+{:.stu}
+
 ``` fhirpath
 'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matches('Library') // returns true
 'N8000123123'.matches('^N[0-9]{8}$') // returns false as the string is not an 8 char number (it has 10)
 'N8000123123'.matches('N[0-9]{8}') // returns true as the string has an 8 number sequence in it starting with `N`
 ```
 
-#### matchesFull(regex : String) : Boolean
+#### matchesFull(regex : String, [flags : String]) : Boolean
 {:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
@@ -1532,6 +1538,12 @@ If the input collection or `regex` are empty, the result is empty (`{ }`).
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+The optional `flags` parameter can be set to:
+{:.stu}
+* `i` to perform a case-insensitive search (otherwise is case-sensitive)
+* `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
+{:.stu}
+
 ``` fhirpath
 'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matchesFull('Library') // returns false
 'N8000123123'.matchesFull('N[0-9]{8}') // returns false as the string is not an 8 char number (it has 10)
@@ -1539,13 +1551,19 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### replaceMatches(regex : String, substitution: String) : String
+#### replaceMatches(regex : String, substitution: String, [flags : String]) : String
 
 Matches the input using the regular expression in `regex` and replaces each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression, as illustrated by the example below that uses named capture groups for `month`, `day`, and `year` to perform a conversion from one date format to another.
 
 If the input collection, `regex`, or `substitution` are empty, the result is empty (`{ }`).
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+The optional `flags` parameter can be set to:
+{:.stu}
+* `i` to perform a case-insensitive search (otherwise is case-sensitive)
+* `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
+{:.stu}
 
 This example of `replaceMatches()` will convert a string with a date formatted as MM/dd/yy to dd-MM-yy:
 
