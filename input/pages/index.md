@@ -14,6 +14,8 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Aggregates](#aggregates)
 > * [Literals - Long](#long)
 > * [Conversions - toLong](#tolong--long)
+> * [Functions - repeatAll](#repeatallprojection-expression--collection)
+> * [Functions - coalesce](#coalesce)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
 > * [Functions - String (trim, split, join)](#trim--string)
@@ -242,6 +244,7 @@ The `Integer` type represents whole numbers in the range -2<sup>31</sup> to 2<su
 > Note that the minus sign (`-`) in the representation of a negative integer is not part of the literal, it is the unary negation operator defined as part of FHIRPath syntax.
 
 ##### Long
+{:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
@@ -426,6 +429,12 @@ In general, functions in FHIRPath operate on collections and return new collecti
 Patient.telecom.where(use = 'official').union(Patient.contact.telecom.where(use = 'official')).exists().not()
 ```
 
+However not all functions support multiple items in the input collection, some expect only a single item and will be explicitly documented. Further details are available in the ["singleton evaluation of collections"](#singleton-evaluation-of-collections) section.
+{:.stu}
+
+Singleton only functions can be run on collections by using the function inside a [`select(...)`](#selectprojection-expression--collection) to evaluate the function for each item in the collection.
+{:.stu}
+
 For a complete listing of the functions defined in FHIRPath, refer to the [Functions](#functions) section.
 
 ### Null and empty
@@ -477,7 +486,7 @@ As another example:
 Patient.active and Patient.gender and Patient.telecom
 ```
 
-Assuming the `Patient` instance has an `active` value of `true`, a `gender` of `female` and a single `telecom` element, this expression will result in true. However, consider a different instance of `Patient` that has an `active` value of `true`, a `gender` of `male`, and multiple `telecom` elements, then this expression will result in an error because of the multiple telecom elements.
+Assuming the `Patient` instance has an `active` value of `true`, a `gender` of `female` and a single `telecom` element, this expression will result in `true`. However, consider a different instance of `Patient` that has an `active` value of `true`, a `gender` of `male`, and multiple `telecom` elements, then this expression will result in an error because of the multiple telecom elements.
 
 Note that for repeating elements like `telecom` in the above example, the logic _looks_ like an existence check. To avoid confusion and reduce unintended errors, authors should use the explicit form of these checks when appropriate. For example, a more explicit rendering of the same logic that more clearly indicates the actual intent and avoids the run-time error is:
 
@@ -498,7 +507,7 @@ The following sections describe the functions supported in FHIRPath, detailing t
 
 For the [aggregate](#aggregates) function, expressions may also refer to the special `$total` element, representing the result of the aggregation.
 
-Note that the bracket notation in function signatures indicates optional parameters.
+Note that the square bracket notation `[]` in function signatures indicates optional parameters.
 
 Note also that although all functions return collections, if a given function is defined to return a single element, the return type is simplified to just the type of the single element, rather than the list type.
 
@@ -523,7 +532,7 @@ The following examples illustrate some potential uses of the `exists()` function
 Patient.name.exists()
 Patient.identifier.exists(use = 'official')
 Patient.telecom.exists(system = 'phone' and use = 'mobile')
-Patient.generalPractitioner.exists(resolve() is Practitioner) // this example is wrong
+Patient.generalPractitioner.exists(resolve() is Practitioner)
 ```
 
 The first example returns `true` if the `Patient` has any `name` elements.
@@ -542,7 +551,7 @@ Returns `true` if for every element in the input collection, `criteria` evaluate
 generalPractitioner.all($this.resolve() is Practitioner)
 ```
 
-This example returns true if all of the `generalPractitioner` elements are of type `Practitioner`.
+This example returns `true` if all of the `generalPractitioner` elements are of type `Practitioner`.
 
 #### allTrue() : Boolean
 
@@ -590,7 +599,7 @@ Returns `true` if all items in the input collection are members of the collectio
 
 Conceptually, this function is evaluated by testing each element in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
 
-The following example returns true if the tags defined in any contained resource are a subset of the tags defined in the MedicationRequest resource:
+The following example returns `true` if the tags defined in any contained resource are a subset of the tags defined in the MedicationRequest resource:
 
 ``` fhirpath
 MedicationRequest.contained.meta.tag.subsetOf(MedicationRequest.meta.tag)
@@ -602,7 +611,7 @@ Returns `true` if all items in the collection passed as the `other` argument are
 
 Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
 
-The following example returns true if the tags defined in any contained resource are a superset of the tags defined in the MedicationRequest resource:
+The following example returns `true` if the tags defined in any contained resource are a superset of the tags defined in the MedicationRequest resource:
 
 ``` fhirpath
 MedicationRequest.contained.meta.tag.supersetOf(MedicationRequest.meta.tag)
@@ -636,7 +645,7 @@ Conceptually, this function is shorthand for a comparison of the `count()` of th
 X.count() = X.distinct().count()
 ```
 
-This means that if the input collection is empty (`{ }`), the result is true.
+This means that if the input collection is empty (`{ }`), the result is `true`.
 
 ### Filtering and projection
 
@@ -706,6 +715,46 @@ which would find *any* descendants called `item`, not just the ones nested insid
 
 The order of items returned by the `repeat()` function is undefined.
 
+#### repeatAll(projection: expression) : collection
+{:.stu}
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+A version of `repeat` that allows duplicate items in the output collection. Unlike `repeat`, this function does not check whether items are already present in the output collection before adding them.
+{:.stu}
+
+This can be evaluated by adding all elements in the input collection to an input queue, then for each item in the input queue evaluate the expression. The results are added to the output collection and also to a new iteration queue, regardless of whether they already exist in either collection. The input queue is then replaced by the new iteration queue and processing continues until there are no more nodes in the input queue to process.
+{:.stu}
+
+This function provides better performance than `repeat` by eliminating the equality comparisons required to check for duplicates, while still providing more targeted traversal than `descendants()`.
+{:.stu}
+
+The order of items returned by the `repeatAll()` function is undefined.
+{:.stu}
+
+> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it references a property accessor that returns child elements.
+> If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.
+{:.stu .dragon}
+
+Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference properties of the input collection and return child elements will naturally terminate when no more child elements are found.
+{:.stu}
+
+Some safe expressions:
+{:.stu}
+``` fhirpath
+ValueSet.expansion.repeatAll(contains)
+Questionnaire.repeatAll(item)
+```
+{:.stu}
+
+Some unsafe expressions:
+{:.stu}
+``` fhirpath
+Questionnaire.repeatAll('item') // this is a common mistake where the "expression" was in a string, which then just keeps getting called.
+'abc'.repeatAll(replace('a', 'A')) // does not rely on the resource structure for termination
+```
+{:.stu}
+
 #### ofType(type : _type specifier_) : collection
 
 Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty. The `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat it as type specifier rather than an identifier expression:
@@ -715,6 +764,59 @@ Bundle.entry.resource.ofType(Patient)
 ```
 
 In the above example, the symbol `Patient` must be treated as a type identifier rather than a reference to a Patient in context.
+
+<a name="coalesce"></a>
+#### coalesce([value : collection, value : collection, ...]) : collection
+{:.stu}
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+The `coalesce` function takes a variable number of arguments, each of which is a collection. It returns the first non-empty collection from the arguments. If all arguments are empty collections, the result is an empty collection.
+{:.stu}
+
+Note that the short-circuit behaviour is expected in this function. In other words, arguments after the first non empty argument are not be evaluated. For implementations, this means delaying evaluation of the arguments (as done with `iif`).
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+```fhirpath
+Patient.coalesce(name.where(use='official'), name.where(use='usual'), name.first()).text // preferentially select name via use
+Patient.name.select(coalesce(family & ' ' & given.join(', '), text, 'unknown')) // select is required to process each name separately
+coalesce(Patient.identifier.where(system = 'http://example.org/identifier').value.first(), 'unknown')
+```
+{:.stu}
+
+Note that this function is useful for providing fallback options, and is more concise than using `iif` to check each collection in turn.
+{:.stu}
+
+Such as selecting specific telecom elements based on their use, and falling back to the first available telecom element if none of the specific uses are present:
+{:.stu}
+```fhirpath
+iif( telecom.where(use='mobile').exists(), telecom.where(use='mobile'),
+    iif( telecom.where(use='home').exists(), telecom.where(use='home'),
+        iif( telecom.where(use='work').exists(), telecom.where(use='work'),
+          telecom))).first()
+// could equivalently be written as:
+coalesce(telecom.where(use='mobile'), telecom.where(use='home'), telecom.where(use='work'), telecom).first()
+```
+{:.stu}
+
+Another common case is to select a specific coding in a CodeableConcept if it is available, otherwise whatever coding is available.
+{:.stu}
+``` fhirpath
+iif( code.coding.where(system='http://snomed.info/sct').exists(),
+        code.coding.where(system='http://snomed.info/sct')),
+            code.coding)
+    .first().code
+// could equivalently be written as:
+coalesce(code.coding.where(system='http://snomed.info/sct'), code.coding).first().code
+```
+{:.stu}
+
+
 
 ### Subsetting
 
@@ -789,9 +891,25 @@ e.g. `x.union(y)`{:.fhirpath} is synonymous with `x | y`{:.fhirpath}
 
 e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name property.
 
-#### combine(other : collection) : collection
+#### combine(other : collection, [preserveOrder : Boolean]) : collection
 
-Merge the input and other collections into a single collection without eliminating duplicate values. Combining an empty collection with a non-empty collection will return the non-empty collection. There is no expectation of order in the resulting collection.
+Merge the input and other collections into a single collection without eliminating duplicate values. Combining an empty collection with a non-empty collection will return the non-empty collection.
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+When `preserveOrder` is `false`, or not supplied, there is no expectation of order. When `preserveOrder` is `true`, the elements of the other collection are appended to the elements of the input collection, preserving the order of elements in both collections.
+{: .stu}
+
+For example, considering the same two lists of integers used in the union example `A: 1, 1, 2, 3` and `B: 2, 3`:
+{: .stu}
+```fhirpath
+A.combine(B) // 1, 1, 2, 2, 3, 3 - order is not guaranteed to be preserved (could be in any order)
+A.combine(B, true) // 1, 1, 2, 3, 2, 3 - The order is preserved using the `preserveOrder` argument
+A.combine( {} ) // 1, 1, 2, 3 - combining an empty collection with a non-empty collection returns the non-empty collection
+```
+{: .stu}
+Note that the duplicate `1`s are not removed from the collection using combine, where using `union` or `|` they would have been.
+{: .stu}
 
 ### Conversion
 
@@ -807,7 +925,7 @@ The following table lists the possible conversions supported, and whether the co
 
 |From\To |Boolean |Integer |Long *(STU)*{:.stu-bg} |Decimal |Quantity |String |Date |DateTime |Time |
 |- |- |- |- |- |- |- |- |- | - |
-|**Boolean** |N/A |Explicit | *Explicit*{:.stu-bg} |Explicit |- |Explicit |- |- |- |
+|**Boolean** |N/A |Explicit | *Explicit*{:.stu-bg} |Explicit |*Explicit*{:.stu-bg} |Explicit |- |- |- |
 |**Integer** |Explicit |N/A | *Implicit*{:.stu-bg} |Implicit |Implicit |Explicit |- |- |- |
 |**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*-*{:.stu-bg} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
 |**Decimal** |Explicit |- | *-*{:.stu-bg} |N/A |Implicit |Explicit |- |- |- |
@@ -828,15 +946,15 @@ The functions in this section operate on collections with a single item. If ther
 <a name="iif"></a>
 #### iif(criterion: expression, true-result: collection [, otherwise-result: collection]) : collection
 
-The `iif` function in FHIRPath is an _immediate if_, also known as a conditional operator (such as C's `? :` operator).
+The `iif` function in FHIRPath is an _immediate if_, also known as a conditional operator (such as the C programming language's `? :` operator).
 
 The `criterion` expression is expected to evaluate to a Boolean.
 
-If `criterion` is true, the function returns the value of the `true-result` argument.
+If `criterion` is `true`, the function returns the value of the `true-result` argument.
 
 If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
 
-Note that short-circuit behavior is expected in this function. In other words, `true-result` should only be evaluated if the `criterion` evaluates to true, and `otherwise-result` should only be evaluated otherwise. For implementations, this means delaying evaluation of the arguments.
+Note that short-circuit behavior is expected in this function. In other words, `true-result` should only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` should only be evaluated otherwise. For implementations, this means delaying evaluation of the arguments.
 
 #### Boolean Conversion Functions
 
@@ -871,14 +989,14 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToBoolean() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a Boolean
 * the item is an Integer that is equal to one of the possible integer representations of Boolean values
 * the item is a Decimal that is equal to one of the possible decimal representations of Boolean values
 * the item is a String that is equal to one of the possible string representations of Boolean values
 
-If the item is not one of the above types, or the item is a String, Integer, or Decimal, but is not equal to one of the possible values convertible to a Boolean, the result is false.
+If the item is not one of the above types, or the item is a String, Integer, or Decimal, but is not equal to one of the possible values convertible to a Boolean, the result is `false`.
 
 Possible values for Integer, Decimal, and String are described in the toBoolean() function.
 
@@ -906,19 +1024,20 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToInteger() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is an Integer
 * the item is a String and is convertible to an Integer
 * the item is a Boolean
 
-If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is false.
+If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
 
 ##### toLong() : Long
+{:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
@@ -944,7 +1063,7 @@ If the input collection is empty, the result is empty.
 ##### convertsToLong() : Boolean
 {:.stu}
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 {:.stu}
 
 * the item is an Integer or Long
@@ -952,7 +1071,7 @@ If the input collection contains a single item, this function will return true i
 * the item is a Boolean
 {:.stu}
 
-If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is false.
+If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is `false`.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -981,13 +1100,13 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToDate() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a Date
 * the item is a DateTime
 * the item is a String and is convertible to a Date
 
-If the item is not one of the above types, or is not convertible to a Date (using the format **YYYY-MM-DD**), the result is false.
+If the item is not one of the above types, or is not convertible to a Date (using the format **YYYY-MM-DD**), the result is `false`.
 
 If the item contains a partial date (e.g. `'2012-01'`), the result is a partial date.
 
@@ -1017,13 +1136,13 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToDateTime() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a DateTime
 * the item is a Date
 * the item is a String and is convertible to a DateTime
 
-If the item is not one of the above types, or is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**), the result is false.
+If the item is not one of the above types, or is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1049,13 +1168,13 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToDecimal() : Boolean
 
-If the input collection contains a single item, this function will true if:
+If the input collection contains a single item, this function will `true` if:
 
 * the item is an Integer or Decimal
 * the item is a String and is convertible to a Decimal
 * the item is a Boolean
 
-If the item is not one of the above types, or is not convertible to a Decimal (using the regex format `(\+|-)?\d+(\.\d+)?`), the result is false.
+If the item is not one of the above types, or is not convertible to a Decimal (using the regex format `(\+|-)?\d+(\.\d+)?`), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1069,18 +1188,15 @@ If the input collection contains a single item, this function will return a sing
 
 * the item is an Integer, or Decimal, where the resulting quantity will have the default unit (`'1'`)
 * the item is a Quantity
-* the item is a String and is convertible to a Quantity
-* the item is a Boolean, where `true` results in the quantity `1.0 '1'`, and `false` results in the quantity `0.0 '1'`
-
-If the item is not one of the above types, the result is empty.
-
-If the item is a String, but the string is not convertible to a Quantity using the following regex format:
-
+* the item is a String and is convertible to a Quantity using the regex format:
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ```
+* the item is a Boolean, where `true` results in the quantity `1.0 '1'`, and `false` results in the quantity `0.0 '1'`
 
-then the result is empty. For example, the following are valid quantity strings:
+If the item is not one of the above, the result is empty.
+
+For example, the following are valid quantity strings:
 
 ``` fhirpath
 '4 days'
@@ -1116,27 +1232,24 @@ q.toQuantity('g') // changes the value and units in the quantity according to UC
 
 ##### convertsToQuantity([unit : String]) : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is an Integer, Decimal, or Quantity
-* the item is a String that is convertible to a Quantity
-* the item is a Boolean
-
-If the item is not one of the above types, or is not convertible to a Quantity using the following regex format:
-
+* the item is a String that is convertible to a Quantity using the regex format:
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ```
-
-then the result is false.
-
-If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+* the item is a Boolean
 
 If the input collection is empty, the result is empty.
 
-If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is true, otherwise, the result is false.
+If the item is not one of the above, the result is `false`.
 
-> Implementations are not required to support a complete UCUM implementation, and may return false when the `unit` argument is used and it is different than the input quantity unit.
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is `true`, otherwise, the result is `false`.
+
+> Implementations are not required to support a complete UCUM implementation, and may return `false` when the `unit` argument is used and it is different than the input quantity unit.
 
 #### String Conversion Functions
 
@@ -1148,7 +1261,7 @@ If the input collection contains a single item, this function will return a sing
 * the item in the input collection is an Integer, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation
 * the item is a Boolean, where `true` results in `'true'` and `false` in `'false'`.
 
-If the item is not one of the above types, the result is false.
+If the item is not one of the above types, the result is empty.
 
 The String representation uses the following formats:
 
@@ -1169,16 +1282,16 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
-##### convertsToString() : String
+##### convertsToString() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a String
 * the item is an Integer, Decimal, Date, Time, or DateTime
 * the item is a Boolean
 * the item is a Quantity
 
-If the item is not one of the above types, the result is false.
+If the item is not one of the above types, the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1205,12 +1318,12 @@ If the input collection is empty, the result is empty.
 
 ##### convertsToTime() : Boolean
 
-If the input collection contains a single item, this function will return true if:
+If the input collection contains a single item, this function will return `true` if:
 
 * the item is a Time
 * the item is a String and is convertible to a Time
 
-If the item is not one of the above types, or is not convertible to a Time (using the format **hh:mm:ss.fff(+\|-)hh:mm**), the result is false.
+If the item is not one of the above types, or is not convertible to a Time (using the format **hh:mm:ss.fff(+\|-)hh:mm**), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1245,6 +1358,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 
 #### lastIndexOf(substring : String) : Integer
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -1252,7 +1366,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 Returns the 0-based index of the last position `substring` is found in the input string, or -1 if it is not found.
 {:.stu}
 
-If `substring` is an empty string (`''`), the function returns 0.
+If `substring` is an empty string (`''`), the function returns the length of the string.
 {:.stu}
 
 If the input or `substring` is empty (`{ }`), the result is empty (`{ }`).
@@ -1266,6 +1380,9 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abcdefg'.lastIndexOf('x') // -1
 'abcdefg'.lastIndexOf('abcdefg') // 0
 'abc abc'.lastIndexOf('a') // 4
+'0123'.lastIndexOf('') // 4
+'0'.lastIndexOf('') // 1
+''.lastIndexOf('') // 0
 ```
 {:.stu}
 
@@ -1399,6 +1516,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 
 #### matchesFull(regex : String) : Boolean
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -1423,7 +1541,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 #### replaceMatches(regex : String, substitution: String) : String
 
-Matches the input using the regular expression in `regex` and replaces each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression.
+Matches the input using the regular expression in `regex` and replaces each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression, as illustrated by the example below that uses named capture groups for `month`, `day`, and `year` to perform a conversion from one date format to another.
 
 If the input collection, `regex`, or `substitution` are empty, the result is empty (`{ }`).
 
@@ -1440,7 +1558,7 @@ This example of `replaceMatches()` will convert a string with a date formatted a
 
 #### length() : Integer
 
-Returns the length of the input string. If the input collection is empty (`{ }`), the result is empty.
+Returns the number of characters in the input string. If the input collection is empty (`{ }`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1455,6 +1573,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 
 ### Additional String Functions
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -1467,8 +1586,8 @@ The encode function takes a singleton string and returns the result of encoding 
 
 |hex |The string is encoded using hexadecimal characters (base 16) in lowercase |
 |=|=|
-|base64 |The string is encoded using standard base64 encoding, using A-Z, a-z, 0-9, +, and /, output padded with =) |
-|urlbase64 |The string is encoded using url base 64 encoding, using A-Z, a-z, 0-9, -, and _, output padded with =) |
+|base64 |The string is encoded using standard base64 encoding, using A-Z, a-z, 0-9, +, and /, output padded with = |
+|urlbase64 |The string is encoded using url base 64 encoding, using A-Z, a-z, 0-9, -, and _, output padded with = |
 {:.grid}
 {:.stu}
 
@@ -1576,6 +1695,7 @@ The following example illustrates the behavior of the `.join` operator:
 {:.stu}
 
 ### Math
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -1723,7 +1843,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 #### power(exponent : Integer | Decimal) : Integer | Decimal
 {:.stu}
 
-Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer. If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal.
+Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer. If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal. Note that if both the base and the `exponent` are integers and the `exponent` is negative, the result is empty since that might result in a Decimal value, not an Integer (the expected output type for this case).
 {:.stu}
 
 If the power cannot be represented (such as the -1 raised to the 0.5), the result is empty.
@@ -1743,9 +1863,8 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 #### round([precision : Integer]) : Decimal
+{:.stu}
 
-> **Note:** The contents of this section are Standard for Trial Use (STU)
->
 > [Discussion on this topic](https://chat.fhir.org/#narrow/stream/179266-fhirpath/topic/round.28.29.20for.20negative.20numbers) If you have specific proposals or feedback please log a change request.
 {: .stu-note }
 
@@ -1771,9 +1890,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 #### sqrt() : Decimal
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
+{:.stu}
 
 Returns the square root of the input number as a Decimal.
 {:.stu}
@@ -1861,6 +1978,7 @@ Returns the current date.
 
 <a name="definevariable"></a>
 #### defineVariable(name: String [, expr: expression])
+{:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
@@ -2310,7 +2428,7 @@ For example:
 
 ##### String Equivalence
 
-For strings, equivalence returns true if the strings are the same value while ignoring case and locale, and normalizing whitespace. Normalizing whitespace means that all whitespace characters are treated as equivalent, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
+For strings, equivalence returns `true` if the strings are the same value while ignoring case and locale, and normalizing whitespace. Normalizing whitespace means that all whitespace characters are treated as equivalent, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
 
 #### != (Not Equals)
 
@@ -2348,7 +2466,7 @@ See the [Equals](#equals) operator for discussion on respecting timezone offsets
 
 #### &gt; (Greater Than)
 
-The greater than operator (`>`) returns true if the first operand is strictly greater than the second. The operands must be of the same type, or convertible to the same type using an implicit conversion.
+The greater than operator (`>`) returns `true` if the first operand is strictly greater than the second. The operands must be of the same type, or convertible to the same type using an implicit conversion.
 
 ``` fhirpath
 10 > 5 // true
@@ -2356,18 +2474,18 @@ The greater than operator (`>`) returns true if the first operand is strictly gr
 'abc' > 'ABC' // true
 4 'm' > 4 'cm' // true (or { } if the implementation does not support unit conversion)
 @2018-03-01 > @2018-01-01 // true
-@2018-03 > @2018-03-01 // empty ({ })
+@2018-03 > @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 > @2018-03-01T10:00:00 // true
-@2018-03-01T10 > @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10 > @2018-03-01T10:30 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 > @2018-03-01T10:30:00.0 // false
 @T10:30:00 > @T10:00:00 // true
-@T10 > @T10:30 // empty ({ })
+@T10 > @T10:30 // empty ({ }) - different precisions
 @T10:30:00 > @T10:30:00.0 // false
 ```
 
 #### &lt; (Less Than)
 
-The less than operator (`<`) returns true if the first operand is strictly less than the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The less than operator (`<`) returns `true` if the first operand is strictly less than the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
 
 ``` fhirpath
 10 < 5 // false
@@ -2375,18 +2493,18 @@ The less than operator (`<`) returns true if the first operand is strictly less 
 'abc' < 'ABC' // false
 4 'm' < 4 'cm' // false (or { } if the implementation does not support unit conversion)
 @2018-03-01 < @2018-01-01 // false
-@2018-03 < @2018-03-01 // empty ({ })
+@2018-03 < @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 < @2018-03-01T10:00:00 // false
-@2018-03-01T10 < @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10 < @2018-03-01T10:30 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 < @2018-03-01T10:30:00.0 // false
 @T10:30:00 < @T10:00:00 // false
-@T10 < @T10:30 // empty ({ })
+@T10 < @T10:30 // empty ({ }) - different precisions
 @T10:30:00 < @T10:30:00.0 // false
 ```
 
 #### &lt;= (Less or Equal)
 
-The less or equal operator (`\<=`) returns true if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The less or equal operator (`<=`) returns `true` if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
 
 ``` fhirpath
 10 <= 5 // true
@@ -2394,18 +2512,18 @@ The less or equal operator (`\<=`) returns true if the first operand is less tha
 'abc' <= 'ABC' // true
 4 'm' <= 4 'cm' // false (or { } if the implementation does not support unit conversion)
 @2018-03-01 <= @2018-01-01 // false
-@2018-03 <= @2018-03-01 // empty ({ })
+@2018-03 <= @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 <= @2018-03-01T10:00:00 // false
-@2018-03-01T10 <= @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10 <= @2018-03-01T10:30 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0 // true
 @T10:30:00 <= @T10:00:00 // false
-@T10 <= @T10:30 // empty ({ })
+@T10 <= @T10:30 // empty ({ }) - different precisions
 @T10:30:00 <= @T10:30:00.0 // true
 ```
 
 #### &gt;= (Greater or Equal)
 
-The greater or equal operator (`>=`) returns true if the first operand is greater than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The greater or equal operator (`>=`) returns `true` if the first operand is greater than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
 
 ``` fhirpath
 10 >= 5 // false
@@ -2413,12 +2531,12 @@ The greater or equal operator (`>=`) returns true if the first operand is greate
 'abc' >= 'ABC' // false
 4 'm' >= 4 'cm' // true (or { } if the implementation does not support unit conversion)
 @2018-03-01 >= @2018-01-01 // true
-@2018-03 >= @2018-03-01 // empty ({ })
+@2018-03 >= @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 >= @2018-03-01T10:00:00 // true
-@2018-03-01T10 >= @2018-03-01T10:30 // empty ({ })
+@2018-03-01T10 >= @2018-03-01T10:30 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0 // true
 @T10:30:00 >= @T10:00:00 // true
-@T10 >= @T10:30 // empty ({ })
+@T10 >= @T10:30 // empty ({ }) - different precisions
 @T10:30:00 >= @T10:30:00.0 // true
 ```
 
@@ -2473,19 +2591,19 @@ Merge the two collections into a single collection, eliminating any duplicate va
 
 See the [union](#unionother-collection) function for more detail.
 
-#### in (membership)
-If the left operand is a collection with a single item, this operator returns true if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is false. If the left operand has multiple items, an exception is thrown.
+#### in (membership) : Boolean
+If the left operand is a collection with a single item, this operator returns `true` if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is `false`. If the left operand has multiple items, an exception is thrown.
 
-The following example returns true if `'Joe'` is in the list of given names for the Patient:
+The following example returns `true` if `'Joe'` is in the list of given names for the Patient:
 
 ``` fhirpath
 'Joe' in Patient.name.given
 ```
 
-#### contains (containership)
-If the right operand is a collection with a single item, this operator returns true if the item is in the left operand using equality semantics. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is false. This is the converse operation of in.
+#### contains (containership) : Boolean
+If the right operand is a collection with a single item, this operator returns `true` if the item is in the left operand using equality semantics. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is `false`. This is the converse operation of `in`.
 
-The following example returns true if the list of given names for the Patient has `'Joe'` in it:
+The following example returns `true` if the list of given names for the Patient has `'Joe'` in it:
 
 ``` fhirpath
 Patient.name.given contains 'Joe'
@@ -2559,7 +2677,7 @@ CareTeam.onBehalfOf.exists() implies (CareTeam.member.resolve() is Practitioner)
 StructureDefinition.contextInvariant.exists() implies StructureDefinition.type = 'Extension'
 ```
 
-Note that implies may use short-circuit evaluation in the case that the first operand evaluates to false.
+Note that implies may use short-circuit evaluation in the case that the first operand evaluates to `false`.
 
 ### Math
 
@@ -2569,7 +2687,9 @@ If there is more than one item, or an incompatible item, the evaluation of the e
 
 As with the other operators, the math operators will return an empty collection if one or both of the operands are empty.
 
-When operating on quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and  `'cm'` cannot. The unit of the result will be the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+When operating on quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and  `'cm'` cannot. The unit of the result will be the most granular unit of either input. 
+However this is not supported with differing ["Special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the unit into base units. 
+Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
@@ -2579,7 +2699,7 @@ Operations that cause arithmetic overflow or underflow will result in empty (`{ 
 
 #### * (multiplication)
 
-Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have the appropriate unit:
+Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have an appropriate unit as determined by application of the UCUM specification:
 
 ``` fhirpath
 12 'cm' * 3 'cm' // 36 'cm2'
@@ -2592,7 +2712,7 @@ Divides the left operand by the right operand (supported for Integer, Decimal, a
 
 If an attempt is made to divide by zero, the result is empty.
 
-For division involving quantities, the resulting quantity will have the appropriate unit:
+For division involving quantities, the resulting quantity will have an appropriate unit:
 
 ``` fhirpath
 12 'cm2' / 3 'cm' // 4.0 'cm'
@@ -2692,6 +2812,13 @@ For `DateTime` values, the quantity unit must be one of: `years`, `months`, `wee
 
 For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
 
+As `Time` is cyclic, the result of overflowing the time value will be wrapped around the beginning of the day, so that adding 1 hour to `@T23:30:00` will result in `@T00:30:00` of the previous day, which is consistent with the behaviour of `DateTime` values.
+{:.stu}
+```fhirpath
+@T23:30:00 + 1 hour // @T00:30:00
+```
+{:.stu}
+
 For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
 
 For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value. For example:
@@ -2721,6 +2848,14 @@ For `Date` values, the quantity unit must be one of: `years`, `months`, `weeks`,
 For `DateTime` values, the quantity unit must be one of: `years`, `months`, `weeks`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
 
 For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
+
+As `Time` is cyclic, the result of overflowing the time value will be wrapped around the beginning of the day, so that subtracting 1 hour from `@T00:30:00` will result in `@T23:30:00` of the previous day, which is consistent with the behaviour of `DateTime` values.
+{:.stu}
+```fhirpath
+@T00:30:00 - 1 hour // @T23:30:00
+@T01:00:00 - 2 hours // @T23:00:00
+```
+{:.stu}
 
 For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
 
@@ -2876,7 +3011,7 @@ Symbols provide structure to the language and allow symbolic invocation of commo
 |`{}`|Braces for delimiting exclusively empty lists|
 |`.`|Period for qualifiers, accessors, and dot-invocation|
 |`,`|Comma for delimiting items in a syntactic list|
-|`= != \<= < > >=`|Comparison operators for comparing values|
+|`= != <= < > >=`|Comparison operators for comparing values|
 |`+ - * / \| &`|Arithmetic and other operators for performing computation|
 {:.grid}
 
@@ -2975,6 +3110,7 @@ When resolving a type name, the context-specific model is searched first. If no 
 When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
 
 ### Reflection
+{:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -3156,7 +3292,7 @@ Apart from throwing exceptions, unexpected outcomes may result because of the wa
 Patient.name.given = 'Wouter'
 ```
 
-will return false as soon as a patient has multiple names, even though one of those may well be 'Wouter'. Again, this can be corrected:
+will return `false` as soon as a patient has multiple names, even though one of those may well be 'Wouter'. Again, this can be corrected:
 
 ``` fhirpath
 Patient.name.where(given = 'Wouter').exists()
@@ -3298,6 +3434,7 @@ The list of known tooling and implementation projects for the FHIRPath language 
 - <a name="XMLRE"></a>[XMLRE] Regular Expressions. XML Schema 1.1. <https://www.w3.org/TR/xmlschema11-2/#regexs>{:target="_blank"}
 - <a name="PCRE"></a>[PCRE] Pearl-Compatible Regular Expressions. <http://www.pcre.org/>{:target="_blank"}
 - <a name="UCUM"></a>[UCUM] Unified Code for Units of Measure (UCUM) <http://unitsofmeasure.org/ucum.html>{:target="_blank"}, Version 2.1, Revision 442 (2017-11-21)
+- <a name="UCUM-special"></a>[UCUM-special] Unified Code for Units of Measure (UCUM) - Special Units on non-ratio Scales <https://ucum.org/ucum#section-Special-Units-on-non-ratio-Scales>{:target="_blank"}
 - <a name="FHIR"></a>[FHIR] HL7 Fast Healthcare Interoperability Resources <http://hl7.org/fhir>{:target="_blank"}
 - [grammar.html](grammar.html)
 - [modelinfo.xsd](modelinfo.xsd)

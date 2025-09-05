@@ -41,43 +41,8 @@
     </resource>
     <resource>
       <reference>
-        <reference value="Binary/binary-tests"/>
-      </reference>
-      <name value="Tests"/>
-      <description value="Test Suite"/>
-    </resource>
-    <resource>
-      <reference>
-        <reference value="Binary/binary-testschema"/>
-      </reference>
-      <name value="TestSchema"/>
-      <description value="Test Schema"/>
-    </resource>
-    <resource>
-      <reference>
         <reference value="CodeSystem/calendar-units"/>
       </reference>
-    </resource>
-    <resource>
-      <reference>
-        <reference value="Observation/example"/>
-      </reference>
-      <name value="Example Observation"/>
-      <description value="Example observation resource to support test cases"/>
-    </resource>
-    <resource>
-      <reference>
-        <reference value="Patient/example"/>
-      </reference>
-      <name value="Example Patient"/>
-      <description value="Example patient resource to support test cases"/>
-    </resource>
-    <resource>
-      <reference>
-        <reference value="Questionnaire/3141"/>
-      </reference>
-      <name value="Example Questionnaire 3141"/>
-      <description value="Example questionnaire resource to support test cases"/>
     </resource>
     <resource>
       <reference>
