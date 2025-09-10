@@ -1862,7 +1862,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 #### power(exponent : Integer | Decimal) : Integer | Decimal
 {:.stu}
 
-Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer (unless the exponent is negative, which can result in a decimal). If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal.
+Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer. If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal. Note that if both the base and the `exponent` are integers and the `exponent` is negative, the result is empty since that might result in a Decimal value, not an Integer (the expected output type for this case).
 {:.stu}
 
 If the power cannot be represented (such as the -1 raised to the 0.5), the result is empty.
@@ -2817,10 +2817,7 @@ Operations that cause arithmetic overflow or underflow will result in empty (`{ 
 
 #### * (multiplication)
 
-Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have an appropriate unit:
-
-*(note that systems may choose to scale responses, however conversion to different measurement systems e.g. imperial to metric would be inappropriate. Arguments should be in the same measurement system)*
-{:.stu}
+Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have an appropriate unit as determined by application of the UCUM specification:
 
 ``` fhirpath
 12 'cm' * 3 'cm' // 36 'cm2'
