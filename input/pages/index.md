@@ -24,6 +24,7 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - Utility (defineVariable, lowBoundary, highBoundary)](#definevariable)
 > * [Functions - Utility (precision)](#precision--integer)
 > * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
+> * [Functions - Date and Time Interval Functions (duration, difference)](#date-and-time-interval-functions)
 > * [Types - Reflection](#reflection)
 > 
 > In addition, the appendices are included as additional documentation and are informative content.
@@ -2310,7 +2311,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 If there is more than one input item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
-#### between(value: date | datetime | time, precision: identifier): Integer
+#### duration(value: date | datetime | time, precision: identifier): Integer
 {:.stu}
 
 Returns the number of whole calendar periods at the specified `precision` between the given input value and the `value` argument. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional periods are dropped.
