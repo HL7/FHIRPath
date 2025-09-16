@@ -875,7 +875,7 @@ e.g. `(1 | 2 | 3).exclude(2)`{:.fhirpath} returns `(1 | 3)`.
 
 ### Combining
 
-#### <a name="unionother-collection"></a>union(other : collection)
+#### <a name="unionother-collection"></a>union(other : collection) : collection
 
 Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`) to determine equality). There is no expectation of order in the resulting collection.
 
