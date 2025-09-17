@@ -171,8 +171,9 @@ FHIRPath expressions can consist of _paths_, _literals_, _operators_, and _funct
 
 ### Literals
 
-In addition to paths, FHIRPath expressions may contain _literals_, _operators_, and _function invocations_. FHIRPath supports the following types of literals:
+In addition to paths, FHIRPath expressions may contain _literals_, _operators_, and _function invocations_. 
 
+Examples of the supported FHIRPath literals:
 ``` txt
 Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
