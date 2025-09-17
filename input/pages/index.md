@@ -2186,7 +2186,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ##### hourOf(): Integer
 {:.stu}
 
-If the input collection contains a single Date, DateTime or Time, this function will return the hour component.
+If the input collection contains a single DateTime or Time, this function will return the hour component.
 {:.stu}
 
 If the input collection is empty, or the hour is not present in the value, the result is empty.
@@ -2204,7 +2204,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ##### minuteOf(): Integer
 {:.stu}
 
-If the input collection contains a single Date, DateTime or Time, this function will return the minute component.
+If the input collection contains a single DateTime or Time, this function will return the minute component.
 {:.stu}
 
 If the input collection is empty, or the minute is not present in the value, the result is empty.
@@ -2221,7 +2221,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ##### secondOf(): Integer
 {:.stu}
 
-If the input collection contains a single Date, DateTime or Time, this function will return the second component.
+If the input collection contains a single DateTime or Time, this function will return the second component.
 {:.stu}
 
 If the input collection is empty, or the second is not present in the value, the result is empty.
@@ -2238,7 +2238,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ##### millisecondOf(): Integer
 {:.stu}
 
-If the input collection contains a single Date, DateTime or Time, this function will return the millisecond component.
+If the input collection contains a single DateTime or Time, this function will return the millisecond component.
 {:.stu}
 
 If the input collection is empty, or the millisecond is not present in the value, the result is empty.
