@@ -1568,10 +1568,14 @@ The optional `flags` parameter can be set to:
 {:.stu}
 
 This example of `replaceMatches()` will convert a string with a date formatted as MM/dd/yy to dd-MM-yy:
-
 ``` fhirpath
 '11/30/1972'.replaceMatches('\\b(?<month>\\d{1,2})/(?<day>\\d{1,2})/(?<year>\\d{2,4})\\b',
        '${day}-${month}-${year}')
+```
+
+This example locates all the instances of `aa` and surrounds them with double quotes:
+``` fhirpath
+'aaabaa'.replaceMatches('aa', '"aa"') // returns "aa"ab"aa"
 ```
 
 > **Note:** Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the [\[PCRE\]](#PCRE) flavor as the dialect most likely to be broadly supported and understood.
