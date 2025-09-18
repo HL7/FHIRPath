@@ -16,6 +16,7 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Conversions - toLong](#tolong--long)
 > * [Functions - repeatAll](#repeatallprojection-expression--collection)
 > * [Functions - coalesce](#coalesce)
+> * [Functions - sort](#sortkeyselector-expression-asc--desc--keyselector-expression-asc--desc---collection)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
 > * [Functions - String (trim, split, join)](#trim--string)
@@ -687,6 +688,49 @@ Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
 
 This example returns a collection containing, for each "usual" name for the Patient, the concatenation of the first given and family names.
 
+#### sort([keySelector: expression [asc | desc] [, keySelector: expression [asc | desc], ...]]) : collection
+{:.stu}
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns a collection containing the items in the input collection, sorted according to the specified key selector expressions. The function takes a variable number of key selector parameters, each of which can be optionally qualified with `asc` (ascending) or `desc` (descending). If no qualifier is provided, `asc` is the default.
+{:.stu}
+
+If no key selector parameters are provided, the sort uses the natural ordering for the type of data in the input collection, using the same comparison semantics as defined for the equals (`=`) and comparison operators (`>`, `>=`, `<`, `<=`).
+{:.stu}
+
+Each key selector expression is evaluated for each item in the input collection using singleton evaluation semantics. If the key selector expression evaluates to a collection with more than one item, the evaluation will end and signal an error to the calling environment.
+{:.stu}
+
+comparing values returned by the no key selector using the same comparison semantics as defined for the equals (`=`) and comparison operators (`>`, `>=`, `<`, `<=`).
+{:.stu}
+
+An empty value is considered lower than all other values, meaning they will appear before others when sorted ascending.
+{:.stu}
+
+When comparing two items, if the values for the first key selector are equal, the comparison proceeds to the next key selector, and so on until all key selectors have been evaluated or a difference is found.
+{:.stu}
+
+Attempting to sort items with incompatible types will result in an error. Values that would result in comparison errors must be filtered from the collection prior to sorting.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the use of the `sort()` function:
+{:.stu}
+
+``` fhirpath
+(3 | 1 | 2).sort() // (1 | 2 | 3) - natural numeric ordering
+(3 | 1 | 2).sort($this) // (1 | 2 | 3) - explicit ascending
+(3 | 1 | 2).sort($this desc) // (3 | 2 | 1) - descending
+('c' | 'a' | 'b').sort() // ('a' | 'b' | 'c') - natural string ordering
+('c' | 'a' | 'b').sort($this desc) // ('c' | 'b' | 'a') - descending
+Patient.name.sort(family desc, given.first()) // sort by family name descending, then by first given name ascending
+Patient.telecom.sort(system, use desc) // sort by system ascending, then by use descending
+```
+{:.stu}
+
 #### repeat(projection: expression) : collection
 
 A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
@@ -768,20 +812,14 @@ Bundle.entry.resource.ofType(Patient)
 In the above example, the symbol `Patient` must be treated as a type identifier rather than a reference to a Patient in context.
 
 <a name="coalesce"></a>
-#### coalesce([value : collection, value : collection, ...]) : collection
+#### coalesce(value : collection, [value : collection, ...]) : collection
 {:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 The `coalesce` function takes a variable number of arguments, each of which is a collection. It returns the first non-empty collection from the arguments. If all arguments are empty collections, the result is an empty collection.
 {:.stu}
 
-Note that the short-circuit behaviour is expected in this function. In other words, arguments after the first non empty argument are not be evaluated. For implementations, this means delaying evaluation of the arguments (as done with `iif`).
-{:.stu}
-
-If the input collection is empty, the result is empty.
-{:.stu}
-
-If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+Note that short-circuit behaviour is expected in this function. In other words, arguments after the first non-empty argument are not evaluated. For implementations, this means delaying evaluation of the arguments (as is done with `iif`).
 {:.stu}
 
 ```fhirpath
