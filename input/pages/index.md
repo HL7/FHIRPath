@@ -123,10 +123,11 @@ Patient.name.given
 
 The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`. When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context. If the identifier cannot be resolved, the evaluation will end and signal an error to the calling environment.
 
-Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use backticks to include characters in path parts that would otherwise be interpreted as keywords or operators, e.g.:
+Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use other characters by using [delimited identifiers](#identifiers) - surrounding with backticks and using FHIRPath escaping as needed. This approach can also be used to encode nodes with names that are keywords. e.g.:
 
 ``` fhirpath
-Message.`PID-1`
+Message.`PID-1` // subtraction operator as a part of a property name
+`as` as string  // a property name that is also a fhirpath keyword
 ```
 
 ### Collections
