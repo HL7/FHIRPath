@@ -1299,22 +1299,22 @@ If the `unit` argument is provided, it must be the string representation of a UC
 If the input collection contains a single item, this function will return a single String if:
 
 * the item in the input collection is a String
-* the item in the input collection is an Integer, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation
+* the item in the input collection is an Integer, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation *(as shown in the table below)*
 * the item is a Boolean, where `true` results in `'true'` and `false` in `'false'`.
 
 If the item is not one of the above types, the result is empty.
 
 The String representation uses the following formats:
 
-|Type |Representation|
-|-|-|
-|**Boolean** |`true` or `false`|
-|**Integer** |`(\+|-)?\d+`|
-|**Decimal** |`(\+|-)?\d+(.\d+)?`|
-|**Quantity** |`(\+|-)?\d+(.\d+)? '.*'`    e.g. `(4 days).toString()`{:.fhirpath} returns `4 'd'` because the FHIRPath literal temporal units are short-hands for the UCUM equivalents. |
-|**Date** |**YYYY-MM-DD**|
-|**DateTime** |**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**|
-|**Time** |**hh:mm:ss.fff(+\|-)hh:mm**|
+|Type |Representation|Examples|
+|-|-|-|
+|**Boolean** |`true` or `false`| `true.toString()`{:.fhirpath} returns `"true"`|
+|**Integer** |`(-)?\d+`| `42.toString()`{:.fhirpath} returns `"42"`|
+|**Decimal** |`(-)?\d+(.\d+)?`| `3.14.toString()`{:.fhirpath} returns `"3.14"`|
+|**Quantity** |`(-)?\d+(.\d+)? (('.*')|(.*))` | `(53 'km').toString()`{:.fhirpath} returns `"53 'km'"` *(ucum units include quotes)*<br/>`(4 days).toString()`{:.fhirpath} returns `"4 days"` *(calendar duration units don't include quotes)*|
+|**Date** |`YYYY-MM-DD`| `@2020-01-01.toString()`{:.fhirpath} returns `"2020-01-01"`|
+|**DateTime** |`YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm`| `@2020-01-01T10:00:00.000+10:00.toString()`{:.fhirpath} returns `"2020-01-01T10:00:00.000+10:00"`|
+|**Time** |`hh:mm:ss.fff`| `@T10:30:00.000.toString()`{:.fhirpath} returns `"10:30:00.000"`<br/>`@T11:45.toString()`{:.fhirpath} returns `"11:45"`|
 {:.grid}
 
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
