@@ -1308,13 +1308,13 @@ The String representation uses the following formats:
 
 |Type |Representation|Examples|
 |-|-|-|
-|**Boolean** |`true` or `false`| `true.toString()`{:.fhirpath} returns `"true"`|
-|**Integer** |`(-)?\d+`| `42.toString()`{:.fhirpath} returns `"42"`|
-|**Decimal** |`(-)?\d+(.\d+)?`| `3.14.toString()`{:.fhirpath} returns `"3.14"`|
-|**Quantity** |`(-)?\d+(.\d+)? (('.*')|(.*))` | `(53 'km').toString()`{:.fhirpath} returns `"53 'km'"` *(ucum units include quotes)*<br/>`(4 days).toString()`{:.fhirpath} returns `"4 days"` *(calendar duration units don't include quotes)*|
-|**Date** |`YYYY-MM-DD`| `@2020-01-01.toString()`{:.fhirpath} returns `"2020-01-01"`|
-|**DateTime** |`YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm`| `@2020-01-01T10:00:00.000+10:00.toString()`{:.fhirpath} returns `"2020-01-01T10:00:00.000+10:00"`|
-|**Time** |`hh:mm:ss.fff`| `@T10:30:00.000.toString()`{:.fhirpath} returns `"10:30:00.000"`<br/>`@T11:45.toString()`{:.fhirpath} returns `"11:45"`|
+|**Boolean** |`true` or `false`| `true.toString()`{:.fhirpath} returns `true`|
+|**Integer** |`(-)?\d+`| `42.toString()`{:.fhirpath} returns `42`|
+|**Decimal** |`(-)?\d+(.\d+)?`| `3.14.toString()`{:.fhirpath} returns `3.14`|
+|**Quantity** |`(-)?\d+(.\d+)? (('.*')|(.*))` | `(53 'km').toString()`{:.fhirpath} returns `53 'km'` *(ucum units include quotes)*<br/>`(4 days).toString()`{:.fhirpath} returns `4 days` *(calendar duration units don't include quotes)*|
+|**Date** |`YYYY-MM-DD`| `@2020-01-01.toString()`{:.fhirpath} returns `2020-01-01`|
+|**DateTime** |`YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm`| `@2020-01-01T10:00:00.000+10:00.toString()`{:.fhirpath} returns `2020-01-01T10:00:00.000+10:00`|
+|**Time** |`hh:mm:ss.fff`| `@T10:30:00.000.toString()`{:.fhirpath} returns `10:30:00.000`<br/>`@T11:45.toString()`{:.fhirpath} returns `11:45`|
 {:.grid}
 
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
