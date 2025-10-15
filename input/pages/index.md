@@ -1128,7 +1128,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains a single item, this function will return a single date if:
 
 * the item is a Date
-* the item is a DateTime
+* the item is a DateTime, in which case the year, month, and day components
+are extracted directly without timezone conversion/normalization
 * the item is a String and is convertible to a Date
 
 If the item is not one of the above types, the result is empty.
@@ -1138,6 +1139,8 @@ If the item is a String, but the string is not convertible to a Date (using the 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
+
+For example: `@2024-01-15T23:30:00-05:00.toDate()` returns `@2024-01-15`
 
 ##### convertsToDate() : Boolean
 
