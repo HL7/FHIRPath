@@ -16,6 +16,7 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Conversions - toLong](#tolong--long)
 > * [Functions - repeatAll](#repeatallprojection-expression--collection)
 > * [Functions - coalesce](#coalesce)
+> * [Functions - sort](#sortkeyselector-expression-asc--desc--keyselector-expression-asc--desc---collection)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
 > * [Functions - String (trim, split, join)](#trim--string)
@@ -24,6 +25,7 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - Utility (defineVariable, lowBoundary, highBoundary)](#definevariable)
 > * [Functions - Utility (precision)](#precision--integer)
 > * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
+> * [Functions - Date and Time Interval Functions (duration, difference)](#date-and-time-interval-functions)
 > * [Types - Reflection](#reflection)
 > 
 > In addition, the appendices are included as additional documentation and are informative content.
@@ -121,10 +123,11 @@ Patient.name.given
 
 The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`. When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context. If the identifier cannot be resolved, the evaluation will end and signal an error to the calling environment.
 
-Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use backticks to include characters in path parts that would otherwise be interpreted as keywords or operators, e.g.:
+Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use other characters by using [delimited identifiers](#identifiers) - surrounding with backticks and using FHIRPath escaping as needed. This approach can also be used to encode nodes with names that are keywords. e.g.:
 
 ``` fhirpath
-Message.`PID-1`
+Message.`PID-1` // subtraction operator as a part of a property name
+`as` as string  // a property name that is also a fhirpath keyword
 ```
 
 ### Collections
@@ -170,8 +173,9 @@ FHIRPath expressions can consist of _paths_, _literals_, _operators_, and _funct
 
 ### Literals
 
-In addition to paths, FHIRPath expressions may contain _literals_, _operators_, and _function invocations_. FHIRPath supports the following types of literals:
+In addition to paths, FHIRPath expressions may contain _literals_, _operators_, and _function invocations_. 
 
+Examples of the supported FHIRPath literals:
 ``` txt
 Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
@@ -685,6 +689,49 @@ Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
 
 This example returns a collection containing, for each "usual" name for the Patient, the concatenation of the first given and family names.
 
+#### sort([keySelector: expression [asc | desc] [, keySelector: expression [asc | desc], ...]]) : collection
+{:.stu}
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns a collection containing the items in the input collection, sorted according to the specified key selector expressions. The function takes a variable number of key selector parameters, each of which can be optionally qualified with `asc` (ascending) or `desc` (descending). If no qualifier is provided, `asc` is the default.
+{:.stu}
+
+If no key selector parameters are provided, the sort uses the natural ordering for the type of data in the input collection, using the same comparison semantics as defined for the equals (`=`) and comparison operators (`>`, `>=`, `<`, `<=`).
+{:.stu}
+
+Each key selector expression is evaluated for each item in the input collection using singleton evaluation semantics. If the key selector expression evaluates to a collection with more than one item, the evaluation will end and signal an error to the calling environment.
+{:.stu}
+
+comparing values returned by the no key selector using the same comparison semantics as defined for the equals (`=`) and comparison operators (`>`, `>=`, `<`, `<=`).
+{:.stu}
+
+An empty value is considered lower than all other values, meaning they will appear before others when sorted ascending.
+{:.stu}
+
+When comparing two items, if the values for the first key selector are equal, the comparison proceeds to the next key selector, and so on until all key selectors have been evaluated or a difference is found.
+{:.stu}
+
+Attempting to sort items with incompatible types will result in an error. Values that would result in comparison errors must be filtered from the collection prior to sorting.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the use of the `sort()` function:
+{:.stu}
+
+``` fhirpath
+(3 | 1 | 2).sort() // (1 | 2 | 3) - natural numeric ordering
+(3 | 1 | 2).sort($this) // (1 | 2 | 3) - explicit ascending
+(3 | 1 | 2).sort($this desc) // (3 | 2 | 1) - descending
+('c' | 'a' | 'b').sort() // ('a' | 'b' | 'c') - natural string ordering
+('c' | 'a' | 'b').sort($this desc) // ('c' | 'b' | 'a') - descending
+Patient.name.sort(family desc, given.first()) // sort by family name descending, then by first given name ascending
+Patient.telecom.sort(system, use desc) // sort by system ascending, then by use descending
+```
+{:.stu}
+
 #### repeat(projection: expression) : collection
 
 A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
@@ -766,20 +813,14 @@ Bundle.entry.resource.ofType(Patient)
 In the above example, the symbol `Patient` must be treated as a type identifier rather than a reference to a Patient in context.
 
 <a name="coalesce"></a>
-#### coalesce([value : collection, value : collection, ...]) : collection
+#### coalesce(value : collection, [value : collection, ...]) : collection
 {:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 The `coalesce` function takes a variable number of arguments, each of which is a collection. It returns the first non-empty collection from the arguments. If all arguments are empty collections, the result is an empty collection.
 {:.stu}
 
-Note that the short-circuit behaviour is expected in this function. In other words, arguments after the first non empty argument are not be evaluated. For implementations, this means delaying evaluation of the arguments (as done with `iif`).
-{:.stu}
-
-If the input collection is empty, the result is empty.
-{:.stu}
-
-If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+Note that short-circuit behaviour is expected in this function. In other words, arguments after the first non-empty argument are not evaluated. For implementations, this means delaying evaluation of the arguments (as is done with `iif`).
 {:.stu}
 
 ```fhirpath
@@ -874,7 +915,7 @@ e.g. `(1 | 2 | 3).exclude(2)`{:.fhirpath} returns `(1 | 3)`.
 
 ### Combining
 
-#### <a name="unionother-collection"></a>union(other : collection)
+#### <a name="unionother-collection"></a>union(other : collection) : collection
 
 Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`) to determine equality). There is no expectation of order in the resulting collection.
 
@@ -963,13 +1004,13 @@ Note that short-circuit behavior is expected in this function. In other words, `
 If the input collection contains a single item, this function will return a single boolean if:
 
 * the item is a Boolean
-* the item is an Integer and is equal to one of the possible integer representations of Boolean values
-* the item is a Decimal that is equal to one of the possible decimal representations of Boolean values
-* the item is a String that is equal to one of the possible string representations of Boolean values
+* the item is an Integer and is equal to one of the **possible** integer **representations** of Boolean values
+* the item is a Decimal that is equal to one of the **possible** decimal **representations** of Boolean values
+* the item is a String that is equal to one of the **possible** string **representations** of Boolean values
 
 If the item is not one the above types, or the item is a String, Integer, or Decimal, but is not equal to one of the possible values convertible to a Boolean, the result is empty.
 
-The following table describes the possible values convertible to an Boolean:
+The following table describes the **possible** type **representations**:
 
 | Type | Representation | Result |
 | -| - | - |
@@ -977,8 +1018,8 @@ The following table describes the possible values convertible to an Boolean:
 | | `'false'`, `'f'`, `'no'`, `'n'`, `'0'`, `'0.0'` | `false` |
 | **Integer** | `1` | `true` |
 | | `0` | `false` |
-| **Decimal** | `1.0` |`true` |
-| | `0.0` | `false` |
+| **Decimal** | `1.0` *(or decimal equivalent)* |`true` |
+| | `0.0` *(or decimal equivalent)* | `false` |
 {: .grid}
 
 Note for the purposes of string representations, case is ignored (so that both `'T'` and `'t'` are considered `true`).
@@ -1258,22 +1299,22 @@ If the `unit` argument is provided, it must be the string representation of a UC
 If the input collection contains a single item, this function will return a single String if:
 
 * the item in the input collection is a String
-* the item in the input collection is an Integer, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation
+* the item in the input collection is an Integer, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation *(as shown in the table below)*
 * the item is a Boolean, where `true` results in `'true'` and `false` in `'false'`.
 
 If the item is not one of the above types, the result is empty.
 
 The String representation uses the following formats:
 
-|Type |Representation|
-|-|-|
-|**Boolean** |`true` or `false`|
-|**Integer** |`(\+|-)?\d+`|
-|**Decimal** |`(\+|-)?\d+(.\d+)?`|
-|**Quantity** |`(\+|-)?\d+(.\d+)? '.*'`    e.g. `(4 days).toString()`{:.fhirpath} returns `4 'd'` because the FHIRPath literal temporal units are short-hands for the UCUM equivalents. |
-|**Date** |**YYYY-MM-DD**|
-|**DateTime** |**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**|
-|**Time** |**hh:mm:ss.fff(+\|-)hh:mm**|
+|Type |Representation|Examples|
+|-|-|-|
+|**Boolean** |`true` or `false`| `true.toString()`{:.fhirpath} returns `true`|
+|**Integer** |`(-)?\d+`| `42.toString()`{:.fhirpath} returns `42`|
+|**Decimal** |`(-)?\d+(.\d+)?`| `3.14.toString()`{:.fhirpath} returns `3.14`|
+|**Quantity** |`(-)?\d+(.\d+)? (('.*')|(.*))` | `(53 'km').toString()`{:.fhirpath} returns `53 'km'` *(ucum units include quotes)*<br/>`(4 days).toString()`{:.fhirpath} returns `4 days` *(calendar duration units don't include quotes)*|
+|**Date** |`YYYY-MM-DD`| `@2020-01-01.toString()`{:.fhirpath} returns `2020-01-01`|
+|**DateTime** |`YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm`| `@2020-01-01T10:00:00.000+10:00.toString()`{:.fhirpath} returns `2020-01-01T10:00:00.000+10:00`|
+|**Time** |`hh:mm:ss.fff`| `@T10:30:00.000.toString()`{:.fhirpath} returns `10:30:00.000`<br/>`@T11:45.toString()`{:.fhirpath} returns `11:45`|
 {:.grid}
 
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
@@ -1500,7 +1541,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abc'.replace('', 'x') // 'xaxbxcx'
 ```
 
-#### matches(regex : String) : Boolean
+#### matches(regex : String, [flags : String]) : Boolean
 
 Returns `true` when the value matches the given regular expression. Regular expressions should function consistently, regardless of any culture- and locale-specific settings in the environment, should be case-sensitive, use 'single line' mode and allow Unicode characters.
 The start/end of line markers `^`, `$` can be used to match the entire string.
@@ -1509,13 +1550,19 @@ If the input collection or `regex` are empty, the result is empty (`{ }`).
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+The optional `flags` parameter can be set to:
+{:.stu}
+* `i` to perform a case-insensitive search (otherwise is case-sensitive)
+* `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
+{:.stu}
+
 ``` fhirpath
 'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matches('Library') // returns true
 'N8000123123'.matches('^N[0-9]{8}$') // returns false as the string is not an 8 char number (it has 10)
 'N8000123123'.matches('N[0-9]{8}') // returns true as the string has an 8 number sequence in it starting with `N`
 ```
 
-#### matchesFull(regex : String) : Boolean
+#### matchesFull(regex : String, [flags : String]) : Boolean
 {:.stu}
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
@@ -1532,6 +1579,12 @@ If the input collection or `regex` are empty, the result is empty (`{ }`).
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+The optional `flags` parameter can be set to:
+{:.stu}
+* `i` to perform a case-insensitive search (otherwise is case-sensitive)
+* `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
+{:.stu}
+
 ``` fhirpath
 'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matchesFull('Library') // returns false
 'N8000123123'.matchesFull('N[0-9]{8}') // returns false as the string is not an 8 char number (it has 10)
@@ -1539,7 +1592,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### replaceMatches(regex : String, substitution: String) : String
+#### replaceMatches(regex : String, substitution: String, [flags : String]) : String
 
 Matches the input using the regular expression in `regex` and replaces each match with the `substitution` string. The substitution may refer to identified match groups in the regular expression, as illustrated by the example below that uses named capture groups for `month`, `day`, and `year` to perform a conversion from one date format to another.
 
@@ -1547,11 +1600,21 @@ If the input collection, `regex`, or `substitution` are empty, the result is emp
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-This example of `replaceMatches()` will convert a string with a date formatted as MM/dd/yy to dd-MM-yy:
+The optional `flags` parameter can be set to:
+{:.stu}
+* `i` to perform a case-insensitive search (otherwise is case-sensitive)
+* `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
+{:.stu}
 
+This example of `replaceMatches()` will convert a string with a date formatted as MM/dd/yy to dd-MM-yy:
 ``` fhirpath
 '11/30/1972'.replaceMatches('\\b(?<month>\\d{1,2})/(?<day>\\d{1,2})/(?<year>\\d{2,4})\\b',
        '${day}-${month}-${year}')
+```
+
+This example locates all the instances of `aa` and surrounds them with double quotes:
+``` fhirpath
+'aaabaa'.replaceMatches('aa', '"aa"') // returns "aa"ab"aa"
 ```
 
 > **Note:** Platforms will typically use native regular expression implementations. These are typically fairly similar, but there will always be small differences. As such, FHIRPath does not prescribe a particular dialect, but recommends the use of the [\[PCRE\]](#PCRE) flavor as the dialect most likely to be broadly supported and understood.
@@ -2166,7 +2229,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ##### hourOf(): Integer
 {:.stu}
 
-If the input collection contains a single Date, DateTime or Time, this function will return the hour component.
+If the input collection contains a single DateTime or Time, this function will return the hour component.
 {:.stu}
 
 If the input collection is empty, or the hour is not present in the value, the result is empty.
@@ -2184,7 +2247,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ##### minuteOf(): Integer
 {:.stu}
 
-If the input collection contains a single Date, DateTime or Time, this function will return the minute component.
+If the input collection contains a single DateTime or Time, this function will return the minute component.
 {:.stu}
 
 If the input collection is empty, or the minute is not present in the value, the result is empty.
@@ -2201,7 +2264,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ##### secondOf(): Integer
 {:.stu}
 
-If the input collection contains a single Date, DateTime or Time, this function will return the second component.
+If the input collection contains a single DateTime or Time, this function will return the second component.
 {:.stu}
 
 If the input collection is empty, or the second is not present in the value, the result is empty.
@@ -2218,7 +2281,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ##### millisecondOf(): Integer
 {:.stu}
 
-If the input collection contains a single Date, DateTime or Time, this function will return the millisecond component.
+If the input collection contains a single DateTime or Time, this function will return the millisecond component.
 {:.stu}
 
 If the input collection is empty, or the millisecond is not present in the value, the result is empty.
@@ -2282,6 +2345,88 @@ If the input collection contains multiple items, the evaluation of the expressio
 @2012-01-01T12:30:00.000-07:00.timeOf() // @T12:30:00.000
 ```
 {:.stu}
+
+### Date and Time Interval Functions
+{:.stu}
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+If there is more than one input item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
+{:.stu}
+
+#### duration(value: date | datetime | time, precision: identifier): Integer
+{:.stu}
+
+Returns the number of whole calendar periods at the specified `precision` between the given input value and the `value` argument. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional periods are dropped.
+{:.stu}
+
+For input and value types of `date` values, the `precision` argument must be one of: `year`, `month`, `week`, or `day`.
+{:.stu}
+
+For input and value types of `datetime` values, the `precision` argument must be one of: `year`, `month`, `week`, `day`, `hour`, `minute`, `second`, or `millisecond`.
+{:.stu}
+
+For input and value types of `time` values, the `precision` argument must be one of: `hour`, `minute`, `second`, or `millisecond`.
+{:.stu}
+
+If the input value or `value` argument are of less precision than the specified `precision`, the result is empty.
+{:.stu}
+
+When computing the duration between DateTime values with different timezone offsets, implementations should normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.
+{:.stu}
+
+If either the input or `value` argument is empty, the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the duration function:
+{:.stu}
+
+```fhirpath
+@2025-01-02.duration(@2025-01-07, 'week') // 0 - hasn't passed 7 days duration
+@2025-01-01.duration(@2025-09-01, 'year') // 0 - baby is 9 months old
+@2024-12-01.duration(@2025-09-01, 'year') // 0 - baby is 10 months old
+```
+{:.stu}
+
+
+#### difference(value: date | datetime | time, precision: identifier): Integer
+{:.stu}
+
+Returns the number of boundaries crossed for the specified `precision` between the input value and the `value` arguments. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional boundaries are dropped.
+{:.stu}
+
+For input and value types of `date` values, the `precision` argument must be one of: `year`, `month`, `week`, or `day`.
+{:.stu}
+
+For input and value types of `datetime` values, the `precision` argument must be one of: `year`, `month`, `week`, `day`, `hour`, `minute`, `second`, or `millisecond`.
+{:.stu}
+
+For input and value types of `time` values, the `precision` argument must be one of: `hour`, `minute`, `second`, or `millisecond`.
+{:.stu}
+
+If the input value or `value` argument are of less precision than the specified `precision`, the result is empty.
+{:.stu}
+
+For calculations involving weeks, Sunday is considered to be the first day of the week for the purposes of determining the number of boundaries crossed.
+{:.stu}
+
+When computing the difference between `datetime` values with different timezone offsets, implementations should normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.
+{:.stu}
+
+If either the input or `value` argument is empty, the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the difference function:
+{:.stu}
+
+```fhirpath
+@2025-01-02.difference(@2025-01-07, 'week') // 1 - crossed a week boundary (Sunday)
+@2025-01-01.difference(@2025-09-01, 'year') // 0 - baby is 9 months old, but born this year
+@2024-12-01.difference(@2025-09-01, 'year') // 1 - baby is 10 months old, but born last year
+```
+{:.stu}
+
 
 ## Operations
 
@@ -2473,14 +2618,16 @@ The greater than operator (`>`) returns `true` if the first operand is strictly 
 10 > 5.0 // true; note the 10 is converted to a decimal to perform the comparison
 'abc' > 'ABC' // true
 4 'm' > 4 'cm' // true (or { } if the implementation does not support unit conversion)
-@2018-03-01 > @2018-01-01 // true
+
+@2018-03-01 > @2018-01-01 // true - same precision
 @2018-03 > @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 > @2018-03-01T10:00:00 // true
 @2018-03-01T10 > @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 > @2018-03-01T10:30:00.0 // false
+@2018-03-01T10:30:00 > @2018-03-01T10:30:00.0 // false (values are equal to seconds, trailing zeroes after the decimal are ignored)
+
 @T10:30:00 > @T10:00:00 // true
 @T10 > @T10:30 // empty ({ }) - different precisions
-@T10:30:00 > @T10:30:00.0 // false
+@T10:30:00 > @T10:30:00.0 // false - values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
 #### &lt; (Less Than)
@@ -2489,17 +2636,23 @@ The less than operator (`<`) returns `true` if the first operand is strictly les
 
 ``` fhirpath
 10 < 5 // false
-10 < 5.0 // false; note the 10 is converted to a decimal to perform the comparison
+10 < 5.0 // false - note the 10 is converted to a decimal to perform the comparison
 'abc' < 'ABC' // false
 4 'm' < 4 'cm' // false (or { } if the implementation does not support unit conversion)
+
 @2018-03-01 < @2018-01-01 // false
+@2018-01-01 < @2018-01-01 // false - same precision
 @2018-03 < @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 < @2018-03-01T10:00:00 // false
 @2018-03-01T10 < @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 < @2018-03-01T10:30:00.0 // false
+@2018-03-01T10:30:00 < @2018-03-01T10:30:00.0 // false - values are equal to seconds, trailing zeroes after the decimal are ignored
+
+@2018-01-01T16:00:00+11:00 < @2018-01-01T15:00:00.0+10:00 // false (same moment in diff timezones)
+@2018-01-01T16:00:00+12:00 < @2018-01-01T15:00:00.0+10:00 // true (4pm+12 is less than 5pm+10 when timezones are considered)
+
 @T10:30:00 < @T10:00:00 // false
 @T10 < @T10:30 // empty ({ }) - different precisions
-@T10:30:00 < @T10:30:00.0 // false
+@T10:30:00 < @T10:30:00.0 // false - values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
 #### &lt;= (Less or Equal)
@@ -2507,15 +2660,21 @@ The less than operator (`<`) returns `true` if the first operand is strictly les
 The less or equal operator (`<=`) returns `true` if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
 
 ``` fhirpath
-10 <= 5 // true
-10 <= 5.0 // true; note the 10 is converted to a decimal to perform the comparison
-'abc' <= 'ABC' // true
+10 <= 5 // false
+10 <= 5.0 // false - note the 10 is converted to a decimal to perform the comparison
+'abc' <= 'ABC' // false
 4 'm' <= 4 'cm' // false (or { } if the implementation does not support unit conversion)
+
 @2018-03-01 <= @2018-01-01 // false
+@2018-01-01 <= @2018-01-01 // true - equal with same precision
 @2018-03 <= @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 <= @2018-03-01T10:00:00 // false
 @2018-03-01T10 <= @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0 // true
+@2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
+
+@2018-01-01T16:00:00+11:00 <= @2018-01-01T15:00:00.0+10:00 // true (same moment in diff timezones)
+@2018-01-01T16:00:00+12:00 <= @2018-01-01T15:00:00.0+10:00 // true (4pm+12 is less than 5pm+10 when timezones are considered)
+
 @T10:30:00 <= @T10:00:00 // false
 @T10 <= @T10:30 // empty ({ }) - different precisions
 @T10:30:00 <= @T10:30:00.0 // true
@@ -2526,18 +2685,21 @@ The less or equal operator (`<=`) returns `true` if the first operand is less th
 The greater or equal operator (`>=`) returns `true` if the first operand is greater than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
 
 ``` fhirpath
-10 >= 5 // false
-10 >= 5.0 // false; note the 10 is converted to a decimal to perform the comparison
-'abc' >= 'ABC' // false
+10 >= 5 // true
+10 >= 5.0 // true - note the 10 is converted to a decimal to perform the comparison
+'abc' >= 'ABC' // true
 4 'm' >= 4 'cm' // true (or { } if the implementation does not support unit conversion)
+
 @2018-03-01 >= @2018-01-01 // true
+@2018-01-01 >= @2018-01-01 // true - equal with same precision
 @2018-03 >= @2018-03-01 // empty ({ }) - different precisions
 @2018-03-01T10:30:00 >= @2018-03-01T10:00:00 // true
 @2018-03-01T10 >= @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0 // true
+@2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
+
 @T10:30:00 >= @T10:00:00 // true
 @T10 >= @T10:30 // empty ({ }) - different precisions
-@T10:30:00 >= @T10:30:00.0 // true
+@T10:30:00 >= @T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
 ### Types

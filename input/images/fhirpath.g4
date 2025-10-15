@@ -9,7 +9,7 @@ grammar fhirpath;
 entireExpression
         : expression EOF
         ;
-        
+
 expression
         : term                                                      #termExpression
         | expression '.' invocation                                 #invocationExpression
@@ -60,7 +60,12 @@ invocation                          // Terms that can be used after the function
         ;
 
 function
-        : identifier '(' paramList? ')'
+        : 'sort' '(' (sortArgument (',' sortArgument)*)? ')'
+        | identifier '(' paramList? ')'
+        ;
+
+sortArgument
+        : expression ('asc' | 'desc')?                          #sortDirectionArgument
         ;
 
 paramList
@@ -100,6 +105,8 @@ identifier
         | 'contains'
         | 'in'
         | 'is'
+        | 'asc'
+        | 'desc'
         ;
 
 
@@ -155,7 +162,7 @@ NUMBER
         ;
 
 LONGNUMBER
-        : [0-9]+ 'L'?
+        : [0-9]+ 'L'
         ;
 
 // Pipe whitespace to the HIDDEN channel to support retrieving source text through the parser.
