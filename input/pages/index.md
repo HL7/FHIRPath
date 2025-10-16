@@ -269,9 +269,6 @@ The `Long` type represents whole numbers in the range -2<sup>63</sup> to 2<sup>6
 ```
 {:.stu}
 
-This type corresponds to System.Long
-{:.stu}
-
 #### Decimal
 
 The `Decimal` type represents real values in the range (-10<sup>28</sup>+1)/10<sup>8</sup> to (10<sup>28</sup>-1)/10<sup>8</sup> with a step size of 10<sup>-8</sup>. This range is defined based on a survey of decimal-value implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger decimals and higher precision, but must provide at least the range and precision defined here. In addition, implementations should use [fixed-precision decimal](https://en.wikipedia.org/wiki/Fixed-point_arithmetic) formats to ensure that decimal values are accurately represented.
