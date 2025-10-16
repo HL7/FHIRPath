@@ -702,7 +702,7 @@ This example returns a collection containing, for each "usual" name for the Pati
 Returns a collection containing the items in the input collection, sorted according to the specified key selector expressions. The function takes a variable number of key selector parameters, each of which can be optionally qualified with `asc` (ascending) or `desc` (descending). If no qualifier is provided, `asc` is the default.
 {:.stu}
 
-If no key selector parameters are provided, the sort uses the natural ordering for the type of data in the input collection, using the same comparison semantics as defined for the equals (`=`) and comparison operators (`>`, `>=`, `<`, `<=`).
+If no key selector parameters are provided, the sort uses the default ordering for the type of data in the input collection, using the same comparison semantics as defined for the equals (`=`) and comparison operators (`>`, `>=`, `<`, `<=`).
 {:.stu}
 
 Each key selector expression is evaluated for each item in the input collection using singleton evaluation semantics. If the key selector expression evaluates to a collection with more than one item, the evaluation will end and signal an error to the calling environment.
@@ -730,7 +730,7 @@ The following examples illustrate the use of the `sort()` function:
 (3 | 1 | 2).sort() // (1 | 2 | 3) - natural numeric ordering
 (3 | 1 | 2).sort($this) // (1 | 2 | 3) - explicit ascending
 (3 | 1 | 2).sort($this desc) // (3 | 2 | 1) - descending
-('c' | 'a' | 'b').sort() // ('a' | 'b' | 'c') - natural string ordering
+('c' | 'a' | 'b').sort() // ('a' | 'b' | 'c') - default string ordering
 ('c' | 'a' | 'b').sort($this desc) // ('c' | 'b' | 'a') - descending
 Patient.name.sort(family desc, given.first()) // sort by family name descending, then by first given name ascending
 Patient.telecom.sort(system, use desc) // sort by system ascending, then by use descending
