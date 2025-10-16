@@ -74,15 +74,23 @@ All operations and functions return a collection, but if the operation or functi
 
 Throughout this specification, formatting patterns for Date, Time, and DateTime values are described using an informal description with the following markers:
 
-* **YYYY** - A full four digit year (0001..9999), padded with leading zeroes if necessary
-* **MM** - A full two digit month value (01..12), padded with leading zeroes if necessary
-* **DD** - A full two digit day value (01..31), padded with leading zeroes if necessary
-* **hh** - A full two digit hour value (00..24), padded with leading zeroes if necessary
-* **mm** - A full two digit minute value (00..59), padded with leading zeroes if necessary
-* **ss** - A full two digit second value (00..59), padded with leading zeroes if necessary
-* **fff** - A fractional millisecond value (0..999)
+* `YYYY`{:.formatted} - A full four digit year (0001..9999), padded with leading zeroes if necessary
+* `MM`{:.formatted} - A full two digit month value (01..12), padded with leading zeroes if necessary
+* `DD`{:.formatted} - A full two digit day value (01..31), padded with leading zeroes if necessary
+* `hh`{:.formatted} - A full two digit hour value (00..24), padded with leading zeroes if necessary
+* `mm`{:.formatted} - A full two digit minute value (00..59), padded with leading zeroes if necessary
+* `ss`{:.formatted} - A full two digit second value (00..59), padded with leading zeroes if necessary
+* `fff`{:.formatted} - A fractional millisecond value (0..999)
 
-These formatting patterns are set in **bold** to distinguish them typographically from literals or code and to make clear that they are not intended to be formally interpreted as regex patterns.
+and formatting patterns for numeric types are described using an informal description with these markers:
+* `0`{:.formatted} - Any digit MUST appear at this location in the format string
+* `#`{:.formatted} - Any digits may appear at this location in the format string
+* `?`{:.formatted} - The immediately preceding pattern is optional
+* `( )`{:.formatted} - Used to group patterns
+* `< >`{:.formatted} - Used indicate some specific text is included. e.g `'<unit>'`{:.formatted} to indicate that a quantities unit would be surrounded by single quotes.
+* `|`{:.formatted} - Used to combine choices of patterns (e.g. | means a  or  may appear at this location)
+
+These formatting patterns are set in `bold`{:.formatted} to distinguish them typographically from literals or code and to make clear that they are not intended to be formally interpreted as regex patterns.
 
 #### Conformance Language
 
@@ -282,7 +290,7 @@ The `Date` type represents date and partial date values in the range @0001-01-01
 The `Date` literal is a subset of [\[ISO8601\]](#ISO8601):
 
 * A date literal begins with an `@`
-* It uses the format **YYYY-MM-DD** format, though month and day parts are optional, and a separator is required between provided components
+* It uses the `YYYY-MM-DD`{:.formatted} format, though month and day parts are optional, and a separator is required between provided components
 * Week dates and ordinal dates are not allowed
 * Years must be present (e.g. `@-10-20` is not a valid Date in FHIRPath)
 * Months must be present if a day is present
@@ -305,7 +313,7 @@ The `Time` type represents time-of-day and partial time-of-day values in the ran
 The `Time` literal uses a subset of [\[ISO8601\]](#ISO8601):
 
 * A time begins with a `@T`
-* It uses the **Thh:mm:ss.fff** format
+* It uses the `Thh:mm:ss.fff`{:.formatted} format
 
 The following examples illustrate the use of the `Time` literal:
 
@@ -323,8 +331,8 @@ The `DateTime` type represents date/time and partial date/time values in the ran
 The `DateTime` literal combines the `Date` and `Time` literals and is a subset of [\[ISO8601\]](#ISO8601):
 
 * A datetime literal begins with an `@`
-* It uses the **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm** format
-* Timezone offset is optional, but if present the notation **(+\|-)hh:mm** is used (so must include both minutes and hours)
+* It uses the `YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted} format
+* Timezone offset is optional, but if present the notation `(+\|-)hh:mm`{:.formatted} is used (so must include both minutes and hours)
 * **Z** is allowed as a synonym for the zero (+00:00) UTC offset.
 * A `T` can be used at the end of any date (year, year-month, or year-month-day) to indicate a partial DateTime.
 
@@ -1134,7 +1142,7 @@ are extracted directly without timezone conversion/normalization
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a Date (using the format **YYYY-MM-DD**), the result is empty.
+If the item is a String, but the string is not convertible to a Date (using the format `YYYY-MM-DD`{:.formatted}), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1150,7 +1158,7 @@ If the input collection contains a single item, this function will return `true`
 * the item is a DateTime
 * the item is a String and is convertible to a Date
 
-If the item is not one of the above types, or is not convertible to a Date (using the format **YYYY-MM-DD**), the result is `false`.
+If the item is not one of the above types, or is not convertible to a Date (using the format `YYYY-MM-DD`{:.formatted}), the result is `false`.
 
 If the item contains a partial date (e.g. `'2012-01'`), the result is a partial date.
 
@@ -1170,7 +1178,7 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**), the result is empty.
+If the item is a String, but the string is not convertible to a DateTime (using the format `YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is empty.
 
 If the item contains a partial datetime (e.g. `'2012-01-01T10:00'`), the result is a partial datetime.
 
@@ -1186,7 +1194,7 @@ If the input collection contains a single item, this function will return `true`
 * the item is a Date
 * the item is a String and is convertible to a DateTime
 
-If the item is not one of the above types, or is not convertible to a DateTime (using the format **YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**), the result is `false`.
+If the item is not one of the above types, or is not convertible to a DateTime (using the format `YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1312,12 +1320,12 @@ The String representation uses the following formats:
 |Type |Representation|Examples|
 |-|-|-|
 |**Boolean** |`true` or `false`| `true.toString()`{:.fhirpath} returns `true`|
-|**Integer** |`(-)?\d+`| `42.toString()`{:.fhirpath} returns `42`|
-|**Decimal** |`(-)?\d+(.\d+)?`| `3.14.toString()`{:.fhirpath} returns `3.14`|
-|**Quantity** |`(-)?\d+(.\d+)? (('.*')|(.*))` | `(53 'km').toString()`{:.fhirpath} returns `53 'km'` *(ucum units include quotes)*<br/>`(4 days).toString()`{:.fhirpath} returns `4 days` *(calendar duration units don't include quotes)*|
-|**Date** |`YYYY-MM-DD`| `@2020-01-01.toString()`{:.fhirpath} returns `2020-01-01`|
-|**DateTime** |`YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm`| `@2020-01-01T10:00:00.000+10:00.toString()`{:.fhirpath} returns `2020-01-01T10:00:00.000+10:00`|
-|**Time** |`hh:mm:ss.fff`| `@T10:30:00.000.toString()`{:.fhirpath} returns `10:30:00.000`<br/>`@T11:45.toString()`{:.fhirpath} returns `11:45`|
+|**Integer** |`(-)?#0`{:.formatted}| `42.toString()`{:.fhirpath} returns `42`|
+|**Decimal** |`(-)?#0.0#`{:.formatted}| `3.14.toString()`{:.fhirpath} returns `3.14`|
+|**Quantity** |`(-)?#0.0# (('<unit>')|(<unit>))`{:.formatted} | `(53 'km').toString()`{:.fhirpath} returns `53 'km'` *(ucum units include quotes)*<br/>`(4 days).toString()`{:.fhirpath} returns `4 days` *(calendar duration units don't include quotes)*|
+|**Date** |`YYYY-MM-DD`{:.formatted}| `@2020-01-01.toString()`{:.fhirpath} returns `2020-01-01`|
+|**DateTime** |`YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm`{:.formatted}| `@2020-01-01T10:00:00.000+10:00.toString()`{:.fhirpath} returns `2020-01-01T10:00:00.000+10:00` and `@2025-11-01.toString()`{:.fhirpath} returns `2025-11-01`|
+|**Time** |`hh:mm:ss.fff`{:.formatted}| `@T10:30:00.000.toString()`{:.fhirpath} returns `10:30:00.000`<br/>`@T11:45.toString()`{:.fhirpath} returns `11:45`|
 {:.grid}
 
 Note that for partial dates and times, the result will only be specified to the level of precision in the value being converted.
@@ -1352,7 +1360,7 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a Time (using the format **hh:mm:ss.fff(+\|-)hh:mm**), the result is empty.
+If the item is a String, but the string is not convertible to a Time (using the format `hh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is empty.
 
 If the item contains a partial time (e.g. `'10:00'`), the result is a partial time.
 
@@ -1367,7 +1375,7 @@ If the input collection contains a single item, this function will return `true`
 * the item is a Time
 * the item is a String and is convertible to a Time
 
-If the item is not one of the above types, or is not convertible to a Time (using the format **hh:mm:ss.fff(+\|-)hh:mm**), the result is `false`.
+If the item is not one of the above types, or is not convertible to a Time (using the format `hh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -3158,9 +3166,9 @@ Literals provide for the representation of values within FHIRPath. The following
 |**[Integer](#integer)**|Sequences of digits in the range 0..2<sup>32</sup>-1|
 |**[Decimal](#decimal)**|Sequences of digits with a decimal point, in the range (-10<sup>28</sup>+1)/10<sup>8</sup>..(10<sup>28</sup>-1)/10<sup>8</sup>|
 |**[String](#string)**|Strings of any character enclosed within single-ticks (`'`)|
-|**[Date](#date)**|The at-symbol (`@`) followed by a date (**YYYY-MM-DD**)|
-|**[DateTime](#datetime)**|The at-symbol (`@`) followed by a datetime (**YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm**) |
-|**[Time](#time)**|The at-symbol (`@`) followed by a time (**Thh:mm:ss.fff(+\|-)hh:mm**) |
+|**[Date](#date)**|The at-symbol (`@`) followed by a date (`YYYY-MM-DD`{:.formatted})|
+|**[DateTime](#datetime)**|The at-symbol (`@`) followed by a datetime (`YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}) |
+|**[Time](#time)**|The at-symbol (`@`) followed by a time (`Thh:mm:ss.fff(+\|-)hh:mm`{:.formatted}) |
 |**[Quantity](#quantity)**|An integer or decimal literal followed by a datetime precision specifier, or a [\[UCUM\]](#UCUM) unit specifier|
 {: .grid}
 
