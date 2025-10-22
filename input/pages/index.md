@@ -2115,7 +2115,14 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 ``` fhirpath
-1.587.lowBoundary(8) // 1.58700000
+1.587.lowBoundary() // 1.58650000
+1.587.lowBoundary(6) // 1.586500
+1.587.lowBoundary(2) // 1.58
+1.587.lowBoundary(0) // 1
+(-1.587).lowBoundary() // -1.58750000
+(-1.587).lowBoundary(6) // -1.587500
+(-1.587).lowBoundary(2) // -1.59
+(-1.587).lowBoundary(0) // -2
 @2014.lowBoundary(6) // @2014-01
 @2014-01-01T08.lowBoundary(17) // @2014-01-01T08:00:00.000
 @T10:30.lowBoundary(9) // @T10:30:00.000
@@ -2144,7 +2151,14 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 ``` fhirpath
-1.587.highBoundary(8) // 1.58799999
+1.587.highBoundary() // 1.58750000
+1.587.highBoundary(6) // 1.587500
+1.587.highBoundary(2) // 1.59
+1.587.highBoundary(0) // 2
+(-1.587).highBoundary() // -1.58650000
+(-1.587).highBoundary(6) // -1.586500
+(-1.587).highBoundary(2) // -1.58
+(-1.587).highBoundary(0) // 1
 @2014.highBoundary(6) // @2014-12
 @2014-01-01T08.highBoundary(17) // @2014-01-01T08:59:59.999
 @T10:30.highBoundary(9) // @T10:30:59.999
