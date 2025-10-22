@@ -2331,7 +2331,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ##### timezoneOffsetOf(): Decimal
 {:.stu}
 
-If the input collection contains a single DateTime, this function will return the timezone offset component.
+If the input collection contains a single DateTime, this function will return the timezone offset component. It is expressed as the number of hours difference from UTC, with fractional hours expressed as decimal values (e.g. -7.5 for UTC-7:30).
 {:.stu}
 
 If the input collection is empty, or the timezone offset is not present in the value, the result is empty.
@@ -2342,6 +2342,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 ``` fhirpath
 @2012-01-01T12:30:00.000-07:00.timezoneOffsetOf() // -7.0
+@2012-01-01T12:30:00.000+08:45.timezoneOffsetOf() // 8.75 Eucla, Western Australia
 ```
 {:.stu}
 
