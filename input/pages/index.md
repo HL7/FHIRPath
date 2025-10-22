@@ -101,6 +101,17 @@ This specification uses the conformance verbs SHALL, MUST, SHOULD, and MAY as de
 * SHOULD/SHOULD NOT: A best practice or recommendation to be considered by implementers within the context of their particular implementation; there may be valid reasons to ignore an item, but the full implications must be understood and carefully weighed before choosing a different course
 * MAY: This is truly optional language for an implementation; can be included or omitted as the implementer decides with no implications.
 
+### Credits
+This implementation guide represents significant person-hours of discussion, development work, and testing. The following are some of the key participants in the work, but many more have assisted through connectathons testing, asking questions and participating in conference calls.
+
+| Role | Contributors |
+| ---- | ------------ |
+| *Editors:* | **Bryn Rhodes** (Smile Digital Health)<br/>**Grahame Grieve** (Health Intersections)<br/>**Ewout Kramer** (Firely)<br/>**Brian Postlethwaite** (Microsoft Research) |
+| *Key Contributors:* | **Paul Lynch** (U.S. National Library of Medicine - NLM)<br/> **Bas van den Heuvel** (Philips Healthcare)<br/> **Chris Moesel** (MITRE)<br/> **Nikolai Ryzhikov** (Health Samurai)<br/> **Brian Kaney** (Vermonster)<br/> **Yury Sedinkin** (US NLM) |
+
+This list inevitably fails to mention many of the individuals who contributed their time and energy to developing this specification and making it better. Thanks to all of you!
+
+
 ## Navigation model
 
 FHIRPath navigates and selects nodes from a tree that abstracts away and is independent of the actual underlying implementation of the source against which the FHIRPath query is run. This way, FHIRPath can be used on in-memory Plain Old Java Objects (POJOs), XML data or any other physical representation, so long as that representation can be viewed as classes that have properties. In somewhat more formal terms, FHIRPath operates on a directed acyclic graph of classes as defined by a Meta Object Facility (MOF)-equivalent [\[MOF\]](#MOF) type system. In this specification, the structures on which FHIRPath operates are referred to as the Object Model.
