@@ -87,8 +87,10 @@ and formatting patterns for numeric types are described using an informal descri
 * `#`{:.formatted} - Any digits may appear at this location in the format string
 * `?`{:.formatted} - The immediately preceding pattern is optional
 * `( )`{:.formatted} - Used to group patterns
-* `< >`{:.formatted} - Used indicate some specific text is included. e.g `'<unit>'`{:.formatted} to indicate that a quantities unit would be surrounded by single quotes.
-* `|`{:.formatted} - Used to combine choices of patterns (e.g. | means a  or  may appear at this location)
+* `< >`{:.formatted} - Used indicate some specific named content is included. e.g `'<unit>'`{:.formatted} to indicate that a quantities unit would be surrounded by single quotes.
+* `|`{:.formatted} - Used to combine choices of patterns (e.g. `+|-`{:.formatted} means a **`+`** or **`-`** will appear at this location)
+
+Any other character in a format string indicates that the character must appear at that location (unless it has an optional indicator, or is part of an optional group), noting that named content inside `<>` isn't explicit text.
 
 These formatting patterns are set in `bold`{:.formatted} to distinguish them typographically from literals or code and to make clear that they are not intended to be formally interpreted as regex patterns.
 
