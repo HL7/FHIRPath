@@ -95,6 +95,17 @@ table.stu:after {
     bottom: -18px;
 }
 
+code.formatted {
+    font-weight: bold;
+    color: blue;
+    background-color: unset !important;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 4px;
+    font-size: unset;
+    white-space: nowrap !important;
+}
+
 blockquote.stu {
     padding-left: 32px;
     position: relative;
