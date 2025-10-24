@@ -3178,6 +3178,10 @@ Use parentheses to ensure the unary negation applies to the `7`:
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed:
 {:.stu}
 
+> **Note:** While the `aggregate()` function is powerful and flexible, authors are encouraged to use the built-in aggregate functions for sum, min, max, and avg described below where possible.
+They are more concise, easier to read, and handle input types more effectively, unless you need to handle specific edge cases.
+{:.stu}
+
 ### aggregate(aggregator : expression [, init : value]) : value
 {:.stu}
 Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
@@ -3195,7 +3199,7 @@ value.aggregate($this + $total, 0)
 ```
 {:.stu}
 
-Min can be expressed as:
+Min could be expressed as:
 {:.stu}
 
 ``` fhirpath
@@ -3203,11 +3207,104 @@ value.aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))
 ```
 {:.stu}
 
-and average would be expressed as:
+and average could be expressed as:
 {:.stu}
 
 ``` fhirpath
 value.aggregate($total + $this, 0) / value.count()
+```
+{:.stu}
+
+### sum() : Integer | Long | Decimal | Quantity
+{:.stu}
+Returns the sum of all elements in the input collection (in the same type).
+{:.stu}
+
+Accepts input collections with elements of type: Integer, Long, Decimal or Quantity.
+{:.stu}
+
+All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the `sum` function:
+{:.stu}
+``` fhirpath
+( 1.0 | 2.0 | 3.0 | 4.0 | 5.0 ).sum() // 15.0
+( 1.0 'mg' | 2.0 'mg' | 3.0 'mg' | 4.0 'mg' | 5.0 'mg' ).sum() // 15.0 'mg'
+```
+{:.stu}
+
+### min() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
+{:.stu}
+Returns the minimum element in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
+{:.stu}
+
+Accepts input collections with elements of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
+{:.stu}
+
+All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the `min` function:
+{:.stu}
+``` fhirpath
+( 2, 4, 8, 6 ).min() // 2
+( 2L, 4L, 8L, 6L ).min() // 2L
+( @2012-12-31, @2013-01-01, @2012-01-01 ).min() // @2012-01-01
+```
+{:.stu}
+
+### max() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
+{:.stu}
+Returns the maximum element in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
+{:.stu}
+
+Accepts input collections with elements of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
+{:.stu}
+
+All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the `max` function:
+{:.stu}
+``` fhirpath
+( 2, 4, 8, 6 ).max() // 8
+( 2L, 4L, 8L, 6L ).max() // 8L
+( @2012-12-31, @2013-01-01, @2012-01-01 ).max() // @2013-01-01
+```
+{:.stu}
+
+### avg() : Decimal | Quantity
+{:.stu}
+Returns the average of all elements in the input collection (in the same type).
+{:.stu}
+
+Accepts input collections with elements of type: Decimal or Quantity.
+{:.stu}
+
+When used with Integer or Long, the arguments will be implicitly converted to Decimal before evaluation.
+{:.stu}
+
+All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the `avg` function:
+{:.stu}
+``` fhirpath
+( 5.5 | 4.7 | 4.8 ).avg() // 5.0
+( 5.5 'cm' | 4.7 'cm' | 4.8 'cm' ).avg() // 5.0 'cm'
 ```
 {:.stu}
 
