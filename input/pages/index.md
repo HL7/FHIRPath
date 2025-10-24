@@ -18,7 +18,7 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - coalesce](#coalesce)
 > * [Functions - sort](#sortkeyselector-expression-asc--desc--keyselector-expression-asc--desc---collection)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
-> * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
+> * [Functions - String (matchesFull)](#matchesfullregex--string-flags--string--boolean)
 > * [Functions - String (trim, split, join)](#trim--string)
 > * [Functions - String (encode, decode, escape, unescape)](#additional-string-functions)
 > * [Functions - Math](#math)
