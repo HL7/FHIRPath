@@ -1784,7 +1784,7 @@ The following example illustrates the behavior of the `.join` operator:
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
-The functions in this section operate on collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
+The functions in this section accept input collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
 Note also that although all functions return collections, if a given function is defined to return a single element, the return type in the description of the function is simplified to just the type of the single element, rather than the list type.
@@ -1794,17 +1794,20 @@ The math functions in this section enable FHIRPath to be used not only for path 
 {:.stu}
 
 ``` fhirpath
-(%weight/(%height.power(2))).round(1)
+(%weight/(%height.power(2))).round(1) // note that these variables are decimal values not quantities
 ```
 {:.stu}
 
 This example from a questionnaire calculates the Body Mass Index (BMI) based on the responses to the weight and height elements. For more information on the use of FHIRPath in questionnaires, see the [Structured Data Capture](http://hl7.org/fhir/uv/sdc/) (SDC) implementation guide.
 {:.stu}
 
-#### abs() : Integer | Decimal | Quantity
+#### abs() : Integer | Long | Decimal | Quantity
 {:.stu}
 
-Returns the absolute value of the input. When taking the absolute value of a quantity, the unit is unchanged.
+Returns the absolute value of the input (in the same type). When taking the absolute value of a quantity, the unit is unchanged.
+{:.stu}
+
+Accepts input types of Integer, Long, Decimal or Quantity.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1820,10 +1823,17 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### ceiling() : Integer
+#### ceiling() : Integer | Quantity
 {:.stu}
 
 Returns the first integer greater than or equal to the input.
+{:.stu}
+
+Accepts input types of Decimal or Quantity.
+{:.stu}
+
+When used with a Decimal input type, the result is an Integer.<br/>
+When used with a Quantity, the result is a Quantity with the same units and the value *(Decimal)* set to the integer result calculated.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1839,13 +1849,16 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
+> Note: We may consider a CeilingLong() function to handle Long output types.
+{: .stu-note }
+
 #### exp() : Decimal
 {:.stu}
 
 Returns _e_ raised to the power of the input.
 {:.stu}
 
-If the input collection contains an Integer, it will be implicitly converted to a Decimal and the result will be a Decimal.
+Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1860,10 +1873,17 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### floor() : Integer
+#### floor() : Integer | Quantity
 {:.stu}
 
 Returns the first integer less than or equal to the input.
+{:.stu}
+
+Accepts input types of Decimal or Quantity.
+{:.stu}
+
+When used with a Decimal input type, the result is an Integer.<br/>
+When used with a Quantity, the result is a Quantity with the same units and the value *(Decimal)* set to the integer result calculated.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1879,13 +1899,16 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
+> Note: We may consider a FloorLong() function to handle Long output types.
+{: .stu-note }
+
 #### ln() : Decimal
 {:.stu}
 
 Returns the natural logarithm of the input (i.e. the logarithm base _e_).
 {:.stu}
 
-When used with an Integer, it will be implicitly converted to a Decimal.
+Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1906,7 +1929,11 @@ If the input collection contains multiple items, the evaluation of the expressio
 Returns the logarithm base `base` of the input number.
 {:.stu}
 
-When used with Integers, the arguments will be implicitly converted to Decimal.
+Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
+{:.stu}
+
+If the input is 0 or negative, the evaluation will end and signal an error to the calling environment.
+If the base argument is 0 or negative, the evaluation will end and signal an error to the calling environment.
 {:.stu}
 
 If `base` is empty, the result is empty.
@@ -1924,13 +1951,19 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### power(exponent : Integer | Decimal) : Integer | Decimal
+#### power(exponent : Integer | Decimal) : Decimal
 {:.stu}
 
-Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer. If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal. Note that if both the base and the `exponent` are integers and the `exponent` is negative, the result is empty since that might result in a Decimal value, not an Integer (the expected output type for this case).
+Raises a number to the `exponent` power.
 {:.stu}
 
-If the power cannot be represented (such as the -1 raised to the 0.5), the result is empty.
+Accepts input types of Decimal, Integer or Long.
+{:.stu}
+
+The result is always a Decimal, because raising a number to a fractional power (such as 1/2) produces a non-integer result.
+{:.stu}
+
+If the power cannot be represented (such as -1 raised to the 0.5), the result is empty.
 {:.stu}
 
 If the input is empty, or exponent is empty, the result is empty.
@@ -1946,19 +1979,26 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### round([precision : Integer]) : Decimal
+#### round([precision : Integer]) : Decimal | Quantity
 {:.stu}
 
 > [Discussion on this topic](https://chat.fhir.org/#narrow/stream/179266-fhirpath/topic/round.28.29.20for.20negative.20numbers) If you have specific proposals or feedback please log a change request.
 {: .stu-note }
 
-Rounds the decimal to the nearest whole number using a traditional round (i.e. 0.5 or higher will round to 1). If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
+Rounds the input to the nearest whole number using a traditional round (i.e. 0.5 or higher will round to 1). If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
 {:.stu}
 
 If specified, the number of digits of precision must be >= 0 or the evaluation will end and signal an error to the calling environment.
 {:.stu}
 
-If the input collection contains a single item of type Integer, it will be implicitly converted to a Decimal.
+Accepts input types of Decimal, or Quantity.
+{:.stu}
+
+When used with a Decimal input type, the result is an Decimal.<br/>
+When used with a Quantity, the result is a Quantity with the same units.
+{:.stu}
+
+When used with Integer or Long, the arguments will be implicitly converted to Decimal before evaluation.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1976,7 +2016,10 @@ If the input collection contains multiple items, the evaluation of the expressio
 #### sqrt() : Decimal
 {:.stu}
 
-Returns the square root of the input number as a Decimal.
+Returns the square root of the input number.
+{:.stu}
+
+Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
 {:.stu}
 
 If the square root cannot be represented (such as the square root of -1), the result is empty.
@@ -1997,10 +2040,17 @@ Note that this function is equivalent to raising a number of the power of 0.5 us
 ```
 {:.stu}
 
-#### truncate() : Integer
+#### truncate() : Integer | Quantity
 {:.stu}
 
 Returns the integer portion of the input.
+{:.stu}
+
+Accepts input types of Decimal or Quantity.
+{:.stu}
+
+When used with a Decimal input type, the result is an Integer.<br/>
+When used with a Quantity, the result is a Quantity with the same units and the value *(Decimal)* set to the integer result calculated.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -2015,6 +2065,10 @@ If the input collection contains multiple items, the evaluation of the expressio
 (-1.56).truncate() // -1
 ```
 {:.stu}
+
+> Note: We may consider a TruncateLong() function to handle Long output types.
+{: .stu-note }
+
 
 ### Tree navigation
 
