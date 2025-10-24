@@ -3073,6 +3073,10 @@ As `Time` is cyclic, the result of overflowing the time value will be wrapped ar
 
 For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
 
+Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.<br/>
+Authors SHOULD consider applying appropriate rounding functions (`round()`, `floor()`, `truncate()`, or `ceiling()`) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.
+{:.stu}
+
 For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value. For example:
 
 ``` fhirpath
@@ -3110,6 +3114,10 @@ As `Time` is cyclic, the result of overflowing the time value will be wrapped ar
 {:.stu}
 
 For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
+
+Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.<br/>
+Authors SHOULD consider applying appropriate rounding functions (`round()`, `floor()`, `truncate()`, or `ceiling()`) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.
+{:.stu}
 
 For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then subtracting from the date/time value. For example:
 
