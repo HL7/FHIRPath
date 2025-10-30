@@ -1985,7 +1985,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 > [Discussion on this topic](https://chat.fhir.org/#narrow/stream/179266-fhirpath/topic/round.28.29.20for.20negative.20numbers) If you have specific proposals or feedback please log a change request.
 {: .stu-note }
 
-Rounds the input to the nearest whole number using a traditional round (i.e. 0.5 or higher will round to 1). If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
+Rounds the input to the nearest whole number using a traditional round (i.e. to the nearest whole number), meaning that a decimal value greater than or equal to 0.5 and less than 1.0 will round to 1, and a decimal value less than or equal to -0.5 and greater than -1.0 will round to -1. If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
 {:.stu}
 
 If specified, the number of digits of precision must be >= 0 or the evaluation will end and signal an error to the calling environment.
