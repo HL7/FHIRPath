@@ -2550,12 +2550,11 @@ If both operands are collections with a single item, they must be of the same ty
   * `Time`: must be exactly the same
 * For complex types, equality requires all child properties to be equal, recursively.
 
-If both operands are collections with multiple items:
+If both operands are collections with multiple items, check the equality of each pair of items in order:
 
-* Each item must be equal
-* Comparison is order dependent
-
-Otherwise, equals returns `false`.
+* if the result is `false` for any pair, returns `false`
+* if the result is `true` for all pairs, returns `true`
+* otherwise returns empty ( `{ }` )
 
 Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
 
