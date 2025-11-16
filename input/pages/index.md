@@ -18,7 +18,7 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - coalesce](#coalesce)
 > * [Functions - sort](#sortkeyselector-expression-asc--desc--keyselector-expression-asc--desc---collection)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
-> * [Functions - String (matchesFull)](#matchesfullregex--string--boolean)
+> * [Functions - String (matchesFull)](#matchesfullregex--string-flags--string--boolean)
 > * [Functions - String (trim, split, join)](#trim--string)
 > * [Functions - String (encode, decode, escape, unescape)](#additional-string-functions)
 > * [Functions - Math](#math)
@@ -1784,7 +1784,7 @@ The following example illustrates the behavior of the `.join` operator:
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
-The functions in this section operate on collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
+The functions in this section accept input collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
 Note also that although all functions return collections, if a given function is defined to return a single element, the return type in the description of the function is simplified to just the type of the single element, rather than the list type.
@@ -1794,17 +1794,20 @@ The math functions in this section enable FHIRPath to be used not only for path 
 {:.stu}
 
 ``` fhirpath
-(%weight/(%height.power(2))).round(1)
+(%weight/(%height.power(2))).round(1) // note that these variables are decimal values not quantities
 ```
 {:.stu}
 
 This example from a questionnaire calculates the Body Mass Index (BMI) based on the responses to the weight and height elements. For more information on the use of FHIRPath in questionnaires, see the [Structured Data Capture](http://hl7.org/fhir/uv/sdc/) (SDC) implementation guide.
 {:.stu}
 
-#### abs() : Integer | Decimal | Quantity
+#### abs() : Integer | Long | Decimal | Quantity
 {:.stu}
 
-Returns the absolute value of the input. When taking the absolute value of a quantity, the unit is unchanged.
+Returns the absolute value of the input (in the same type). When taking the absolute value of a quantity, the unit is unchanged.
+{:.stu}
+
+Accepts input types of Integer, Long, Decimal or Quantity.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1820,10 +1823,17 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### ceiling() : Integer
+#### ceiling() : Integer | Quantity
 {:.stu}
 
 Returns the first integer greater than or equal to the input.
+{:.stu}
+
+Accepts input types of Decimal or Quantity.
+{:.stu}
+
+When used with a Decimal input type, the result is an Integer.<br/>
+When used with a Quantity, the result is a Quantity with the same units and the value *(Decimal)* set to the integer result calculated.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1839,13 +1849,16 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
+> Note: We may consider a CeilingLong() function to handle Long output types.
+{: .stu-note }
+
 #### exp() : Decimal
 {:.stu}
 
 Returns _e_ raised to the power of the input.
 {:.stu}
 
-If the input collection contains an Integer, it will be implicitly converted to a Decimal and the result will be a Decimal.
+Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1860,10 +1873,17 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### floor() : Integer
+#### floor() : Integer | Quantity
 {:.stu}
 
 Returns the first integer less than or equal to the input.
+{:.stu}
+
+Accepts input types of Decimal or Quantity.
+{:.stu}
+
+When used with a Decimal input type, the result is an Integer.<br/>
+When used with a Quantity, the result is a Quantity with the same units and the value *(Decimal)* set to the integer result calculated.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1879,13 +1899,16 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
+> Note: We may consider a FloorLong() function to handle Long output types.
+{: .stu-note }
+
 #### ln() : Decimal
 {:.stu}
 
 Returns the natural logarithm of the input (i.e. the logarithm base _e_).
 {:.stu}
 
-When used with an Integer, it will be implicitly converted to a Decimal.
+Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1906,7 +1929,11 @@ If the input collection contains multiple items, the evaluation of the expressio
 Returns the logarithm base `base` of the input number.
 {:.stu}
 
-When used with Integers, the arguments will be implicitly converted to Decimal.
+Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
+{:.stu}
+
+If the input is 0 or negative, the evaluation will end and signal an error to the calling environment.
+If the base argument is 0 or negative, the evaluation will end and signal an error to the calling environment.
 {:.stu}
 
 If `base` is empty, the result is empty.
@@ -1924,13 +1951,19 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### power(exponent : Integer | Decimal) : Integer | Decimal
+#### power(exponent : Integer | Decimal) : Decimal
 {:.stu}
 
-Raises a number to the `exponent` power. If this function is used with Integers, the result is an Integer. If the function is used with Decimals, the result is a Decimal. If the function is used with a mixture of Integer and Decimal, the Integer is implicitly converted to a Decimal and the result is a Decimal. Note that if both the base and the `exponent` are integers and the `exponent` is negative, the result is empty since that might result in a Decimal value, not an Integer (the expected output type for this case).
+Raises a number to the `exponent` power.
 {:.stu}
 
-If the power cannot be represented (such as the -1 raised to the 0.5), the result is empty.
+Accepts input types of Decimal, Integer or Long.
+{:.stu}
+
+The result is always a Decimal, because raising an Integer to a negative power (such as -1) produces a Decimal result.
+{:.stu}
+
+If the power cannot be represented (such as -1 raised to the 0.5), the result is empty.
 {:.stu}
 
 If the input is empty, or exponent is empty, the result is empty.
@@ -1946,19 +1979,26 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 {:.stu}
 
-#### round([precision : Integer]) : Decimal
+#### round([precision : Integer]) : Decimal | Quantity
 {:.stu}
 
 > [Discussion on this topic](https://chat.fhir.org/#narrow/stream/179266-fhirpath/topic/round.28.29.20for.20negative.20numbers) If you have specific proposals or feedback please log a change request.
 {: .stu-note }
 
-Rounds the decimal to the nearest whole number using a traditional round (i.e. 0.5 or higher will round to 1). If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
+Rounds the input to the nearest whole number using a traditional round (i.e. to the nearest whole number), meaning that a decimal value greater than or equal to 0.5 and less than 1.0 will round to 1, and a decimal value less than or equal to -0.5 and greater than -1.0 will round to -1. If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
 {:.stu}
 
 If specified, the number of digits of precision must be >= 0 or the evaluation will end and signal an error to the calling environment.
 {:.stu}
 
-If the input collection contains a single item of type Integer, it will be implicitly converted to a Decimal.
+Accepts input types of Decimal, or Quantity.
+{:.stu}
+
+When used with a Decimal input type, the result is an Decimal.<br/>
+When used with a Quantity, the result is a Quantity with the same units.
+{:.stu}
+
+When used with Integer or Long, the arguments will be implicitly converted to Decimal before evaluation.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -1976,7 +2016,10 @@ If the input collection contains multiple items, the evaluation of the expressio
 #### sqrt() : Decimal
 {:.stu}
 
-Returns the square root of the input number as a Decimal.
+Returns the square root of the input number.
+{:.stu}
+
+Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
 {:.stu}
 
 If the square root cannot be represented (such as the square root of -1), the result is empty.
@@ -1997,10 +2040,17 @@ Note that this function is equivalent to raising a number of the power of 0.5 us
 ```
 {:.stu}
 
-#### truncate() : Integer
+#### truncate() : Integer | Quantity
 {:.stu}
 
 Returns the integer portion of the input.
+{:.stu}
+
+Accepts input types of Decimal or Quantity.
+{:.stu}
+
+When used with a Decimal input type, the result is an Integer.<br/>
+When used with a Quantity, the result is a Quantity with the same units and the value *(Decimal)* set to the integer result calculated.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -2015,6 +2065,10 @@ If the input collection contains multiple items, the evaluation of the expressio
 (-1.56).truncate() // -1
 ```
 {:.stu}
+
+> Note: We may consider a TruncateLong() function to handle Long output types.
+{: .stu-note }
+
 
 ### Tree navigation
 
@@ -2496,12 +2550,11 @@ If both operands are collections with a single item, they must be of the same ty
   * `Time`: must be exactly the same
 * For complex types, equality requires all child properties to be equal, recursively.
 
-If both operands are collections with multiple items:
+If both operands are collections with multiple items, check the equality of each pair of items in order:
 
-* Each item must be equal
-* Comparison is order dependent
-
-Otherwise, equals returns `false`.
+* if the result is `false` for any pair, returns `false`
+* if the result is `true` for all pairs, returns `true`
+* otherwise returns empty ( `{ }` )
 
 Note that this implies that if the collections have a different number of items to compare, the result will be `false`.
 
@@ -3019,6 +3072,10 @@ As `Time` is cyclic, the result of overflowing the time value will be wrapped ar
 
 For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
 
+Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.<br/>
+Authors SHOULD consider applying appropriate rounding functions (`round()`, `floor()`, `truncate()`, or `ceiling()`) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.
+{:.stu}
+
 For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value. For example:
 
 ``` fhirpath
@@ -3056,6 +3113,10 @@ As `Time` is cyclic, the result of overflowing the time value will be wrapped ar
 {:.stu}
 
 For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
+
+Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.<br/>
+Authors SHOULD consider applying appropriate rounding functions (`round()`, `floor()`, `truncate()`, or `ceiling()`) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.
+{:.stu}
 
 For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then subtracting from the date/time value. For example:
 
@@ -3116,6 +3177,10 @@ Use parentheses to ensure the unary negation applies to the `7`:
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed:
 {:.stu}
 
+> **Note:** While the `aggregate()` function is powerful and flexible, authors are encouraged to use the built-in aggregate functions for sum, min, max, and avg described below where possible.
+They are more concise, easier to read, and handle input types more effectively, unless you need to handle specific edge cases.
+{:.stu}
+
 ### aggregate(aggregator : expression [, init : value]) : value
 {:.stu}
 Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
@@ -3133,7 +3198,7 @@ value.aggregate($this + $total, 0)
 ```
 {:.stu}
 
-Min can be expressed as:
+Min could be expressed as:
 {:.stu}
 
 ``` fhirpath
@@ -3141,11 +3206,104 @@ value.aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))
 ```
 {:.stu}
 
-and average would be expressed as:
+and average could be expressed as:
 {:.stu}
 
 ``` fhirpath
 value.aggregate($total + $this, 0) / value.count()
+```
+{:.stu}
+
+### sum() : Integer | Long | Decimal | Quantity
+{:.stu}
+Returns the sum of all elements in the input collection (in the same type).
+{:.stu}
+
+Accepts input collections with elements of type: Integer, Long, Decimal or Quantity.
+{:.stu}
+
+All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the `sum` function:
+{:.stu}
+``` fhirpath
+( 1.0 | 2.0 | 3.0 | 4.0 | 5.0 ).sum() // 15.0
+( 1.0 'mg' | 2.0 'mg' | 3.0 'mg' | 4.0 'mg' | 5.0 'mg' ).sum() // 15.0 'mg'
+```
+{:.stu}
+
+### min() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
+{:.stu}
+Returns the minimum element in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
+{:.stu}
+
+Accepts input collections with elements of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
+{:.stu}
+
+All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the `min` function:
+{:.stu}
+``` fhirpath
+( 2, 4, 8, 6 ).min() // 2
+( 2L, 4L, 8L, 6L ).min() // 2L
+( @2012-12-31, @2013-01-01, @2012-01-01 ).min() // @2012-01-01
+```
+{:.stu}
+
+### max() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
+{:.stu}
+Returns the maximum element in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
+{:.stu}
+
+Accepts input collections with elements of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
+{:.stu}
+
+All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the `max` function:
+{:.stu}
+``` fhirpath
+( 2, 4, 8, 6 ).max() // 8
+( 2L, 4L, 8L, 6L ).max() // 8L
+( @2012-12-31, @2013-01-01, @2012-01-01 ).max() // @2013-01-01
+```
+{:.stu}
+
+### avg() : Decimal | Quantity
+{:.stu}
+Returns the average of all elements in the input collection (in the same type).
+{:.stu}
+
+Accepts input collections with elements of type: Decimal or Quantity.
+{:.stu}
+
+When used with Integer or Long, the arguments will be implicitly converted to Decimal before evaluation.
+{:.stu}
+
+All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+{:.stu}
+
+If the input collection is empty (`{ }`), the result is empty.
+{:.stu}
+
+The following examples illustrate the behavior of the `avg` function:
+{:.stu}
+``` fhirpath
+( 5.5 | 4.7 | 4.8 ).avg() // 5.0
+( 5.5 'cm' | 4.7 'cm' | 4.8 'cm' ).avg() // 5.0 'cm'
 ```
 {:.stu}
 

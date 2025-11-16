@@ -15,7 +15,7 @@
 			<value value="http://hl7.org/fhir"/>
 		</telecom>
 	</contact>
-	<description value="Calendar Duration Units - which are disctinct to the UCUM units"/>
+	<description value="Calendar Duration Units - which are distinct to the UCUM units"/>
 	<caseSensitive value="true"/>
 	<content value="complete"/>
 	<concept>
@@ -47,7 +47,7 @@
 	<concept>
 		<code value="minute"/>
 		<display value="Minute"/>
-		<definition value="One minute - excactly 60 seconds"/>
+		<definition value="One minute - exactly 60 seconds"/>
 		<designation>
 			<use>
 				<system value="http://snomed.info/sct"/>

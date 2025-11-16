@@ -17,7 +17,7 @@
 			<value value="http://hl7.org/fhir"/>
 		</telecom>
 	</contact>
-	<description value="Calendar Duration Units - which are disctinct to the UCUM units."/>
+	<description value="Calendar Duration Units - which are distinct to the UCUM units."/>
 	<compose>
 		<include>
 			<system value="http://hl7.org/fhirpath/CodeSystem/calendar-units"/>
