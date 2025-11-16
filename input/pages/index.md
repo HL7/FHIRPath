@@ -1960,7 +1960,7 @@ Raises a number to the `exponent` power.
 Accepts input types of Decimal, Integer or Long.
 {:.stu}
 
-The result is always a Decimal, because raising a number to a fractional power (such as 1/2) produces a non-integer result.
+The result is always a Decimal, because raising an Integer to a negative power (such as -1) produces a Decimal result.
 {:.stu}
 
 If the power cannot be represented (such as -1 raised to the 0.5), the result is empty.
