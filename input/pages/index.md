@@ -1975,6 +1975,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ``` fhirpath
 2.power(3) // 8
 2.5.power(2) // 6.25
+2.power(-1) // 0.5
 (-1).power(0.5) // empty ({ })
 ```
 {:.stu}
