@@ -142,7 +142,15 @@ The path may start with the type of the root node (which otherwise does not have
 Patient.name.given
 ```
 
-The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`. When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context. If the identifier cannot be resolved, the evaluation will end and signal an error to the calling environment.
+The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`.
+
+When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first. If it resolves to a type and that type is the type of the context (or a supertype), then the evaluation proceeds with the context unchanged, i.e. in the example above proceeds to evaluate the `name` property.
+Otherwise the identifier is resolved as a path on the context, which if not found returns an empty collection.
+
+This could also be written using `ofType()`, which would have the same behaviour:
+``` fhirpath
+ofType(Patient).name.given
+```
 
 Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use other characters by using [delimited identifiers](#identifiers) - surrounding with backticks and using FHIRPath escaping as needed. This approach can also be used to encode nodes with names that are keywords. e.g.:
 
@@ -3424,7 +3432,7 @@ The use of backticks allows identifiers to contains spaces, commas, and other ch
 
 FHIRPath [escape sequences](#string) for strings also work for delimited identifiers.
 
-When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context. If the identifier cannot be resolved, the evaluation will end and signal an error to the calling environment.
+As with simple identifiers, when a delimited identifier is used at the root of a FHIRPath expression, it follows the same [type resolution rules](#path-selection) as described in the Path selection section.
 
 ### Case-Sensitivity
 FHIRPath is a case-sensitive language, meaning that case is considered when matching keywords in the language. However, because FHIRPath can be used with different models, the case-sensitivity of type and property names is defined by each model.
@@ -3463,8 +3471,6 @@ Because FHIRPath is defined to work in multiple contexts, each context provides 
 To allow type names to be referenced in expressions such as the `is` and `as` operators, the language includes a _type specifier_, an optionally qualified identifier that must resolve to the name of a model type.
 
 When resolving a type name, the context-specific model is searched first. If no match is found, the `System` model (containing only the built-in types defined in the [Literals](#literals) section) is searched.
-
-When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
 
 ### Reflection
 {:.stu}
