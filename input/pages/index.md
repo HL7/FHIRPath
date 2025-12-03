@@ -571,7 +571,8 @@ These are the fhirpath defined scoped functions: *(argument processing only, ref
 | [`iif`](#iifcriterion-boolean-true-result-collection--otherwise-result-collection--collection) | The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned. |
 | [`trace`](#tracename--string--projection-any--collection) | If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function. |
 | [`aggregate`](#aggregateaggregator--any--init--value--value) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> TODO: what is the evaluation context of the `init` argument? Should it be once with the `$this` being from the outer context? <br/>`$index` is not set by this function during evaluation of the `init` argument. |
-{:.list .highlight}
+{:.list}
+{:.fhir-highlight}
 
 For example (some expressions using scoped functions and accessing the special `$this` variable):
 {:.fhir-highlight}
@@ -599,7 +600,8 @@ Appointment.participant.select(required.iff($this, $this.actor.display + ' (requ
 | `%resource` | The current resource being processed (that contains the property in $focus)<br/> When passing through `resolve()` or into a contained resource will be changed to the new resource context. |
 | `%context` | The entry/starting point for execution of the fhirpath expression.<br/> Often used in fhirpath invariants.<br/> *(Does not change during execution)* |
 | `%rootResource` | The top level fhir resource. Usually a Bundle, or resource that has contained resources (or Parameters resource).<br/> Though processing on regular fhir resources this is also the same as %resource.<br/> *(Does not change during execution)* |
-{:.list .highlight}
+{:.list}
+{:.fhir-highlight}
 
 > **Note:** Other specifications may introduce their own variables
 {:.fhir-highlight}
