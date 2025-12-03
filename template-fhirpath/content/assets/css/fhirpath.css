@@ -112,6 +112,27 @@ blockquote.stu {
     margin-left: 20px;
 }
 
+.highlight {
+    position: relative;
+}
+
+.highlight::before {
+    content: '';
+    background-color: green;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+blockquote.highlight.stu::before {
+    width: unset;
+}
+
 blockquote.stu:after {
     left: -20px;
 }
