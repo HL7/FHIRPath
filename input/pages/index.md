@@ -1112,6 +1112,9 @@ If `criterion` is `false` or an empty collection, the function returns `otherwis
 
 Note that short-circuit behavior is expected in this function. In other words, `true-result` should only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` should only be evaluated otherwise. For implementations, this means delaying evaluation of the output arguments (specifically true-result and otherwise-result) to remove the chance that their evaluation throws an error and terminates the expression early.
 
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+{:.highlight}
+
 #### Boolean Conversion Functions
 
 ##### toBoolean() : Boolean
