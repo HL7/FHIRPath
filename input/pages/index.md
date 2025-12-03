@@ -563,7 +563,7 @@ These are the fhirpath defined scoped functions: *(argument processing only, ref
 | --------------- | ------------------------- |
 | [`exists`](#existscriteria--any--boolean) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if any return `true` then the function returns `true`, otherwise `false`. |
 | [`all`](#allcriteria--boolean--boolean) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`. |
-| [`where`](#wherecriteria--any--collection) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), those that return `true` are included in the output collection. |
+| [`where`](#wherecriteria--boolean--collection) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), those that return `true` are included in the output collection. |
 | [`select`](#selectprojection-any--collection) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. |
 | [`sort`](#sortkeyselector-any-asc--desc--keyselector-any-asc--desc---collection) | Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is undefined in this context, it could be anywhere during any evaluation depending on algorithms selected. |
 | [`repeat`](#repeatprojection-any--collection) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>TODO: on the subsequent iterations, what is `$index` set to? |
@@ -603,7 +603,7 @@ Appointment.participant.select(required.iff($this, $this.actor.display + ' (requ
 {:.list}
 {:.fhir-highlight}
 
-> **Note:** Other specifications may introduce their own variables
+> **Note:** Other specifications MAY introduce their own variables
 {:.fhir-highlight}
 
 ### Existence
@@ -3295,7 +3295,7 @@ FHIRPath supports a general-purpose aggregate function to enable the calculation
 They are more concise, easier to read, and handle input types more effectively, unless you need to handle specific edge cases.
 {:.stu}
 
-### aggregate(aggregator : `any`{:.fhir-highlight} [, init : value]) : value
+### aggregate(aggregator : `collection`{:.fhir-highlight} [, init : `collection`{:.fhir-highlight}]) : `collection`{:.fhir-highlight}
 {:.stu}
 Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
 {:.stu}
