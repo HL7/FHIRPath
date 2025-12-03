@@ -112,11 +112,11 @@ blockquote.stu {
     margin-left: 20px;
 }
 
-.highlight {
+.fhir-highlight {
     position: relative;
 }
 
-.highlight::before {
+.fhir-highlight::before {
     content: '';
     background-color: green;
     position: absolute;
@@ -129,7 +129,7 @@ blockquote.stu {
     pointer-events: none;
 }
 
-blockquote.highlight.stu::before {
+blockquote.fhir-highlight.stu::before {
     width: unset;
 }
 
