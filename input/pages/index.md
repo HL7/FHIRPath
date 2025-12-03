@@ -570,7 +570,7 @@ These are the fhirpath defined scoped functions: *(argument processing only, ref
 | [`repeatAll`](#repeatallprojection-any--collection) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>TODO: on the subsequent iterations, what is `$index` set to? |
 | [`iif`](#iifcriterion-boolean-true-result-collection--otherwise-result-collection--collection) | The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned. |
 | [`trace`](#tracename--string--projection-any--collection) | If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function. |
-| [`aggregate`](#aggregateaggregator--any--init--value--value) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> TODO: what is the evaluation context of the `init` argument? Should it be once with the `$this` being from the outer context? <br/>`$index` is not set by this function during evaluation of the `init` argument. |
+| [`aggregate`](#aggregate) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> TODO: what is the evaluation context of the `init` argument? Should it be once with the `$this` being from the outer context? <br/>`$index` is not set by this function during evaluation of the `init` argument. |
 {:.list}
 {:.fhir-highlight}
 
@@ -596,7 +596,7 @@ Appointment.participant.select(required.iff($this, $this.actor.display + ' (requ
 | - | - |
 | `$this` | Set at the beginning of execution of an expression as the initial context *(See `%context` below)*<br/> Re-set to the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details* |
 | `$index` | Set at the beginning of execution of an expression to 0<br/> Re-set to the index of the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details*<br/> Its value is undefined while evaluating [`sort`](#sortkeyselector-any-asc--desc--keyselector-any-asc--desc---collection) `keySelector` parameters |
-| `$total` | Only available inside the parameters of the [`aggregate`](#aggregateaggregator--any--init--value--value) function. Holds the running total during processing, and at the end will be the result returned by the function. |
+| `$total` | Only available inside the parameters of the [`aggregate`](#aggregate) function. Holds the running total during processing, and at the end will be the result returned by the function. |
 | `%resource` | The current resource being processed (that contains the property in $focus)<br/> When passing through `resolve()` or into a contained resource will be changed to the new resource context. |
 | `%context` | The entry/starting point for execution of the fhirpath expression.<br/> Often used in fhirpath invariants.<br/> *(Does not change during execution)* |
 | `%rootResource` | The top level fhir resource. Usually a Bundle, or resource that has contained resources (or Parameters resource).<br/> Though processing on regular fhir resources this is also the same as %resource.<br/> *(Does not change during execution)* |
@@ -3295,6 +3295,7 @@ FHIRPath supports a general-purpose aggregate function to enable the calculation
 They are more concise, easier to read, and handle input types more effectively, unless you need to handle specific edge cases.
 {:.stu}
 
+<a name="aggregate"></a>
 ### aggregate(aggregator : `collection`{:.fhir-highlight} [, init : `collection`{:.fhir-highlight}]) : `collection`{:.fhir-highlight}
 {:.stu}
 Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
