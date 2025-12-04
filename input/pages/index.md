@@ -583,10 +583,6 @@ Patient.name.select(given.join(' ').combine($this.family, true).join(', '))
 
 // Observation values that are outside a specific range
 Observation.value.where($this < 90 or $this > 110)
-
-// textual list of required participants in an appointment
-Appointment.participant.select(required.iff($this, $this.actor.display + ' (required)'))
-// Pretty sure this expression is wrong, as $this is used twice in the iff condition
 ```
 {:.fhir-highlight}
 
