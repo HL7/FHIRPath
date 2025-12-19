@@ -544,6 +544,11 @@ The following sections describe the functions supported in FHIRPath, detailing t
 {:.fhir-highlight}
 * If a parameter doesn't require a specific type, but does not support collections, then the parameter type will be defined as `any`
 {:.fhir-highlight}
+* Some parameters passed to a scoped function (documented below) will set and use some special variables when the parameter expression is evaluated.<br/>
+  This is only intended to provide clarity on the usage of the expression, not how it is actually written.<br/>
+  e.g. `all(criteria : ($this, $index) => Boolean)` indicates that when the `criteria` expression is evaluated, the special variables `$this` and `$index` will be set in the evaluation context according to the definition of the function.
+  but when used in an expression `name.all($this.family.exists() and $this.given.exists())`. Usage is the same as if the parameter were a `Boolean`.
+{:.fhir-highlight}
 
 Note that although all functions return collections, if a given function is defined to return a single element, the return type is simplified to just the type of the single element, rather than the list type.
 {:.fhir-highlight}
@@ -561,16 +566,16 @@ These are the fhirpath defined scoped functions: *(argument processing only, ref
 
 | Scoped Function | Argument Processing Logic |
 | --------------- | ------------------------- |
-| [`exists`](#existscriteria--any--boolean) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if any return `true` then the function returns `true`, otherwise `false`. |
-| [`all`](#allcriteria--boolean--boolean) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`. |
-| [`where`](#wherecriteria--boolean--collection) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), those that return `true` are included in the output collection. |
-| [`select`](#selectprojection-any--collection) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. |
-| [`sort`](#sortkeyselector-any-asc--desc--keyselector-any-asc--desc---collection) | Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is undefined in this context, it could be anywhere during any evaluation depending on algorithms selected. |
-| [`repeat`](#repeatprojection-any--collection) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>TODO: on the subsequent iterations, what is `$index` set to? |
-| [`repeatAll`](#repeatallprojection-any--collection) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>TODO: on the subsequent iterations, what is `$index` set to? |
-| [`iif`](#iifcriterion-boolean-true-result-collection--otherwise-result-collection--collection) | The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned. |
-| [`trace`](#tracename--string--projection-any--collection) | If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function. |
-| [`aggregate`](#aggregate) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> TODO: what is the evaluation context of the `init` argument? Should it be once with the `$this` being from the outer context? <br/>`$index` is not set by this function during evaluation of the `init` argument. |
+| [`exists`](#fn-exists) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if any return `true` then the function returns `true`, otherwise `false`. |
+| [`all`](#fn-all) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`. |
+| [`where`](#fn-where) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), those that return `true` are included in the output collection. |
+| [`select`](#fn-select) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. |
+| [`sort`](#fn-sort) | Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is undefined in this context, it could be anywhere during any evaluation depending on algorithms selected. |
+| [`repeat`](#fn-repeat) | The `projection` argument is evaluated for each item (setting `$this` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
+| [`repeatAll`](#fn-repeatall) | The `projection` argument is evaluated for each item (setting `$this` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
+| [`iif`](#iif) | The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned. |
+| [`trace`](#fn-trace) | If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function. |
+| [`aggregate`](#aggregate) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values. |
 {:.list}
 {:.fhir-highlight}
 
@@ -584,6 +589,10 @@ Patient.name.select(given.join(' ').combine($this.family, true).join(', '))
 // Observation values that are outside a specific range
 Observation.value.where($this < 90 or $this > 110)
 ```
+{:.fhir-highlight}
+
+> **Note:** Scoped functions are similar to lambda functions, closures, or callbacks in other languages.
+> They allow passing expressions as parameters that are evaluated in a specific context with special variables like `$this` and `$index`.
 {:.fhir-highlight}
 
 #### Special variables
@@ -608,7 +617,8 @@ Observation.value.where($this < 90 or $this > 110)
 
 Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
 
-#### exists([criteria : `any`{:.fhir-highlight}]) : Boolean
+<a name="fn-exists"></a>
+#### exists([criteria : `($this, $index) => any`{:.fhir-highlight}]) : Boolean
 
 > This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if any return `true` then the function returns `true`, otherwise `false`.
 {:.fhir-highlight}
@@ -637,7 +647,8 @@ The third example returns `true` if the `Patient` has any `telecom` elements tha
 
 And finally, the fourth example returns `true` if the `Patient` has any `generalPractitioner` elements of type `Practitioner`.
 
-#### all(criteria : `Boolean`{:.fhir-highlight}) : Boolean
+<a name="fn-all"></a>
+#### all(criteria : `($this, $index) => Boolean`{:.fhir-highlight}) : Boolean
 
 > This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`.
 {:.fhir-highlight}
@@ -746,7 +757,8 @@ This means that if the input collection is empty (`{ }`), the result is `true`.
 
 ### Filtering and projection
 
-#### where(criteria : `Boolean`{:.fhir-highlight}) : collection
+<a name="fn-where"></a>
+#### where(criteria : `($this, $index) => Boolean`{:.fhir-highlight}) : collection
 
 > This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), those that return `true` are included in the output collection.
 {:.fhir-highlight}
@@ -763,7 +775,8 @@ The following example returns the list of `telecom` elements that have a `use` e
 Patient.telecom.where(use = 'official')
 ```
 
-#### select(projection: `any`{:.fhir-highlight}) : collection
+<a name="fn-select"></a>
+#### select(projection: `($this, $index) => any`{:.fhir-highlight}) : collection
 
 > This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection.
 {:.fhir-highlight}
@@ -788,7 +801,8 @@ Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
 
 This example returns a collection containing, for each "usual" name for the Patient, the concatenation of the first given and family names.
 
-#### sort([keySelector: `any`{:.fhir-highlight} [asc | desc] [, keySelector: `any`{:.fhir-highlight} [asc | desc], ...]]) : collection
+<a name="fn-sort"></a>
+#### sort([keySelector: `($this) => any`{:.fhir-highlight} [asc | desc] [, keySelector: `($this) => any`{:.fhir-highlight} [asc | desc], ...]]) : collection
 {:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
@@ -835,9 +849,10 @@ Patient.telecom.sort(system, use desc) // sort by system ascending, then by use 
 ```
 {:.stu}
 
-#### repeat(projection: `any`{:.fhir-highlight}) : collection
+<a name="fn-repeat"></a>
+#### repeat(projection: `($this) => collection`{:.fhir-highlight}) : collection
 
-> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>TODO: on the subsequent iterations, what is `$index` set to?
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
 {:.fhir-highlight}
 
 A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
@@ -868,12 +883,13 @@ which would find *any* descendants called `item`, not just the ones nested insid
 
 The order of items returned by the `repeat()` function is undefined.
 
-#### repeatAll(projection: `any`{:.fhir-highlight}) : collection
+<a name="fn-repeatall"></a>
+#### repeatAll(projection: `($this) => collection`{:.fhir-highlight}) : collection
 {:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
-> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>TODO: on the subsequent iterations, what is `$index` set to?
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
 {:.stu}
 {:.fhir-highlight}
 
@@ -1095,7 +1111,7 @@ The following table lists the possible conversions supported, and whether the co
 The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
 
 <a name="iif"></a>
-#### iif(criterion: `Boolean`{:.fhir-highlight}, true-result: collection [, otherwise-result: collection]) : collection
+#### iif(criterion: `($this, $index) => Boolean`{:.fhir-highlight}, true-result: `($this, $index) => collection`{:.fhir-highlight} [, otherwise-result: `($this, $index) => collection`{:.fhir-highlight}]) : collection
 
 > This is a [scoped function](#scoped-functions): The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned.
 {:.fhir-highlight}
@@ -2183,9 +2199,11 @@ Returns a collection with all descendant nodes of all items in the input collect
 
 ### Utility functions
 
-#### trace(name : String [, projection: `any`{:.fhir-highlight}]) : collection
+<a name="fn-trace"></a>
+#### trace(name : String [, projection: `($this, $index) => any`{:.fhir-highlight}]) : collection
 
-> This is a [scoped function](#scoped-functions): If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function.
+> This is a [scoped function](#scoped-functions): If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function.<br/>
+> The `name` parameter is evaluated before the function is executed and is not re-evaluated for each iteration of the projection.
 {:.fhir-highlight}
 
 Adds a String representation of the input collection to the diagnostic log, using the `name` argument as the name in the log. This log should be made available to the user in some appropriate fashion. Does not change the input, so returns the input collection as output.
@@ -3292,12 +3310,12 @@ They are more concise, easier to read, and handle input types more effectively, 
 {:.stu}
 
 <a name="aggregate"></a>
-### aggregate(aggregator : `collection`{:.fhir-highlight} [, init : `collection`{:.fhir-highlight}]) : `collection`{:.fhir-highlight}
+### aggregate(aggregator : `($total, $this, $index) => collection`{:.fhir-highlight} [, init : `collection`{:.fhir-highlight}]) : `collection`{:.fhir-highlight}
 {:.stu}
 Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
 {:.stu}
 
-> This is a [scoped function](#scoped-functions): The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> TODO: what is the evaluation context of the `init` argument? Should it be once with the `$this` being from the outer context? <br/>`$index` is not set by this function during evaluation of the `init` argument.
+> This is a [scoped function](#scoped-functions): The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/>  The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values.
 {:.stu}
 {:.fhir-highlight}
 
