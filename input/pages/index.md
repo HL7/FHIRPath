@@ -546,8 +546,8 @@ The following sections describe the functions supported in FHIRPath, detailing t
 {:.fhir-highlight}
 * Some parameters passed to a scoped function (documented below) will set and use some special variables when the parameter expression is evaluated.<br/>
   This is only intended to provide clarity on the usage of the expression, not how it is actually written.<br/>
-  e.g. `all(criteria : ($this, $index) => Boolean)` indicates that when the `criteria` expression is evaluated, the special variables `$this` and `$index` will be set in the evaluation context according to the definition of the function.
-  but when used in an expression `name.all($this.family.exists() and $this.given.exists())`. Usage is the same as if the parameter were a `Boolean`.
+  For example, the `where` function's definition is `where(criteria : ($this, $index) => Boolean)` indicating that when the `criteria` expression is evaluated, the special variables `$this` and `$index` will be set in the evaluation context according to the definition of the function.
+  When you actually use it, you would write something like `rules.where($index mod 2 = 0)` (which will filter out every second rule from the collection). Usage in this case is the same as if the parameter was a simple `Boolean` parameter in the definition.
 {:.fhir-highlight}
 
 Note that although all functions return collections, if a given function is defined to return a single element, the return type is simplified to just the type of the single element, rather than the list type.
@@ -566,13 +566,13 @@ These are the fhirpath defined scoped functions: *(argument processing only, ref
 
 | Scoped Function | Argument Processing Logic |
 | --------------- | ------------------------- |
-| [`exists`](#fn-exists) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if any return `true` then the function returns `true`, otherwise `false`. |
-| [`all`](#fn-all) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`. |
-| [`where`](#fn-where) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), those that return `true` are included in the output collection. |
-| [`select`](#fn-select) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection. |
+| [`exists`](#fn-exists) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if any return `true` then the function returns `true`, otherwise `false`. |
+| [`all`](#fn-all) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`. |
+| [`where`](#fn-where) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); those that return `true` are included in the output collection. |
+| [`select`](#fn-select) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration); and the results are included in the output collection. |
 | [`sort`](#fn-sort) | Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is undefined in this context, it could be anywhere during any evaluation depending on algorithms selected. |
-| [`repeat`](#fn-repeat) | The `projection` argument is evaluated for each item (setting `$this` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
-| [`repeatAll`](#fn-repeatall) | The `projection` argument is evaluated for each item (setting `$this` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
+| [`repeat`](#fn-repeat) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
+| [`repeatAll`](#fn-repeatall) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
 | [`iif`](#iif) | The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned. |
 | [`trace`](#fn-trace) | If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function. |
 | [`aggregate`](#aggregate) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values. |
@@ -620,7 +620,7 @@ Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
 <a name="fn-exists"></a>
 #### exists([criteria : `($this, $index) => any`{:.fhir-highlight}]) : Boolean
 
-> This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if any return `true` then the function returns `true`, otherwise `false`.
+> This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if any return `true` then the function returns `true`, otherwise `false`.
 {:.fhir-highlight}
 
 Returns `true` if the input collection has any elements (optionally filtered by the criteria), and `false` otherwise.
@@ -650,7 +650,7 @@ And finally, the fourth example returns `true` if the `Patient` has any `general
 <a name="fn-all"></a>
 #### all(criteria : `($this, $index) => Boolean`{:.fhir-highlight}) : Boolean
 
-> This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`.
+> This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`.
 {:.fhir-highlight}
 
 Returns `true` if for every element in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
@@ -760,7 +760,7 @@ This means that if the input collection is empty (`{ }`), the result is `true`.
 <a name="fn-where"></a>
 #### where(criteria : `($this, $index) => Boolean`{:.fhir-highlight}) : collection
 
-> This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration), those that return `true` are included in the output collection.
+> This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); those that return `true` are included in the output collection.
 {:.fhir-highlight}
 
 Returns a collection containing only those elements in the input collection for which the stated `criteria` expression evaluates to `true`. Elements for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
@@ -778,7 +778,7 @@ Patient.telecom.where(use = 'official')
 <a name="fn-select"></a>
 #### select(projection: `($this, $index) => any`{:.fhir-highlight}) : collection
 
-> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration), and the results are included in the output collection.
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration); and the results are included in the output collection.
 {:.fhir-highlight}
 
 Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_). This means that if the evaluation for an element results in the empty collection (`{ }`), no element is added to the result, and that if the input collection is empty (`{ }`), the result is empty as well.
@@ -852,7 +852,7 @@ Patient.telecom.sort(system, use desc) // sort by system ascending, then by use 
 <a name="fn-repeat"></a>
 #### repeat(projection: `($this) => collection`{:.fhir-highlight}) : collection
 
-> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
 {:.fhir-highlight}
 
 A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
@@ -889,7 +889,7 @@ The order of items returned by the `repeat()` function is undefined.
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
-> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration), and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
 {:.stu}
 {:.fhir-highlight}
 
