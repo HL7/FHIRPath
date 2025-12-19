@@ -39,7 +39,7 @@ literal
         : '{' '}'                                               #nullLiteral
         | ('true' | 'false')                                    #booleanLiteral
         | STRING                                                #stringLiteral
-        | NUMBER                                                #numberLiteral
+        | (INTEGER | DECIMAL)                                   #numberLiteral
         | LONGNUMBER                                            #longNumberLiteral
         | DATE                                                  #dateLiteral
         | DATETIME                                              #dateTimeLiteral
@@ -73,7 +73,7 @@ paramList
         ;
 
 quantity
-        : NUMBER unit?
+        : (INTEGER | DECIMAL) unit?
         ;
 
 unit
@@ -158,8 +158,12 @@ STRING
         ;
 
 // Also allows leading zeroes now (just like CQL and XSD)
-NUMBER
-        : [0-9]+('.' [0-9]+)?
+INTEGER
+        : [0-9]+
+        ;
+
+DECIMAL
+        : [0-9]+ '.' [0-9]+
         ;
 
 LONGNUMBER
