@@ -15,8 +15,8 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Literals - Long](#long)
 > * [Conversions - toLong](#tolong--long)
 > * [Functions - repeatAll](#repeatallprojection-any--collection)
-> * [Functions - coalesce](#coalesce)
 > * [Functions - sort](#sortkeyselector-any-asc--desc--keyselector-any-asc--desc---collection)
+> * [Functions - coalesce](#coalesce)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string-flags--string--boolean)
 > * [Functions - String (trim, split, join)](#trim--string)
@@ -26,8 +26,12 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - Utility (precision)](#precision--integer)
 > * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
 > * [Functions - Date and Time Interval Functions (duration, difference)](#date-and-time-interval-functions)
+> * [Instance Selector/Object Creation](#instance-selector)
 > * [Types - Reflection](#reflection)
 > 
+> This section has undergone extensive clarification:
+> * [Functions - documentation of functions with scoped arguments](scoped-functions)
+>
 > In addition, the appendices are included as additional documentation and are informative content.
 {: .stu-note }
 
