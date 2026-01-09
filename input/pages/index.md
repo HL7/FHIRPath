@@ -801,6 +801,86 @@ Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
 
 This example returns a collection containing, for each "usual" name for the Patient, the concatenation of the first given and family names.
 
+<a name="instance-selector"></a>
+#### Instance Selector/Object Creation
+{:.stu}
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+*Although the instance selector is not a function, it is closely related to the `select` function in that this statement is
+used to convert the input collection into a different output collection. Its sub-expression format is:*
+{:.stu}
+
+> ```
+> «typename» { element : value, element : value, ...  } : «typename»
+> ```
+> `«typename»` is the name of the type to create (optionally prefixed with a namespace)<br/>
+> `element` is the name *(identifier)* of an element of the type being created<br/>
+> `value` is any fhirpath expression (including literals) to set to the associated `element`
+{:.stu}
+
+Creates a new object of type `«typename»` and returns that to the output collection. 
+Any elements listed within the parentheses are set as children on the newly created object.
+{:.stu}
+
+If any of child element's `value` is evaluated to an empty collection, then that element will not be added to the object.
+{:.stu}
+
+To create an empty object requires the use of `{ : }` to differentiate it from the empty set.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+However element selectors can return multiples, provided that the property in that objects structure supports it. 
+If not the engine MAY throw an error.
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
+
+Some examples of creating data using static instance selectors:
+{:.stu}
+``` fhirpath
+// create a static coding
+Coding { system : 'http://example.org/demo', code : 'c1' }
+
+// create an simple identifier, explicitly defining the FHIR namespace
+FHIR.Identifier { system : 'http://example.org/demo', value : 'N0001231' }
+
+// create an MRN identifier similar to the one in the patient example at https://hl7.org/fhir/patient-example.json.html
+Identifier { 
+  type : CodeableConcept { coding: Coding { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' } },
+  system : 'urn:oid:1.2.36.146.595.217.0.1',
+  value : '12345',
+  period : Period { start: @2001-05-06 }
+}
+
+// create an empty Period
+Period {:}
+```
+{:.stu}
+
+Instance Selectors are usually used to manipulate existing elements into another datatype:
+{:.stu}
+
+``` fhirpath
+// Convert the patient gender from a code into a coding
+Patient.select( 
+  Coding { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: gender }
+)
+
+// Convert a set of concepts from a code system into Codings
+CodeSystem.concept.select(Coding { system: %resource.url, code: code, display: display })
+```
+{:.stu}
+
+**Note:** Primitive types can be created and set using a special element name `value` if specifically required.
+The evaluating fhirpath engine is responsible for performing any type conversions from fhirpath primitives to the target object/type system as required.
+{:.stu}
+``` fhirpath
+code { value: 'final' }
+```
+{:.stu}
+
 <a name="fn-sort"></a>
 #### sort([keySelector: `($this) => any`{:.fhir-highlight} [asc | desc] [, keySelector: `($this) => any`{:.fhir-highlight} [asc | desc], ...]]) : collection
 {:.stu}
