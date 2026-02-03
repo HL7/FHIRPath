@@ -3955,6 +3955,7 @@ Patient.name.where(given = 'Wouter').exists()
 
 but is still less concise than would be possible if constraints were well known in advance.
 
+### Compile-time checks
 In cases where compile-time checking like this is desirable, implementations may choose to protect against such cases by employing strict typing. Based on the definitions of the operators and functions involved in the expression, and given the types of the inputs, a compiler can analyze the expression and determine whether "unsafe" situations can occur.
 
 Unsafe uses are:
@@ -3980,6 +3981,14 @@ In cases where a compiler finds places where a collection of multiple items can 
 
 * Use `first()`, `last()` or indexer (`[ ]`) to select a single item
 * Use `select()` and `where()` to turn the expression into one that evaluates each of the repeating items individually (as in the examples above)
+
+### Run-time behavior
+In the absence of strongly-typed compile-time checks, the implementation may still provide strong type-checks at run-time.
+The difference between strongly typed compile-time checks and strongly-typed run-time checks is that the latter will only throw errors when the data does not conform to type requirements, where the former checks that any data is guaranteed to be conformant due to the construction of the expression.
+
+However, the default run-time behavior of a compliant FHIRPath implementation should be weakly typed. This means:
+
+return an empty collection ({ }) when a path references an element that does not exist on the context node
 
 ## Formal Specifications
 

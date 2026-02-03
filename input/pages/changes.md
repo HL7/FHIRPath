@@ -138,4 +138,5 @@
 * [FHIR-53883](https://jira.hl7.org/browse/FHIR-53883):  Mixed use of the term element and property to refer to child nodes of an object
 * [FHIR-49523](https://jira.hl7.org/browse/FHIR-49523):  Support encoding a string as ascii (replacing chars over code 127 with '?')
 * [FHIR-53554](https://jira.hl7.org/browse/FHIR-53554):  Clarify Unicode support
+* [FHIR-53660](https://jira.hl7.org/browse/FHIR-53660):  Clarify default behavior when accessing non existent data elements
 
