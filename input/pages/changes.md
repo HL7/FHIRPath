@@ -135,4 +135,5 @@
 * [FHIR-53656](https://jira.hl7.org/browse/FHIR-53656):  Add polarity operator definition (unary operators +/-)
 * [FHIR-53957](https://jira.hl7.org/browse/FHIR-53957):  Migrate the FHIR function `comparable` to fhirpath
 * [FHIR-52957](https://jira.hl7.org/browse/FHIR-52957):  Removed inconsistencies in equality/equivalence of calendar/definite durations
+* [FHIR-53883](https://jira.hl7.org/browse/FHIR-53883):  Mixed use of the term element and property to refer to child nodes of an object
 

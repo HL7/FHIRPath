@@ -149,7 +149,7 @@ Patient.name.given
 
 The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`.
 
-When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first. If it resolves to a type and that type is the type of the context (or a supertype), then the evaluation proceeds with the context unchanged, i.e. in the example above proceeds to evaluate the `name` property.
+When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first. If it resolves to a type and that type is the type of the context (or a supertype), then the evaluation proceeds with the context unchanged, i.e. in the example above proceeds to evaluate the `name` element.
 Otherwise the identifier is resolved as a path on the context, which if not found returns an empty collection.
 
 This could also be written using `ofType()`, which would have the same behaviour:
@@ -160,8 +160,8 @@ ofType(Patient).name.given
 Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use other characters by using [delimited identifiers](#identifiers) - surrounding with backticks and using FHIRPath escaping as needed. This approach can also be used to encode nodes with names that are keywords. e.g.:
 
 ``` fhirpath
-Message.`PID-1` // subtraction operator as a part of a property name
-`as` as string  // a property name that is also a fhirpath keyword
+Message.`PID-1` // subtraction operator as a part of an element name
+`as` as string  // an element name that is also a fhirpath keyword
 ```
 
 ### Collections
@@ -607,7 +607,7 @@ Observation.value.where($this < 90 or $this > 110)
 | `$this` | Set at the beginning of execution of an expression as the initial context *(See `%context` below)*<br/> Re-set to the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details* |
 | `$index` | Set at the beginning of execution of an expression to 0<br/> Re-set to the index of the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details*<br/> Its value is undefined while evaluating [`sort`](#fn-sort) `keySelector` parameters |
 | `$total` | Only available inside the parameters of the [`aggregate`](#aggregate) function. Holds the running total during processing, and at the end will be the result returned by the function. |
-| `%resource` | The current resource being processed (that contains the property in $focus)<br/> When passing through `resolve()` or into a contained resource will be changed to the new resource context. |
+| `%resource` | The current resource being processed (that contains the element in focus)<br/> When passing through `resolve()` or into a contained resource will be changed to the new resource context. |
 | `%context` | The entry/starting point for execution of the fhirpath expression.<br/> Often used in fhirpath invariants.<br/> *(Does not change during execution)* |
 | `%rootResource` | The top level fhir resource. Usually a Bundle, or resource that has contained resources (or Parameters resource).<br/> Though processing on regular fhir resources this is also the same as %resource.<br/> *(Does not change during execution)* |
 {:.list}
@@ -835,7 +835,7 @@ To create an empty object requires the use of `{ : }` to differentiate it from t
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-However element selectors can return multiples, provided that the property in that objects structure supports it. 
+However element selectors can return multiples, provided that the element in that objects structure supports it. 
 If not the engine MAY throw an error.
 {:.stu}
 
@@ -990,11 +990,11 @@ This function provides better performance than `repeat` by eliminating the equal
 The order of items returned by the `repeatAll()` function is undefined.
 {:.stu}
 
-> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it references a property accessor that returns child elements.
+> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it references an element accessor that returns child elements.
 > If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.
 {:.stu .dragon}
 
-Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference properties of the input collection and return child elements will naturally terminate when no more child elements are found.
+Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference elements of the input collection and return child elements will naturally terminate when no more child elements are found.
 {:.stu}
 
 Some safe expressions:
@@ -1141,7 +1141,7 @@ This function can also be invoked using the `|` operator.
 
 e.g. `x.union(y)`{:.fhirpath} is synonymous with `x | y`{:.fhirpath}
 
-e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name property.
+e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name element.
 
 #### combine(other : collection, [preserveOrder : Boolean]) : collection
 
@@ -2762,7 +2762,7 @@ If both operands are collections with a single item, they must be of the same ty
   * `Date`: must be exactly the same
   * `DateTime`: must be exactly the same, respecting the timezone offset (though +00:00 = -00:00 = Z)
   * `Time`: must be exactly the same
-* For complex types, equality requires all child properties to be equal, recursively.
+* For complex types, equality requires all child elements to be equal, recursively.
 
 If both operands are collections with multiple items, check the equality of each pair of items in order:
 
@@ -2833,7 +2833,7 @@ If both operands are collections with a single item, they must be of the same ty
   * `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision.
   * `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).
   * `Boolean`: the values must be the same
-* For complex types, equivalence requires all child properties to be equivalent, recursively.
+* For complex types, equivalence requires all child elements to be equivalent, recursively.
 
 If both operands are collections with multiple items:
 
@@ -3616,7 +3616,7 @@ FHIRPath defines the following lexical elements:
 |**Literal**|Literals allow basic values to be represented within the language|
 |**Symbol** |Symbols such as `+`, `-`, `*`, and `/` |
 |**Keyword** |Grammar-recognized tokens such as `and`, `or` and `in` |
-|**Identifier** |Labels such as type names and property names |
+|**Identifier** |Labels such as type names and element names |
 {:.grid}
 
 ### Whitespace
@@ -3718,14 +3718,14 @@ A delimited identifier is any sequence of characters enclosed in backticks (`` `
 `us-zip`
 ```
 
-The use of backticks allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have property or type names that are not valid simple identifiers.
+The use of backticks allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have element or type names that are not valid simple identifiers.
 
 FHIRPath [escape sequences](#string) for strings also work for delimited identifiers.
 
 As with simple identifiers, when a delimited identifier is used at the root of a FHIRPath expression, it follows the same [type resolution rules](#path-selection) as described in the Path selection section.
 
 ### Case-Sensitivity
-FHIRPath is a case-sensitive language, meaning that case is considered when matching keywords in the language. However, because FHIRPath can be used with different models, the case-sensitivity of type and property names is defined by each model.
+FHIRPath is a case-sensitive language, meaning that case is considered when matching keywords in the language. However, because FHIRPath can be used with different models, the case-sensitivity of type and element names is defined by each model.
 
 ## Environment variables
 
