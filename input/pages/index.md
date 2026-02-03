@@ -14,8 +14,8 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Aggregates](#aggregates)
 > * [Literals - Long](#long)
 > * [Conversions - toLong](#tolong--long)
-> * [Functions - repeatAll](#repeatallprojection-any--collection)
-> * [Functions - sort](#sortkeyselector-any-asc--desc--keyselector-any-asc--desc---collection)
+> * [Functions - repeatAll](#fn-repeatall)
+> * [Functions - sort](#fn-sort)
 > * [Functions - coalesce](#coalesce)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string-flags--string--boolean)
@@ -31,7 +31,7 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Types - Reflection](#reflection)
 > 
 > This section has undergone extensive clarification:
-> * [Functions - documentation of functions with scoped arguments](scoped-functions)
+> * [Functions - documentation of functions with scoped arguments](#scoped-functions)
 >
 > In addition, the appendices are included as additional documentation and are informative content.
 {: .stu-note }
@@ -67,7 +67,7 @@ In both FHIR and CQL, the model independence of FHIRPath means that expressions 
 
 The expressions can in theory be converted to equivalent expressions in XPath, OCL, or another similarly expressive language.
 
-FHIRPath can be used against many other graphs as well. For example, [Use of FHIRPath on HL7 Version 2 messages](#hl7v2) describes how FHIRPath is used in HL7 V2.
+FHIRPath can be used against many other graphs as well. For example, [Use of FHIRPath on HL7 Version 2 messages](appendices.html#hl7v2) describes how FHIRPath is used in HL7 V2.
 
 ### Conventions
 
@@ -467,7 +467,7 @@ Patient.telecom.where(use = 'official').union(Patient.contact.telecom.where(use 
 However not all functions support multiple items in the input collection, some expect only a single item and will be explicitly documented. Further details are available in the ["singleton evaluation of collections"](#singleton-evaluation-of-collections) section.
 {:.stu}
 
-Singleton only functions can be run on collections by using the function inside a [`select(...)`](#selectprojection-any--collection) to evaluate the function for each item in the collection.
+Singleton only functions can be run on collections by using the function inside a [`select(...)`](#fn-select) to evaluate the function for each item in the collection.
 {:.stu}
 
 For a complete listing of the functions defined in FHIRPath, refer to the [Functions](#functions) section.
@@ -605,7 +605,7 @@ Observation.value.where($this < 90 or $this > 110)
 | Variable | Description |
 | - | - |
 | `$this` | Set at the beginning of execution of an expression as the initial context *(See `%context` below)*<br/> Re-set to the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details* |
-| `$index` | Set at the beginning of execution of an expression to 0<br/> Re-set to the index of the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details*<br/> Its value is undefined while evaluating [`sort`](#sortkeyselector-any-asc--desc--keyselector-any-asc--desc---collection) `keySelector` parameters |
+| `$index` | Set at the beginning of execution of an expression to 0<br/> Re-set to the index of the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details*<br/> Its value is undefined while evaluating [`sort`](#fn-sort) `keySelector` parameters |
 | `$total` | Only available inside the parameters of the [`aggregate`](#aggregate) function. Holds the running total during processing, and at the end will be the result returned by the function. |
 | `%resource` | The current resource being processed (that contains the property in $focus)<br/> When passing through `resolve()` or into a contained resource will be changed to the new resource context. |
 | `%context` | The entry/starting point for execution of the fhirpath expression.<br/> Often used in fhirpath invariants.<br/> *(Does not change during execution)* |
