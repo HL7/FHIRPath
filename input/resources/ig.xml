@@ -69,6 +69,11 @@
         <generation value="markdown"/>
       </page>
       <page>
+        <nameUrl value="appendices.html"/>
+        <title value="Appendices"/>
+        <generation value="markdown"/>
+      </page>
+      <page>
         <nameUrl value="changes.html"/>
         <title value="Changes"/>
         <generation value="markdown"/>

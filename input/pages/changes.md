@@ -1,4 +1,31 @@
 
+### Release 2 STU1 Change Summary
+**Summary of Changes:**
+* Added new functions: `coalesce()`, `sort()`, `repeatAll()`, `defineVariable()`, `matchesFull()`, `indexOf()`, `lastIndexOf()`
+* Added aggregate functions: `sum()`, `min()`, `max()`, `avg()`
+* Added date/time component extraction functions: `yearOf()`, `monthOf()`, `dayOf()`, `hourOf()`, `minuteOf()`, `secondOf()`, `millisecondOf()`, `timezoneOffsetOf()`, `dateOf()`, `timeOf()`
+* Added boundary and precision functions: `lowBoundary()`, `highBoundary()`, `precision()`
+* Added support for Long (integer64) type with required `L` suffix
+* Added constructor syntax support for type instantiation
+* Added date/time subtraction operations
+* Added `combine()` function with `preserveOrder` parameter
+* Added case-sensitivity options to regex functions
+* Clarified singleton evaluation rules and function behavior for multi-item collections
+* Clarified iteration context and scoped function behavior
+* Clarified `iif()` delayed argument evaluation semantics
+* Clarified date/time arithmetic edge cases (overflow, fractions, subtraction)
+* Clarified quantity unit handling and UCUM conformance
+* Clarified equality semantics for collections
+* Clarified rounding behavior for negative numbers
+* Improved conversion documentation and `toString()` representations
+* Defined calendar duration units code system
+* Corrected numerous examples throughout
+* Updated implementation references
+* Added authors and contributors list
+* Typographical corrections throughout
+* Documentation source format changed from asciiidoc to markdown
+
+
 ### Release 2 STU1 Ballot (version 3.0.0-ballot)
 
 * [FHIR-44803](https://jira.hl7.org/browse/FHIR-44803): Spelling errors and typos
@@ -40,3 +67,66 @@
 * [FHIR-41382](https://jira.hl7.org/browse/FHIR-41382): Introduce a function to "stash" variables into scope for use further down the expression
 * [FHIR-44701](https://jira.hl7.org/browse/FHIR-44701): First batch of sample fhirpath expressions uses a `-` for a comment where should be a `//`
 * [FHIR-27757](https://jira.hl7.org/browse/FHIR-27757): More string manipulation functions
+
+
+### Ballot reconciliation issues
+
+* [FHIR-49237](https://jira.hl7.org/browse/FHIR-49237):  toString if type is not applicable, then result should be empty, not false
+* [FHIR-28122](https://jira.hl7.org/browse/FHIR-28122):  Conversion table misses bool->quantity
+* [FHIR-49172](https://jira.hl7.org/browse/FHIR-49172):  Clarify that the "C" referred to is the C programming language
+* [FHIR-49521](https://jira.hl7.org/browse/FHIR-49521):  Clarify the usage of regex match groups by referencing the example
+* [FHIR-49527](https://jira.hl7.org/browse/FHIR-49527):  Add return types to section titles in 6.4
+* [FHIR-49236](https://jira.hl7.org/browse/FHIR-49236):  update all uses of true and false where referring to the boolean type should be tagged
+* [FHIR-25194](https://jira.hl7.org/browse/FHIR-25194):  FHIRPath test xml is not valid xml
+* [FHIR-27055](https://jira.hl7.org/browse/FHIR-27055):  Behavior for comparing Date, Time, and DateTime primitives is unclear - highlight through examples
+* [FHIR-28242](https://jira.hl7.org/browse/FHIR-28242):  Test cases are inconsistent with fhir-test-cases
+* [FHIR-43294](https://jira.hl7.org/browse/FHIR-43294):  Add a SQL COALESCE-like function to FhirPath
+* [FHIR-49154](https://jira.hl7.org/browse/FHIR-49154):  Remove the test source files from the specification and refer directly to the github test repo
+* [FHIR-49155](https://jira.hl7.org/browse/FHIR-49155):  Include an Append function that does not effect the ordering of the content via preserveOrder parameter
+* [FHIR-49171](https://jira.hl7.org/browse/FHIR-49171):  Include a worked example for combine to contrast difference to union and |
+* [FHIR-49530](https://jira.hl7.org/browse/FHIR-49530):  Date/time arithmetic - subtraction below 0 (and also addition over 24 hours)
+* [FHIR-44939](https://jira.hl7.org/browse/FHIR-44939):  Correct description of power()
+* [FHIR-49170](https://jira.hl7.org/browse/FHIR-49170):  Function Invocations to indicate that some functions only work on a collection with a single element
+* [FHIR-49522](https://jira.hl7.org/browse/FHIR-49522):  Length() - number of characters in the input string
+* [FHIR-36708](https://jira.hl7.org/browse/FHIR-36708):  Add repeatAll function
+* [FHIR-40557](https://jira.hl7.org/browse/FHIR-40557):  Clarify remark about unit resulting from multiplication of Quantities
+* [FHIR-41343](https://jira.hl7.org/browse/FHIR-41343):  Return empty or error when doing math with "special" UCUM units
+* [FHIR-49227](https://jira.hl7.org/browse/FHIR-49227):  LastIndexOf with an empty string should return the length of the string
+* [FHIR-49235](https://jira.hl7.org/browse/FHIR-49235):  Clarify the regex to be a part of the bullet list
+* [FHIR-49117](https://jira.hl7.org/browse/FHIR-49117):  Remove incorrect comment "// example is wrong"
+* [FHIR-49124](https://jira.hl7.org/browse/FHIR-49124):  typos in encode function parameter descriptions
+* [FHIR-49139](https://jira.hl7.org/browse/FHIR-49139):  typos \<= (from markdown conversion - backslash delimiter for < no longer required)
+* [FHIR-51613](https://jira.hl7.org/browse/FHIR-51613):  convertsToString() wrong return time documented
+* [FHIR-51832](https://jira.hl7.org/browse/FHIR-51832):  optional parameters are marked with square brackets
+* [FHIR-19896](https://jira.hl7.org/browse/FHIR-19896):  Allow two dates to be subtracted
+* [FHIR-42969](https://jira.hl7.org/browse/FHIR-42969):  Create a way to specify case-insensitive/case-sensitive search, and clarify the default (with existing regex functions)
+* [FHIR-51432](https://jira.hl7.org/browse/FHIR-51432):  Correct examples for <= and >= (and add more examples)
+* [FHIR-52019](https://jira.hl7.org/browse/FHIR-52019):  fhirpath grammar for long to require L suffix (not optional)
+* [FHIR-49513](https://jira.hl7.org/browse/FHIR-49513):  Wording correction
+* [FHIR-49520](https://jira.hl7.org/browse/FHIR-49520):  Include an additional ReplaceMatches example
+* [FHIR-52023](https://jira.hl7.org/browse/FHIR-52023):  hourOf, minuteOf, secondOf, millisecondOf should not apply to date
+* [FHIR-52050](https://jira.hl7.org/browse/FHIR-52050):  Union function signature missing return type
+* [FHIR-49512](https://jira.hl7.org/browse/FHIR-49512):  Add sort functionality
+* [FHIR-49511](https://jira.hl7.org/browse/FHIR-49511):  Escaped backticks in paths permitted via escaping
+* [FHIR-49519](https://jira.hl7.org/browse/FHIR-49519):  Table in 5.5.2.1 is confusing
+* [FHIR-51576](https://jira.hl7.org/browse/FHIR-51576):  Quantity should preserve the units that were input
+* [FHIR-49156](https://jira.hl7.org/browse/FHIR-49156):  Refine how the toDate operation is evaluated on a datetime
+* [FHIR-49515](https://jira.hl7.org/browse/FHIR-49515):  What is System.Long and where is it defined?
+* [FHIR-53131](https://jira.hl7.org/browse/FHIR-53131):  toString representations table needs improvement, And made all the use of the custom output formatter styling consistent
+* [FHIR-46816](https://jira.hl7.org/browse/FHIR-46816):  Correct examples for lowBoundary and highBoundary
+* [FHIR-49137](https://jira.hl7.org/browse/FHIR-49137):  timezoneOffsetOf return value units clarifies as hours
+* [FHIR-49442](https://jira.hl7.org/browse/FHIR-49442):  Change log must be added (remove history toolbar - already in publishing box)
+* [FHIR-49445](https://jira.hl7.org/browse/FHIR-49445):  add list of authors/contributors, organization to home pages
+* [FHIR-49518](https://jira.hl7.org/browse/FHIR-49518):  Clarify iif function delayed argument evaluation
+* [FHIR-28173](https://jira.hl7.org/browse/FHIR-28173):  Add sum(), min(), max(), count(), avg()
+* [FHIR-49526](https://jira.hl7.org/browse/FHIR-49526):  Math section input requirements unclear and should include Quantity
+* [FHIR-49529](https://jira.hl7.org/browse/FHIR-49529):  Date time arithmetic with fractions - additional guidance
+* [FHIR-53076](https://jira.hl7.org/browse/FHIR-53076):  Equality semantics for collections
+* [FHIR-53159](https://jira.hl7.org/browse/FHIR-53159):  What should rounding to for negative numbers?
+* [FHIR-44601](https://jira.hl7.org/browse/FHIR-44601):  clarifying behaviour of iif
+* [FHIR-44774](https://jira.hl7.org/browse/FHIR-44774):  Better describe "iteration context" and impact on input collections/function execution - Scoped Functions
+* [FHIR-53196](https://jira.hl7.org/browse/FHIR-53196):  Update grammar to split NUMERIC into DECIMAL | INTEGER
+* [FHIR-33044](https://jira.hl7.org/browse/FHIR-33044):  Support constructor syntax
+* [FHIR-49112](https://jira.hl7.org/browse/FHIR-49112):  Version and Changes pages added to menu
+* [FHIR-49533](https://jira.hl7.org/browse/FHIR-49533):  Appendix A, B and section 17-19 moved to separate pages
+
