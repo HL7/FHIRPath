@@ -3357,6 +3357,39 @@ The first example above will evaluate to the value `@2012` even though the date/
 
 Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
 
+### Unary operators (`+` and `-`)
+{:.stu}
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+The unary operators support a single item input operand of type Integer, Long, Decimal, or Quantity. The output type is the same as the input type.
+Using with any incompatible type will end and signal an error to the calling environment.
+{:.stu}
+
+The `+` operator returns the value of its operand unchanged.
+{:.stu}
+
+The `-` operator will negate the numeric value. If the value is a Quantity, the unit remains unchanged.
+{:.stu}
+> **Note:** The CQL language describes the `-` operator as unary negation.
+{:.stu}
+
+If the result of negating the number cannot be represented, the result is empty (`{ }`).
+{:.stu}
+
+If the input collection is empty, the result is empty (`{ }`).
+{:.stu}
+
+examples:
+{:.stu}
+``` fhirpath
++5 // a simple literal 5 numeric value
+-4 // a simple negative value
+-Account.balance.amount // The negated account balance
+```
+{:.stu}
+
 ### Operator precedence
 
 Precedence of operations, in order from high to low:

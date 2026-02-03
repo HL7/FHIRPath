@@ -132,4 +132,5 @@
 * [FHIR-38007](https://jira.hl7.org/browse/FHIR-38007):  Better documentation for 'implies'
 * [FHIR-54718](https://jira.hl7.org/browse/FHIR-54718):  Grammar delimiter for " (double quotes) is missing for the "fragment" rule
 * [FHIR-34315](https://jira.hl7.org/browse/FHIR-34315):  Partial Date arithmetic for adding weeks
+* [FHIR-53656](https://jira.hl7.org/browse/FHIR-53656):  Add polarity operator definition (unary operators +/-)
 
