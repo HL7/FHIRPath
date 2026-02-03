@@ -134,4 +134,5 @@
 * [FHIR-34315](https://jira.hl7.org/browse/FHIR-34315):  Partial Date arithmetic for adding weeks
 * [FHIR-53656](https://jira.hl7.org/browse/FHIR-53656):  Add polarity operator definition (unary operators +/-)
 * [FHIR-53957](https://jira.hl7.org/browse/FHIR-53957):  Migrate the FHIR function `comparable` to fhirpath
+* [FHIR-52957](https://jira.hl7.org/browse/FHIR-52957):  Removed inconsistencies in equality/equivalence of calendar/definite durations
 

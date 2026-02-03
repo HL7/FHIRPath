@@ -404,10 +404,10 @@ For time-valued quantities, in addition to the definite duration UCUM units, FHI
 | - | - | - |
 | `year`/`years` | `'year'` | `~ 1 'a'` |
 | `month`/`months` | `'month'` | `~ 1 'mo'` |
-| `week`/`weeks` | `'week'` | `~ 1 'wk'` |
-| `day`/`days` | `'day'` | `~ 1 'd'` |
-| `hour`/`hours` | `'hour'` | `~ 1 'h'` |
-| `minute`/`minutes` | `'minute'` | `~ 1 'min'` |
+| `week`/`weeks` | `'week'` | `= 1 'wk'` |
+| `day`/`days` | `'day'` | `= 1 'd'` |
+| `hour`/`hours` | `'hour'` | `= 1 'h'` |
+| `minute`/`minutes` | `'minute'` | `= 1 'min'` |
 | `second`/`seconds` | `'second'` | `= 1 's'` |
 | `millisecond`/`milliseconds` | `'millisecond'` | `= 1 'ms'` |
 {: .grid}
