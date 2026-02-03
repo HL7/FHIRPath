@@ -564,7 +564,7 @@ Note that although all functions return collections, if a given function is defi
 Some functions are marked as **scoped** functions. This type of function creates a scoped context with the variables `$this` and `$index` (*and `$total` for `aggregate`*), which are populated and arguments evaluated according to the definition of the function. Most functions just set the $index to the 0-based position of the item in the input collection, though not used in all functions (*specifically `sort`, as it will be modifying the order of the list thus index should be undefined in this context*). `iif` is a special case where its input collection is a single value, so doesn't *iterate*, but it does set the $this variable into the scoped context for parameter evaluations.
 {:.fhir-highlight}
 
-> Note: The scope of the `$this` and `$index` variables is within the parameters of the scoped function. If nesting scoped functions, the scope of the variable is restored to the outer scope.
+> Note: Variables introduced by scoped functions can only be accessed within the specified parameters of the scoped function. This behavior is preserved through nesting, meaning specifically that once a nested scope function evaluation is complete, the variables in the outer scoped function are again available.
 {:.fhir-highlight}
 
 These are the fhirpath defined scoped functions: *(argument processing only, refer to each function for full details of its functionality)*
@@ -3176,7 +3176,7 @@ CareTeam.onBehalfOf.exists() implies (CareTeam.member.resolve() is Practitioner)
 StructureDefinition.contextInvariant.exists() implies StructureDefinition.type = 'Extension'
 ```
 
-In order to gracefully handle missing left arguments of implies, use the equivalence `~` instead of equal `=`:
+Note carefully that if the left side of an implies evaluates to empty, the result of the operation is the right side. This is often not the intended result, so the use of operators that ensure a value (such as `~`, instead of `=`) is recommended for testing boolean conditions, as illustrated in the following examples:
 ``` fhirpath
 Medication.status ~ 'active' implies form.exists()
 
