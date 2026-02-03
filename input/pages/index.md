@@ -3140,6 +3140,21 @@ CareTeam.onBehalfOf.exists() implies (CareTeam.member.resolve() is Practitioner)
 StructureDefinition.contextInvariant.exists() implies StructureDefinition.type = 'Extension'
 ```
 
+In order to gracefully handle missing left arguments of implies, use the equivalence `~` instead of equal `=`:
+``` fhirpath
+Medication.status ~ 'active' implies form.exists()
+
+// if using the following expression in a constraint, it won't have the expected behavior of only requiring form is status was active.
+// (using equal '=' would evaluate and return the right argument if the left argument (status) is missing from the input)
+Medication.status = 'active' implies form.exists() // bad constraint expression
+
+// More complex conditions
+(type ~ 'incident' and severity ~ 'high') implies reviewDate.exists()
+
+// Works with boolean too, but not special-cased
+wasNotGiven ~ true implies reasonNotGiven.exists()
+```
+
 Note that implies may use short-circuit evaluation in the case that the first operand evaluates to `false`.
 
 ### Math

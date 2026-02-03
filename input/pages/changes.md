@@ -129,4 +129,5 @@
 * [FHIR-33044](https://jira.hl7.org/browse/FHIR-33044):  Support constructor syntax
 * [FHIR-49112](https://jira.hl7.org/browse/FHIR-49112):  Version and Changes pages added to menu
 * [FHIR-49533](https://jira.hl7.org/browse/FHIR-49533):  Appendix A, B and section 17-19 moved to separate pages
+* [FHIR-38007](https://jira.hl7.org/browse/FHIR-38007):  Better documentation for 'implies'
 
