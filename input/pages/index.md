@@ -234,8 +234,7 @@ false
 ```
 
 #### String
-
-The `String` type represents string values up to 2<sup>31</sup>-1 characters in length. String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
+The `String` type represents string values up to 2<sup>31</sup>-1 characters in length and is UTF-8 encoded. String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
 
 | Escape | Character |
 | - | - |
@@ -253,6 +252,8 @@ The `String` type represents string values up to 2<sup>31</sup>-1 characters in 
 No other escape sequences besides those listed above are recognized.
 
 Note that Unicode is supported in both string literals and delimited [Identifiers](#identifiers).
+
+> Note: The UTF-8 encoding is consistent with XML and JSON specifications, as well as the base FHIR specification.
 
 ``` fhirpath
 'test string'
