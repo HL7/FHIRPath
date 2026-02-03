@@ -139,4 +139,5 @@
 * [FHIR-49523](https://jira.hl7.org/browse/FHIR-49523):  Support encoding a string as ascii (replacing chars over code 127 with '?')
 * [FHIR-53554](https://jira.hl7.org/browse/FHIR-53554):  Clarify Unicode support
 * [FHIR-53660](https://jira.hl7.org/browse/FHIR-53660):  Clarify default behavior when accessing non existent data elements
+* [FHIR-49516](https://jira.hl7.org/browse/FHIR-49516):  Inconsistent use of empty and error with quantity processing
 

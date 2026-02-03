@@ -394,7 +394,9 @@ The `Quantity` literal is a number (integer or decimal), followed by a (single-q
 >
 > Implementations should support other unit functionality as specified by UCUM, including unit conversion.
 >
-> Implementations that do not support complete UCUM functionality may return empty (`{ }`) for calculations involving quantities with units where the units are different.
+> Implementations that do NOT support complete UCUM functionality may return empty (`{ }`) for calculations involving quantities with units where the units are different.
+>
+> For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
 
 ##### Time-valued Quantities
 
@@ -1490,7 +1492,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is `true`, otherwise, the result is `false`.
 
-> Implementations are not required to support a complete UCUM implementation, and may return `false` when the `unit` argument is used and it is different than the input quantity unit.
+> Implementations are not required to support a complete UCUM implementation, and may return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
 
 #### String Conversion Functions
 
