@@ -1872,6 +1872,7 @@ The encode function takes a singleton string and returns the result of encoding 
 |=|=|
 |base64 |The string is encoded using standard base64 encoding, using A-Z, a-z, 0-9, +, and /, output padded with = |
 |urlbase64 |The string is encoded using url base 64 encoding, using A-Z, a-z, 0-9, -, and _, output padded with = |
+|ascii | The string has any character above character code 127 replaced with `?`. *This is a lossy encoding, and not reversible via `decode`*
 {:.grid}
 {:.stu}
 
@@ -1887,7 +1888,7 @@ If no format is specified, the result is empty.
 #### decode(format : String) : String
 {:.stu}
 
-The decode function takes a singleton encoded string and returns the result of decoding that string according to the given format. The format parameter defines the encoding format. Available formats are listed in the encode function.
+The decode function takes a singleton encoded string and returns the result of decoding that string according to the given format. The format parameter defines the encoding format. Available formats are listed in the encode function (excluding 'ascii').
 {:.stu}
 
 If the input is empty, the result is empty.
