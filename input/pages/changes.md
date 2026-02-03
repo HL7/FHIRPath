@@ -1,7 +1,7 @@
 
 ### Release 2 STU1 Change Summary
 **Summary of Changes:**
-* Added new functions: `coalesce()`, `sort()`, `repeatAll()`, `defineVariable()`, `matchesFull()`, `indexOf()`, `lastIndexOf()`
+* Added new functions: `coalesce()`, `sort()`, `repeatAll()`, `defineVariable()`, `matchesFull()`, `indexOf()`, `lastIndexOf()`, `comparable()`
 * Added aggregate functions: `sum()`, `min()`, `max()`, `avg()`
 * Added date/time component extraction functions: `yearOf()`, `monthOf()`, `dayOf()`, `hourOf()`, `minuteOf()`, `secondOf()`, `millisecondOf()`, `timezoneOffsetOf()`, `dateOf()`, `timeOf()`
 * Added boundary and precision functions: `lowBoundary()`, `highBoundary()`, `precision()`
@@ -133,4 +133,5 @@
 * [FHIR-54718](https://jira.hl7.org/browse/FHIR-54718):  Grammar delimiter for " (double quotes) is missing for the "fragment" rule
 * [FHIR-34315](https://jira.hl7.org/browse/FHIR-34315):  Partial Date arithmetic for adding weeks
 * [FHIR-53656](https://jira.hl7.org/browse/FHIR-53656):  Add polarity operator definition (unary operators +/-)
+* [FHIR-53957](https://jira.hl7.org/browse/FHIR-53957):  Migrate the FHIR function `comparable` to fhirpath
 

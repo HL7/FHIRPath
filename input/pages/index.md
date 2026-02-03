@@ -26,6 +26,7 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - Utility (precision)](#precision--integer)
 > * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
 > * [Functions - Date and Time Interval Functions (duration, difference)](#date-and-time-interval-functions)
+> * [Operations - Comparison (comparable)](#fn-comparable)
 > * [Instance Selector/Object Creation](#instance-selector)
 > * [Types - Reflection](#reflection)
 > 
@@ -3003,6 +3004,38 @@ The greater or equal operator (`>=`) returns `true` if the first operand is grea
 @T10 >= @T10:30 // empty ({ }) - different precisions
 @T10:30:00 >= @T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
+
+<a name="fn-comparable"></a>
+#### comparable(other : Quantity) : Boolean
+{:.stu}
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns `true` if the input Quantity can be compared with the `other` Quantity and their relationship to each other determined.
+Comparable means that both have values, and the units are the same (irrespective of the system), or both have `code` and `system` values,
+and the `system` is recognized by the FHIRPath implementation, and the codes are comparable within that system
+(e.g. `'d'` (days) and `'h'` (hours), or `'[in_i]'` (inches) and `'cm'` (centimeters)).
+{:.stu}
+
+If either or both inputs are empty, or either input is not a single Quantity value, the result is empty (`{ }`).
+{:.stu}
+
+``` fhirpath
+1 'mg'.comparable(2 'mg') // true - these types are comparable
+1 'm'.comparable(20 'cm') // true - these types are both metric distance measures
+2 '1'.comparable(3) // true - the integer will implicitly convert to a Quantity with unit `'1'` which is the same system/code so is comparable
+1.comparable(2) // true - these will both convert to quantities with the same system/code, hence are comparable
+```
+{:.stu}
+
+This function can be used to guard comparison operations to prevent returning empty results when the quantities are not comparable:
+{:.stu}
+
+``` fhirpath
+iif(Observation.value.comparable(2 'mg'), Observation.value < 2 'mg', {})
+```
+{:.stu}
 
 ### Types
 
