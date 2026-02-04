@@ -194,7 +194,7 @@ LINE_COMMENT
         ;
 
 fragment ESC
-        : '\\' ([`"'\\/fnrt] | UNICODE)    // allow \`, \', \\, \/, \f, etc. and \uXXX
+        : '\\' ([`"'\\/fnrt] | UNICODE)    // allow \`, \", \', \\, \/, \f, etc. and \uXXX
         ;
 
 fragment UNICODE

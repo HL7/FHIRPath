@@ -1372,6 +1372,7 @@ If the item is not one of the above types, the result is empty.
 If the item is a String, but the string is not convertible to a Date (using the default format `yyyy-MM-DD`{:.formatted}), the result is empty.
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+If the input is not a string, the format parameter it ignored.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -1398,6 +1399,7 @@ If the input collection contains a single item, this function will return `true`
 If the item is not one of the above types, or is not convertible to a Date (using the default format `yyyy-MM-DD`{:.formatted}), the result is `false`.
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+If the input is not a string, the format parameter it ignored.
 {:.stu}
 
 If the item contains a partial date (e.g. `'2012-01'`), the result is a partial date.
@@ -1421,6 +1423,7 @@ If the item is not one of the above types, the result is empty.
 If the item is a String, but the string is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is empty.
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+If the input is not a string, the format parameter it ignored.
 {:.stu}
 
 If the item contains a partial datetime (e.g. `'2012-01-01T10:00'`), the result is a partial datetime.
@@ -1440,6 +1443,7 @@ If the input collection contains a single item, this function will return `true`
 If the item is not one of the above types, or is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is `false`.
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+If the input is not a string, the format parameter it ignored.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
