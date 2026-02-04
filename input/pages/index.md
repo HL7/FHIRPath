@@ -599,9 +599,9 @@ Observation.value.where($this < 90 or $this > 110)
 | `$this` | Set at the beginning of execution of an expression as the initial context *(See `%context` below)*<br/> Re-set to the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details* |
 | `$index` | Set at the beginning of execution of an expression to 0<br/> Re-set to the index of the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details*<br/> Its value is undefined while evaluating [`sort`](#fn-sort) `keySelector` parameters |
 | `$total` | Only available inside the parameters of the [`aggregate`](#aggregate) function. Holds the running total during processing, and at the end will be the result returned by the function. |
-| `%resource` | The current resource being processed (that contains the element in focus)<br/> When passing through `resolve()` or into a contained resource will be changed to the new resource context. |
 | `%context` | The entry/starting point for execution of the fhirpath expression.<br/> Often used in fhirpath invariants.<br/> *(Does not change during execution)* |
-| `%rootResource` | The top level fhir resource. Usually a Bundle, or resource that has contained resources (or Parameters resource).<br/> Though processing on regular fhir resources this is also the same as %resource.<br/> *(Does not change during execution)* |
+| `%resource` | (Defined in FHIR) The current resource being processed (that contains the element in focus)<br/> When passing through `resolve()` or into a contained resource will be changed to the new resource context. |
+| `%rootResource` | (Defined in FHIR) The top level fhir resource. Usually a Bundle, or resource that has contained resources (or Parameters resource).<br/> Though processing on regular fhir resources this is also the same as %resource.<br/> *(Does not change during execution)* |
 {:.list}
 
 > **Note:** Other specifications MAY introduce their own variables
@@ -2282,6 +2282,63 @@ contained.where(criteria).trace('unmatched', id).empty()
 ```
 
 The above example traces only the id elements of the result of the where.
+
+<a name="fn-pathname"></a>
+#### pathname([short : Boolean]) : collection
+{:.stu}
+<!-- FHIR-45314 -->
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns the direct path of each element of the input collection within the input resource (`%rootResource` in FHIR implementations),
+using only element names and indexers. *Such that if you used that result on the input resource, you would get that node, and only that node.*
+{:.stu}
+
+If an element in the input collection was derived from computation (e.g. via `substring(..)`, `&`, or mathematical operations) rather than navigation it is excluded from the result.
+Elements that are outside the input resource, such as those navigated to via resolve() are also excluded from the result, however if resolve()
+references a resource contained within the input Resource then it is included (such as with FHIR bundles, or contained resources).
+{:.stu}
+
+The optional `short` parameter permits excluding array indexers if an element is known to not be an array, either in the model, or in the specific instance at runtime.
+{:.stu}
+
+If the input collection is empty `({ })`, the result is empty.
+{:.stu}
+
+This function could be used to populate fields in a FHIR OperationOutcome.issue.expression field, or assist in debugging complex expressions using it in conjunction with trace.
+{:.stu}
+
+For example, validating a FHIR QuestionnaireResponse (against a Questionnaire) could use the following expression to calculate the location of an invalid answer:
+{:.stu}
+``` fhirpath
+item.item.item.where(linkId = 'i508').item.where(linkId='i534').answer.value.pathname()
+```
+{:.stu}
+
+would return the following string *(which is also a valid fhirpath expression)* if only 1 node was at that location in the input QuestionnaireResponse.
+{:.stu}
+
+``` fhirpath
+'QuestionnaireResponse.item[2].item[8].item[1].item[1].answer[0].value[0]'
+```
+{:.stu}
+
+Another example could be the FHIR Observation invariant `obs-7` that roughly checks if components are duplicating codings captured at the top level:
+*(not an exact copy of the invariant, but a part of it)*
+{:.stu}
+``` fhirpath
+// trace out the pathname of the components that have duplicated codings
+component.code.where(coding.intersect(%resource.code.coding).trace('component', pathname()).exists()).empty()
+```
+{:.stu}
+would return the following strings: (simplifying finding the specific component(s) that were duplicated)
+{:.stu}
+``` fhirpath
+'Observation.component[0].code[0].coding[0]'
+'Observation.component[23].code[0].coding[0]'
+```
+{:.stu}
 
 #### Current date and time functions
 

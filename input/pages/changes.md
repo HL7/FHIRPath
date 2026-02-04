@@ -1,7 +1,7 @@
 
 ### Release 2 STU1 Change Summary
 **Summary of Changes:**
-* Added new functions: `coalesce()`, `sort()`, `repeatAll()`, `defineVariable()`, `matchesFull()`, `indexOf()`, `lastIndexOf()`, `comparable()`
+* Added new functions: `coalesce()`, `sort()`, `repeatAll()`, `defineVariable()`, `matchesFull()`, `indexOf()`, `lastIndexOf()`, `comparable()`, `pathname()`
 * Added aggregate functions: `sum()`, `min()`, `max()`, `avg()`
 * Added date/time component extraction functions: `yearOf()`, `monthOf()`, `dayOf()`, `hourOf()`, `minuteOf()`, `secondOf()`, `millisecondOf()`, `timezoneOffsetOf()`, `dateOf()`, `timeOf()`
 * Added boundary and precision functions: `lowBoundary()`, `highBoundary()`, `precision()`
@@ -140,4 +140,5 @@
 * [FHIR-53554](https://jira.hl7.org/browse/FHIR-53554):  Clarify Unicode support
 * [FHIR-53660](https://jira.hl7.org/browse/FHIR-53660):  Clarify default behavior when accessing non existent data elements
 * [FHIR-49516](https://jira.hl7.org/browse/FHIR-49516):  Inconsistent use of empty and error with quantity processing
+* [FHIR-45314](https://jira.hl7.org/browse/FHIR-45314):  Add a new function `pathname()` that returns the location(s) of the focused item(s)
 
