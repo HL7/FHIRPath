@@ -152,7 +152,7 @@ The two expressions have the same outcome, but when evaluating the second, the e
 When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first. If it resolves to a type and that type is the type of the context (or a supertype), then the evaluation proceeds with the context unchanged, i.e. in the example above proceeds to evaluate the `name` element.
 Otherwise the identifier is resolved as a path on the context, which if not found returns an empty collection.
 
-This could also be written using `ofType()`, which would have the same behaviour:
+This could also be written using [`ofType()`](#fn-oftype), which would have the same behaviour:
 ``` fhirpath
 ofType(Patient).name.given
 ```
@@ -199,7 +199,7 @@ The `as` operator can be used to treat a value as a specific type:
 Observation.value as Quantity // returns value as a Quantity if it is of type Quantity, and an empty result otherwise
 ```
 
-The list of available types that can be passed as an argument to the `ofType()` function and `is` and `as` operators is determined by the underlying object model. Within FHIRPath, they are just identifiers, either delimited or simple.
+The list of available types that can be passed as an argument to the [`ofType()`](#fn-oftype) function and `is` and `as` operators is determined by the underlying object model. Within FHIRPath, they are just identifiers, either delimited or simple.
 
 ## Expressions
 
@@ -996,6 +996,7 @@ Questionnaire.repeatAll('item') // this is a common mistake where the "expressio
 ```
 {:.stu}
 
+<a name="fn-oftype"></a>
 #### ofType(type : _type specifier_) : collection
 
 Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty. The `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat it as type specifier rather than an identifier expression:
@@ -1424,6 +1425,7 @@ If the input collection is empty, the result is empty.
 
 #### Quantity Conversion Functions
 
+<a name="fn-toquantity"></a>
 ##### toQuantity([unit : String]) : Quantity
 
 If the input collection contains a single item, this function will return a single quantity if:
@@ -2263,7 +2265,7 @@ Returns a collection with all immediate child nodes of all items in the input co
 
 Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
 
-> **Note:** Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
+> **Note:** Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use [`ofType()`](#fn-oftype) as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
 
 ### Utility functions
 
@@ -4007,7 +4009,7 @@ There are a few constructs in the FHIRPath language where the compiler cannot de
 
 Note that the `resolve()` function is defined by the FHIR context, it is not part of FHIRPath directly. For more information see the [FHIRPath](https://hl7.org/fhir/fhirpath.html#functions) section of the FHIR specification.
 
-Authors can use the `as` operator or `ofType()` function directly after such constructs to inform the compiler of the expected type.
+Authors can use the `as` operator or [`ofType()`](#fn-oftype) function directly after such constructs to inform the compiler of the expected type.
 
 In cases where a compiler finds places where a collection of multiple items can be present while just a single item is expected, the author will need to make explicit how repetitions are dealt with. Depending on the situation one may:
 
@@ -4015,12 +4017,16 @@ In cases where a compiler finds places where a collection of multiple items can 
 * Use `select()` and `where()` to turn the expression into one that evaluates each of the repeating items individually (as in the examples above)
 
 ### Run-time behavior
+{:.stu}
 In the absence of strongly-typed compile-time checks, the implementation may still provide strong type-checks at run-time.
 The difference between strongly typed compile-time checks and strongly-typed run-time checks is that the latter will only throw errors when the data does not conform to type requirements, where the former checks that any data is guaranteed to be conformant due to the construction of the expression.
+{:.stu}
 
 However, the default run-time behavior of a compliant FHIRPath implementation should be weakly typed. This means:
+{:.stu}
 
 return an empty collection ({ }) when a path references an element that does not exist on the context node
+{:.stu}
 
 ## Formal Specifications
 
@@ -4038,7 +4044,7 @@ The model information returned by the reflection function `type()`  is specified
 
 [modelinfo.xsd](modelinfo.xsd)
 
-> **Note:** The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the normative [Reflection](#reflection) section above.
+> **Note:** The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the [Reflection](#reflection) section above.
 
 As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and tooling should respect the case-sensitive settings for each model.
 
