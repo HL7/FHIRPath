@@ -1321,8 +1321,44 @@ If the input collection is empty, the result is empty.
 {:.stu}
 
 #### Date Conversion Functions
+<a name="format-codes"></a>
+##### Date/DateTime String Format Codes
+{:.stu}
+Parsing textual content into date/time values is a complex task, given the wide variety of formats in use in the real world. The `toDate()` and `toDateTime()` functions defined below provide a way to parse a wide variety of date/time formats into FHIRPath date and datetime types. Unfortunately, there is no single standard for date/time formats across the contexts where FHIRPath is used (e.g., most programming languages have their own date/time formats), so the this specification defines the following format codes below.
+{:.stu}
+Note that:
+{:.stu}
+* Format codes are case-sensitive.
+* Any character in the format string parameter not represented by a format code is treated as a literal and must match exactly in the input string.
+* Only a subset of the codes are required, implementations may vary.
+{:.stu}
 
-##### toDate() : Date
+| Format Code	| Support	| Description |
+| ----------- | ------- | ----------- |
+| yy	 | optional	| 2-digit year (e.g., 80 for 1980)<br/>Implementations have discretion on how to interpret the century for 2-digit years (e.g., based on contextual knowledge).<br/>A common approach is to interpret values 00-49 as 2000-2049 and 50-99 as 1950-1999.<br/>Note that this format code is discouraged due to the ambiguity it introduces.
+| yyyy | required	| 4-digit year (e.g., 2024)
+| M    | optional	| 1- or 2-digit month of year (1=January, etc.)
+| MM   | required	| 2-digit month of year (01=January, etc.)
+| MMM  | optional	| The localized abbreviated name of the month (e.g., 'Jun' for en-US, 'juin' for fr-FR)
+| MMMM | optional	| The localized full name of the month (e.g., 'June' for en-US, 'juni' for da-DK)
+| d    | optional	| 1- or 2-digit day of month (1 through 31)
+| dd   | required	| 2-digit day of month (01 through 31)
+| h    | optional	| 1- or 2-digit hour of AM/PM (1 through 12)
+| hh   | required	| 2-digit hour of AM/PM (01 through 12)
+| H    | optional	| 1- or 2-digit hour of day (00 through 23)
+| HH   | required	| 2-digit hour of day (00 through 23)
+| m    | optional	| 1- or 2-digit minute of hour (0 through 59)
+| mm   | required	| 2-digit minute of hour (00 through 59)
+| s    | optional	| 1- or 2-digit second of minute (0 through 59)
+| ss   | required	| 2-digit second of minute (00 through 59)
+| S[+] | required	| 1-digit fraction of second (0 through 9)<br/>Note that consecutive fractional seconds are grouped together, e.g. SSS for milliseconds.<br/>Implementations MUST support at least 3 digits (milliseconds); support for additional digits is optional.
+| a    | required	| 1- or 2-letter localized AM/PM specifier.<br/>e.g., en-US: A, AM, P, etc.<br/>e.g., ja-JP: 午, 午前, etc.
+| z    | optional	| Time zone literal (name or id). E.g., America/Los_Angeles, Pacific Standard Time, or PST.
+| Z    | required	| Time zone offset from UTC (e.g., +0200, -0500) or Z literal for UTC
+{:.grid}
+{:.stu}
+
+##### toDate([format : string]) : Date
 
 If the input collection contains a single item, this function will return a single date if:
 
@@ -1333,15 +1369,25 @@ are extracted directly without timezone conversion/normalization
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a Date (using the format `yyyy-MM-DD`{:.formatted}), the result is empty.
+If the item is a String, but the string is not convertible to a Date (using the default format `yyyy-MM-DD`{:.formatted}), the result is empty.
+
+When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
 
-For example: `@2024-01-15T23:30:00-05:00.toDate()` returns `@2024-01-15`
+For example: 
+```fhirpath
+@2024-01-15T23:30:00-05:00.toDate() // returns @2024-01-15
+'2024-01-15'.toDate() // returns @2024-01-15
+'150124'.toDate('ddMMyy') // returns @2024-01-15 
+'15-01-2024'.toDate('dd-MM-yyyy') // returns @2024-01-15
+'12-27'.toDate('MM-yy') // returns @2027-12 (a partial date with just year and month entered)
+```
 
-##### convertsToDate() : Boolean
+##### convertsToDate([format : string]) : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
 
@@ -1349,7 +1395,10 @@ If the input collection contains a single item, this function will return `true`
 * the item is a DateTime
 * the item is a String and is convertible to a Date
 
-If the item is not one of the above types, or is not convertible to a Date (using the format `yyyy-MM-DD`{:.formatted}), the result is `false`.
+If the item is not one of the above types, or is not convertible to a Date (using the default format `yyyy-MM-DD`{:.formatted}), the result is `false`.
+
+When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+{:.stu}
 
 If the item contains a partial date (e.g. `'2012-01'`), the result is a partial date.
 
@@ -1359,7 +1408,7 @@ If the input collection is empty, the result is empty.
 
 #### DateTime Conversion Functions
 
-##### toDateTime() : DateTime
+##### toDateTime([format : string]) : DateTime
 
 If the input collection contains a single item, this function will return a single datetime if:
 
@@ -1369,7 +1418,10 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a DateTime (using the format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is empty.
+If the item is a String, but the string is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is empty.
+
+When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+{:.stu}
 
 If the item contains a partial datetime (e.g. `'2012-01-01T10:00'`), the result is a partial datetime.
 
@@ -1377,7 +1429,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
-##### convertsToDateTime() : Boolean
+##### convertsToDateTime([format : string]) : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
 
@@ -1385,7 +1437,10 @@ If the input collection contains a single item, this function will return `true`
 * the item is a Date
 * the item is a String and is convertible to a DateTime
 
-If the item is not one of the above types, or is not convertible to a DateTime (using the format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is `false`.
+If the item is not one of the above types, or is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is `false`.
+
+When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
