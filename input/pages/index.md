@@ -3274,7 +3274,7 @@ Note carefully that if the left side of an implies evaluates to empty, the resul
 ``` fhirpath
 Medication.status ~ 'active' implies form.exists()
 
-// if using the following expression in a constraint, it won't have the expected behavior of only requiring form is status was active.
+// if using the following expression in a constraint, it won't have the expected behavior of only requiring form if status was active.
 // (using equal '=' would evaluate and return the right argument if the left argument (status) is missing from the input)
 Medication.status = 'active' implies form.exists() // bad constraint expression
 
