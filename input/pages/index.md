@@ -127,7 +127,7 @@ Data are represented as a tree of labelled nodes, where each node may optionally
 
 ![Tree representation of a Patient](treestructure.png){: height="375px" width="500px" style="float: unset; margin-bottom:0;" }
 
-The diagram shows a tree with a repeating `name` node, which represents repeating members of the FHIR Object Model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
+The diagram shows a tree with a repeating `name` node, representing repeating elements of the FHIR Object Model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
 
 FHIRPath expressions are then _evaluated_ with respect to a specific instance, such as the Patient one described above. This instance is referred to as the _context_ (also called the _root_) and paths within the expression are evaluated in terms of this instance.
 
@@ -166,12 +166,12 @@ Message.`PID-1` // subtraction operator as a part of an element name
 
 ### Collections
 
-Collections are fundamental to FHIRPath, in that the result of every expression is a collection, even if that expression only results in a single element. This approach allows paths to be specified without having to care about the cardinality of any particular element, and is therefore ideally suited to graph traversal.
+Collections are fundamental to FHIRPath, in that the result of every expression is a collection, even if that expression only results in a single item. This approach allows paths to be specified without having to care about the cardinality of any particular element, and is therefore ideally suited to graph traversal.
 
 Within FHIRPath, a collection is:
 
 * Ordered - The order of items in the collection is important and is preserved through operations as much as possible. Operators and functions that do not preserve order will note that in their documentation.
-* Non-Unique - Duplicate elements are allowed within a collection. Some operations and functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
+* Non-Unique - Duplicate values are allowed within a collection. Some operations and functions, such as `distinct()` and the union operator `|` produce collections of unique values, but in general, duplicate values are allowed.
 * Indexed - Each item in a collection can be addressed by its index, i.e. ordinal position within the collection (e.g. `a[2]`).
 * Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 * Countable - The number of items in a given collection can always be determined using the `count()` function
@@ -203,7 +203,7 @@ The list of available types that can be passed as an argument to the [`ofType()`
 
 ## Expressions
 
-FHIRPath expressions can consist of _paths_, _literals_, _operators_, and _function invocations_, and these elements can be chained together, so that the output of one operation or function is the input to the next. This is the core of the _fluent_ [\[Fluent\]](#fluent) syntactic style and allows complex paths and expressions to be built up from simpler components.
+FHIRPath expressions can consist of _paths_, _literals_, _operators_, and _function invocations_. These can be chained together, so that the output of one operation or function is the input to the next. This is the core of the _fluent_ [\[Fluent\]](#fluent) syntactic style and allows complex paths and expressions to be built up from simpler components.
 
 ### Literals
 
@@ -377,7 +377,7 @@ Consult the [formal grammar](grammar.html) for more details.
 
 #### Quantity
 
-The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be either a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or one of the calendar duration keywords, singular or plural.
+The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` is represented as a `String` that is required to be either a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or one of the calendar duration keywords, singular or plural.
 
 The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or calendar duration keyword. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
 
@@ -477,7 +477,7 @@ For a complete listing of the functions defined in FHIRPath, refer to the [Funct
 
 ### Null and empty
 
-There is no literal representation for _null_ in FHIRPath. This means that when, in an underlying data object (i.e. they physical data on which the implementation is operating) a member is null or missing, there will simply be no corresponding node for that member in the tree, e.g. `Patient.name`{:.fhirpath} will return an empty collection (not null) if there are no name elements in the instance.
+There is no literal representation for _null_ in FHIRPath. This means that when, in an underlying data object (i.e. they physical data on which the implementation is operating) an element is null or missing, there will simply be no corresponding node for that element in the tree, e.g. `Patient.name`{:.fhirpath} will return an empty collection (not null) if there are no name elements in the instance.
 
 In expressions, the empty collection is represented as `{ }`.
 
@@ -550,7 +550,7 @@ The following sections describe the functions supported in FHIRPath, detailing t
   For example, the `where` function's definition is `where(criteria : ($this, $index) => Boolean)` indicating that when the `criteria` expression is evaluated, the special variables `$this` and `$index` will be set in the evaluation context according to the definition of the function.
   When you actually use it, you would write something like `rules.where($index mod 2 = 0)` (which will filter out every second rule from the collection). Usage in this case is the same as if the parameter was a simple `Boolean` parameter in the definition.
 
-Note that although all functions return collections, if a given function is defined to return a single element, the return type is simplified to just the type of the single element, rather than the list type.
+Note that although all functions return collections, if a given function is defined to return a single item, the return type is simplified to just the type of the single item, rather than the list type.
 
 #### Scoped Functions
 Some functions are marked as **scoped** functions. This type of function creates special variables (such as `$this`) that are available when evaluating arguments to the function.
@@ -617,7 +617,7 @@ Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
 
 > This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if any return `true` then the function returns `true`, otherwise `false`.
 
-Returns `true` if the input collection has any elements (optionally filtered by the criteria), and `false` otherwise.
+Returns `true` if the input collection has any items (optionally filtered by the criteria), and `false` otherwise.
 This is the opposite of `empty()`, and as such is a shorthand for `empty().not()`. If the input collection is empty (`{ }`), the result is `false`.
 
 Using the optional criteria can be considered a shorthand for `where(criteria).exists()`.
@@ -646,7 +646,7 @@ And finally, the fourth example returns `true` if the `Patient` has any `general
 
 > This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`.
 
-Returns `true` if for every element in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
+Returns `true` if for every item in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
 
 ``` fhirpath
 generalPractitioner.all($this.resolve() is Practitioner)
@@ -698,7 +698,7 @@ Observation.select(component.value > 90 'mm[Hg]').anyFalse()
 
 Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the [equals](#equals) (`=`) operation.
 
-Conceptually, this function is evaluated by testing each element in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
+Conceptually, this function is evaluated by testing each item in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
 
 The following example returns `true` if the tags defined in any contained resource are a subset of the tags defined in the MedicationRequest resource:
 
@@ -710,7 +710,7 @@ MedicationRequest.contained.meta.tag.subsetOf(MedicationRequest.meta.tag)
 
 Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the [equals](#equals) (`=`) operation.
 
-Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
+Conceptually, this function is evaluated by testing each item in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
 
 The following example returns `true` if the tags defined in any contained resource are a superset of the tags defined in the MedicationRequest resource:
 
@@ -728,7 +728,7 @@ Returns a collection containing only the unique items in the input collection. T
 
 If the input collection is empty (`{ }`), the result is empty.
 
-Note that the order of elements in the input collection is not guaranteed to be preserved in the result.
+Note that the order of items in the input collection is not guaranteed to be preserved in the result.
 
 The following example returns the distinct list of tags on the given Patient:
 
@@ -755,7 +755,7 @@ This means that if the input collection is empty (`{ }`), the result is `true`.
 
 > This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); those that return `true` are included in the output collection.
 
-Returns a collection containing only those elements in the input collection for which the stated `criteria` expression evaluates to `true`. Elements for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
+Returns a collection containing only those items in the input collection for which the stated `criteria` expression evaluates to `true`. Items for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
 
 If the input collection is empty (`{ }`), the result is empty.
 
@@ -772,7 +772,7 @@ Patient.telecom.where(use = 'official')
 
 > This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration); and the results are included in the output collection.
 
-Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_). This means that if the evaluation for an element results in the empty collection (`{ }`), no element is added to the result, and that if the input collection is empty (`{ }`), the result is empty as well.
+Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_). This means that if the evaluation for an item results in the empty collection (`{ }`), no item is added to the result, and that if the input collection is empty (`{ }`), the result is empty as well.
 
 ``` fhirpath
 Bundle.entry.select(resource as Patient)
@@ -926,7 +926,7 @@ Patient.telecom.sort(system, use desc) // sort by system ascending, then by use 
 
 A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
 
-This can be evaluated by adding all elements in the input collection to an input queue, then for each item in the input queue evaluate the repeat expression. If the result of the repeat expression is not in the output collection, add it to both the output collection and also the input queue. Processing continues until the input queue is empty.
+This can be evaluated by adding all items in the input collection to an input queue, then for each item in the input queue evaluate the repeat expression. If the result of the repeat expression is not in the output collection, add it to both the output collection and also the input queue. Processing continues until the input queue is empty.
 
 This function can be used to traverse a tree and selecting only specific children:
 
@@ -934,13 +934,13 @@ This function can be used to traverse a tree and selecting only specific childre
 ValueSet.expansion.repeat(contains)
 ```
 
-Will repeat finding children called `contains`, until no new nodes are found.
+Will repeat finding children called `contains`, until no new items are found.
 
 ``` fhirpath
 Questionnaire.repeat(item)
 ```
 
-Will repeat finding children called `item`, until no new nodes are found.
+Will repeat finding children called `item`, until no new items are found.
 
 Note that this is slightly different from:
 
@@ -964,7 +964,7 @@ The order of items returned by the `repeat()` function is undefined.
 A version of `repeat` that allows duplicate items in the output collection. Unlike `repeat`, this function does not check whether items are already present in the output collection before adding them.
 {:.stu}
 
-This can be evaluated by adding all elements in the input collection to an input queue, then for each item in the input queue evaluate the expression. The results are added to the output collection and also to a new iteration queue, regardless of whether they already exist in either collection. The input queue is then replaced by the new iteration queue and processing continues until there are no more nodes in the input queue to process.
+This can be evaluated by adding all items in the input collection to an input queue, then for each item in the input queue evaluate the expression. The results are added to the output collection and also to a new iteration queue, regardless of whether they already exist in either collection. The input queue is then replaced by the new iteration queue and processing continues until there are no more items in the input queue to process.
 {:.stu}
 
 This function provides better performance than `repeat` by eliminating the equality comparisons required to check for duplicates, while still providing more targeted traversal than `descendants()`.
@@ -1062,7 +1062,7 @@ The indexer operation returns a collection with only the `index`-th item (0-base
 
 > **Note:** Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 
-The following example returns the element in the `name` collection of the Patient with index 0:
+The following example returns the item in the `name` collection of the Patient at index 0:
 
 ``` fhirpath
 Patient.name[0]
@@ -1100,11 +1100,11 @@ Returns a collection containing the first `num` items in the input collection, o
 
 #### intersect(other: collection) : collection
 
-Returns the set of elements that are in both collections. Duplicate items will be eliminated by this function. Order of items is not guaranteed to be preserved in the result of this function.
+Returns the set of items that are in both collections. Duplicate items will be eliminated by this function. Order of items is not guaranteed to be preserved in the result of this function.
 
 #### exclude(other: collection) : collection
 
-Returns the set of elements that are not in the `other` collection. Duplicate items will not be eliminated by this function, and order will be preserved.
+Returns the set of items that are not in the `other` collection. Duplicate items will not be eliminated by this function, and order will be preserved.
 
 e.g. `(1 | 2 | 3).exclude(2)`{:.fhirpath} returns `(1 | 3)`.
 
@@ -1114,7 +1114,7 @@ e.g. `(1 | 2 | 3).exclude(2)`{:.fhirpath} returns `(1 | 3)`.
 
 Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`) to determine equality). There is no expectation of order in the resulting collection.
 
-In other words, this function returns the distinct list of elements from both inputs. For example, consider two lists of integers `A: 1, 1, 2, 3` and `B: 2, 3`:
+In other words, this function returns the distinct list of items from both inputs. For example, consider two lists of integers `A: 1, 1, 2, 3` and `B: 2, 3`:
 
 ``` fhirpath
 A.union( B ) // 1, 2, 3
@@ -1133,7 +1133,7 @@ Merge the input and other collections into a single collection without eliminati
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
-When `preserveOrder` is `false`, or not supplied, there is no expectation of order. When `preserveOrder` is `true`, the elements of the other collection are appended to the elements of the input collection, preserving the order of elements in both collections.
+When `preserveOrder` is `false`, or not supplied, there is no expectation of order. When `preserveOrder` is `true`, the items of the other collection are appended to the items of the input collection, preserving the order of items in both collections.
 {: .stu}
 
 For example, considering the same two lists of integers used in the union example `A: 1, 1, 2, 3` and `B: 2, 3`:
@@ -1762,7 +1762,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abc'.contains('d') // false
 ```
 
-> **Note:** The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the `contains` operator, which is a list operator that looks for an element in a list.
+> **Note:** The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the [`contains`](#contains-containership--boolean) operator, which is a list operator that looks for an item in a list.
 
 #### upper() : String
 
@@ -2030,7 +2030,7 @@ The following example illustrates the behavior of the `.join` operator:
 The functions in this section accept input collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
-Note also that although all functions return collections, if a given function is defined to return a single element, the return type in the description of the function is simplified to just the type of the single element, rather than the list type.
+Note also that although all functions return collections, if a given function is defined to return a single item, the return type in the description of the function is simplified to just the type of the single item, rather than the list type.
 {:.stu}
 
 The math functions in this section enable FHIRPath to be used not only for path selection, but for providing a platform-independent representation of calculation logic in artifacts such as questionnaires and documentation templates. For example:
@@ -2322,9 +2322,9 @@ Returns a collection with all immediate child nodes of all items in the input co
 
 #### descendants() : collection
 
-Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
+Returns a collection with all descendant nodes of all items in the input collection. The result does not include the items in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
 
-> **Note:** Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use [`ofType()`](#fn-oftype) as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
+> **Note:** Many of these functions will result in a set of items of different underlying types. It may be necessary to use [`ofType()`](#fn-oftype) as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
 
 ### Utility functions
 
@@ -2352,12 +2352,12 @@ The above example traces only the id elements of the result of the where.
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
-Returns the direct path of each element of the input collection within the input resource (`%rootResource` in FHIR implementations),
+Returns the direct path of each item of the input collection within the input resource (`%rootResource` in FHIR implementations),
 using only element names and indexers. *Such that if you used that result on the input resource, you would get that node, and only that node.*
 {:.stu}
 
-If an element in the input collection was derived from computation (e.g. via `substring(..)`, `&`, or mathematical operations) rather than navigation it is excluded from the result.
-Elements that are outside the input resource, such as those navigated to via resolve() are also excluded from the result, however if resolve()
+If an item in the input collection was derived from computation (e.g. via `substring(..)`, `&`, or mathematical operations) rather than navigation it is excluded from the result.
+Items that are outside the input resource, such as those navigated to via resolve() are also excluded from the result, however if resolve()
 references a resource contained within the input Resource then it is included (such as with FHIR bundles, or contained resources).
 {:.stu}
 
@@ -3289,7 +3289,7 @@ Note that implies may use short-circuit evaluation in the case that the first op
 
 ### Math
 
-The math operators require each operand to be a single element. Both operands must be of the same type, or of compatible types according to the rules for implicit conversion. Each operator below specifies which types are supported.
+The math operators require each operand to be a single item. Both operands must be of the same type, or of compatible types according to the rules for implicit conversion. Each operator below specifies which types are supported.
 
 If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -3574,7 +3574,7 @@ They are more concise, easier to read, and handle input types more effectively, 
 <a name="aggregate"></a>
 ### aggregate(aggregator : ($total, $this, $index) => collection [, init : collection]) : collection
 {:.stu}
-Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
+Performs general-purpose aggregation by evaluating the aggregator expression for each item of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
 {:.stu}
 
 > This is a [scoped function](#scoped-functions): The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/>  The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values.
@@ -3610,13 +3610,13 @@ value.aggregate($total + $this, 0) / value.count()
 
 ### sum() : Integer | Long | Decimal | Quantity
 {:.stu}
-Returns the sum of all elements in the input collection (in the same type).
+Returns the sum of all items in the input collection (in the same type).
 {:.stu}
 
-Accepts input collections with elements of type: Integer, Long, Decimal or Quantity.
+Accepts input collections with items of type: Integer, Long, Decimal or Quantity.
 {:.stu}
 
-All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+All items in the input collection SHALL be the same type, otherwise an exception is thrown.
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -3632,13 +3632,13 @@ The following examples illustrate the behavior of the `sum` function:
 
 ### min() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
 {:.stu}
-Returns the minimum element in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
+Returns the minimum item in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
 {:.stu}
 
-Accepts input collections with elements of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
+Accepts input collections with items of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
 {:.stu}
 
-All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+All items in the input collection SHALL be the same type, otherwise an exception is thrown.
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -3655,13 +3655,13 @@ The following examples illustrate the behavior of the `min` function:
 
 ### max() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
 {:.stu}
-Returns the maximum element in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
+Returns the maximum item in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
 {:.stu}
 
-Accepts input collections with elements of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
+Accepts input collections with items of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
 {:.stu}
 
-All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+All items in the input collection SHALL be the same type, otherwise an exception is thrown.
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -3678,16 +3678,16 @@ The following examples illustrate the behavior of the `max` function:
 
 ### avg() : Decimal | Quantity
 {:.stu}
-Returns the average of all elements in the input collection (in the same type).
+Returns the average of all items in the input collection (in the same type).
 {:.stu}
 
-Accepts input collections with elements of type: Decimal or Quantity.
+Accepts input collections with items of type: Decimal or Quantity.
 {:.stu}
 
 When used with Integer or Long, the arguments will be implicitly converted to Decimal before evaluation.
 {:.stu}
 
-All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+All items in the input collection SHALL be the same type, otherwise an exception is thrown.
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -4064,7 +4064,7 @@ There are a few constructs in the FHIRPath language where the compiler cannot de
 
 * The `children()` and `descendants()` functions
 * The `resolve()` function
-* A member which is polymorphic (e.g. a `choice[x]` type in FHIR)
+* An element that is polymorphic (e.g. a choice type in FHIR such as `value[x]`)
 
 Note that the `resolve()` function is defined by the FHIR context, it is not part of FHIRPath directly. For more information see the [FHIRPath](https://hl7.org/fhir/fhirpath.html#functions) section of the FHIR specification.
 
