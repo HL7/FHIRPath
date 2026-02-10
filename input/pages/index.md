@@ -1516,9 +1516,9 @@ For calendar durations, FHIRPath defines the following conversion factors:
 
 | Calendar duration | Conversion factor |
 | - | -|
-| `1 year` | `12 months` or `52 weeks` or `365 days` |
+| `1 year` | `12 months` or `365 days` |
 | `1 month` | `30 days` |
-| `1 week` | `7 days` or `1/52 years`|
+| `1 week` | `7 days` |
 | `1 day` | `24 hours` |
 | `1 hour` | `60 minutes` |
 | `1 minute` | `60 seconds` |
