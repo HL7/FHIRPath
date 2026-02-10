@@ -112,6 +112,10 @@ blockquote.stu {
     margin-left: 20px;
 }
 
+span.fhir-lighlight {
+    background-color: rgba(0, 128, 0, 0.1);
+}
+
 .fhir-highlight {
     position: relative;
 }

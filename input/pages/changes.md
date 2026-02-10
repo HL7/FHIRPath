@@ -23,7 +23,7 @@
 * Updated implementation references
 * Added authors and contributors list
 * Typographical corrections throughout
-* Documentation source format changed from asciiidoc to markdown
+* Documentation source format changed from asciidoc to markdown
 
 
 ### Release 2 STU1 Ballot (version 3.0.0-ballot)
@@ -48,12 +48,12 @@
 * [FHIR-27764](https://jira.hl7.org/browse/FHIR-27764): Clarify return value of aggregate
 * [FHIR-27859](https://jira.hl7.org/browse/FHIR-27859): Clarify format of UCUM argument toQuantity
 * [FHIR-27890](https://jira.hl7.org/browse/FHIR-27890): Correct example for "union" function
-* [FHIR-28144](https://jira.hl7.org/browse/FHIR-28144): Inconsistent result between compare and equal for uncomparable quantities
+* [FHIR-28144](https://jira.hl7.org/browse/FHIR-28144): Inconsistent result between compare and equal for un-comparable quantities
 * [FHIR-28449](https://jira.hl7.org/browse/FHIR-28449): Please correct iff() earlier in the document to iif() and link the reference to the definition
 * [FHIR-28927](https://jira.hl7.org/browse/FHIR-28927): Define code system for calendar duration units
 * [FHIR-31018](https://jira.hl7.org/browse/FHIR-31018): Example errors?
 * [FHIR-31551](https://jira.hl7.org/browse/FHIR-31551): Add EOF marker to grammar
-* [FHIR-32113](https://jira.hl7.org/browse/FHIR-32113): small spelling mistake in endsWith (ednsWith)
+* [FHIR-32113](https://jira.hl7.org/browse/FHIR-32113): small spelling mistake in endsWith (endsWith)
 * [FHIR-34208](https://jira.hl7.org/browse/FHIR-34208): typo on day range in 1.4. Conventions
 * [FHIR-36091](https://jira.hl7.org/browse/FHIR-36091): 'is' examples suck
 * [FHIR-36257](https://jira.hl7.org/browse/FHIR-36257): Clarify expected behavior of matches and replaceMatches
