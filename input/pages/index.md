@@ -160,8 +160,8 @@ ofType(Patient).name.given
 Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use other characters by using [delimited identifiers](#identifiers) - surrounding with backticks and using FHIRPath escaping as needed. This approach can also be used to encode nodes with names that are keywords. e.g.:
 
 ``` fhirpath
-Message.`PID-1` // subtraction operator as a part of an element name
-`as` as string  // an element name that is also a fhirpath keyword
+Message.`PID-1` // Identifier delimiting is required as the subtraction operator is part of the element's name
+`as` as string  // Identifier delimiting is also required if an element's name is also a fhirpath keyword
 ```
 
 ### Collections
@@ -821,7 +821,7 @@ To create an empty object requires the use of `{ : }` to differentiate it from t
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-However element selectors can return multiples, provided that the element in that objects structure supports it. 
+However element selectors can return multiples where the object's structure supports it for that element. 
 If not the engine MAY throw an error.
 {:.stu}
 
@@ -973,11 +973,11 @@ This function provides better performance than `repeat` by eliminating the equal
 The order of items returned by the `repeatAll()` function is undefined.
 {:.stu}
 
-> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it references an element accessor that returns child elements.
+> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it navigates to child elements within the hierarchical structure.
 > If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.
 {:.stu .dragon}
 
-Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference elements of the input collection and return child elements will naturally terminate when no more child elements are found.
+Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference children of the input collection's items will naturally terminate when no more child elements are found.
 {:.stu}
 
 Some safe expressions:
@@ -1125,7 +1125,7 @@ This function can also be invoked using the `|` operator.
 
 e.g. `x.union(y)`{:.fhirpath} is synonymous with `x | y`{:.fhirpath}
 
-e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name element.
+e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name elements.
 
 #### combine(other : collection, [preserveOrder : Boolean]) : collection
 
