@@ -24,6 +24,7 @@
 * Added authors and contributors list
 * Typographical corrections throughout
 * Documentation source format changed from asciidoc to markdown
+* Simplified reflection capabilities - removed element information returned from `type()`
 
 
 ### Release 2 STU1 Ballot (version 3.0.0-ballot)
@@ -142,4 +143,4 @@
 * [FHIR-49516](https://jira.hl7.org/browse/FHIR-49516):  Inconsistent use of empty and error with quantity processing
 * [FHIR-45314](https://jira.hl7.org/browse/FHIR-45314):  Add a new function `pathname()` that returns the location(s) of the focused item(s)
 * [FHIR-54485](https://jira.hl7.org/browse/FHIR-54485):  toDate and toDateTime consider the fhir mapping language formatting codes for string parsing
-
+* [FHIR-49531](https://jira.hl7.org/browse/FHIR-49531):  Incorrect example in reflection

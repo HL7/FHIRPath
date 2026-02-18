@@ -3863,21 +3863,37 @@ When resolving a type name, the context-specific model is searched first. If no 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
-FHIRPath supports reflection to provide the ability for expressions to access type information describing the structure of values. The `type()` function returns the type information for each element of the input collection, using one of the following concrete subtypes of `TypeInfo`:
+FHIRPath supports limited reflection to provide the ability for expressions to access basic type information of values. 
+The ability to access child elements or walk type trees to parent definitions using this mechanism is outside the scope of this specification.
+The [`ofType()`](#fn-oftype) function can be used with type-names or their subtypes to filter content.
 {:.stu}
 
-#### Primitive Types
+#### Structures
 {:.stu}
-
-For primitive types such as `String` and `Integer`, the result is a `SimpleTypeInfo`:
-{:.stu}
-
 ``` typescript
-SimpleTypeInfo { namespace: string, name: string, baseType: TypeSpecifier }
+TypeInfo { baseType: string }
+SimpleTypeInfo extends TypeInfo { namespace: string, name: string }
+ClassInfo extends TypeInfo { namespace: string, name: string }
 ```
 {:.stu}
 
-For example:
+> **Note:** These structures are a subset of the abstract metamodel used by the [Clinical Quality Language Tooling](https://github.com/cqframework/clinical_quality_language).
+> Although the SimpleTypeInfo and ClassInfo appear the same here, implementations may have additional information (as is the case in the referenced CQL structures).
+{:.stu}
+
+
+#### type() : collection
+{:.stu}
+The `type` function returns the type information for each item of the input collection, using concrete subtypes of `TypeInfo`.
+{:.stu}
+
+> Note: using `X.ofType(Y)` or `X as Y` to filter content is better supported than using `X.type().name = 'Y'`.
+{:.stu}
+
+If the input collection is empty (`{ }`), or access to type information is unavailable, the result is empty.
+{:.stu}
+
+For primitive types such as `String` and `Integer`, the result is a `SimpleTypeInfo`:
 {:.stu}
 
 ``` fhirpath
@@ -3894,20 +3910,11 @@ Results in:
 }
 ```
 {:.stu}
-
-#### Class Types
+*Note: The base type for primitives is defined as `System.Any`.*
 {:.stu}
 
-For class types, the result is a `ClassInfo`:
-{:.stu}
 
-``` typescript
-ClassInfoElement { name: string, type: TypeSpecifier, isOneBased: Boolean }
-ClassInfo { namespace: string, name: string, baseType: TypeSpecifier, element: List<ClassInfoElement> }
-```
-{:.stu}
-
-For example:
+For complex types such as a FHIR CodeableConcept, the result is a `ClassInfo`:
 {:.stu}
 
 ``` fhirpath
@@ -3920,87 +3927,11 @@ Results in:
 
 ``` typescript
 {
-  ClassInfo {
-    namespace: 'FHIR',
-    name: 'CodeableConcept',
-    baseType: 'FHIR.Element',
-    element: {
-      ClassInfoElement { name: 'coding', type: 'List<Coding>', isOneBased: false },
-      ClassInfoElement { name: 'text', type: 'FHIR.string' }
-    }
-  }
+  ClassInfo { namespace: 'FHIR', name: 'CodeableConcept', baseType: 'FHIR.Element' }
 }
 ```
 {:.stu}
 
-#### Collection Types
-{:.stu}
-
-For collection types, the result is a `ListTypeInfo`:
-{:.stu}
-
-``` typescript
-ListTypeInfo { elementType: TypeSpecifier }
-```
-{:.stu}
-
-For example:
-{:.stu}
-
-``` fhirpath
-Patient.address.type()
-```
-{:.stu}
-
-Results in:
-{:.stu}
-``` typescript
-{
-  ListTypeInfo { elementType: 'FHIR.Address' }
-}
-```
-{:.stu}
-
-#### Anonymous Types
-{:.stu}
-
-Anonymous types are structured types that have no associated name, only the elements of the structure. For example, in FHIR, the `Patient.contact` element has multiple sub-elements, but is not explicitly named. For types such as this, the result is a `TupleTypeInfo`:
-{:.stu}
-
-``` typescript
-TupleTypeInfoElement { name: string, type: TypeSpecifier, isOneBased: Boolean }
-TupleTypeInfo { element: List<TupleTypeInfoElement> }
-```
-{:.stu}
-
-For example:
-{:.stu}
-``` fhirpath
-Patient.contact.single().type()
-```
-{:.stu}
-
-Results in:
-{:.stu}
-``` typescript
-{
-  TupleTypeInfo {
-    element: {
-      TupleTypeInfoElement { name: 'relationship', type: 'List<FHIR.CodeableConcept>', isOneBased: false },
-      TupleTypeInfoElement { name: 'name', type: 'FHIR.HumanName', isOneBased: false },
-      TupleTypeInfoElement { name: 'telecom', type: 'List<FHIR.ContactPoint>', isOneBased: false },
-      TupleTypeInfoElement { name: 'address', type: 'FHIR.Address', isOneBased: false },
-      TupleTypeInfoElement { name: 'gender', type: 'FHIR.code', isOneBased: false },
-      TupleTypeInfoElement { name: 'organization', type: 'FHIR.Reference', isOneBased: false },
-      TupleTypeInfoElement { name: 'period', type: 'FHIR.Period', isOneBased: false }
-    }
-  }
-}
-```
-{:.stu}
-
-> **Note:** These structures are a subset of the abstract metamodel used by the [Clinical Quality Language Tooling](https://github.com/cqframework/clinical_quality_language).
-{:.stu}
 
 ## Type safety and strict evaluation
 
