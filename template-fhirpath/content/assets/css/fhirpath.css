@@ -112,6 +112,31 @@ blockquote.stu {
     margin-left: 20px;
 }
 
+span.fhir-lighlight {
+    background-color: rgba(0, 128, 0, 0.1);
+}
+
+.fhir-highlight {
+    position: relative;
+}
+
+.fhir-highlight::before {
+    content: '';
+    background-color: green;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+blockquote.fhir-highlight.stu::before {
+    width: unset;
+}
+
 blockquote.stu:after {
     left: -20px;
 }

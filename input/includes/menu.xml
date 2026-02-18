@@ -8,4 +8,13 @@
     <li>
         <a href="tests.html">Tests</a>
     </li>
+    <li>
+        <a href="artifacts.html">FHIR Artifacts</a>
+    </li>
+    <li>
+        <a href="appendices.html">Appendices</a>
+    </li>
+    <li>
+        <a href="changes.html">Changes</a>
+    </li>
 </ul>

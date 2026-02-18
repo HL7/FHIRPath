@@ -14,9 +14,9 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Aggregates](#aggregates)
 > * [Literals - Long](#long)
 > * [Conversions - toLong](#tolong--long)
-> * [Functions - repeatAll](#repeatallprojection-expression--collection)
+> * [Functions - repeatAll](#fn-repeatall)
+> * [Functions - sort](#fn-sort)
 > * [Functions - coalesce](#coalesce)
-> * [Functions - sort](#sortkeyselector-expression-asc--desc--keyselector-expression-asc--desc---collection)
 > * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
 > * [Functions - String (matchesFull)](#matchesfullregex--string-flags--string--boolean)
 > * [Functions - String (trim, split, join)](#trim--string)
@@ -26,8 +26,13 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - Utility (precision)](#precision--integer)
 > * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
 > * [Functions - Date and Time Interval Functions (duration, difference)](#date-and-time-interval-functions)
+> * [Operations - Comparison (comparable)](#fn-comparable)
+> * [Instance Selector/Object Creation](#instance-selector)
 > * [Types - Reflection](#reflection)
 > 
+> This section has undergone extensive clarification:
+> * [Functions - documentation of functions with scoped arguments](#scoped-functions)
+>
 > In addition, the appendices are included as additional documentation and are informative content.
 {: .stu-note }
 
@@ -62,7 +67,7 @@ In both FHIR and CQL, the model independence of FHIRPath means that expressions 
 
 The expressions can in theory be converted to equivalent expressions in XPath, OCL, or another similarly expressive language.
 
-FHIRPath can be used against many other graphs as well. For example, [Use of FHIRPath on HL7 Version 2 messages](#hl7v2) describes how FHIRPath is used in HL7 V2.
+FHIRPath can be used against many other graphs as well. For example, [Use of FHIRPath on HL7 Version 2 messages](appendices.html#hl7v2) describes how FHIRPath is used in HL7 V2.
 
 ### Conventions
 
@@ -74,7 +79,7 @@ All operations and functions return a collection, but if the operation or functi
 
 Throughout this specification, formatting patterns for Date, Time, and DateTime values are described using an informal description with the following markers:
 
-* `YYYY`{:.formatted} - A full four digit year (0001..9999), padded with leading zeroes if necessary
+* `yyyy`{:.formatted} - A full four digit year (0001..9999), padded with leading zeroes if necessary
 * `MM`{:.formatted} - A full two digit month value (01..12), padded with leading zeroes if necessary
 * `DD`{:.formatted} - A full two digit day value (01..31), padded with leading zeroes if necessary
 * `hh`{:.formatted} - A full two digit hour value (00..24), padded with leading zeroes if necessary
@@ -87,10 +92,10 @@ and formatting patterns for numeric types are described using an informal descri
 * `#`{:.formatted} - Any digits may appear at this location in the format string
 * `?`{:.formatted} - The immediately preceding pattern is optional
 * `( )`{:.formatted} - Used to group patterns
-* `< >`{:.formatted} - Used indicate some specific named content is included. e.g `'<unit>'`{:.formatted} to indicate that a quantities unit would be surrounded by single quotes.
+* `« »`{:.formatted} - Used indicate some specific named content is included. e.g `'«unit»'`{:.formatted} to indicate that a quantities unit would be surrounded by single quotes.
 * `|`{:.formatted} - Used to combine choices of patterns (e.g. `+|-`{:.formatted} means a **`+`** or **`-`** will appear at this location)
 
-Any other character in a format string indicates that the character must appear at that location (unless it has an optional indicator, or is part of an optional group), noting that named content inside `<>` isn't explicit text.
+Any other character in a format string indicates that the character must appear at that location (unless it has an optional indicator, or is part of an optional group), noting that named content inside `« »` isn't explicit text.
 
 These formatting patterns are set in `bold`{:.formatted} to distinguish them typographically from literals or code and to make clear that they are not intended to be formally interpreted as regex patterns.
 
@@ -122,7 +127,7 @@ Data are represented as a tree of labelled nodes, where each node may optionally
 
 ![Tree representation of a Patient](treestructure.png){: height="375px" width="500px" style="float: unset; margin-bottom:0;" }
 
-The diagram shows a tree with a repeating `name` node, which represents repeating members of the FHIR Object Model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
+The diagram shows a tree with a repeating `name` node, representing repeating elements of the FHIR Object Model. Leaf nodes such as `use` and `family` carry a (string) value. It is also possible for internal nodes to carry a value, as is the case for the node labelled `active`: this allows the tree to represent FHIR "primitives", which may still have child extension data.
 
 FHIRPath expressions are then _evaluated_ with respect to a specific instance, such as the Patient one described above. This instance is referred to as the _context_ (also called the _root_) and paths within the expression are evaluated in terms of this instance.
 
@@ -142,23 +147,31 @@ The path may start with the type of the root node (which otherwise does not have
 Patient.name.given
 ```
 
-The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`. When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context. If the identifier cannot be resolved, the evaluation will end and signal an error to the calling environment.
+The two expressions have the same outcome, but when evaluating the second, the evaluation will only produce results when used on data of type `Patient`.
+
+When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first. If it resolves to a type and that type is the type of the context (or a supertype), then the evaluation proceeds with the context unchanged, i.e. in the example above proceeds to evaluate the `name` element.
+Otherwise the identifier is resolved as a path on the context, which if not found returns an empty collection.
+
+This could also be written using [`ofType()`](#fn-oftype), which would have the same behaviour:
+``` fhirpath
+ofType(Patient).name.given
+```
 
 Syntactically, FHIRPath defines identifiers as any sequence of characters consisting only of letters, digits, and underscores, beginning with a letter or underscore. Paths may use other characters by using [delimited identifiers](#identifiers) - surrounding with backticks and using FHIRPath escaping as needed. This approach can also be used to encode nodes with names that are keywords. e.g.:
 
 ``` fhirpath
-Message.`PID-1` // subtraction operator as a part of a property name
-`as` as string  // a property name that is also a fhirpath keyword
+Message.`PID-1` // Identifier delimiting is required as the subtraction operator is part of the element's name
+`as` as string  // Identifier delimiting is also required if an element's name is also a fhirpath keyword
 ```
 
 ### Collections
 
-Collections are fundamental to FHIRPath, in that the result of every expression is a collection, even if that expression only results in a single element. This approach allows paths to be specified without having to care about the cardinality of any particular element, and is therefore ideally suited to graph traversal.
+Collections are fundamental to FHIRPath, in that the result of every expression is a collection, even if that expression only results in a single item. This approach allows paths to be specified without having to care about the cardinality of any particular element, and is therefore ideally suited to graph traversal.
 
 Within FHIRPath, a collection is:
 
 * Ordered - The order of items in the collection is important and is preserved through operations as much as possible. Operators and functions that do not preserve order will note that in their documentation.
-* Non-Unique - Duplicate elements are allowed within a collection. Some operations and functions, such as `distinct()` and the union operator `|` produce collections of unique elements, but in general, duplicate elements are allowed.
+* Non-Unique - Duplicate values are allowed within a collection. Some operations and functions, such as `distinct()` and the union operator `|` produce collections of unique values, but in general, duplicate values are allowed.
 * Indexed - Each item in a collection can be addressed by its index, i.e. ordinal position within the collection (e.g. `a[2]`).
 * Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 * Countable - The number of items in a given collection can always be determined using the `count()` function
@@ -186,11 +199,11 @@ The `as` operator can be used to treat a value as a specific type:
 Observation.value as Quantity // returns value as a Quantity if it is of type Quantity, and an empty result otherwise
 ```
 
-The list of available types that can be passed as an argument to the `ofType()` function and `is` and `as` operators is determined by the underlying object model. Within FHIRPath, they are just identifiers, either delimited or simple.
+The list of available types that can be passed as an argument to the [`ofType()`](#fn-oftype) function and `is` and `as` operators is determined by the underlying object model. Within FHIRPath, they are just identifiers, either delimited or simple.
 
 ## Expressions
 
-FHIRPath expressions can consist of _paths_, _literals_, _operators_, and _function invocations_, and these elements can be chained together, so that the output of one operation or function is the input to the next. This is the core of the _fluent_ [\[Fluent\]](#fluent) syntactic style and allows complex paths and expressions to be built up from simpler components.
+FHIRPath expressions can consist of _paths_, _literals_, _operators_, and _function invocations_. These can be chained together, so that the output of one operation or function is the input to the next. This is the core of the _fluent_ [\[Fluent\]](#fluent) syntactic style and allows complex paths and expressions to be built up from simpler components.
 
 ### Literals
 
@@ -221,8 +234,7 @@ false
 ```
 
 #### String
-
-The `String` type represents string values up to 2<sup>31</sup>-1 characters in length. String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
+The `String` type represents string values up to 2<sup>31</sup>-1 characters in length and is UTF-8 encoded. String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
 
 | Escape | Character |
 | - | - |
@@ -240,6 +252,8 @@ The `String` type represents string values up to 2<sup>31</sup>-1 characters in 
 No other escape sequences besides those listed above are recognized.
 
 Note that Unicode is supported in both string literals and delimited [Identifiers](#identifiers).
+
+> Note: The UTF-8 encoding is consistent with XML and JSON specifications, as well as the base FHIR specification.
 
 ``` fhirpath
 'test string'
@@ -300,7 +314,7 @@ The `Date` type represents date and partial date values in the range @0001-01-01
 The `Date` literal is a subset of [\[ISO8601\]](#ISO8601):
 
 * A date literal begins with an `@`
-* It uses the `YYYY-MM-DD`{:.formatted} format, though month and day parts are optional, and a separator is required between provided components
+* It uses the `yyyy-MM-DD`{:.formatted} format, though month and day parts are optional, and a separator is required between provided components
 * Week dates and ordinal dates are not allowed
 * Years must be present (e.g. `@-10-20` is not a valid Date in FHIRPath)
 * Months must be present if a day is present
@@ -341,7 +355,7 @@ The `DateTime` type represents date/time and partial date/time values in the ran
 The `DateTime` literal combines the `Date` and `Time` literals and is a subset of [\[ISO8601\]](#ISO8601):
 
 * A datetime literal begins with an `@`
-* It uses the `YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted} format
+* It uses the `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted} format
 * Timezone offset is optional, but if present the notation `(+\|-)hh:mm`{:.formatted} is used (so must include both minutes and hours)
 * **Z** is allowed as a synonym for the zero (+00:00) UTC offset.
 * A `T` can be used at the end of any date (year, year-month, or year-month-day) to indicate a partial DateTime.
@@ -363,7 +377,7 @@ Consult the [formal grammar](grammar.html) for more details.
 
 #### Quantity
 
-The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` element is represented as a `String` that is required to be either a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or one of the calendar duration keywords, singular or plural.
+The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` is represented as a `String` that is required to be either a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or one of the calendar duration keywords, singular or plural.
 
 The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or calendar duration keyword. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
 
@@ -380,7 +394,9 @@ The `Quantity` literal is a number (integer or decimal), followed by a (single-q
 >
 > Implementations should support other unit functionality as specified by UCUM, including unit conversion.
 >
-> Implementations that do not support complete UCUM functionality may return empty (`{ }`) for calculations involving quantities with units where the units are different.
+> Implementations that do NOT support complete UCUM functionality may return empty (`{ }`) for calculations involving quantities with units where the units are different.
+>
+> For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
 
 ##### Time-valued Quantities
 
@@ -391,10 +407,10 @@ For time-valued quantities, in addition to the definite duration UCUM units, FHI
 | - | - | - |
 | `year`/`years` | `'year'` | `~ 1 'a'` |
 | `month`/`months` | `'month'` | `~ 1 'mo'` |
-| `week`/`weeks` | `'week'` | `~ 1 'wk'` |
-| `day`/`days` | `'day'` | `~ 1 'd'` |
-| `hour`/`hours` | `'hour'` | `~ 1 'h'` |
-| `minute`/`minutes` | `'minute'` | `~ 1 'min'` |
+| `week`/`weeks` | `'week'` | `= 1 'wk'` |
+| `day`/`days` | `'day'` | `= 1 'd'` |
+| `hour`/`hours` | `'hour'` | `= 1 'h'` |
+| `minute`/`minutes` | `'minute'` | `= 1 'min'` |
 | `second`/`seconds` | `'second'` | `= 1 's'` |
 | `millisecond`/`milliseconds` | `'millisecond'` | `= 1 'ms'` |
 {: .grid}
@@ -454,14 +470,14 @@ Patient.telecom.where(use = 'official').union(Patient.contact.telecom.where(use 
 However not all functions support multiple items in the input collection, some expect only a single item and will be explicitly documented. Further details are available in the ["singleton evaluation of collections"](#singleton-evaluation-of-collections) section.
 {:.stu}
 
-Singleton only functions can be run on collections by using the function inside a [`select(...)`](#selectprojection-expression--collection) to evaluate the function for each item in the collection.
+Singleton only functions can be run on collections by using the function inside a [`select(...)`](#fn-select) to evaluate the function for each item in the collection.
 {:.stu}
 
 For a complete listing of the functions defined in FHIRPath, refer to the [Functions](#functions) section.
 
 ### Null and empty
 
-There is no literal representation for _null_ in FHIRPath. This means that when, in an underlying data object (i.e. they physical data on which the implementation is operating) a member is null or missing, there will simply be no corresponding node for that member in the tree, e.g. `Patient.name`{:.fhirpath} will return an empty collection (not null) if there are no name elements in the instance.
+There is no literal representation for _null_ in FHIRPath. This means that when, in an underlying data object (i.e. they physical data on which the implementation is operating) an element is null or missing, there will simply be no corresponding node for that element in the tree, e.g. `Patient.name`{:.fhirpath} will return an empty collection (not null) if there are no name elements in the instance.
 
 In expressions, the empty collection is represented as `{ }`.
 
@@ -518,20 +534,77 @@ Patient.active and Patient.gender and Patient.telecom.count() = 1
 
 ## Functions
 
-Functions are distinguished from path navigation names by the fact that they are followed by a `()` with zero or more arguments. Throughout this specification, the word _parameter_ is used to refer to the definition of a parameter as part of the function definition, while the word _argument_ is used to refer to the values passed as part of a function invocation. With a few minor exceptions (e.g. [current date and time functions](#current-date-and-time-functions)), functions in FHIRPath operate on a collection of values (referred to as the _input collection_) and produce another collection as output (referred to as the _output collection_). However, for many functions, passing an input collection with more than one item is defined as an error condition. Each function definition should define its behavior for input collections of any cardinality (0, 1, or many).
+Functions are distinguished from path navigation names by the fact that they are followed by `()` with zero or more arguments. Throughout this specification, the word _parameter_ is used to refer to the definition of a parameter as part of the function definition, while the word _argument_ is used to refer to the values passed as part of a function invocation. With a few minor exceptions (e.g. [current date and time functions](#current-date-and-time-functions)), functions in FHIRPath operate on a collection of values (referred to as the _input collection_) and produce another collection as output (referred to as the _output collection_). However, for many functions, passing an input collection with more than one item is defined as an error condition. Each function defines its behavior for input collections of any cardinality (0, 1, or many).
 
-Correspondingly, arguments to the functions can be any FHIRPath expression, though functions taking a single item as input require these expressions to evaluate to a collection containing a single item of a specific type. This approach allows functions to be chained, successively operating on the results of the previous function in order to produce the desired final result.
+This approach allows functions to be chained, successively operating on the results of the previous function in order to produce the desired final result.
 
-The following sections describe the functions supported in FHIRPath, detailing the expected types of parameters and type of collection returned by the function:
+The following sections describe the functions supported in FHIRPath, detailing the expected types of parameters, when and how they are evaluated, and the type of output collections returned by the function:
 
-* If the function expects the argument passed to a parameter to be a single value (e.g. `startsWith(prefix: String)`) and it is passed an argument that evaluates to a collection with multiple items, or to a collection with an item that is not of the required type (or cannot be converted to the required type), the evaluation of the expression will end and an error will be signaled to the calling environment.
-* If the function takes an `expression` as a parameter, the function will evaluate the expression passed for the parameter with respect to each of the items in the input collection. These expressions may refer to the special `$this` and `$index` elements, which represent the item from the input collection currently under evaluation, and its index in the collection, respectively. For example, in `name.given.where($this > 'ba' and $this < 'bc')`{:.fhirpath} the `where()` function will iterate over each item in the input collection (elements named `given`) and `$this` will be set to each item when the expression passed to `where()` is evaluated.
+* Although the function parameters are defined with a specific type, they are expressed as fhirpath expressions that will return the specific type (where a type is defined)<br/> - often the expression is a simple constant
+* If a function expects the argument passed to a parameter to be a single value (e.g. `startsWith(prefix: String)`) and it is passed an argument that evaluates to a collection with multiple items, or to a collection with an item that is not of the required type (or cannot be converted to the required type), the evaluation of the expression will end and an error will be signaled to the calling environment.
+* Square bracket notation `[]` is used in function signatures to indicate optional parameters.<br/> (e.g. `toQuantity([unit : String]) : Quantity`)
+* If a parameter doesn't require a specific type, and supports collections, then the parameter type will be defined as `collection`
+* If a parameter doesn't require a specific type, but does not support collections, then the parameter type will be defined as `any`
+* Some parameters passed to a scoped function (documented below) will set and use some special variables when the parameter expression is evaluated.<br/>
+  This is only intended to provide clarity on the usage of the expression, not how it is actually written.<br/>
+  For example, the `where` function's definition is `where(criteria : ($this, $index) => Boolean)` indicating that when the `criteria` expression is evaluated, the special variables `$this` and `$index` will be set in the evaluation context according to the definition of the function.
+  When you actually use it, you would write something like `rules.where($index mod 2 = 0)` (which will filter out every second rule from the collection). Usage in this case is the same as if the parameter was a simple `Boolean` parameter in the definition.
 
-For the [aggregate](#aggregates) function, expressions may also refer to the special `$total` element, representing the result of the aggregation.
+Note that although all functions return collections, if a given function is defined to return a single item, the return type is simplified to just the type of the single item, rather than the list type.
 
-Note that the square bracket notation `[]` in function signatures indicates optional parameters.
+#### Scoped Functions
+Some functions are marked as **scoped** functions. This type of function creates special variables (such as `$this`) that are available when evaluating arguments to the function.
+Most of these functions iterate through the items in the input collection, allowing the current item to be accessed.<br/>
+For example:
+``` fhirpath
+(1 | 2 | 3 | 4 | 5).where($this > 3) // filter the input collection to values that are greater than 3
+```
+The documentation for each scoped function defines what variables are available and how/when they are used as part of evaluating the function arguments.
 
-Note also that although all functions return collections, if a given function is defined to return a single element, the return type is simplified to just the type of the single element, rather than the list type.
+> **Note:** Variables introduced by scoped functions can only be accessed within the specified parameters of the scoped function. This behavior is preserved through nesting, meaning specifically that once a nested scope function evaluation is complete, the variables in the outer scoped function are again available.
+
+These are the fhirpath defined scoped functions: *(argument processing only, refer to each function for full details of its functionality)*
+
+| Scoped Function | Argument Processing Logic |
+| --------------- | ------------------------- |
+| [`exists`](#fn-exists) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if any return `true` then the function returns `true`, otherwise `false`. |
+| [`all`](#fn-all) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`. |
+| [`where`](#fn-where) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); those that return `true` are included in the output collection. |
+| [`select`](#fn-select) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration); and the results are included in the output collection. |
+| [`sort`](#fn-sort) | Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is not defined in this context, it could be anywhere during any evaluation depending on algorithms selected. |
+| [`repeat`](#fn-repeat) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
+| [`repeatAll`](#fn-repeatall) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
+| [`iif`](#iif) | The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned. |
+| [`trace`](#fn-trace) | If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function. |
+| [`aggregate`](#aggregate) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values. |
+{:.list}
+
+For example (some expressions using scoped functions and accessing the special `$this` variable):
+```
+// Retrieve a list of formatted names for the patient
+// (with no unwanted padding white-space)
+Patient.name.select(given.join(' ').combine($this.family, true).join(', '))
+
+// Observation values that are outside a specific range
+Observation.value.where($this < 90 or $this > 110)
+```
+
+> **Note:** Scoped functions are similar to lambda functions, closures, or callbacks in other languages.
+> They allow passing expressions as parameters that are evaluated in a specific context with special variables like `$this` and `$index`.
+
+#### Special variables
+
+| Variable | Description |
+| - | - |
+| `$this` | Set at the beginning of execution of an expression as the initial context *(See `%context` below)*<br/> Re-set to the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details* |
+| `$index` | Set at the beginning of execution of an expression to 0<br/> Re-set to the index of the current item being processed in [scoped functions](#scoped-functions).<br/> *Refer to each scoped function for specific details*<br/> Its value is undefined while evaluating [`sort`](#fn-sort) `keySelector` parameters |
+| `$total` | Only available inside the parameters of the [`aggregate`](#aggregate) function. Holds the running total during processing, and at the end will be the result returned by the function. |
+| `%context` | The entry/starting point for execution of the fhirpath expression.<br/> Often used in fhirpath invariants.<br/> *(Does not change during execution)* |
+| `%resource` | (Defined in FHIR) The current resource being processed (that contains the element in focus)<br/> When passing through `resolve()` or into a contained resource will be changed to the new resource context. |
+| `%rootResource` | (Defined in FHIR) The top level fhir resource. Usually a Bundle, or resource that has contained resources (or Parameters resource).<br/> Though processing on regular fhir resources this is also the same as %resource.<br/> *(Does not change during execution)* |
+{:.list}
+
+> **Note:** Other specifications MAY introduce their own variables
 
 ### Existence
 
@@ -539,9 +612,12 @@ Note also that although all functions return collections, if a given function is
 
 Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
 
-#### exists([criteria : expression]) : Boolean
+<a name="fn-exists"></a>
+#### exists([criteria : ($this, $index) => any]) : Boolean
 
-Returns `true` if the input collection has any elements (optionally filtered by the criteria), and `false` otherwise.
+> This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if any return `true` then the function returns `true`, otherwise `false`.
+
+Returns `true` if the input collection has any items (optionally filtered by the criteria), and `false` otherwise.
 This is the opposite of `empty()`, and as such is a shorthand for `empty().not()`. If the input collection is empty (`{ }`), the result is `false`.
 
 Using the optional criteria can be considered a shorthand for `where(criteria).exists()`.
@@ -565,9 +641,12 @@ The third example returns `true` if the `Patient` has any `telecom` elements tha
 
 And finally, the fourth example returns `true` if the `Patient` has any `generalPractitioner` elements of type `Practitioner`.
 
-#### all(criteria : expression) : Boolean
+<a name="fn-all"></a>
+#### all(criteria : ($this, $index) => Boolean) : Boolean
 
-Returns `true` if for every element in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
+> This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if all return `true` then the function returns `true`, otherwise `false`. An empty input collection returns `true`.
+
+Returns `true` if for every item in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
 
 ``` fhirpath
 generalPractitioner.all($this.resolve() is Practitioner)
@@ -619,7 +698,7 @@ Observation.select(component.value > 90 'mm[Hg]').anyFalse()
 
 Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the [equals](#equals) (`=`) operation.
 
-Conceptually, this function is evaluated by testing each element in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
+Conceptually, this function is evaluated by testing each item in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
 
 The following example returns `true` if the tags defined in any contained resource are a subset of the tags defined in the MedicationRequest resource:
 
@@ -631,7 +710,7 @@ MedicationRequest.contained.meta.tag.subsetOf(MedicationRequest.meta.tag)
 
 Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the [equals](#equals) (`=`) operation.
 
-Conceptually, this function is evaluated by testing each element in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
+Conceptually, this function is evaluated by testing each item in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
 
 The following example returns `true` if the tags defined in any contained resource are a superset of the tags defined in the MedicationRequest resource:
 
@@ -649,7 +728,7 @@ Returns a collection containing only the unique items in the input collection. T
 
 If the input collection is empty (`{ }`), the result is empty.
 
-Note that the order of elements in the input collection is not guaranteed to be preserved in the result.
+Note that the order of items in the input collection is not guaranteed to be preserved in the result.
 
 The following example returns the distinct list of tags on the given Patient:
 
@@ -671,9 +750,12 @@ This means that if the input collection is empty (`{ }`), the result is `true`.
 
 ### Filtering and projection
 
-#### where(criteria : expression) : collection
+<a name="fn-where"></a>
+#### where(criteria : ($this, $index) => Boolean) : collection
 
-Returns a collection containing only those elements in the input collection for which the stated `criteria` expression evaluates to `true`. Elements for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
+> This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); those that return `true` are included in the output collection.
+
+Returns a collection containing only those items in the input collection for which the stated `criteria` expression evaluates to `true`. Items for which the expression evaluates to `false` or empty (`{ }`) are not included in the result.
 
 If the input collection is empty (`{ }`), the result is empty.
 
@@ -685,9 +767,12 @@ The following example returns the list of `telecom` elements that have a `use` e
 Patient.telecom.where(use = 'official')
 ```
 
-#### select(projection: expression) : collection
+<a name="fn-select"></a>
+#### select(projection: ($this, $index) => any) : collection
 
-Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_). This means that if the evaluation for an element results in the empty collection (`{ }`), no element is added to the result, and that if the input collection is empty (`{ }`), the result is empty as well.
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration); and the results are included in the output collection.
+
+Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_). This means that if the evaluation for an item results in the empty collection (`{ }`), no item is added to the result, and that if the input collection is empty (`{ }`), the result is empty as well.
 
 ``` fhirpath
 Bundle.entry.select(resource as Patient)
@@ -707,10 +792,94 @@ Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
 
 This example returns a collection containing, for each "usual" name for the Patient, the concatenation of the first given and family names.
 
-#### sort([keySelector: expression [asc | desc] [, keySelector: expression [asc | desc], ...]]) : collection
+<a name="instance-selector"></a>
+#### Instance Selector/Object Creation
 {:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
+
+*Although the instance selector is not a function, it is closely related to the `select` function in that this statement is
+used to convert the input collection into a different output collection. Its sub-expression format is:*
+{:.stu}
+
+> ```
+> «typename» { element : value, element : value, ...  } : «typename»
+> ```
+> `«typename»` is the name of the type to create (optionally prefixed with a namespace)<br/>
+> `element` is the name *(identifier)* of an element of the type being created<br/>
+> `value` is any fhirpath expression (including literals) to set to the associated `element`
+{:.stu}
+
+Creates a new object of type `«typename»` and returns that to the output collection. 
+Any elements listed within the parentheses are set as children on the newly created object.
+{:.stu}
+
+If any of child element's `value` is evaluated to an empty collection, then that element will not be added to the object.
+{:.stu}
+
+To create an empty object requires the use of `{ : }` to differentiate it from the empty set.
+{:.stu}
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+However element selectors can return multiples where the object's structure supports it for that element. 
+If not the engine MAY throw an error.
+{:.stu}
+
+If the input collection is empty, the result is empty.
+{:.stu}
+
+Some examples of creating data using static instance selectors:
+{:.stu}
+``` fhirpath
+// create a static coding
+Coding { system : 'http://example.org/demo', code : 'c1' }
+
+// create an simple identifier, explicitly defining the FHIR namespace
+FHIR.Identifier { system : 'http://example.org/demo', value : 'N0001231' }
+
+// create an MRN identifier similar to the one in the patient example at https://hl7.org/fhir/patient-example.json.html
+Identifier { 
+  type : CodeableConcept { coding: Coding { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' } },
+  system : 'urn:oid:1.2.36.146.595.217.0.1',
+  value : '12345',
+  period : Period { start: @2001-05-06 }
+}
+
+// create an empty Period
+Period {:}
+```
+{:.stu}
+
+Instance Selectors are usually used to manipulate existing elements into another datatype:
+{:.stu}
+
+``` fhirpath
+// Convert the patient gender from a code into a coding
+Patient.select( 
+  Coding { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: gender }
+)
+
+// Convert a set of concepts from a code system into Codings
+CodeSystem.concept.select(Coding { system: %resource.url, code: code, display: display })
+```
+{:.stu}
+
+**Note:** Primitive types can be created and set using a special element name `value` if specifically required.
+The evaluating fhirpath engine is responsible for performing any type conversions from fhirpath primitives to the target object/type system as required.
+{:.stu}
+``` fhirpath
+code { value: 'final' }
+```
+{:.stu}
+
+<a name="fn-sort"></a>
+#### sort([keySelector: ($this) => any [asc | desc] [, keySelector: ($this) => any [asc | desc], ...]]) : collection
+{:.stu}
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+> This is a [scoped function](#scoped-functions): Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is undefined in this context, it could be anywhere during any evaluation depending on algorithms selected.
+{:.stu}
 
 Returns a collection containing the items in the input collection, sorted according to the specified key selector expressions. The function takes a variable number of key selector parameters, each of which can be optionally qualified with `asc` (ascending) or `desc` (descending). If no qualifier is provided, `asc` is the default.
 {:.stu}
@@ -750,11 +919,14 @@ Patient.telecom.sort(system, use desc) // sort by system ascending, then by use 
 ```
 {:.stu}
 
-#### repeat(projection: expression) : collection
+<a name="fn-repeat"></a>
+#### repeat(projection: ($this) => collection) : collection
+
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
 
 A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
 
-This can be evaluated by adding all elements in the input collection to an input queue, then for each item in the input queue evaluate the repeat expression. If the result of the repeat expression is not in the output collection, add it to both the output collection and also the input queue. Processing continues until the input queue is empty.
+This can be evaluated by adding all items in the input collection to an input queue, then for each item in the input queue evaluate the repeat expression. If the result of the repeat expression is not in the output collection, add it to both the output collection and also the input queue. Processing continues until the input queue is empty.
 
 This function can be used to traverse a tree and selecting only specific children:
 
@@ -762,13 +934,13 @@ This function can be used to traverse a tree and selecting only specific childre
 ValueSet.expansion.repeat(contains)
 ```
 
-Will repeat finding children called `contains`, until no new nodes are found.
+Will repeat finding children called `contains`, until no new items are found.
 
 ``` fhirpath
 Questionnaire.repeat(item)
 ```
 
-Will repeat finding children called `item`, until no new nodes are found.
+Will repeat finding children called `item`, until no new items are found.
 
 Note that this is slightly different from:
 
@@ -780,15 +952,19 @@ which would find *any* descendants called `item`, not just the ones nested insid
 
 The order of items returned by the `repeat()` function is undefined.
 
-#### repeatAll(projection: expression) : collection
+<a name="fn-repeatall"></a>
+#### repeatAll(projection: ($this) => collection) : collection
 {:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
+{:.stu}
+
 A version of `repeat` that allows duplicate items in the output collection. Unlike `repeat`, this function does not check whether items are already present in the output collection before adding them.
 {:.stu}
 
-This can be evaluated by adding all elements in the input collection to an input queue, then for each item in the input queue evaluate the expression. The results are added to the output collection and also to a new iteration queue, regardless of whether they already exist in either collection. The input queue is then replaced by the new iteration queue and processing continues until there are no more nodes in the input queue to process.
+This can be evaluated by adding all items in the input collection to an input queue, then for each item in the input queue evaluate the expression. The results are added to the output collection and also to a new iteration queue, regardless of whether they already exist in either collection. The input queue is then replaced by the new iteration queue and processing continues until there are no more items in the input queue to process.
 {:.stu}
 
 This function provides better performance than `repeat` by eliminating the equality comparisons required to check for duplicates, while still providing more targeted traversal than `descendants()`.
@@ -797,11 +973,11 @@ This function provides better performance than `repeat` by eliminating the equal
 The order of items returned by the `repeatAll()` function is undefined.
 {:.stu}
 
-> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it references a property accessor that returns child elements.
+> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it navigates to child elements within the hierarchical structure.
 > If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.
 {:.stu .dragon}
 
-Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference properties of the input collection and return child elements will naturally terminate when no more child elements are found.
+Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference children of the input collection's items will naturally terminate when no more child elements are found.
 {:.stu}
 
 Some safe expressions:
@@ -820,6 +996,7 @@ Questionnaire.repeatAll('item') // this is a common mistake where the "expressio
 ```
 {:.stu}
 
+<a name="fn-oftype"></a>
 #### ofType(type : _type specifier_) : collection
 
 Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty. The `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat it as type specifier rather than an identifier expression:
@@ -879,19 +1056,19 @@ coalesce(code.coding.where(system='http://snomed.info/sct'), code.coding).first(
 
 ### Subsetting
 
-#### [ index : Integer ] : collection
+#### [ index : Integer ] : any
 
 The indexer operation returns a collection with only the `index`-th item (0-based index). If the input collection is empty (`{ }`), or the index lies outside the boundaries of the input collection, an empty collection is returned.
 
 > **Note:** Unless specified otherwise by the underlying Object Model, the first item in a collection has index 0. Note that if the underlying model specifies that a collection is 1-based (the only reasonable alternative to 0-based collections), _any collections generated from operations on the 1-based list are 0-based_.
 
-The following example returns the element in the `name` collection of the Patient with index 0:
+The following example returns the item in the `name` collection of the Patient at index 0:
 
 ``` fhirpath
 Patient.name[0]
 ```
 
-#### single() : collection
+#### single() : any
 
 Will return the single item in the input if there is just one item. If the input collection is empty (`{ }`), the result is empty. If there are multiple items, an error is signaled to the evaluation environment. This function is useful for ensuring that an error is returned if an assumption about cardinality is violated at run-time.
 
@@ -901,11 +1078,11 @@ The following example returns the name of the Patient if there is one. If there 
 Patient.name.single()
 ```
 
-#### first() : collection
+#### first() : any
 
 Returns a collection containing only the first item in the input collection. This function is equivalent to `item[0]`, so it will return an empty collection if the input collection has no items.
 
-#### last() : collection
+#### last() : any
 
 Returns a collection containing only the last item in the input collection. Will return an empty collection if the input collection has no items.
 
@@ -923,11 +1100,11 @@ Returns a collection containing the first `num` items in the input collection, o
 
 #### intersect(other: collection) : collection
 
-Returns the set of elements that are in both collections. Duplicate items will be eliminated by this function. Order of items is not guaranteed to be preserved in the result of this function.
+Returns the set of items that are in both collections. Duplicate items will be eliminated by this function. Order of items is not guaranteed to be preserved in the result of this function.
 
 #### exclude(other: collection) : collection
 
-Returns the set of elements that are not in the `other` collection. Duplicate items will not be eliminated by this function, and order will be preserved.
+Returns the set of items that are not in the `other` collection. Duplicate items will not be eliminated by this function, and order will be preserved.
 
 e.g. `(1 | 2 | 3).exclude(2)`{:.fhirpath} returns `(1 | 3)`.
 
@@ -937,7 +1114,7 @@ e.g. `(1 | 2 | 3).exclude(2)`{:.fhirpath} returns `(1 | 3)`.
 
 Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`) to determine equality). There is no expectation of order in the resulting collection.
 
-In other words, this function returns the distinct list of elements from both inputs. For example, consider two lists of integers `A: 1, 1, 2, 3` and `B: 2, 3`:
+In other words, this function returns the distinct list of items from both inputs. For example, consider two lists of integers `A: 1, 1, 2, 3` and `B: 2, 3`:
 
 ``` fhirpath
 A.union( B ) // 1, 2, 3
@@ -948,7 +1125,7 @@ This function can also be invoked using the `|` operator.
 
 e.g. `x.union(y)`{:.fhirpath} is synonymous with `x | y`{:.fhirpath}
 
-e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name property.
+e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name elements.
 
 #### combine(other : collection, [preserveOrder : Boolean]) : collection
 
@@ -956,7 +1133,7 @@ Merge the input and other collections into a single collection without eliminati
 
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
-When `preserveOrder` is `false`, or not supplied, there is no expectation of order. When `preserveOrder` is `true`, the elements of the other collection are appended to the elements of the input collection, preserving the order of elements in both collections.
+When `preserveOrder` is `false`, or not supplied, there is no expectation of order. When `preserveOrder` is `true`, the items of the other collection are appended to the items of the input collection, preserving the order of items in both collections.
 {: .stu}
 
 For example, considering the same two lists of integers used in the union example `A: 1, 1, 2, 3` and `B: 2, 3`:
@@ -1003,7 +1180,9 @@ The following table lists the possible conversions supported, and whether the co
 The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
 
 <a name="iif"></a>
-#### iif(criterion: expression, true-result: collection [, otherwise-result: collection]) : collection
+#### iif(criterion: ($this, $index) => Boolean, true-result: ($this, $index) => collection [, otherwise-result: ($this, $index) => collection]) : collection
+
+> This is a [scoped function](#scoped-functions): The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned.
 
 The `iif` function in FHIRPath is an _immediate if_, also known as a conditional operator (such as the C programming language's `? :` operator).
 
@@ -1014,6 +1193,8 @@ If `criterion` is `true`, the function returns the value of the `true-result` ar
 If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
 
 Note that short-circuit behavior is expected in this function. In other words, `true-result` should only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` should only be evaluated otherwise. For implementations, this means delaying evaluation of the output arguments (specifically true-result and otherwise-result) to remove the chance that their evaluation throws an error and terminates the expression early.
+
+If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 #### Boolean Conversion Functions
 
@@ -1140,8 +1321,44 @@ If the input collection is empty, the result is empty.
 {:.stu}
 
 #### Date Conversion Functions
+<a name="format-codes"></a>
+##### Date/DateTime String Format Codes
+{:.stu}
+Parsing textual content into date/time values is a complex task, given the wide variety of formats in use in the real world. The `toDate()` and `toDateTime()` functions defined below provide a way to parse a wide variety of date/time formats into FHIRPath date and datetime types. Unfortunately, there is no single standard for date/time formats across the contexts where FHIRPath is used (e.g., most programming languages have their own date/time formats), so the this specification defines the following format codes below.
+{:.stu}
+Note that:
+{:.stu}
+* Format codes are case-sensitive.
+* Any character in the format string parameter not represented by a format code is treated as a literal and must match exactly in the input string.
+* Only a subset of the codes are required, implementations may vary.
+{:.stu}
 
-##### toDate() : Date
+| Format Code	| Support	| Description |
+| ----------- | ------- | ----------- |
+| yy	 | optional	| 2-digit year (e.g., 80 for 1980)<br/>Implementations have discretion on how to interpret the century for 2-digit years (e.g., based on contextual knowledge).<br/>A common approach is to interpret values 00-49 as 2000-2049 and 50-99 as 1950-1999.<br/>Note that this format code is discouraged due to the ambiguity it introduces.
+| yyyy | required	| 4-digit year (e.g., 2024)
+| M    | optional	| 1- or 2-digit month of year (1=January, etc.)
+| MM   | required	| 2-digit month of year (01=January, etc.)
+| MMM  | optional	| The localized abbreviated name of the month (e.g., 'Jun' for en-US, 'juin' for fr-FR)
+| MMMM | optional	| The localized full name of the month (e.g., 'June' for en-US, 'juni' for da-DK)
+| d    | optional	| 1- or 2-digit day of month (1 through 31)
+| dd   | required	| 2-digit day of month (01 through 31)
+| h    | optional	| 1- or 2-digit hour of AM/PM (1 through 12)
+| hh   | required	| 2-digit hour of AM/PM (01 through 12)
+| H    | optional	| 1- or 2-digit hour of day (00 through 23)
+| HH   | required	| 2-digit hour of day (00 through 23)
+| m    | optional	| 1- or 2-digit minute of hour (0 through 59)
+| mm   | required	| 2-digit minute of hour (00 through 59)
+| s    | optional	| 1- or 2-digit second of minute (0 through 59)
+| ss   | required	| 2-digit second of minute (00 through 59)
+| S[+] | required	| 1-digit fraction of second (0 through 9)<br/>Note that consecutive fractional seconds are grouped together, e.g. SSS for milliseconds.<br/>Implementations MUST support at least 3 digits (milliseconds); support for additional digits is optional.
+| a    | required	| 1- or 2-letter localized AM/PM specifier.<br/>e.g., en-US: A, AM, P, etc.<br/>e.g., ja-JP: 午, 午前, etc.
+| z    | optional	| Time zone literal (name or id). E.g., America/Los_Angeles, Pacific Standard Time, or PST.
+| Z    | required	| Time zone offset from UTC (e.g., +0200, -0500) or Z literal for UTC
+{:.grid}
+{:.stu}
+
+##### toDate([format : string]) : Date
 
 If the input collection contains a single item, this function will return a single date if:
 
@@ -1152,15 +1369,26 @@ are extracted directly without timezone conversion/normalization
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a Date (using the format `YYYY-MM-DD`{:.formatted}), the result is empty.
+If the item is a String, but the string is not convertible to a Date (using the default format `yyyy-MM-DD`{:.formatted}), the result is empty.
+
+When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+If the input is not a string, the format parameter it ignored.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
 
-For example: `@2024-01-15T23:30:00-05:00.toDate()` returns `@2024-01-15`
+For example: 
+```fhirpath
+@2024-01-15T23:30:00-05:00.toDate() // returns @2024-01-15
+'2024-01-15'.toDate() // returns @2024-01-15
+'150124'.toDate('ddMMyy') // returns @2024-01-15 
+'15-01-2024'.toDate('dd-MM-yyyy') // returns @2024-01-15
+'12-27'.toDate('MM-yy') // returns @2027-12 (a partial date with just year and month entered)
+```
 
-##### convertsToDate() : Boolean
+##### convertsToDate([format : string]) : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
 
@@ -1168,7 +1396,11 @@ If the input collection contains a single item, this function will return `true`
 * the item is a DateTime
 * the item is a String and is convertible to a Date
 
-If the item is not one of the above types, or is not convertible to a Date (using the format `YYYY-MM-DD`{:.formatted}), the result is `false`.
+If the item is not one of the above types, or is not convertible to a Date (using the default format `yyyy-MM-DD`{:.formatted}), the result is `false`.
+
+When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+If the input is not a string, the format parameter it ignored.
+{:.stu}
 
 If the item contains a partial date (e.g. `'2012-01'`), the result is a partial date.
 
@@ -1178,7 +1410,7 @@ If the input collection is empty, the result is empty.
 
 #### DateTime Conversion Functions
 
-##### toDateTime() : DateTime
+##### toDateTime([format : string]) : DateTime
 
 If the input collection contains a single item, this function will return a single datetime if:
 
@@ -1188,7 +1420,11 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a DateTime (using the format `YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is empty.
+If the item is a String, but the string is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is empty.
+
+When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+If the input is not a string, the format parameter it ignored.
+{:.stu}
 
 If the item contains a partial datetime (e.g. `'2012-01-01T10:00'`), the result is a partial datetime.
 
@@ -1196,7 +1432,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
-##### convertsToDateTime() : Boolean
+##### convertsToDateTime([format : string]) : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
 
@@ -1204,7 +1440,11 @@ If the input collection contains a single item, this function will return `true`
 * the item is a Date
 * the item is a String and is convertible to a DateTime
 
-If the item is not one of the above types, or is not convertible to a DateTime (using the format `YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is `false`.
+If the item is not one of the above types, or is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is `false`.
+
+When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
+If the input is not a string, the format parameter it ignored.
+{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1244,6 +1484,7 @@ If the input collection is empty, the result is empty.
 
 #### Quantity Conversion Functions
 
+<a name="fn-toquantity"></a>
 ##### toQuantity([unit : String]) : Quantity
 
 If the input collection contains a single item, this function will return a single quantity if:
@@ -1277,6 +1518,7 @@ For calendar durations, FHIRPath defines the following conversion factors:
 | - | -|
 | `1 year` | `12 months` or `365 days` |
 | `1 month` | `30 days` |
+| `1 week` | `7 days` |
 | `1 day` | `24 hours` |
 | `1 hour` | `60 minutes` |
 | `1 minute` | `60 seconds` |
@@ -1311,7 +1553,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is `true`, otherwise, the result is `false`.
 
-> Implementations are not required to support a complete UCUM implementation, and may return `false` when the `unit` argument is used and it is different than the input quantity unit.
+> Implementations are not required to support a complete UCUM implementation, and may return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
 
 #### String Conversion Functions
 
@@ -1332,9 +1574,9 @@ The String representation uses the following formats:
 |**Boolean** |`true` or `false`| `true.toString()`{:.fhirpath} returns `true`|
 |**Integer** |`(-)?#0`{:.formatted}| `42.toString()`{:.fhirpath} returns `42`|
 |**Decimal** |`(-)?#0.0#`{:.formatted}| `3.14.toString()`{:.fhirpath} returns `3.14`|
-|**Quantity** |`(-)?#0.0# (('<unit>')|(<unit>))`{:.formatted} | `(53 'km').toString()`{:.fhirpath} returns `53 'km'` *(ucum units include quotes)*<br/>`(4 days).toString()`{:.fhirpath} returns `4 days` *(calendar duration units don't include quotes)*|
-|**Date** |`YYYY-MM-DD`{:.formatted}| `@2020-01-01.toString()`{:.fhirpath} returns `2020-01-01`|
-|**DateTime** |`YYYY-MM-DDThh:mm:ss.fff(+|-)hh:mm`{:.formatted}| `@2020-01-01T10:00:00.000+10:00.toString()`{:.fhirpath} returns `2020-01-01T10:00:00.000+10:00` and `@2025-11-01.toString()`{:.fhirpath} returns `2025-11-01`|
+|**Quantity** |`(-)?#0.0# (('«unit»')|(«unit»))`{:.formatted} | `(53 'km').toString()`{:.fhirpath} returns `53 'km'` *(ucum units include quotes)*<br/>`(4 days).toString()`{:.fhirpath} returns `4 days` *(calendar duration units don't include quotes)*|
+|**Date** |`yyyy-MM-DD`{:.formatted}| `@2020-01-01.toString()`{:.fhirpath} returns `2020-01-01`|
+|**DateTime** |`yyyy-MM-DDThh:mm:ss.fff(+|-)hh:mm`{:.formatted}| `@2020-01-01T10:00:00.000+10:00.toString()`{:.fhirpath} returns `2020-01-01T10:00:00.000+10:00` and `@2025-11-01.toString()`{:.fhirpath} returns `2025-11-01`|
 |**Time** |`hh:mm:ss.fff`{:.formatted}| `@T10:30:00.000.toString()`{:.fhirpath} returns `10:30:00.000`<br/>`@T11:45.toString()`{:.fhirpath} returns `11:45`|
 {:.grid}
 
@@ -1520,7 +1762,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abc'.contains('d') // false
 ```
 
-> **Note:** The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the `contains` operator, which is a list operator that looks for an element in a list.
+> **Note:** The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the [`contains`](#contains-containership--boolean) operator, which is a list operator that looks for an item in a list.
 
 #### upper() : String
 
@@ -1672,6 +1914,7 @@ The encode function takes a singleton string and returns the result of encoding 
 |=|=|
 |base64 |The string is encoded using standard base64 encoding, using A-Z, a-z, 0-9, +, and /, output padded with = |
 |urlbase64 |The string is encoded using url base 64 encoding, using A-Z, a-z, 0-9, -, and _, output padded with = |
+|ascii | The string has any character above character code 127 replaced with `?`. *This is a lossy encoding, and not reversible via `decode`*
 {:.grid}
 {:.stu}
 
@@ -1687,7 +1930,7 @@ If no format is specified, the result is empty.
 #### decode(format : String) : String
 {:.stu}
 
-The decode function takes a singleton encoded string and returns the result of decoding that string according to the given format. The format parameter defines the encoding format. Available formats are listed in the encode function.
+The decode function takes a singleton encoded string and returns the result of decoding that string according to the given format. The format parameter defines the encoding format. Available formats are listed in the encode function (excluding 'ascii').
 {:.stu}
 
 If the input is empty, the result is empty.
@@ -1787,7 +2030,7 @@ The following example illustrates the behavior of the `.join` operator:
 The functions in this section accept input collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
-Note also that although all functions return collections, if a given function is defined to return a single element, the return type in the description of the function is simplified to just the type of the single element, rather than the list type.
+Note also that although all functions return collections, if a given function is defined to return a single item, the return type in the description of the function is simplified to just the type of the single item, rather than the list type.
 {:.stu}
 
 The math functions in this section enable FHIRPath to be used not only for path selection, but for providing a platform-independent representation of calculation logic in artifacts such as questionnaires and documentation templates. For example:
@@ -1975,6 +2218,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 ``` fhirpath
 2.power(3) // 8
 2.5.power(2) // 6.25
+2.power(-1) // 0.5
 (-1).power(0.5) // empty ({ })
 ```
 {:.stu}
@@ -2078,13 +2322,17 @@ Returns a collection with all immediate child nodes of all items in the input co
 
 #### descendants() : collection
 
-Returns a collection with all descendant nodes of all items in the input collection. The result does not include the nodes in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
+Returns a collection with all descendant nodes of all items in the input collection. The result does not include the items in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
 
-> **Note:** Many of these functions will result in a set of nodes of different underlying types. It may be necessary to use `ofType()` as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
+> **Note:** Many of these functions will result in a set of items of different underlying types. It may be necessary to use [`ofType()`](#fn-oftype) as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
 
 ### Utility functions
 
-#### trace(name : String [, projection: Expression]) : collection
+<a name="fn-trace"></a>
+#### trace(name : String [, projection: ($this, $index) => any]) : collection
+
+> This is a [scoped function](#scoped-functions): If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function.<br/>
+> The `name` parameter is evaluated before the function is executed and is not re-evaluated for each iteration of the projection.
 
 Adds a String representation of the input collection to the diagnostic log, using the `name` argument as the name in the log. This log should be made available to the user in some appropriate fashion. Does not change the input, so returns the input collection as output.
 
@@ -2095,6 +2343,63 @@ contained.where(criteria).trace('unmatched', id).empty()
 ```
 
 The above example traces only the id elements of the result of the where.
+
+<a name="fn-pathname"></a>
+#### pathname([short : Boolean]) : collection
+{:.stu}
+<!-- FHIR-45314 -->
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns the direct path of each item of the input collection within the input resource (`%rootResource` in FHIR implementations),
+using only element names and indexers. *Such that if you used that result on the input resource, you would get that node, and only that node.*
+{:.stu}
+
+If an item in the input collection was derived from computation (e.g. via `substring(..)`, `&`, or mathematical operations) rather than navigation it is excluded from the result.
+Items that are outside the input resource, such as those navigated to via resolve() are also excluded from the result, however if resolve()
+references a resource contained within the input Resource then it is included (such as with FHIR bundles, or contained resources).
+{:.stu}
+
+The optional `short` parameter permits excluding array indexers if an element is known to not be an array, either in the model, or in the specific instance at runtime.
+{:.stu}
+
+If the input collection is empty `({ })`, the result is empty.
+{:.stu}
+
+This function could be used to populate fields in a FHIR OperationOutcome.issue.expression field, or assist in debugging complex expressions using it in conjunction with trace.
+{:.stu}
+
+For example, validating a FHIR QuestionnaireResponse (against a Questionnaire) could use the following expression to calculate the location of an invalid answer:
+{:.stu}
+``` fhirpath
+item.item.item.where(linkId = 'i508').item.where(linkId='i534').answer.value.pathname()
+```
+{:.stu}
+
+would return the following string *(which is also a valid fhirpath expression)* if only 1 node was at that location in the input QuestionnaireResponse.
+{:.stu}
+
+``` fhirpath
+'QuestionnaireResponse.item[2].item[8].item[1].item[1].answer[0].value[0]'
+```
+{:.stu}
+
+Another example could be the FHIR Observation invariant `obs-7` that roughly checks if components are duplicating codings captured at the top level:
+*(not an exact copy of the invariant, but a part of it)*
+{:.stu}
+``` fhirpath
+// trace out the pathname of the components that have duplicated codings
+component.code.where(coding.intersect(%resource.code.coding).trace('component', pathname()).exists()).empty()
+```
+{:.stu}
+would return the following strings: (simplifying finding the specific component(s) that were duplicated)
+{:.stu}
+``` fhirpath
+'Observation.component[0].code[0].coding[0]'
+'Observation.component[23].code[0].coding[0]'
+```
+{:.stu}
 
 #### Current date and time functions
 
@@ -2115,17 +2420,22 @@ Returns the current time.
 Returns the current date.
 
 <a name="definevariable"></a>
-#### defineVariable(name: String [, expr: expression])
+#### defineVariable(name: String [, projection: collection])
 {:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
-Defines a variable named `name` that is accessible in subsequent expressions and has the value of `expr` if present, otherwise the value of the input collection. In either case the function does not change the input and the output is the same as the input collection.
+Defines a variable named `name` that is accessible in subsequent expressions on the output collection and has the value of `projection` if present, otherwise the value of the input collection. In either case the function does not change the input and the output is the same as the input collection.
 {:.stu}
 
-If the name already exists in the current expression scope, the evaluation will end and signal an error to the calling environment. Note that functions that take an `expression` as an argument establish a scope for the iteration variables ($this and $index). If a variable is defined within such an expression, it is only available within that expression scope.
+> **Note:** This is not a scoped function, it does not change any variables such as `$this` or `$index`.<br/>
+>
+> This function is the only function that changes the state of the context for processing on the output collection.<br/>
+> Whereas [scoped functions](#scoped-functions) only impact the context while evaluating the function, and it's parameters, and the context is restored to the same as before the function was called.
 {:.stu}
 
+If the name already exists in the current expression scope, the evaluation will end and signal an error to the calling environment.
+{:.stu}
 
 Example:
 {:.stu}
@@ -2146,7 +2456,7 @@ group.select(
 ```
 {:.stu}
 
-> **Note:** this would be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
+> **Note:** this could be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
 {:.stu}
 
 #### lowBoundary([precision: Integer]): Decimal | Date | DateTime | Time
@@ -2548,7 +2858,7 @@ If both operands are collections with a single item, they must be of the same ty
   * `Date`: must be exactly the same
   * `DateTime`: must be exactly the same, respecting the timezone offset (though +00:00 = -00:00 = Z)
   * `Time`: must be exactly the same
-* For complex types, equality requires all child properties to be equal, recursively.
+* For complex types, equality requires all child elements to be equal, recursively.
 
 If both operands are collections with multiple items, check the equality of each pair of items in order:
 
@@ -2619,7 +2929,7 @@ If both operands are collections with a single item, they must be of the same ty
   * `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision.
   * `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).
   * `Boolean`: the values must be the same
-* For complex types, equivalence requires all child properties to be equivalent, recursively.
+* For complex types, equivalence requires all child elements to be equivalent, recursively.
 
 If both operands are collections with multiple items:
 
@@ -2791,6 +3101,38 @@ The greater or equal operator (`>=`) returns `true` if the first operand is grea
 @T10:30:00 >= @T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
+<a name="fn-comparable"></a>
+#### comparable(other : Quantity) : Boolean
+{:.stu}
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+Returns `true` if the input Quantity can be compared with the `other` Quantity and their relationship to each other determined.
+Comparable means that both have values, and the units are the same (irrespective of the system), or both have `code` and `system` values,
+and the `system` is recognized by the FHIRPath implementation, and the codes are comparable within that system
+(e.g. `'d'` (days) and `'h'` (hours), or `'[in_i]'` (inches) and `'cm'` (centimeters)).
+{:.stu}
+
+If either or both inputs are empty, or either input is not a single Quantity value, the result is empty (`{ }`).
+{:.stu}
+
+``` fhirpath
+1 'mg'.comparable(2 'mg') // true - these types are comparable
+1 'm'.comparable(20 'cm') // true - these types are both metric distance measures
+2 '1'.comparable(3) // true - the integer will implicitly convert to a Quantity with unit `'1'` which is the same system/code so is comparable
+1.comparable(2) // true - these will both convert to quantities with the same system/code, hence are comparable
+```
+{:.stu}
+
+This function can be used to guard comparison operations to prevent returning empty results when the quantities are not comparable:
+{:.stu}
+
+``` fhirpath
+iif(Observation.value.comparable(2 'mg'), Observation.value < 2 'mg', {})
+```
+{:.stu}
+
 ### Types
 
 #### is _type specifier_
@@ -2928,11 +3270,26 @@ CareTeam.onBehalfOf.exists() implies (CareTeam.member.resolve() is Practitioner)
 StructureDefinition.contextInvariant.exists() implies StructureDefinition.type = 'Extension'
 ```
 
+Note carefully that if the left side of an implies evaluates to empty, the result of the operation is the right side. This is often not the intended result, so the use of operators that ensure a value (such as `~`, instead of `=`) is recommended for testing boolean conditions, as illustrated in the following examples:
+``` fhirpath
+Medication.status ~ 'active' implies form.exists()
+
+// if using the following expression in a constraint, it won't have the expected behavior of only requiring form if status was active.
+// (using equal '=' would evaluate and return the right argument if the left argument (status) is missing from the input)
+Medication.status = 'active' implies form.exists() // bad constraint expression
+
+// More complex conditions
+(type ~ 'incident' and severity ~ 'high') implies reviewDate.exists()
+
+// Works with boolean too, but not special-cased
+wasNotGiven ~ true implies reasonNotGiven.exists()
+```
+
 Note that implies may use short-circuit evaluation in the case that the first operand evaluates to `false`.
 
 ### Math
 
-The math operators require each operand to be a single element. Both operands must be of the same type, or of compatible types according to the rules for implicit conversion. Each operator below specifies which types are supported.
+The math operators require each operand to be a single item. Both operands must be of the same type, or of compatible types according to the rules for implicit conversion. Each operator below specifies which types are supported.
 
 If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -3129,6 +3486,39 @@ The first example above will evaluate to the value `@2012` even though the date/
 
 Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
 
+### Unary operators (`+` and `-`)
+{:.stu}
+
+> **Note:** The contents of this section are Standard for Trial Use (STU)
+{: .stu-note }
+
+The unary operators support a single item input operand of type Integer, Long, Decimal, or Quantity. The output type is the same as the input type.
+Using with any incompatible type will end and signal an error to the calling environment.
+{:.stu}
+
+The `+` operator returns the value of its operand unchanged.
+{:.stu}
+
+The `-` operator will negate the numeric value. If the value is a Quantity, the unit remains unchanged.
+{:.stu}
+> **Note:** The CQL language describes the `-` operator as unary negation.
+{:.stu}
+
+If the result of negating the number cannot be represented, the result is empty (`{ }`).
+{:.stu}
+
+If the input collection is empty, the result is empty (`{ }`).
+{:.stu}
+
+examples:
+{:.stu}
+``` fhirpath
++5 // a simple literal 5 numeric value
+-4 // a simple negative value
+-Account.balance.amount // The negated account balance
+```
+{:.stu}
+
 ### Operator precedence
 
 Precedence of operations, in order from high to low:
@@ -3181,9 +3571,13 @@ FHIRPath supports a general-purpose aggregate function to enable the calculation
 They are more concise, easier to read, and handle input types more effectively, unless you need to handle specific edge cases.
 {:.stu}
 
-### aggregate(aggregator : expression [, init : value]) : value
+<a name="aggregate"></a>
+### aggregate(aggregator : ($total, $this, $index) => collection [, init : collection]) : collection
 {:.stu}
-Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
+Performs general-purpose aggregation by evaluating the aggregator expression for each item of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
+{:.stu}
+
+> This is a [scoped function](#scoped-functions): The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/>  The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values.
 {:.stu}
 
 The value of the `$total` variable is set to `init`, or empty (`{ }`) if no `init` value is supplied, and is set to the result of the aggregator expression after every iteration.<br/>
@@ -3216,13 +3610,13 @@ value.aggregate($total + $this, 0) / value.count()
 
 ### sum() : Integer | Long | Decimal | Quantity
 {:.stu}
-Returns the sum of all elements in the input collection (in the same type).
+Returns the sum of all items in the input collection (in the same type).
 {:.stu}
 
-Accepts input collections with elements of type: Integer, Long, Decimal or Quantity.
+Accepts input collections with items of type: Integer, Long, Decimal or Quantity.
 {:.stu}
 
-All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+All items in the input collection SHALL be the same type, otherwise an exception is thrown.
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -3238,13 +3632,13 @@ The following examples illustrate the behavior of the `sum` function:
 
 ### min() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
 {:.stu}
-Returns the minimum element in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
+Returns the minimum item in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
 {:.stu}
 
-Accepts input collections with elements of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
+Accepts input collections with items of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
 {:.stu}
 
-All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+All items in the input collection SHALL be the same type, otherwise an exception is thrown.
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -3261,13 +3655,13 @@ The following examples illustrate the behavior of the `min` function:
 
 ### max() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
 {:.stu}
-Returns the maximum element in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
+Returns the maximum item in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
 {:.stu}
 
-Accepts input collections with elements of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
+Accepts input collections with items of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
 {:.stu}
 
-All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+All items in the input collection SHALL be the same type, otherwise an exception is thrown.
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -3284,16 +3678,16 @@ The following examples illustrate the behavior of the `max` function:
 
 ### avg() : Decimal | Quantity
 {:.stu}
-Returns the average of all elements in the input collection (in the same type).
+Returns the average of all items in the input collection (in the same type).
 {:.stu}
 
-Accepts input collections with elements of type: Decimal or Quantity.
+Accepts input collections with items of type: Decimal or Quantity.
 {:.stu}
 
 When used with Integer or Long, the arguments will be implicitly converted to Decimal before evaluation.
 {:.stu}
 
-All elements in the input collection SHALL be the same type, otherwise an exception is thrown.
+All items in the input collection SHALL be the same type, otherwise an exception is thrown.
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -3317,7 +3711,7 @@ FHIRPath defines the following lexical elements:
 |**Literal**|Literals allow basic values to be represented within the language|
 |**Symbol** |Symbols such as `+`, `-`, `*`, and `/` |
 |**Keyword** |Grammar-recognized tokens such as `and`, `or` and `in` |
-|**Identifier** |Labels such as type names and property names |
+|**Identifier** |Labels such as type names and element names |
 {:.grid}
 
 ### Whitespace
@@ -3349,8 +3743,8 @@ Literals provide for the representation of values within FHIRPath. The following
 |**[Integer](#integer)**|Sequences of digits in the range 0..2<sup>32</sup>-1|
 |**[Decimal](#decimal)**|Sequences of digits with a decimal point, in the range (-10<sup>28</sup>+1)/10<sup>8</sup>..(10<sup>28</sup>-1)/10<sup>8</sup>|
 |**[String](#string)**|Strings of any character enclosed within single-ticks (`'`)|
-|**[Date](#date)**|The at-symbol (`@`) followed by a date (`YYYY-MM-DD`{:.formatted})|
-|**[DateTime](#datetime)**|The at-symbol (`@`) followed by a datetime (`YYYY-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}) |
+|**[Date](#date)**|The at-symbol (`@`) followed by a date (`yyyy-MM-DD`{:.formatted})|
+|**[DateTime](#datetime)**|The at-symbol (`@`) followed by a datetime (`yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}) |
 |**[Time](#time)**|The at-symbol (`@`) followed by a time (`Thh:mm:ss.fff(+\|-)hh:mm`{:.formatted}) |
 |**[Quantity](#quantity)**|An integer or decimal literal followed by a datetime precision specifier, or a [\[UCUM\]](#UCUM) unit specifier|
 {: .grid}
@@ -3419,14 +3813,14 @@ A delimited identifier is any sequence of characters enclosed in backticks (`` `
 `us-zip`
 ```
 
-The use of backticks allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have property or type names that are not valid simple identifiers.
+The use of backticks allows identifiers to contains spaces, commas, and other characters that would not be allowed within simple identifiers. This allows identifiers to be more descriptive, and also enables expressions to reference models that have element or type names that are not valid simple identifiers.
 
 FHIRPath [escape sequences](#string) for strings also work for delimited identifiers.
 
-When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context. If the identifier cannot be resolved, the evaluation will end and signal an error to the calling environment.
+As with simple identifiers, when a delimited identifier is used at the root of a FHIRPath expression, it follows the same [type resolution rules](#path-selection) as described in the Path selection section.
 
 ### Case-Sensitivity
-FHIRPath is a case-sensitive language, meaning that case is considered when matching keywords in the language. However, because FHIRPath can be used with different models, the case-sensitivity of type and property names is defined by each model.
+FHIRPath is a case-sensitive language, meaning that case is considered when matching keywords in the language. However, because FHIRPath can be used with different models, the case-sensitivity of type and element names is defined by each model.
 
 ## Environment variables
 
@@ -3462,8 +3856,6 @@ Because FHIRPath is defined to work in multiple contexts, each context provides 
 To allow type names to be referenced in expressions such as the `is` and `as` operators, the language includes a _type specifier_, an optionally qualified identifier that must resolve to the name of a model type.
 
 When resolving a type name, the context-specific model is searched first. If no match is found, the `System` model (containing only the built-in types defined in the [Literals](#literals) section) is searched.
-
-When resolving an identifier that is also the root of a FHIRPath expression, it is resolved as a type name first, and if it resolves to a type, it must resolve to the type of the context (or a supertype). Otherwise, it is resolved as a path on the context.
 
 ### Reflection
 {:.stu}
@@ -3656,6 +4048,7 @@ Patient.name.where(given = 'Wouter').exists()
 
 but is still less concise than would be possible if constraints were well known in advance.
 
+### Compile-time checks
 In cases where compile-time checking like this is desirable, implementations may choose to protect against such cases by employing strict typing. Based on the definitions of the operators and functions involved in the expression, and given the types of the inputs, a compiler can analyze the expression and determine whether "unsafe" situations can occur.
 
 Unsafe uses are:
@@ -3671,16 +4064,28 @@ There are a few constructs in the FHIRPath language where the compiler cannot de
 
 * The `children()` and `descendants()` functions
 * The `resolve()` function
-* A member which is polymorphic (e.g. a `choice[x]` type in FHIR)
+* An element that is polymorphic (e.g. a choice type in FHIR such as `value[x]`)
 
 Note that the `resolve()` function is defined by the FHIR context, it is not part of FHIRPath directly. For more information see the [FHIRPath](https://hl7.org/fhir/fhirpath.html#functions) section of the FHIR specification.
 
-Authors can use the `as` operator or `ofType()` function directly after such constructs to inform the compiler of the expected type.
+Authors can use the `as` operator or [`ofType()`](#fn-oftype) function directly after such constructs to inform the compiler of the expected type.
 
 In cases where a compiler finds places where a collection of multiple items can be present while just a single item is expected, the author will need to make explicit how repetitions are dealt with. Depending on the situation one may:
 
 * Use `first()`, `last()` or indexer (`[ ]`) to select a single item
 * Use `select()` and `where()` to turn the expression into one that evaluates each of the repeating items individually (as in the examples above)
+
+### Run-time behavior
+{:.stu}
+In the absence of strongly-typed compile-time checks, the implementation may still provide strong type-checks at run-time.
+The difference between strongly typed compile-time checks and strongly-typed run-time checks is that the latter will only throw errors when the data does not conform to type requirements, where the former checks that any data is guaranteed to be conformant due to the construction of the expression.
+{:.stu}
+
+However, the default run-time behavior of a compliant FHIRPath implementation should be weakly typed. This means:
+{:.stu}
+
+return an empty collection ({ }) when a path references an element that does not exist on the context node
+{:.stu}
 
 ## Formal Specifications
 
@@ -3698,7 +4103,7 @@ The model information returned by the reflection function `type()`  is specified
 
 [modelinfo.xsd](modelinfo.xsd)
 
-> **Note:** The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the normative [Reflection](#reflection) section above.
+> **Note:** The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the [Reflection](#reflection) section above.
 
 As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and tooling should respect the case-sensitive settings for each model.
 
@@ -3717,70 +4122,9 @@ text/fhirpath
 
 > **Note:** The appendices are included for informative purposes and are not a normative part of the specification.
 
-<a name="hl7v2"></a>
-## Use of FHIRPath on HL7 Version 2 messages
-{: .appendix }
-
-FHIRPath can be used against HL7 V2 messages. This UML diagram summarizes the
-Object Model on which the FHIRPath statements are written:
-
-![Class Model for HL7 V2](v2-class-model.png){: height="456",width="760"}
-
-In this Object Model:
-
-* The object graph always starts with a message.
-* Each message has a list of segments.
-* In addition, Abstract Message Syntax is available through the groups() function, for use where the message follows the Abstract Message Syntax sufficiently for the parser to reconcile the segment list with the structure.
-* The names of the groups are the names published in the specification, e.g. 'PATIENT_OBSERVATION' (with spaces, where present, replaced by underscores. In case of doubt, consult the V2 XML schemas).
-* Each Segment has a list of fields, which each have a list of "Cells". This is necessary to allow for repeats, but users are accustomed to just jumping to Element - use the function elements() which returns all repeats with the given index.
-* A "cell" can be either an Element, a Component or a Sub-Components. Elements can contain Components, which can contain Sub-Components. Sub-Sub-Components are not allowed.
-* Calls may have a simple text content, or a series of (sub-)components. The simple() function returns either the text, if it exists, or the return value of simple() from the first component
-* A V2 data type (e.g. ST, SN, CE etc) is a profile on Cell that specifies whether it has simple content, or complex content.
-* todo: this object model doesn't make provision for non-syntax escapes in the simple content (e.g. `\.b\`).
-* all the lists are 1 based. That means the first item in the list is numbered 1, not 0.
-
-Some example queries:
-
-``` fhirpath
-Message.segment.where(code = 'PID').field[3].element.first().simple()
-```
-
-Get the value of the first component in the first repeat of PID-3
-
-``` fhirpath
-Message.segment[2].elements(3).simple()
-```
-
-Get a collection  with is the string values of all the repeats in the 3rd element of the 2nd segment. Typically, this assumes that there are no repeats, and so this is a simple value.
-
-``` fhirpath
-Message.segment.where(code = 'PID').field[3].element.where(component[4].value = 'MR').simple()
-```
-
-Pick out the MR number from PID-3 (assuming, in this case, that there's only one PID segment in the message. No good for an A17). Note that this returns the whole Cell - e.g. `|value^^MR|`, though often more components will be present)
-
-``` fhirpath
-Message.segment.where(code = 'PID').elements(3).where(component[4].value = 'MR').component[1].text
-```
-
-Same as the last, but pick out just the MR value
-
-``` fhirpath
-Message.group('PATIENT').group('PATIENT_OBSERVATION').item.ofType(Segment)
-  .where(code = 'OBX' and elements(2).exists(components(2) = 'LN')))
-```
-
-Return any OBXs from the patient observations (and ignore others e.g. in a R01 message) segments that have LOINC codes.
-Note that if the parser cannot properly parse the Abstract Message Syntax, group() must fail with an error message.
-
-## FHIRPath Tooling and Implementation
-{: .appendix }
-
-The list of known tooling and implementation projects for the FHIRPath language has been moved to the [HL7 confluence site](https://confluence.hl7.org/display/FHIRI/FHIRPath+Implementations){:target="_blank"}
 
 
 ## References
-{: .appendix }
 
 <a name="bibliography"></a>
 - <a name="ANTLR"></a>[ANTLR] Another Tool for Language Recognition (ANTLR) <http://www.antlr.org/>{:target="_blank"}
@@ -3795,19 +4139,3 @@ The list of known tooling and implementation projects for the FHIRPath language 
 - [grammar.html](grammar.html)
 - [modelinfo.xsd](modelinfo.xsd)
 - <a name="fluent"></a>[Fluent] Fluent interface pattern. <https://en.wikipedia.org/wiki/Fluent_interface>{:target="_blank"}
-
-## Dependencies
-
-{% include dependency-table-short.xhtml %}
-
-## Cross Version Analysis
-
-{% include cross-version-analysis-inline.xhtml %}
-
-## Global Profiles
-
-{% include globals-table.xhtml %}
-
-## IP Statements
-
-{% include ip-statements.xhtml %}
