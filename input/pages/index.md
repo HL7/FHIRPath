@@ -3914,10 +3914,10 @@ For primitive types such as `String` and `Integer`, the result is a `SimpleTypeI
 Results in:
 {:.stu}
 ``` typescript
-{
+[
   SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' },
   SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' }
-}
+]
 ```
 {:.stu}
 *Note: The base type for primitives is defined as `System.Any`.*
