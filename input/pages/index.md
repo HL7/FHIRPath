@@ -24,14 +24,19 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - Math](#math)
 > * [Functions - Utility (defineVariable, lowBoundary, highBoundary)](#definevariable)
 > * [Functions - Utility (precision)](#precision--integer)
+> * [Functions - pathname](#fn-pathname)
 > * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
 > * [Functions - Date and Time Interval Functions (duration, difference)](#date-and-time-interval-functions)
 > * [Operations - Comparison (comparable)](#fn-comparable)
 > * [Instance Selector/Object Creation](#instance-selector)
 > * [Types - Reflection](#reflection)
 > 
-> This section has undergone extensive clarification:
+> These sections have undergone extensive clarification:
 > * [Functions - documentation of functions with scoped arguments](#scoped-functions)
+> * [Functions - combine](#fn-combine) - additional optional parameter `preserveOrder`
+> * [Date Conversion Functions](#date-conversion-functions) - inclusion of string format codes and `format` parameter
+> * [Functions - String (matches)](#fn-matches) - additional optional parameter `flags`
+> * [Unary Operators](#unary-operators) - this is a new section, however they have been implied as defined since the normative version via other parts of the specification and grammar. 
 >
 > In addition, the appendices are included as additional documentation and are informative content.
 {: .stu-note }
@@ -355,8 +360,8 @@ The `DateTime` type represents date/time and partial date/time values in the ran
 The `DateTime` literal combines the `Date` and `Time` literals and is a subset of [\[ISO8601\]](#ISO8601):
 
 * A datetime literal begins with an `@`
-* It uses the `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted} format
-* Timezone offset is optional, but if present the notation `(+\|-)hh:mm`{:.formatted} is used (so must include both minutes and hours)
+* It uses the `yyyy-MM-DDThh:mm:ss.fff(+|-)hh:mm`{:.formatted} format
+* Timezone offset is optional, but if present the notation `(+|-)hh:mm`{:.formatted} is used (so must include both minutes and hours)
 * **Z** is allowed as a synonym for the zero (+00:00) UTC offset.
 * A `T` can be used at the end of any date (year, year-month, or year-month-day) to indicate a partial DateTime.
 
@@ -382,8 +387,9 @@ The `Quantity` type represents quantities with a specified unit, where the `valu
 The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or calendar duration keyword. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
 
 ``` fhirpath
-4.5 'mg'
-100 '[degF]'
+4.5 'mg'      // UCUM milligrams
+100 '[degF]'  // UCUM temperature in Fahrenheit
+2 years       // Calendar units
 ```
 
 > Implementations must respect UCUM units, meaning that they must not ignore UCUM units in calculations involving quantities, including comparison, conversion, and arithmetic operations. For implementations that do not support unit conversion, this means that the calculation need only be supported if the units are the same value, case-sensitively.
@@ -613,7 +619,7 @@ Observation.value.where($this < 90 or $this > 110)
 Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
 
 <a name="fn-exists"></a>
-#### exists([criteria : ($this, $index) => any]) : Boolean
+#### exists([criteria : ($this, $index) => Boolean]) : Boolean
 
 > This is a [scoped function](#scoped-functions): The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); if any return `true` then the function returns `true`, otherwise `false`.
 
@@ -1127,6 +1133,7 @@ e.g. `x.union(y)`{:.fhirpath} is synonymous with `x | y`{:.fhirpath}
 
 e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use | given)`{:.fhirpath}, noting that the union function does not introduce an iteration context, in this example the select introduces the iteration context on the name elements.
 
+<a name="fn-combine"></a>
 #### combine(other : collection, [preserveOrder : Boolean]) : collection
 
 Merge the input and other collections into a single collection without eliminating duplicate values. Combining an empty collection with a non-empty collection will return the non-empty collection.
@@ -1420,7 +1427,7 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is empty.
+If the item is a String, but the string is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+|-)hh:mm`{:.formatted}), the result is empty.
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
 If the input is not a string, the format parameter it ignored.
@@ -1440,7 +1447,7 @@ If the input collection contains a single item, this function will return `true`
 * the item is a Date
 * the item is a String and is convertible to a DateTime
 
-If the item is not one of the above types, or is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is `false`.
+If the item is not one of the above types, or is not convertible to a DateTime (using the default format `yyyy-MM-DDThh:mm:ss.fff(+|-)hh:mm`{:.formatted}), the result is `false`.
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
 If the input is not a string, the format parameter it ignored.
@@ -1512,6 +1519,7 @@ If the input collection is empty, the result is empty.
 
 If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is the converted quantity, otherwise, the result is empty.
 
+<a name="fn-toquantity-conversion-factors"></a>
 For calendar durations, FHIRPath defines the following conversion factors:
 
 | Calendar duration | Conversion factor |
@@ -1612,7 +1620,7 @@ If the input collection contains a single item, this function will return a sing
 
 If the item is not one of the above types, the result is empty.
 
-If the item is a String, but the string is not convertible to a Time (using the format `hh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is empty.
+If the item is a String, but the string is not convertible to a Time (using the format `hh:mm:ss.fff(+|-)hh:mm`{:.formatted}), the result is empty.
 
 If the item contains a partial time (e.g. `'10:00'`), the result is a partial time.
 
@@ -1627,7 +1635,7 @@ If the input collection contains a single item, this function will return `true`
 * the item is a Time
 * the item is a String and is convertible to a Time
 
-If the item is not one of the above types, or is not convertible to a Time (using the format `hh:mm:ss.fff(+\|-)hh:mm`{:.formatted}), the result is `false`.
+If the item is not one of the above types, or is not convertible to a Time (using the format `hh:mm:ss.fff(+|-)hh:mm`{:.formatted}), the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1804,6 +1812,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 'abc'.replace('', 'x') // 'xaxbxcx'
 ```
 
+<a name="fn-matches"></a>
 #### matches(regex : String, [flags : String]) : Boolean
 
 Returns `true` when the value matches the given regular expression. Regular expressions should function consistently, regardless of any culture- and locale-specific settings in the environment, should be case-sensitive, use 'single line' mode and allow Unicode characters.
@@ -2101,7 +2110,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 Returns _e_ raised to the power of the input.
 {:.stu}
 
-Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
+Accepts Decimal input types. Integer and Long types are also accepted via [implicit conversion](#conversion) to Decimal. 
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -2151,7 +2160,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 Returns the natural logarithm of the input (i.e. the logarithm base _e_).
 {:.stu}
 
-Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
+Accepts Decimal input types. Integer and Long types are also accepted via [implicit conversion](#conversion) to Decimal. 
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -2172,7 +2181,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 Returns the logarithm base `base` of the input number.
 {:.stu}
 
-Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
+Accepts Decimal input types. Integer and Long types are also accepted via [implicit conversion](#conversion) to Decimal. 
 {:.stu}
 
 If the input is 0 or negative, the evaluation will end and signal an error to the calling environment.
@@ -2263,7 +2272,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 Returns the square root of the input number.
 {:.stu}
 
-Accepts Decimal input types. Integer and Long types are also accepted via implicit conversion to Decimal. 
+Accepts Decimal input types. Integer and Long types are also accepted via [implicit conversion](#conversion) to Decimal. 
 {:.stu}
 
 If the square root cannot be represented (such as the square root of -1), the result is empty.
@@ -3010,7 +3019,7 @@ See the [Equals](#equals) operator for discussion on respecting timezone offsets
 
 #### &gt; (Greater Than)
 
-The greater than operator (`>`) returns `true` if the first operand is strictly greater than the second. The operands must be of the same type, or convertible to the same type using an implicit conversion.
+The greater than operator (`>`) returns `true` if the first operand is strictly greater than the second. The operands must be of the same type, or convertible to the same type using an [implicit conversion](#conversion).
 
 ``` fhirpath
 10 > 5 // true
@@ -3031,7 +3040,7 @@ The greater than operator (`>`) returns `true` if the first operand is strictly 
 
 #### &lt; (Less Than)
 
-The less than operator (`<`) returns `true` if the first operand is strictly less than the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The less than operator (`<`) returns `true` if the first operand is strictly less than the second. The operands must be of the same type, or convertible to the same type using [implicit conversion](#conversion).
 
 ``` fhirpath
 10 < 5 // false
@@ -3056,7 +3065,7 @@ The less than operator (`<`) returns `true` if the first operand is strictly les
 
 #### &lt;= (Less or Equal)
 
-The less or equal operator (`<=`) returns `true` if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The less or equal operator (`<=`) returns `true` if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using [implicit conversion](#conversion).
 
 ``` fhirpath
 10 <= 5 // false
@@ -3081,7 +3090,7 @@ The less or equal operator (`<=`) returns `true` if the first operand is less th
 
 #### &gt;= (Greater or Equal)
 
-The greater or equal operator (`>=`) returns `true` if the first operand is greater than or equal to the second. The operands must be of the same type, or convertible to the same type using implicit conversion.
+The greater or equal operator (`>=`) returns `true` if the first operand is greater than or equal to the second. The operands must be of the same type, or convertible to the same type using [implicit conversion](#conversion).
 
 ``` fhirpath
 10 >= 5 // true
@@ -3486,6 +3495,7 @@ The first example above will evaluate to the value `@2012` even though the date/
 
 Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
 
+<a name="unary-operators"></a>
 ### Unary operators (`+` and `-`)
 {:.stu}
 
@@ -3744,8 +3754,8 @@ Literals provide for the representation of values within FHIRPath. The following
 |**[Decimal](#decimal)**|Sequences of digits with a decimal point, in the range (-10<sup>28</sup>+1)/10<sup>8</sup>..(10<sup>28</sup>-1)/10<sup>8</sup>|
 |**[String](#string)**|Strings of any character enclosed within single-ticks (`'`)|
 |**[Date](#date)**|The at-symbol (`@`) followed by a date (`yyyy-MM-DD`{:.formatted})|
-|**[DateTime](#datetime)**|The at-symbol (`@`) followed by a datetime (`yyyy-MM-DDThh:mm:ss.fff(+\|-)hh:mm`{:.formatted}) |
-|**[Time](#time)**|The at-symbol (`@`) followed by a time (`Thh:mm:ss.fff(+\|-)hh:mm`{:.formatted}) |
+|**[DateTime](#datetime)**|The at-symbol (`@`) followed by a datetime (`yyyy-MM-DDThh:mm:ss.fff(+|-)hh:mm`{:.formatted}) |
+|**[Time](#time)**|The at-symbol (`@`) followed by a time (`Thh:mm:ss.fff(+|-)hh:mm`{:.formatted}) |
 |**[Quantity](#quantity)**|An integer or decimal literal followed by a datetime precision specifier, or a [\[UCUM\]](#UCUM) unit specifier|
 {: .grid}
 
