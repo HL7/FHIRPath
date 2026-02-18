@@ -143,4 +143,4 @@
 * [FHIR-49516](https://jira.hl7.org/browse/FHIR-49516):  Inconsistent use of empty and error with quantity processing
 * [FHIR-45314](https://jira.hl7.org/browse/FHIR-45314):  Add a new function `pathname()` that returns the location(s) of the focused item(s)
 * [FHIR-54485](https://jira.hl7.org/browse/FHIR-54485):  toDate and toDateTime consider the fhir mapping language formatting codes for string parsing
-* [FHIR-49531](https://jira.hl7.org/browse/FHIR-49531):  Incorrect example in reflection
+* [FHIR-49531](https://jira.hl7.org/browse/FHIR-49531):  Incorrect example in reflection - significant simplification of functionality, removed elements properties.
