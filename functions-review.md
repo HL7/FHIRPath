@@ -2,6 +2,16 @@
 
 Review of all functions defined in the FHIRPath specification (index.md - N2-STU1) against `functions.json` and the normative specification at https://hl7.org/fhirpath/N1/index.html (N1).
 
+**Legend:**
+* N1 Column function status in N1 specification
+    - `✅` - the function is normative
+    - `STU` - the function is STU
+    - `No` - the function was not present
+* N2-STU1 Column function status in N2-STU1 specification (current draft)
+    - ` ` - Function semantically unchanged from N1
+    - `STU` - the function is STU
+    - `*` - the function has had substantive clarifications/additions since a normative N1
+
 ---
 
 ## 5.1 Existence
@@ -9,7 +19,7 @@ Review of all functions defined in the FHIRPath specification (index.md - N2-STU
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
 | 1 | `empty() : Boolean` | 5.1.1 | ✅ | |
-| 2 | `exists([criteria : ($this, $index) => any]) : Boolean` | 5.1.2 | ✅ | |
+| 2 | `exists([criteria : ($this, $index) => Boolean]) : Boolean` | 5.1.2 | ✅ | |
 | 3 | `all(criteria : ($this, $index) => Boolean) : Boolean` | 5.1.3 | ✅ | |
 | 4 | `allTrue() : Boolean` | 5.1.4 | ✅ | |
 | 5 | `anyTrue() : Boolean` | 5.1.5 | ✅ | |
@@ -53,13 +63,13 @@ Review of all functions defined in the FHIRPath specification (index.md - N2-STU
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
 | 30 | `union(other : collection) : collection` | 5.4.1 | ✅ | |
-| 31 | `combine(other : collection, [preserveOrder : Boolean]) : collection` | 5.4.2 | ✅ | |
+| 31 | `combine(other : collection, [preserveOrder : Boolean]) : collection` | 5.4.2 | ✅ | * |
 
 ## 5.5 Conversion
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|-----|
-| 32 | `iif(criterion, true-result, [otherwise-result]) : collection` | 5.5.1 | ✅ | |
+| 32 | `iif(criterion: ($this, $index) => Boolean, true-result: ($this, $index) => collection [, otherwise-result: ($this, $index) => collection]) : collection` | 5.5.1 | ✅ | * |
 | 33 | `toBoolean() : Boolean` | 5.5.2.1 | ✅ | |
 | 34 | `convertsToBoolean() : Boolean` | 5.5.2.2 | ✅ | |
 | 35 | `toInteger() : Integer` | 5.5.3.1 | ✅ | |
@@ -67,10 +77,10 @@ Review of all functions defined in the FHIRPath specification (index.md - N2-STU
 | 37 | `toLong() : Long` | 5.5.3.3 | No | STU |
 | 38 | `convertsToLong() : Boolean` | 5.5.3.4 | No | STU |
 | 39 | Date/DateTime String Format Codes (not a function) | 5.5.4.1 | No | STU |
-| 40 | `toDate([format : string]) : Date` | 5.5.4.2 | ✅ | |
-| 41 | `convertsToDate([format : string]) : Boolean` | 5.5.4.3 | ✅ | |
-| 42 | `toDateTime([format : string]) : DateTime` | 5.5.5.1 | ✅ | |
-| 43 | `convertsToDateTime([format : string]) : Boolean` | 5.5.5.2 | ✅ | |
+| 40 | `toDate([format : string]) : Date` | 5.5.4.2 | ✅ | * |
+| 41 | `convertsToDate([format : string]) : Boolean` | 5.5.4.3 | ✅ | * |
+| 42 | `toDateTime([format : string]) : DateTime` | 5.5.5.1 | ✅ | * |
+| 43 | `convertsToDateTime([format : string]) : Boolean` | 5.5.5.2 | ✅ | * |
 | 44 | `toDecimal() : Decimal` | 5.5.6.1 | ✅ | |
 | 45 | `convertsToDecimal() : Boolean` | 5.5.6.2 | ✅ | |
 | 46 | `toQuantity([unit : String]) : Quantity` | 5.5.7.1 | ✅ | |
@@ -93,9 +103,9 @@ Review of all functions defined in the FHIRPath specification (index.md - N2-STU
 | 58 | `upper() : String` | 5.6.7 | ✅ | |
 | 59 | `lower() : String` | 5.6.8 | ✅ | |
 | 60 | `replace(pattern : String, substitution : String) : String` | 5.6.9 | ✅ | |
-| 61 | `matches(regex : String, [flags : String]) : Boolean` | 5.6.10 | ✅ | |
+| 61 | `matches(regex : String, [flags : String]) : Boolean` | 5.6.10 | ✅ | * |
 | 62 | `matchesFull(regex : String, [flags : String]) : Boolean` | 5.6.11 | No | STU |
-| 63 | `replaceMatches(regex : String, substitution: String, [flags : String]) : String` | 5.6.12 | ✅ | |
+| 63 | `replaceMatches(regex : String, substitution: String, [flags : String]) : String` | 5.6.12 | ✅ | * |
 | 64 | `length() : Integer` | 5.6.13 | ✅ | |
 | 65 | `toChars() : collection` | 5.6.14 | ✅ | |
 
@@ -192,7 +202,7 @@ Review of all functions defined in the FHIRPath specification (index.md - N2-STU
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 110 | `aggregate(aggregator, [init]) : collection` | 7.1 | STU | STU |
+| 110 | `aggregate(aggregator : ($total, $this, $index) => collection [, init : collection]) : collection` | 7.1 | STU | STU |
 | 111 | `sum() : Integer \| Long \| Decimal \| Quantity` | 7.2 | No | STU |
 | 112 | `min() : Integer \| Long \| Decimal \| Quantity \| Date \| DateTime \| Time \| String` | 7.3 | No | STU |
 | 113 | `max() : Integer \| Long \| Decimal \| Quantity \| Date \| DateTime \| Time \| String` | 7.4 | No | STU |
