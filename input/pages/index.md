@@ -2764,7 +2764,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 If there is more than one input item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
-#### duration(value: date | datetime | time, precision: identifier): Integer
+#### duration(value: Date | DateTime | Time, precision: String): Integer
 {:.stu}
 
 Returns the number of whole calendar periods at the specified `precision` between the given input value and the `value` argument. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional periods are dropped.
@@ -2790,7 +2790,6 @@ If either the input or `value` argument is empty, the result is empty.
 
 The following examples illustrate the behavior of the duration function:
 {:.stu}
-
 ```fhirpath
 @2025-01-02.duration(@2025-01-07, 'week') // 0 - hasn't passed 7 days duration
 @2025-01-01.duration(@2025-09-01, 'year') // 0 - baby is 9 months old
@@ -2799,7 +2798,7 @@ The following examples illustrate the behavior of the duration function:
 {:.stu}
 
 
-#### difference(value: date | datetime | time, precision: identifier): Integer
+#### difference(value: Date | DateTime | Time, precision: String): Integer
 {:.stu}
 
 Returns the number of boundaries crossed for the specified `precision` between the input value and the `value` arguments. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional boundaries are dropped.
@@ -2828,7 +2827,6 @@ If either the input or `value` argument is empty, the result is empty.
 
 The following examples illustrate the behavior of the difference function:
 {:.stu}
-
 ```fhirpath
 @2025-01-02.difference(@2025-01-07, 'week') // 1 - crossed a week boundary (Sunday)
 @2025-01-01.difference(@2025-09-01, 'year') // 0 - baby is 9 months old, but born this year
