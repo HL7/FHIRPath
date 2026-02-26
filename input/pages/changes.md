@@ -25,6 +25,7 @@
 * Typographical corrections throughout
 * Documentation source format changed from asciidoc to markdown
 * Simplified reflection capabilities - removed element information returned from `type()`
+* Added many new examples for functions that did not previously have examples
 
 
 ### Release 2 STU1 Ballot (version 3.0.0-ballot)
