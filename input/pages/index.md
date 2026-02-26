@@ -3613,7 +3613,7 @@ Note that implies may use short-circuit evaluation in the case that the first op
 
 ### Math
 
-The math operators require each operand to be a single item. Both operands must be of the same type, or of compatible types according to the rules for implicit conversion. Each operator below specifies which types are supported.
+The math operators require each operand to be a single item. Both operands must be of the same type, or of compatible types according to the rules for [implicit conversion](#conversion). Each operator below specifies which types are supported.
 
 If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -3655,8 +3655,7 @@ For division involving quantities, the resulting quantity will have an appropria
 
 For Integer, Decimal, and quantity, adds the operands. For strings, concatenates the right operand to the left operand.
 
-When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
-
+When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit:
 ``` fhirpath
 3 'm' + 3 'cm' // 303 'cm'
 ```
