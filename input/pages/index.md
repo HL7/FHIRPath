@@ -901,6 +901,22 @@ code { value: 'final' }
 ```
 {:.stu}
 
+Collection elements can be populated with multiple values using `|`, `combine` or an expression that results in multiple items:
+{:.stu}
+```fhirpath
+// Set the codings via an expression that returns multiple codings (using |)
+CodeableConcept {
+   coding: Coding { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' }
+         | Coding { system: 'http://example.org/id-types', code: 'mr' }
+}
+
+// create a codeable concept that contains all of the codes selected
+// multiple codings come from the answers in the questionnaire
+QuestionnaireResponse.item.where(linkId='coded-q')
+.select( CodeableConcept { coding: answer.value.ofType(coding) } )
+```
+{:.stu}
+
 <a name="fn-sort"></a>
 #### sort([keySelector: ($this) => any [asc | desc] [, keySelector: ($this) => any [asc | desc], ...]]) : collection
 {:.stu}
