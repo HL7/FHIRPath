@@ -702,7 +702,8 @@ Observation.select(component.value > 90 'mm[Hg]').anyFalse()
 
 #### subsetOf(other : collection) : Boolean
 
-Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the [equals](#equals) (`=`) operation.
+Returns `true` if all items in the input collection are members of the collection passed as the `other` argument.
+Membership is determined when the [equals](#equals) (`=`) operator returns `true` *(i.e. `false` and empty both indicate that an item is not a member)*.
 
 Conceptually, this function is evaluated by testing each item in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
 
@@ -714,7 +715,8 @@ MedicationRequest.contained.meta.tag.subsetOf(MedicationRequest.meta.tag)
 
 #### supersetOf(other : collection) : Boolean
 
-Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the [equals](#equals) (`=`) operation.
+Returns `true` if all items in the collection passed as the `other` argument are members of the input collection.
+Membership is determined when the [equals](#equals) (`=`) operator returns `true` *(i.e. `false` and empty both indicate that an item is not a member)*.
 
 Conceptually, this function is evaluated by testing each item in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
 
@@ -730,7 +732,8 @@ Returns the integer count of the number of items in the input collection. Return
 
 #### distinct() : collection
 
-Returns a collection containing only the unique items in the input collection. To determine whether two items are the same, the [equals](#equals) (`=`) operator is used, as defined below.
+Returns a collection containing only the unique items in the input collection.
+Items are considered to be equal when the [equals](#equals) (`=`) operator returns `true` *(i.e. `false` and empty both indicate that the items are distinct)*.
 
 If the input collection is empty (`{ }`), the result is empty.
 
@@ -742,9 +745,15 @@ The following example returns the distinct list of tags on the given Patient:
 Patient.meta.tag.distinct()
 ```
 
+As the equality operator for quantities can support unit conversions, this also applies here, so for example the following expression would return a collection with a single item (either `1 'm'` or `100 'cm'`, depending on the implementation), as they are considered equal:
+``` fhirpath
+1 'm' | 100 'cm' // 1 'm' (or could be 100 'cm')
+```
+
 #### isDistinct() : Boolean
 
-Returns `true` if all the items in the input collection are distinct. To determine whether two items are distinct, the [equals](#equals) (`=`) operator is used, as defined below.
+Returns `true` if all the items in the input collection are distinct.
+Items are considered to be equal when the [equals](#equals) (`=`) operator returns `true` *(i.e. `false` and empty both indicate that the items are distinct)*.
 
 Conceptually, this function is shorthand for a comparison of the `count()` of the input collection against the `count()` of the `distinct()` of the input collection:
 
@@ -753,6 +762,13 @@ X.count() = X.distinct().count()
 ```
 
 This means that if the input collection is empty (`{ }`), the result is `true`.
+
+For example:
+``` fhirpath
+(1 | 2 | 3).isDistinct() // true
+(1 | 2 | 3 | 2).isDistinct() // false - the 2 appears twice in the input collection
+(1 'm' | 100 'cm').isDistinct() // false - both quantities are the same (via unit conversion)
+```
 
 ### Filtering and projection
 
@@ -903,6 +919,7 @@ An empty value is considered lower than all other values, meaning they will appe
 {:.stu}
 
 When comparing two items, if the values for the first key selector are equal, the comparison proceeds to the next key selector, and so on until all key selectors have been evaluated or a difference is found.
+Items are considered equal if and only if the [equals](#equals) (`=`) operator returns `true`. *(i.e. `false` and empty both indicate that the items are not equal).*
 {:.stu}
 
 Attempting to sort items with incompatible types will result in an error. Values that would result in comparison errors must be filtered from the collection prior to sorting.
@@ -930,7 +947,7 @@ Patient.telecom.sort(system, use desc) // sort by system ascending, then by use 
 
 > This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
 
-A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
+A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator returning `true` *(i.e. `false` and empty both indicate that the values are not equal and thus added to the output)*.
 
 This can be evaluated by adding all items in the input collection to an input queue, then for each item in the input queue evaluate the repeat expression. If the result of the repeat expression is not in the output collection, add it to both the output collection and also the input queue. Processing continues until the input queue is empty.
 
@@ -1118,7 +1135,9 @@ e.g. `(1 | 2 | 3).exclude(2)`{:.fhirpath} returns `(1 | 3)`.
 
 #### <a name="unionother-collection"></a>union(other : collection) : collection
 
-Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`) to determine equality). There is no expectation of order in the resulting collection.
+Merge the two collections into a single collection, eliminating any duplicate values *(items are considered duplicates if and only if the [equals](#equals) (`=`) operator returns `true`. i.e. `false` and empty both indicate that the items are not duplicates, and thus appear in the output collection)*.
+
+There is no expectation of order in the resulting collection.
 
 In other words, this function returns the distinct list of items from both inputs. For example, consider two lists of integers `A: 1, 1, 2, 3` and `B: 2, 3`:
 
@@ -1127,7 +1146,7 @@ A.union( B ) // 1, 2, 3
 A.union( { } ) // 1, 2, 3
 ```
 
-This function can also be invoked using the `|` operator.
+This function can also be invoked using the [`|`](#-union-collections) operator.
 
 e.g. `x.union(y)`{:.fhirpath} is synonymous with `x | y`{:.fhirpath}
 
@@ -3187,12 +3206,14 @@ Observation.component.where(value.as(Quantity) > 30 'mg')
 ### Collections
 
 #### | (union collections)
-Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`)) to determine equality). There is no expectation of order in the resulting collection.
+Merge the two collections into a single collection, eliminating any duplicate values *(items are considered duplicates if and only if the [equals](#equals) (`=`) operator returns `true`. i.e. `false` and empty both indicate that the items are not duplicates, and thus appear in the output collection)*.
+
+There is no expectation of order in the resulting collection.
 
 See the [union](#unionother-collection) function for more detail.
 
 #### in (membership) : Boolean
-If the left operand is a collection with a single item, this operator returns `true` if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is `false`. If the left operand has multiple items, an exception is thrown.
+If the left operand is a collection with a single item, this operator returns `true` if the item is in the right operand using equality semantics *(items are considered equal if and only if the [equals](#equals) (`=`) operator returns `true`. i.e. `false` and empty both indicate that the items are not equal)*. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is `false`. If the left operand has multiple items, an exception is thrown.
 
 The following example returns `true` if `'Joe'` is in the list of given names for the Patient:
 
@@ -3201,7 +3222,7 @@ The following example returns `true` if `'Joe'` is in the list of given names fo
 ```
 
 #### contains (containership) : Boolean
-If the right operand is a collection with a single item, this operator returns `true` if the item is in the left operand using equality semantics. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is `false`. This is the converse operation of `in`.
+If the right operand is a collection with a single item, this operator returns `true` if the item is in the left operand using equality semantics *(items are considered equal if and only if the [equals](#equals) (`=`) operator returns `true`. i.e. `false` and empty both indicate that the items are not equal)*. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is `false`. This is the converse operation of `in`.
 
 The following example returns `true` if the list of given names for the Patient has `'Joe'` in it:
 

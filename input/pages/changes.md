@@ -145,3 +145,4 @@
 * [FHIR-54485](https://jira.hl7.org/browse/FHIR-54485):  toDate and toDateTime consider the fhir mapping language formatting codes for string parsing
 * [FHIR-49531](https://jira.hl7.org/browse/FHIR-49531):  Incorrect example in reflection - significant simplification of functionality, removed elements properties.
 * [FHIR-55962](https://jira.hl7.org/browse/FHIR-55962):  Difference and duration functions precision parameter should be string not identifier
+* [FHIR-55911](https://jira.hl7.org/browse/FHIR-55911):  Missing what to do when equality returns empty for functions like distinct
