@@ -3166,7 +3166,7 @@ Returns `true` if the left collection is equal to the right collection:
 
 As noted above, if either operand is an empty collection, the result is an empty collection. Otherwise:
 
-If both operands are collections with a single item, they must be of the same type (or be implicitly convertible to the same type), and:
+If both operands are collections with a single item, they must be of the same type (or be [implicitly convertible](#conversion) to the same type), and:
 
 * For primitives:
   * `String`: comparison is based on Unicode values
@@ -3239,7 +3239,7 @@ Additional functions to support more sophisticated timezone offset comparison (s
 
 Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }`{:.fhirpath} will result in `true`.
 
-If both operands are collections with a single item, they must be of the same type (or implicitly convertible to the same type), and:
+If both operands are collections with a single item, they must be of the same type (or [implicitly convertible](#conversion) to the same type), and:
 
 * For primitives
   * `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see [String Equivalence](#string-equivalence) for more details).
@@ -3303,7 +3303,7 @@ The converse of the equivalent operator, returning `true` if equivalent returns 
 * The comparison operators are defined for strings, integers, decimals, quantities, dates, datetimes and times.
 * If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
 * Both arguments must be collections with single values, and the evaluator will throw an error if either collection has more than one item.
-* Both arguments must be of the same type (or implicitly convertible to the same type), and the evaluator will throw an error if the types differ.
+* Both arguments must be of the same type (or [implicitly convertible](#conversion) to the same type), and the evaluator will throw an error if the types differ.
 * When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible.
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
 
