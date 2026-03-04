@@ -4074,6 +4074,7 @@ For Example:
 @1973-12-25 + 7.9 days  // @1974-01-01 ; same as above as the decimal is truncated (though a warning may be triggered)
 @1973-12-25 + 1 week    // @1974-01-01
 @2019-03-01 + 24 months // @2021-03-01 ; month value overflows into years
+@2026-01-31 + 1 month   // @2026-02-28 ; 31st day isn't valid in february, so revert to last day in the month
 @2026-01-01T13:00:00 + 30 minutes // @2026-01-01T13:30:00
 @1973-12-25T00:00:00.000+10:00 + 42.53 seconds // @1973-12-25T00:00:42.530+10:00
 @1973-12-25 + 1 'd'     // @1973-12-26 ; ucum days handled as calendar units
