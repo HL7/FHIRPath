@@ -792,8 +792,8 @@ This means that if the input collection is empty (`{ }`), the result is `true`.
 For example:
 ``` fhirpath
 (1 | 2 | 3).isDistinct() // true
-(1 | 2 | 3 | 2).isDistinct() // false - the 2 appears twice in the input collection
-(1 'm' | 100 'cm').isDistinct() // false - both quantities are the same (via unit conversion)
+(1 | 2 | 3 | 2).isDistinct() // false ; the 2 appears twice in the input collection
+(1 'm' | 100 'cm').isDistinct() // false ; both quantities are the same (via unit conversion)
 ```
 
 ### Filtering and projection
@@ -971,11 +971,11 @@ The following examples illustrate the use of the `sort()` function:
 {:.stu}
 
 ``` fhirpath
-(3 | 1 | 2).sort() // (1 | 2 | 3) - natural numeric ordering
-(3 | 1 | 2).sort($this) // (1 | 2 | 3) - explicit ascending
-(3 | 1 | 2).sort($this desc) // (3 | 2 | 1) - descending
-('c' | 'a' | 'b').sort() // ('a' | 'b' | 'c') - default string ordering
-('c' | 'a' | 'b').sort($this desc) // ('c' | 'b' | 'a') - descending
+(3 | 1 | 2).sort() // (1 | 2 | 3) ; natural numeric ordering
+(3 | 1 | 2).sort($this) // (1 | 2 | 3) ; explicit ascending
+(3 | 1 | 2).sort($this desc) // (3 | 2 | 1) ; descending
+('c' | 'a' | 'b').sort() // ('a' | 'b' | 'c') ; default string ordering
+('c' | 'a' | 'b').sort($this desc) // ('c' | 'b' | 'a') ; descending
 Patient.name.sort(family desc, given.first()) // sort by family name descending, then by first given name ascending
 Patient.telecom.sort(system, use desc) // sort by system ascending, then by use descending
 ```
@@ -1241,9 +1241,9 @@ When `preserveOrder` is `false`, or not supplied, there is no expectation of ord
 For example, considering the same two lists of integers used in the union example `A: 1, 1, 2, 3` and `B: 2, 3`:
 {: .stu}
 ```fhirpath
-A.combine(B)       // 1, 1, 2, 2, 3, 3 - order is not guaranteed to be preserved (could be in any order)
-A.combine(B, true) // 1, 1, 2, 3, 2, 3 - The order is preserved using the `preserveOrder` argument
-A.combine( {} )    // 1, 1, 2, 3       - combining an empty collection with a non-empty collection returns the non-empty collection
+A.combine(B)       // 1, 1, 2, 2, 3, 3 ; order is not guaranteed to be preserved (could be in any order)
+A.combine(B, true) // 1, 1, 2, 3, 2, 3 ; The order is preserved using the `preserveOrder` argument
+A.combine( {} )    // 1, 1, 2, 3       ; combining an empty collection with a non-empty collection returns the non-empty collection
 ```
 {: .stu}
 Note that the duplicate `1`s are not removed from the collection using combine, where using `union` or `|` they would have been.
@@ -1703,11 +1703,11 @@ If the input can be [**converted**](#unit-conversions), the result is the conver
 For example:
 ``` fhirpath
 52 'cm'.toQuantity('m') // 0.52 'm'
-45.toQuantity('m')      // 45 'm' - this literal value 45 is recorded in meters.
+45.toQuantity('m')      // 45 'm' ; this literal value 45 is recorded in meters.
 q.toQuantity('g')       // returns the value of q converted to grams according to UCUM conversion rules
-24 'm'.toQuantity('kg') // empty - there is no conversion between these units in UCUM
-1 'a'.toQuantity('d')   // 365.25 'd' - UCUM conversion for definite durations
-1 'wk'.toQuantity('d')  // 7 'd' - UCUM conversion for definite durations
+24 'm'.toQuantity('kg') // empty ; there is no conversion between these units in UCUM
+1 'a'.toQuantity('d')   // 365.25 'd' ; UCUM conversion for definite durations
+1 'wk'.toQuantity('d')  // 7 'd' ; UCUM conversion for definite durations
 ```
 {:.fhir-highlight}
 
@@ -1757,9 +1757,9 @@ These conversion factors (apart from years/months) are the same as UCUM, so can 
 When explicitly converting between UCUM definite durations and calendar units of differing magnitudes (e.g. days and weeks), perform the conversion within the unit system oof the source, then change to the matching target unit:
 {:.fhir-highlight}
 ```fhirpath
-7 days.toQuantity('wk')  // 7 days => 1 week => 1 'wk'
-182.5 days.toQuantity('a') // 182.5 days => 0.5 year => 0.5 'a'
-182.5 'd'.toQuantity('a') // 0.4996577686516085 'a' - UCUM conversion result
+7 days.toQuantity('wk')  // 7 days → 1 week → 1 'wk'
+182.5 days.toQuantity('a') // 182.5 days → 0.5 year → 0.5 'a'
+182.5 'd'.toQuantity('a') // 0.4996577686516085 'a' ; UCUM conversion result
 ```
 {:.fhir-highlight}
 If converting to/from years or months you shall use the shortest conversion chain possible (i.e. don't convert from days to months to years when you can go from direct days to years).
@@ -1852,8 +1852,8 @@ For example:
 ``` fhirpath
 @2025-01-15.convertsToString() // true
 1.convertsToString() // true
-Patient.name.first().convertsToString() // false - not a type that supports toString() (assuming there was at least 1 name)
-{}.convertsToString() // empty - no input collection
+Patient.name.first().convertsToString() // false ; not a type that supports toString() (assuming there was at least 1 name)
+{}.convertsToString() // empty ; no input collection
 ```
 
 #### Time Conversion Functions
@@ -2783,8 +2783,8 @@ Returns the current time.
 
 For example:
 ``` fhirpath
-timeOfDay() // @T14:34:17.923 - only the time portion of the result of today. Equivalent to now().timeOf()
-timeOfDay() = timeOfDay() // true - timeOfDay should be deterministic within a single expression
+timeOfDay() // @T14:34:17.923 ; only the time portion of the result of today. Equivalent to now().timeOf()
+timeOfDay() = timeOfDay() // true ; timeOfDay should be deterministic within a single expression
 ```
 
 ##### today() : Date
@@ -2793,7 +2793,7 @@ Returns the current date.
 
 The following example demonstrates that `today()` returns a date in YYYY-MM-DD format:
 ``` fhirpath
-today() // @2026-02-25 - equivalent to now().toDate()
+today() // @2026-02-25 ; equivalent to now().toDate()
 ```
 
 <a name="definevariable"></a>
@@ -2934,7 +2934,7 @@ For example with decimal values:
 {:.stu}
 ``` fhirpath
 1.58700.precision() // 5
-100.precision() // 0 - no digits after the decimal place (integer implicitly converted to a decimal for processing)
+100.precision() // 0 ; no digits after the decimal place (integer implicitly converted to a decimal for processing)
 ```
 {:.stu}
 
@@ -3186,9 +3186,9 @@ If either the input or `value` argument is empty, the result is empty.
 The following examples illustrate the behavior of the duration function:
 {:.stu}
 ```fhirpath
-@2025-01-02.duration(@2025-01-07, 'week') // 0 - hasn't passed 7 days duration
-@2025-01-01.duration(@2025-09-01, 'year') // 0 - baby is 9 months old
-@2024-12-01.duration(@2025-09-01, 'year') // 0 - baby is 10 months old
+@2025-01-02.duration(@2025-01-07, 'week') // 0 ; hasn't passed 7 days duration
+@2025-01-01.duration(@2025-09-01, 'year') // 0 ; baby is 9 months old
+@2024-12-01.duration(@2025-09-01, 'year') // 0 ; baby is 10 months old
 ```
 {:.stu}
 
@@ -3223,9 +3223,9 @@ If either the input or `value` argument is empty, the result is empty.
 The following examples illustrate the behavior of the difference function:
 {:.stu}
 ```fhirpath
-@2025-01-02.difference(@2025-01-07, 'week') // 1 - crossed a week boundary (Sunday)
-@2025-01-01.difference(@2025-09-01, 'year') // 0 - baby is 9 months old, but born this year
-@2024-12-01.difference(@2025-09-01, 'year') // 1 - baby is 10 months old, but born last year
+@2025-01-02.difference(@2025-01-07, 'week') // 1 ; crossed a week boundary (Sunday)
+@2025-01-01.difference(@2025-09-01, 'year') // 0 ; baby is 9 months old, but born this year
+@2024-12-01.difference(@2025-09-01, 'year') // 1 ; baby is 10 months old, but born last year
 ```
 {:.stu}
 
@@ -3279,16 +3279,16 @@ If one or both of the operands is the empty collection, this operation returns a
 For example:
 {:.fhir-highlight}
 ```fhirpath
-1.10 = 1.1 // true - zeros after the decimal place are ignored
-1.2 / 1.8 = 0.67 // false - division results in a decimal with recurring digits, 
+1.10 = 1.1 // true ; zeros after the decimal place are ignored
+1.2 / 1.8 = 0.67 // false ; division results in a decimal with recurring digits, 
                  //        these are not equal to 0.67 
-0.0 = 0 // true - zeros after the decimal place are ignored
-{} = {} // empty - as explicitly defined above
-name = name // true - its the same object, and thus will have all the same properties recursively
-(1 | 2 | 3) = (3 | 2 | 1) // false - all items are in both collections, but order doesn't match
-(1 | 2 | 3) = (1 | 2 | 3) // true - all items are in both collections, and order matches
-'a' = 'A' // false - case is NOT ignored for equality
-23 = 23 '1' // true - integer implicitly converts to Quantity with unit '1', thus compares exactly here
+0.0 = 0 // true ; zeros after the decimal place are ignored
+{} = {} // empty ; as explicitly defined above
+name = name // true ; its the same object, and thus will have all the same properties recursively
+(1 | 2 | 3) = (3 | 2 | 1) // false ; all items are in both collections, but order doesn't match
+(1 | 2 | 3) = (1 | 2 | 3) // true ; all items are in both collections, and order matches
+'a' = 'A' // false ; case is NOT ignored for equality
+23 = 23 '1' // true ; integer implicitly converts to Quantity with unit '1', thus compares exactly here
 ```
 {:.fhir-highlight}
 
@@ -3311,10 +3311,10 @@ Once the units are the same, the values can be compared using simple decimal com
 
 For example:
 ```fhirpath
-1 'cm' = 10.0 'mm' // true - UCUM conversion gives the same decimal value (ignoring trailing zeros after the decimal place)
-1 'cm' = 1 'm' // false - UCUM conversion yields the difference
-1 'cm' = 1 's' // empty ({ }) - invalid comparison of different dimensions
-23 'Cel' = 73.4 'degF' // empty ({ }) - invalid comparison of "special" units on non-ratio scales
+1 'cm' = 10.0 'mm' // true ; UCUM conversion gives the same decimal value (ignoring trailing zeros after the decimal place)
+1 'cm' = 1 'm' // false ; UCUM conversion yields the difference
+1 'cm' = 1 's' // empty ({ }) ; invalid comparison of different dimensions
+23 'Cel' = 73.4 'degF' // empty ({ }) ; invalid comparison of "special" units on non-ratio scales
 ```
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, years and months are not equal across UCUM definite durations and calendar units. Hence when the arguments are a mix of these, the result is empty as they are considered un-comparable.<br/>
@@ -3324,16 +3324,16 @@ Note that Explicit conversion will change code-systems to permit intentionally p
 For example:
 {:.fhir-highlight}
 ``` fhirpath
-1 'h' = 3600 's'  // true - ucum conversion
-1 hour = 3600 's' // true - 1 hour -> 3600 second -> 3600 's'
-1 year = 1 'a'    // empty {} - comparisons between calendar and UCUM definite-time duration units for years or months result in empty
-1 year.toQuantity('a') = 1 'a' // true - intentionally converting to unum units
-1 year = 12 months // true - calendar unit conversion
-1 year = 12 'mo' // empty {} - comparisons between calendar and UCUM definite-time duration units for years or months result in empty 
+1 'h' = 3600 's'  // true ; ucum conversion
+1 hour = 3600 's' // true ; 1 hour → 3600 second → 3600 's'
+1 year = 1 'a'    // empty {} ; comparisons between calendar and UCUM definite-time duration units for years or months result in empty
+1 year.toQuantity('a') = 1 'a' // true ; intentionally converting to unum units
+1 year = 12 months // true ; calendar unit conversion
+1 year = 12 'mo' // empty {} ; comparisons between calendar and UCUM definite-time duration units for years or months result in empty 
 1 week = 1 'wk'  // true
 1 second = 1 's' // true
-7 days = 1 'wk'  // true - 7 days -> 1 week -> 1 'wk'
-1 week = 7 'd'   // true - 1 week -> 7 days -> 7 'd'
+7 days = 1 'wk'  // true ; 7 days → 1 week → 1 'wk'
+1 week = 7 'd'   // true ; 1 week → 7 days → 7 'd'
 ```
 {:.fhir-highlight}
 
@@ -3345,10 +3345,10 @@ For example:
 ``` fhirpath
 @2012 = @2012 // true
 @2012 = @2013 // false
-@2012-01 = @2012 // empty ({ }) - different date precision
+@2012-01 = @2012 // empty ({ }) ; different date precision
 @2012-01-01T10:30 = @2012-01-01T10:30 // true
 @2012-01-01T10:30 = @2012-01-01T10:31 // false
-@2012-01-01T10:30:31 = @2012-01-01T10:30 // empty ({ }) - different datetime precision
+@2012-01-01T10:30:31 = @2012-01-01T10:30 // empty ({ }) ; different datetime precision
 @2012-01-01T10:30:31.0 = @2012-01-01T10:30:31 // true
 @2012-01-01T10:30:31.1 = @2012-01-01T10:30:31 // false
 ```
@@ -3393,15 +3393,15 @@ Note that this implies that if the collections have a different number of items 
 For example:
 {:.fhir-highlight}
 ```fhirpath
-1.10 ~ 1.1  // true - round to 1 decimal place, then compare values
-1.2 / 1.8 ~ 0.67 // true - division results in a decimal with recurring digits, 
+1.10 ~ 1.1  // true ; round to 1 decimal place, then compare values
+1.2 / 1.8 ~ 0.67 // true ; division results in a decimal with recurring digits, 
                  //        equivalence rounds to the 2 digits and then compares the values
-0.0 ~ 0     // true - implicit conversion to decimals, then rounding to the least precise operand (0) results in both sides being 0
-{} ~ {}     // true - as explicitly defined above
-name ~ name // true - its the same object, and thus will have all the same properties recursively
-(1 | 2 | 3) ~ (3 | 2 | 1) // true - all items are in both collections irrespective of order
-'a' ~ 'A'   // true - case is ignored for equivalence
-23 ~ 23 '1' // true - integer implicitly converts to Quantity with unit '1', thus compares exactly here
+0.0 ~ 0     // true ; implicit conversion to decimals, then rounding to the least precise operand (0) results in both sides being 0
+{} ~ {}     // true ; as explicitly defined above
+name ~ name // true ; its the same object, and thus will have all the same properties recursively
+(1 | 2 | 3) ~ (3 | 2 | 1) // true ; all items are in both collections irrespective of order
+'a' ~ 'A'   // true ; case is ignored for equivalence
+23 ~ 23 '1' // true ; integer implicitly converts to Quantity with unit '1', thus compares exactly here
 ```
 {:.fhir-highlight}
 
@@ -3426,12 +3426,12 @@ Once the units are the same, the values can be compared using decimal equivalenc
 For example:
 {:.fhir-highlight}
 ```fhirpath
-2.1 'cm' ~ 21 'mm'  // true - convert to 'cm' (2.1 ~ 2.1), round to least precise and compare (2.1 = 2.1)
-21 'mm' ~ 2 'cm'    // true - convert to 'cm' (2.1 ~ 2), round to least precise and compare (2 = 2)
-4 'g' ~ 4000 'mg'   // true - convert to 'g' (4 ~ 4.000), round to least precise and compare (4 = 4)
-4 'g' ~ 4040 'mg'   // true - convert to 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
-1 'inch' ~ 2.5 'cm' // true - convert to 'inch' (1 ~ 0.98..), round to least precise and compare (1 = 1)
-23 'Cel' ~ 73.4 'degF' // empty ({ }) - invalid comparison of "special" units on non-ratio scales
+2.1 'cm' ~ 21 'mm'  // true ; convert to 'cm' (2.1 ~ 2.1), round to least precise and compare (2.1 = 2.1)
+21 'mm' ~ 2 'cm'    // true ; convert to 'cm' (2.1 ~ 2), round to least precise and compare (2 = 2)
+4 'g' ~ 4000 'mg'   // true ; convert to 'g' (4 ~ 4.000), round to least precise and compare (4 = 4)
+4 'g' ~ 4040 'mg'   // true ; convert to 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
+1 'inch' ~ 2.5 'cm' // true ; convert to 'inch' (1 ~ 0.98..), round to least precise and compare (1 = 1)
+23 'Cel' ~ 73.4 'degF' // empty ({ }) ; invalid comparison of "special" units on non-ratio scales
 ```
 {:.fhir-highlight}
 
@@ -3442,9 +3442,9 @@ Hence when the arguments are a mix of these, the results can be compared.
 For example:
 {:.fhir-highlight}
 ``` fhirpath
-1 year ~ 1 'a' // true - by definition in equivalent
-1 year ~ 11 months // true - convert to 'year' (1 ~ 0.9166666), round to least precise and compare (1 = 1)
-1 second ~ 1 's' // true - by definition in equal
+1 year ~ 1 'a' // true ; by definition in equivalent
+1 year ~ 11 months // true ; convert to 'year' (1 ~ 0.9166666), round to least precise and compare (1 = 1)
+1 second ~ 1 's' // true ; by definition in equal
 ```
 {:.fhir-highlight}
 
@@ -3456,10 +3456,10 @@ For example:
 ``` fhirpath
 @2012 ~ @2012 // true
 @2012 ~ @2013 // false
-@2012-01 ~ @2012 // false as well - different precision
+@2012-01 ~ @2012 // false ; different precision
 @2012-01-01T10:30 ~ @2012-01-01T10:30 // true
 @2012-01-01T10:30 ~ @2012-01-01T10:31 // false
-@2012-01-01T10:30:31 ~ @2012-01-01T10:30 // false as well - different precision
+@2012-01-01T10:30:31 ~ @2012-01-01T10:30 // false ; different precision
 @2012-01-01T10:30:31.0 ~ @2012-01-01T10:30:31 // true
 @2012-01-01T10:30:31.1 ~ @2012-01-01T10:30:31 // false
 ```
@@ -3509,10 +3509,10 @@ Note that Explicit conversion will change code-systems to permit intentionally p
 For example:
 {:.fhir-highlight}
 ``` fhirpath
-1 year > 1 `a` // empty ({ }) - these units are un-comparable
+1 year > 1 `a` // empty ({ }) ; these units are un-comparable
 10 seconds > 1 's' // true
-2 year.toQuantity('a') > 1 `a` // true - as the units have been explicitly converted, these are now comparable
-6 months > 1 year  // false - convert to 'year' (0.5 > 1) and compare
+2 year.toQuantity('a') > 1 `a` // true ; as the units have been explicitly converted, these are now comparable
+6 months > 1 year  // false ; convert to 'year' (0.5 > 1) and compare
 ```
 {:.fhir-highlight}
 
@@ -3531,15 +3531,15 @@ For example:
 'abc' > 'ABC' // true
 4 'm' > 4 'cm' // true (or { } if the implementation does not support unit conversion)
 
-@2018-03-01 > @2018-01-01 // true - same precision
-@2018-03 > @2018-03-01 // empty ({ }) - different precisions
+@2018-03-01 > @2018-01-01 // true ; same precision
+@2018-03 > @2018-03-01 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 > @2018-03-01T10:00:00 // true
-@2018-03-01T10 > @2018-03-01T10:30 // empty ({ }) - different precisions
+@2018-03-01T10 > @2018-03-01T10:30 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 > @2018-03-01T10:30:00.0 // false (values are equal to seconds, trailing zeroes after the decimal are ignored)
 
 @T10:30:00 > @T10:00:00 // true
-@T10 > @T10:30 // empty ({ }) - different precisions
-@T10:30:00 > @T10:30:00.0 // false - values are equal to seconds, trailing zeroes after the decimal are ignored
+@T10 > @T10:30 // empty ({ }) ; different precisions
+@T10:30:00 > @T10:30:00.0 // false ; values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
 #### &lt; (Less Than)
@@ -3549,23 +3549,23 @@ The less than operator (`<`) returns `true` if the first operand is strictly les
 For example:
 ``` fhirpath
 10 < 5 // false
-10 < 5.0 // false - note the 10 is converted to a decimal to perform the comparison
+10 < 5.0 // false ; note the 10 is converted to a decimal to perform the comparison
 'abc' < 'ABC' // false
 4 'm' < 4 'cm' // false (or { } if the implementation does not support unit conversion)
 
 @2018-03-01 < @2018-01-01 // false
-@2018-01-01 < @2018-01-01 // false - same precision
-@2018-03 < @2018-03-01 // empty ({ }) - different precisions
+@2018-01-01 < @2018-01-01 // false ; same precision
+@2018-03 < @2018-03-01 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 < @2018-03-01T10:00:00 // false
-@2018-03-01T10 < @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 < @2018-03-01T10:30:00.0 // false - values are equal to seconds, trailing zeroes after the decimal are ignored
+@2018-03-01T10 < @2018-03-01T10:30 // empty ({ }) ; different precisions
+@2018-03-01T10:30:00 < @2018-03-01T10:30:00.0 // false ; values are equal to seconds, trailing zeroes after the decimal are ignored
 
 @2018-01-01T16:00:00+11:00 < @2018-01-01T15:00:00.0+10:00 // false (same moment in diff timezones)
 @2018-01-01T16:00:00+12:00 < @2018-01-01T15:00:00.0+10:00 // true (4pm+12 is less than 5pm+10 when timezones are considered)
 
 @T10:30:00 < @T10:00:00 // false
-@T10 < @T10:30 // empty ({ }) - different precisions
-@T10:30:00 < @T10:30:00.0 // false - values are equal to seconds, trailing zeroes after the decimal are ignored
+@T10 < @T10:30 // empty ({ }) ; different precisions
+@T10:30:00 < @T10:30:00.0 // false ; values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
 #### &lt;= (Less or Equal)
@@ -3575,22 +3575,22 @@ The less or equal operator (`<=`) returns `true` if the first operand is less th
 For example:
 ``` fhirpath
 10 <= 5 // false
-10 <= 5.0 // false - note the 10 is converted to a decimal to perform the comparison
+10 <= 5.0 // false ; note the 10 is converted to a decimal to perform the comparison
 'abc' <= 'ABC' // false
 4 'm' <= 4 'cm' // false (or { } if the implementation does not support unit conversion)
 
 @2018-03-01 <= @2018-01-01 // false
-@2018-01-01 <= @2018-01-01 // true - equal with same precision
-@2018-03 <= @2018-03-01 // empty ({ }) - different precisions
+@2018-01-01 <= @2018-01-01 // true ; equal with same precision
+@2018-03 <= @2018-03-01 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 <= @2018-03-01T10:00:00 // false
-@2018-03-01T10 <= @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
+@2018-03-01T10 <= @2018-03-01T10:30 // empty ({ }) ; different precisions
+@2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0 // true ; values are equal to seconds, trailing zeroes after the decimal are ignored
 
 @2018-01-01T16:00:00+11:00 <= @2018-01-01T15:00:00.0+10:00 // true (same moment in diff timezones)
 @2018-01-01T16:00:00+12:00 <= @2018-01-01T15:00:00.0+10:00 // true (4pm+12 is less than 5pm+10 when timezones are considered)
 
 @T10:30:00 <= @T10:00:00 // false
-@T10 <= @T10:30 // empty ({ }) - different precisions
+@T10 <= @T10:30 // empty ({ }) ; different precisions
 @T10:30:00 <= @T10:30:00.0 // true
 ```
 
@@ -3601,20 +3601,20 @@ The greater or equal operator (`>=`) returns `true` if the first operand is grea
 For example:
 ``` fhirpath
 10 >= 5 // true
-10 >= 5.0 // true - note the 10 is converted to a decimal to perform the comparison
+10 >= 5.0 // true ; note the 10 is converted to a decimal to perform the comparison
 'abc' >= 'ABC' // true
 4 'm' >= 4 'cm' // true (or { } if the implementation does not support unit conversion)
 
 @2018-03-01 >= @2018-01-01 // true
-@2018-01-01 >= @2018-01-01 // true - equal with same precision
-@2018-03 >= @2018-03-01 // empty ({ }) - different precisions
+@2018-01-01 >= @2018-01-01 // true ; equal with same precision
+@2018-03 >= @2018-03-01 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 >= @2018-03-01T10:00:00 // true
-@2018-03-01T10 >= @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
+@2018-03-01T10 >= @2018-03-01T10:30 // empty ({ }) ; different precisions
+@2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0 // true ; values are equal to seconds, trailing zeroes after the decimal are ignored
 
 @T10:30:00 >= @T10:00:00 // true
-@T10 >= @T10:30 // empty ({ }) - different precisions
-@T10:30:00 >= @T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
+@T10 >= @T10:30 // empty ({ }) ; different precisions
+@T10:30:00 >= @T10:30:00.0 // true ; values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
 <a name="fn-comparable"></a>
@@ -3642,13 +3642,13 @@ If either or both inputs are empty, or either input is not a single Quantity val
 For example:
 {:.stu}
 ``` fhirpath
-1 'mg'.comparable(2 'mg') // true - these types are comparable
-1 'm'.comparable(20 'cm') // true - these types are both metric distance measures
-2 '1'.comparable(3) // true - the integer will implicitly convert to a Quantity with unit `'1'` which is the same system/code so is comparable
-1.comparable(2) // true - these will both convert to quantities with the same system/code, hence are comparable
-1 'in_i'.comparable(1 'cm') // true - These UCUM units can be compared/converted
-1 year.comparable(1 'a') // false - these units are equivalent, not equal hence not comparable
-23 'Cel'.comparable(73.4 'degF') // false - these "special" units on non-ratio scales are not comparable
+1 'mg'.comparable(2 'mg') // true ; these types are comparable
+1 'm'.comparable(20 'cm') // true ; these types are both metric distance measures
+2 '1'.comparable(3) // true ; the integer will implicitly convert to a Quantity with unit `'1'` which is the same system/code so is comparable
+1.comparable(2) // true ; these will both convert to quantities with the same system/code, hence are comparable
+1 'in_i'.comparable(1 'cm') // true ; These UCUM units can be compared/converted
+1 year.comparable(1 'a') // false ; these units are equivalent, not equal hence not comparable
+23 'Cel'.comparable(73.4 'degF') // false ; these "special" units on non-ratio scales are not comparable
 ```
 {:.stu}
 
@@ -3857,11 +3857,11 @@ Multiplication involving calendar units (apart from the special UCUM `'1'` unit)
 For example:
 {:.fhir-highlight}
 ``` fhirpath
-12 'cm' * 3 'cm'  // 36 'cm2' - multiply 12 by 3 and ucum handling for these units results in square cms.
-3 'cm' * 12 'cm2' // 36 'cm3' - multiply 12 by 3 and ucum handling for these units results in cubic cms.
-10 'm/s' * 10 's' // 100 'm' - muliply 10 by 10 and ucum handling for these units results in meters as seconds cancel out.
+12 'cm' * 3 'cm'  // 36 'cm2' ; multiply 12 by 3 and ucum handling for these units results in square cms.
+3 'cm' * 12 'cm2' // 36 'cm3' ; multiply 12 by 3 and ucum handling for these units results in cubic cms.
+10 'm/s' * 10 's' // 100 'm' ; multiply 10 by 10 and ucum handling for these units results in meters as seconds cancel out.
 3 * 2 'cm'        // 6 'cm' via implicit conversion of 3 to the quantity 3 '1', and results using cm.
-12 day * 45 'm'   // empty ( { } ) - multiplication with calendar units is not supported
+12 day * 45 'm'   // empty ( { } ) ; multiplication with calendar units is not supported
 ```
 {:.fhir-highlight}
 
@@ -3887,7 +3887,7 @@ For example:
 4 / 2  // 2
 2 / 4  // 0.5
 12 / 0 // empty ({ })
-0 / 0  // empty ({ }) - div by zero error result
+0 / 0  // empty ({ }) ; div by zero error result
 ```
 {:.fhir-highlight}
 
@@ -3899,8 +3899,8 @@ Division examples involving quantities:
 ``` fhirpath
 12 'cm2' / 3 'cm' // 4.0 'cm'
 120 'm' / 60 's'  // 2 'm/s'
-60 / 1 's'        // 60 '/s' - note the unit here is not "seconds", it is "per second", as the seconds are on the denominator as determined by the UCUM specification.
-60 's' / 2        // 30 's' - simple division of the integer value
+60 / 1 's'        // 60 '/s' ; note the unit here is not "seconds", it is "per second", as the seconds are on the denominator as determined by the UCUM specification.
+60 's' / 2        // 30 's' ; simple division of the integer value
 ```
 {:.fhir-highlight}
 
@@ -3934,11 +3934,11 @@ Attempting to operate on quantities with invalid units will result in empty (`{ 
 
 For example:
 ``` fhirpath
-1 + 2          // 3 - simple numeric addition
-5L + 4.5       // 9.5 - implicit conversion from long to decimal then addition
-3 'm' + 3 'cm' // 3.03 'm' - via ucum conversion
-3 'cm' + 3 'm' // 303 'cm' - via ucum conversion
-1 + 2 'cm'     // 3 'cm' - via implicit conversion
+1 + 2          // 3 ; simple numeric addition
+5L + 4.5       // 9.5 ; implicit conversion from long to decimal then addition
+3 'm' + 3 'cm' // 3.03 'm' ; via ucum conversion
+3 'cm' + 3 'm' // 303 'cm' ; via ucum conversion
+1 + 2 'cm'     // 3 'cm' ; via implicit conversion
 ```
 {:.fhir-highlight}
 
@@ -3952,13 +3952,13 @@ For example:
 Quantity addition examples with time based units:
 {:.fhir-highlight}
 ``` fhirpath
-2 minutes + 60 seconds  // 3 minutes - seconds converted to minutes, then value addition
-60 's' + 2 minutes      // 180 seconds = conversion to ucum seconds, then value addition
-1 year + 12 months // empty ( {} ) - month/year unit conversion is equivalent and needs explicit unit conversion
+2 minutes + 60 seconds  // 3 minutes ; seconds converted to minutes, then value addition
+60 's' + 2 minutes      // 180 seconds ; conversion to ucum seconds, then value addition
+1 year + 12 months // empty ( {} ) ; month/year unit conversion is equivalent and needs explicit unit conversion
 1 year + 12 'mo'   // empty ( {} )
-1 year.toQuantity('month') + 12 months // 24 months - explicit conversion to months, then addition with the same unit
-1 week + 14 days   // 3 week - convert the days to weeks then add
-3 'd' + 1 'wk'     // 10 'd' - UCUM conversion from 'wk' to 'd' then add
+1 year.toQuantity('month') + 12 months // 24 months ; explicit conversion to months, then addition with the same unit
+1 week + 14 days   // 3 week ; convert the days to weeks then add
+3 'd' + 1 'wk'     // 10 'd' ; UCUM conversion from 'wk' to 'd' then add
 ```
 {:.fhir-highlight}
 
@@ -3978,9 +3978,9 @@ Handling subtraction of quantities is the same as adding with a negative value, 
 
 For example:
 ``` fhirpath
-3 'm' - 3 'cm'    // 2.97 'm' - ucum conversion to meters
-3 'cm' - 3 'm'    // -297 'cm' - ucum conversion to centimeters
-1 minute - 30 's' // 0.5 minute - seconds converted to minutes, then value subtraction
+3 'm' - 3 'cm'    // 2.97 'm' ; ucum conversion to meters
+3 'cm' - 3 'm'    // -297 'cm' ; ucum conversion to centimeters
+1 minute - 30 's' // 0.5 minute ; seconds converted to minutes, then value subtraction
 ```
 {:.fhir-highlight}
 
@@ -4071,26 +4071,26 @@ Returns the value of the given `Date`, `DateTime`, or `Time`, incremented by the
 For Example:
 ```fhirpath
 @1973-12-25 + 7 days    // @1974-01-01
-@1973-12-25 + 7.9 days  // @1974-01-01 - same as above as the decimal is truncated (though a warning may be triggered)
+@1973-12-25 + 7.9 days  // @1974-01-01 ; same as above as the decimal is truncated (though a warning may be triggered)
 @1973-12-25 + 1 week    // @1974-01-01
-@2019-03-01 + 24 months // @2021-03-01 - month value overflows into years
+@2019-03-01 + 24 months // @2021-03-01 ; month value overflows into years
 @2026-01-01T13:00:00 + 30 minutes // @2026-01-01T13:30:00
 @1973-12-25T00:00:00.000+10:00 + 42.53 seconds // @1973-12-25T00:00:42.530+10:00
-@1973-12-25 + 1 'd'     // @1973-12-26 - ucum days handled as calendar units
-@T23:30:00 + 1 hour     // @T00:30:00 - overflow midnight
-@T01:00:00 + 48 hour    // @T01:00:00 - cycles through twice, but resulting time is the same
+@1973-12-25 + 1 'd'     // @1973-12-26 ; ucum days handled as calendar units
+@T23:30:00 + 1 hour     // @T00:30:00 ; overflow midnight
+@T01:00:00 + 48 hour    // @T01:00:00 ; cycles through twice, but resulting time is the same
 ```
 {:.fhir-highlight}
 
 For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (truncating any decimal fraction) and then adding to the date/time value. For example:
 {:.fhir-highlight}
 ``` fhirpath
-@2014 + 24 months  // @2016 - 24/12 = 2 years (converting the quantity value to the highest precision in the partial date value)
-@2014 + 23 months  // @2015 - 23 months only constitutes one year (23/12 = 1 year, remainder ignored)
-@2016 + 365 days   // @2017 - even though 2016 is a leap-year, the time-valued quantity (`365 days`) is converted to `1 year`, a standard calendar year of 365 days
-@2014 + 11 months  // @2014 - 11/12 = 0 years, remainder ignored
-@2026-02 + 5 weeks // @2026-03 - 5 weeks is converted to 35 days, which are then converted to months 35/30 = 1 month, remainder ignored
-@2026-02 + 4 weeks // @2026-02 - 4 weeks is converted to 28 days, which are then converted to months 28/30 = 0 month, remainder ignored
+@2014 + 24 months  // @2016 ; 24/12 → 2 years (converting the quantity value to the highest precision in the partial date value)
+@2014 + 23 months  // @2015 ; 23 months only constitutes one year (23/12 = 1.9167 → 1 year, remainder ignored)
+@2016 + 365 days   // @2017 ; even though 2016 is a leap-year, the time-valued quantity (`365 days`) is converted to `1 year`, a standard calendar year of 365 days
+@2014 + 11 months  // @2014 ; 11/12 = 0.9167 → 0 years, remainder ignored
+@2026-02 + 5 weeks // @2026-03 ; 5 weeks is converted to 35 days, which are then converted to months 35/30 = 1.1667 → 1 month, remainder ignored
+@2026-02 + 4 weeks // @2026-02 ; 4 weeks is converted to 28 days, which are then converted to months 28/30 = 0.9333 → 0 month, remainder ignored
 ```
 {:.fhir-highlight}
 
@@ -4112,10 +4112,10 @@ For partial date/time values where the time-valued quantity is more precise than
 
 For example:
 ``` fhirpath
-@2014 - 24 months       // @2012 - even though the date/time value is not specified to the level of precision of the time-valued quantity
+@2014 - 24 months       // @2012 ; even though the date/time value is not specified to the level of precision of the time-valued quantity
 @2019-03-01 - 24 months // @2017-03-01
-@2014 - 1 month         // @2014 - Partial date calculation 1/12 = 0 years, remainder ignored
-@2026-02 - 1 day        // @2026-02 - Partial date calculation 1/30 = 0 months, remainder ignored
+@2014 - 1 month         // @2014 ; Partial date calculation 1/12 = 0.0833 → 0 years, remainder ignored
+@2026-02 - 1 day        // @2026-02 ; Partial date calculation 1/30 = 0.0333 → 0 months, remainder ignored
 ```
 {:.fhir-highlight}
 
