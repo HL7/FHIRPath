@@ -560,7 +560,8 @@ Note that although all functions return collections, if a given function is defi
 
 #### Scoped Functions
 Some functions are marked as **scoped** functions. This type of function creates special variables (such as `$this`) that are available when evaluating arguments to the function.
-Most of these functions iterate through the items in the input collection, allowing the current item to be accessed.<br/>
+Most of these functions iterate through the items in the input collection, allowing the current item to be accessed.
+
 For example:
 ``` fhirpath
 (1 | 2 | 3 | 4 | 5).where($this > 3) // filter the input collection to values that are greater than 3
@@ -586,7 +587,7 @@ These are the fhirpath defined scoped functions: *(argument processing only, ref
 {:.list}
 
 For example (some expressions using scoped functions and accessing the special `$this` variable):
-```
+```fhirpath
 // Retrieve a list of formatted names for the patient
 // (with no unwanted padding white-space)
 Patient.name.select(given.join(' ').combine($this.family, true).join(', '))
@@ -617,6 +618,11 @@ Observation.value.where($this < 90 or $this > 110)
 #### empty() : Boolean
 
 Returns `true` if the input collection is empty (`{ }`) and `false` otherwise.
+
+The following example returns `true` when the Patient has no link elements:
+``` fhirpath
+Patient.link.empty()
+```
 
 <a name="fn-exists"></a>
 #### exists([criteria : ($this, $index) => Boolean]) : Boolean
@@ -654,11 +660,10 @@ And finally, the fourth example returns `true` if the `Patient` has any `general
 
 Returns `true` if for every item in the input collection, `criteria` evaluates to `true`. Otherwise, the result is `false`. If the input collection is empty (`{ }`), the result is `true`.
 
+The following example returns `true` if all of the `generalPractitioner` elements are of type `Practitioner`:
 ``` fhirpath
 generalPractitioner.all($this.resolve() is Practitioner)
 ```
-
-This example returns `true` if all of the `generalPractitioner` elements are of type `Practitioner`.
 
 #### allTrue() : Boolean
 
@@ -702,7 +707,8 @@ Observation.select(component.value > 90 'mm[Hg]').anyFalse()
 
 #### subsetOf(other : collection) : Boolean
 
-Returns `true` if all items in the input collection are members of the collection passed as the `other` argument. Membership is determined using the [equals](#equals) (`=`) operation.
+Returns `true` if all items in the input collection are members of the collection passed as the `other` argument.
+Membership is determined when the [equals](#equals) (`=`) operator returns `true` *(i.e. `false` and empty both indicate that an item is not a member)*.
 
 Conceptually, this function is evaluated by testing each item in the input collection for membership in the `other` collection, with a default of `true`. This means that if the input collection is empty (`{ }`), the result is `true`, otherwise if the `other` collection is empty (`{ }`), the result is `false`.
 
@@ -714,7 +720,8 @@ MedicationRequest.contained.meta.tag.subsetOf(MedicationRequest.meta.tag)
 
 #### supersetOf(other : collection) : Boolean
 
-Returns `true` if all items in the collection passed as the `other` argument are members of the input collection. Membership is determined using the [equals](#equals) (`=`) operation.
+Returns `true` if all items in the collection passed as the `other` argument are members of the input collection.
+Membership is determined when the [equals](#equals) (`=`) operator returns `true` *(i.e. `false` and empty both indicate that an item is not a member)*.
 
 Conceptually, this function is evaluated by testing each item in the `other` collection for membership in the input collection, with a default of `true`. This means that if the `other` collection is empty (`{ }`), the result is `true`, otherwise if the input collection is empty (`{ }`), the result is `false`.
 
@@ -728,9 +735,15 @@ MedicationRequest.contained.meta.tag.supersetOf(MedicationRequest.meta.tag)
 
 Returns the integer count of the number of items in the input collection. Returns 0 when the input collection is empty.
 
+The following example returns the number of names on the Patient:
+``` fhirpath
+Patient.name.count()
+```
+
 #### distinct() : collection
 
-Returns a collection containing only the unique items in the input collection. To determine whether two items are the same, the [equals](#equals) (`=`) operator is used, as defined below.
+Returns a collection containing only the unique items in the input collection.
+Items are considered to be equal when the [equals](#equals) (`=`) operator returns `true` *(i.e. `false` and empty both indicate that the items are distinct)*.
 
 If the input collection is empty (`{ }`), the result is empty.
 
@@ -742,9 +755,15 @@ The following example returns the distinct list of tags on the given Patient:
 Patient.meta.tag.distinct()
 ```
 
+As the equality operator for quantities can support unit conversions, this also applies here, so for example the following expression would return a collection with a single item (either `1 'm'` or `100 'cm'`, depending on the implementation), as they are considered equal:
+``` fhirpath
+1 'm' | 100 'cm' // 1 'm' (or could be 100 'cm')
+```
+
 #### isDistinct() : Boolean
 
-Returns `true` if all the items in the input collection are distinct. To determine whether two items are distinct, the [equals](#equals) (`=`) operator is used, as defined below.
+Returns `true` if all the items in the input collection are distinct.
+Items are considered to be equal when the [equals](#equals) (`=`) operator returns `true` *(i.e. `false` and empty both indicate that the items are distinct)*.
 
 Conceptually, this function is shorthand for a comparison of the `count()` of the input collection against the `count()` of the `distinct()` of the input collection:
 
@@ -753,6 +772,13 @@ X.count() = X.distinct().count()
 ```
 
 This means that if the input collection is empty (`{ }`), the result is `true`.
+
+For example:
+``` fhirpath
+(1 | 2 | 3).isDistinct() // true
+(1 | 2 | 3 | 2).isDistinct() // false - the 2 appears twice in the input collection
+(1 'm' | 100 'cm').isDistinct() // false - both quantities are the same (via unit conversion)
+```
 
 ### Filtering and projection
 
@@ -780,23 +806,20 @@ Patient.telecom.where(use = 'official')
 
 Evaluates the `projection` expression for each item in the input collection. The result of each evaluation is added to the output collection. If the evaluation results in a collection with multiple items, all items are added to the output collection (collections resulting from evaluation of `projection` are _flattened_). This means that if the evaluation for an item results in the empty collection (`{ }`), no item is added to the result, and that if the input collection is empty (`{ }`), the result is empty as well.
 
+The following example results in a collection with only the patient resources from the bundle:
 ``` fhirpath
 Bundle.entry.select(resource as Patient)
 ```
 
-This example results in a collection with only the patient resources from the bundle.
-
+The following example results in a collection with all the telecom elements with system of `phone` for all the patients in the bundle:
 ``` fhirpath
 Bundle.entry.select((resource as Patient).telecom.where(system = 'phone'))
 ```
 
-This example results in a collection with all the telecom elements with system of `phone` for all the patients in the bundle.
-
+The following example returns a collection containing the concatenation of the first given and family names for each of the Patient's "usual" names:
 ``` fhirpath
-Patient.name.where(use = 'usual').select(given.first() + ' ' + family)
+Patient.name.where(use = 'usual').select(given.first() & ' ' & family)
 ```
-
-This example returns a collection containing, for each "usual" name for the Patient, the concatenation of the first given and family names.
 
 <a name="instance-selector"></a>
 #### Instance Selector/Object Creation
@@ -878,6 +901,22 @@ code { value: 'final' }
 ```
 {:.stu}
 
+Collection elements can be populated with multiple values using `|`, `combine` or an expression that results in multiple items:
+{:.stu}
+```fhirpath
+// Set the codings via an expression that returns multiple codings (using |)
+CodeableConcept {
+   coding: Coding { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' }
+         | Coding { system: 'http://example.org/id-types', code: 'mr' }
+}
+
+// create a codeable concept that contains all of the codes selected
+// multiple codings come from the answers in the questionnaire
+QuestionnaireResponse.item.where(linkId='coded-q')
+.select( CodeableConcept { coding: answer.value.ofType(coding) } )
+```
+{:.stu}
+
 <a name="fn-sort"></a>
 #### sort([keySelector: ($this) => any [asc | desc] [, keySelector: ($this) => any [asc | desc], ...]]) : collection
 {:.stu}
@@ -903,6 +942,7 @@ An empty value is considered lower than all other values, meaning they will appe
 {:.stu}
 
 When comparing two items, if the values for the first key selector are equal, the comparison proceeds to the next key selector, and so on until all key selectors have been evaluated or a difference is found.
+Items are considered equal if and only if the [equals](#equals) (`=`) operator returns `true`. *(i.e. `false` and empty both indicate that the items are not equal).*
 {:.stu}
 
 Attempting to sort items with incompatible types will result in an error. Values that would result in comparison errors must be filtered from the collection prior to sorting.
@@ -930,7 +970,7 @@ Patient.telecom.sort(system, use desc) // sort by system ascending, then by use 
 
 > This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
 
-A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator.
+A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator returning `true` *(i.e. `false` and empty both indicate that the values are not equal and thus added to the output)*.
 
 This can be evaluated by adding all items in the input collection to an input queue, then for each item in the input queue evaluate the repeat expression. If the result of the repeat expression is not in the output collection, add it to both the output collection and also the input queue. Processing continues until the input queue is empty.
 
@@ -1005,13 +1045,14 @@ Questionnaire.repeatAll('item') // this is a common mistake where the "expressio
 <a name="fn-oftype"></a>
 #### ofType(type : _type specifier_) : collection
 
-Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty. The `type` argument is an identifier that must resolve to the name of a type in a model. For implementations with compile-time typing, this requires special-case handling when processing the argument to treat it as type specifier rather than an identifier expression:
+Returns a collection that contains all items in the input collection that are of the given type or a subclass thereof. If the input collection is empty (`{ }`), the result is empty.
+The `type` argument is an identifier that must resolve to the name of a type in a model.
+For implementations with compile-time typing, this requires special-case handling when processing the argument to treat it as type specifier rather than an identifier expression.
 
+In the following example, the symbol `Patient` must be treated as a type identifier rather than a reference to a Patient in context:
 ``` fhirpath
 Bundle.entry.resource.ofType(Patient)
 ```
-
-In the above example, the symbol `Patient` must be treated as a type identifier rather than a reference to a Patient in context.
 
 <a name="coalesce"></a>
 #### coalesce(value : collection, [value : collection, ...]) : collection
@@ -1088,46 +1129,84 @@ Patient.name.single()
 
 Returns a collection containing only the first item in the input collection. This function is equivalent to `item[0]`, so it will return an empty collection if the input collection has no items.
 
+The following example returns the first name element, equivalent to `Patient.name[0]`:
+``` fhirpath
+Patient.name.first()
+```
+
 #### last() : any
 
 Returns a collection containing only the last item in the input collection. Will return an empty collection if the input collection has no items.
+
+The following example returns the last name element in the collection:
+``` fhirpath
+Patient.name.last()
+```
 
 #### tail() : collection
 
 Returns a collection containing all but the first item in the input collection. Will return an empty collection if the input collection has no items, or only one item.
 
+For example:
+``` fhirpath
+(0 | 1 | 2).tail() // 1, 2
+```
+
 #### skip(num : Integer) : collection
 
 Returns a collection containing all but the first `num` items in the input collection. Will return an empty collection if there are no items remaining after the indicated number of items have been skipped, or if the input collection is empty. If `num` is less than or equal to zero, the input collection is simply returned.
+
+For example:
+``` fhirpath
+(0 | 1 | 2).skip(1) // 1, 2
+(0 | 1 | 2).skip(2) // 2
+```
 
 #### take(num : Integer) : collection
 
 Returns a collection containing the first `num` items in the input collection, or less if there are less than `num` items. If num is less than or equal to 0, or if the input collection is empty (`{ }`), `take` returns an empty collection.
 
+For example:
+``` fhirpath
+(0 | 1 | 2).take(2) // 0, 1
+(0 | 1 | 2).take(5) // 0, 1, 2
+```
+
 #### intersect(other: collection) : collection
 
 Returns the set of items that are in both collections. Duplicate items will be eliminated by this function. Order of items is not guaranteed to be preserved in the result of this function.
+
+For example:
+``` fhirpath
+(1 | 2 | 3).intersect(2 | 4) // 2
+```
 
 #### exclude(other: collection) : collection
 
 Returns the set of items that are not in the `other` collection. Duplicate items will not be eliminated by this function, and order will be preserved.
 
-e.g. `(1 | 2 | 3).exclude(2)`{:.fhirpath} returns `(1 | 3)`.
+For example:
+``` fhirpath
+(1 | 2 | 3).exclude(2) // 1, 3
+```
 
 ### Combining
 
 #### <a name="unionother-collection"></a>union(other : collection) : collection
 
-Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`) to determine equality). There is no expectation of order in the resulting collection.
+Merge the two collections into a single collection, eliminating any duplicate values *(items are considered duplicates if and only if the [equals](#equals) (`=`) operator returns `true`. i.e. `false` and empty both indicate that the items are not duplicates, and thus appear in the output collection)*.
 
-In other words, this function returns the distinct list of items from both inputs. For example, consider two lists of integers `A: 1, 1, 2, 3` and `B: 2, 3`:
+There is no expectation of order in the resulting collection.
 
+In other words, this function returns the distinct list of items from both inputs.
+
+For example, consider two lists of integers `A: 1, 1, 2, 3` and `B: 2, 3`:
 ``` fhirpath
-A.union( B ) // 1, 2, 3
+A.union( B )   // 1, 2, 3
 A.union( { } ) // 1, 2, 3
 ```
 
-This function can also be invoked using the `|` operator.
+This function can also be invoked using the [`|`](#-union-collections) operator.
 
 e.g. `x.union(y)`{:.fhirpath} is synonymous with `x | y`{:.fhirpath}
 
@@ -1146,9 +1225,9 @@ When `preserveOrder` is `false`, or not supplied, there is no expectation of ord
 For example, considering the same two lists of integers used in the union example `A: 1, 1, 2, 3` and `B: 2, 3`:
 {: .stu}
 ```fhirpath
-A.combine(B) // 1, 1, 2, 2, 3, 3 - order is not guaranteed to be preserved (could be in any order)
+A.combine(B)       // 1, 1, 2, 2, 3, 3 - order is not guaranteed to be preserved (could be in any order)
 A.combine(B, true) // 1, 1, 2, 3, 2, 3 - The order is preserved using the `preserveOrder` argument
-A.combine( {} ) // 1, 1, 2, 3 - combining an empty collection with a non-empty collection returns the non-empty collection
+A.combine( {} )    // 1, 1, 2, 3       - combining an empty collection with a non-empty collection returns the non-empty collection
 ```
 {: .stu}
 Note that the duplicate `1`s are not removed from the collection using combine, where using `union` or `|` they would have been.
@@ -1156,8 +1235,9 @@ Note that the duplicate `1`s are not removed from the collection using combine, 
 
 ### Conversion
 
-FHIRPath defines both _implicit_ and _explicit_ conversion. Implicit conversions occur automatically, as opposed to explicit conversions that require the function be called explicitly. Implicit conversion is performed when an operator or function is used with a compatible type. For example:
+FHIRPath defines both _implicit_ and _explicit_ conversion. Implicit conversions occur automatically, as opposed to explicit conversions that require the function be called explicitly. Implicit conversion is performed when an operator or function is used with a compatible type.
 
+For example:
 ``` fhirpath
 5 + 10.0
 ```
@@ -1234,6 +1314,13 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
+For example:
+``` fhirpath
+'true'.toBoolean()  // true
+1.toBoolean()       // true
+'hello'.toBoolean() // empty { } — not a recognized boolean representation
+```
+
 ##### convertsToBoolean() : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
@@ -1250,6 +1337,12 @@ Possible values for Integer, Decimal, and String are described in the toBoolean(
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
+
+For example:
+``` fhirpath
+'true'.convertsToBoolean() // true
+'abc'.convertsToBoolean()  // false — not a recognized boolean representation
+```
 
 #### Integer Conversion Functions
 
@@ -1269,6 +1362,12 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
+For example:
+``` fhirpath
+'1'.toInteger()  // 1
+'st'.toInteger() // empty { } — not convertible to an integer
+```
+
 ##### convertsToInteger() : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
@@ -1282,6 +1381,12 @@ If the item is not one of the above types, or the item is a String, but is not c
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
+
+For example:
+``` fhirpath
+'1'.convertsToInteger()   // true
+'1.0'.convertsToInteger() // false — decimal strings are not convertible to integer
+```
 
 ##### toLong() : Long
 {:.stu}
@@ -1307,6 +1412,15 @@ If the input collection contains multiple items, the evaluation of the expressio
 If the input collection is empty, the result is empty.
 {:.stu}
 
+For example:
+{:.stu}
+``` fhirpath
+42.toLong()    // 42
+'123'.toLong() // 123
+'abc'.toLong() // empty { } — not convertible to a long
+```
+{:.stu}
+
 ##### convertsToLong() : Boolean
 {:.stu}
 
@@ -1325,6 +1439,14 @@ If the input collection contains multiple items, the evaluation of the expressio
 {:.stu}
 
 If the input collection is empty, the result is empty.
+{:.stu}
+
+For example:
+{:.stu}
+``` fhirpath
+'123'.convertsToLong() // true
+'abc'.convertsToLong() // false
+```
 {:.stu}
 
 #### Date Conversion Functions
@@ -1415,6 +1537,12 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
+For example:
+``` fhirpath
+'2015-02-04'.convertsToDate() // true
+'not-a-date'.convertsToDate() // false
+```
+
 #### DateTime Conversion Functions
 
 ##### toDateTime([format : string]) : DateTime
@@ -1439,6 +1567,12 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
+For example:
+``` fhirpath
+'2015-02-04T14:34:28Z'.toDateTime() // @2015-02-04T14:34:28Z
+'2012-01-01T10:00'.toDateTime() // @2012-01-01T10:00 — partial datetime is preserved
+```
+
 ##### convertsToDateTime([format : string]) : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
@@ -1456,6 +1590,12 @@ If the input is not a string, the format parameter it ignored.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
+
+For example:
+``` fhirpath
+'2015-02-04T14:34:28'.convertsToDateTime() // true
+'not a datetime'.convertsToDateTime() // false
+```
 
 #### Decimal Conversion Functions
 
@@ -1475,6 +1615,13 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
+For example:
+``` fhirpath
+'1.1'.toDecimal() // 1.1
+'42'.toDecimal() // 42 (as a decimal value)
+'st'.toDecimal() // empty { } — not convertible to a decimal
+```
+
 ##### convertsToDecimal() : Boolean
 
 If the input collection contains a single item, this function will `true` if:
@@ -1488,6 +1635,13 @@ If the item is not one of the above types, or is not convertible to a Decimal (u
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
+
+For example:
+``` fhirpath
+'1.0'.convertsToDecimal() // true
+'42'.convertsToDecimal()  // true
+'1.a'.convertsToDecimal() // false
+```
 
 #### Quantity Conversion Functions
 
@@ -1563,6 +1717,12 @@ If the `unit` argument is provided, it must be the string representation of a UC
 
 > Implementations are not required to support a complete UCUM implementation, and may return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
 
+For example:
+``` fhirpath
+'1 day'.convertsToQuantity() // true
+10 'mg'.convertsToQuantity() // true
+```
+
 #### String Conversion Functions
 
 ##### toString() : String
@@ -1609,6 +1769,14 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
+For example:
+``` fhirpath
+@2025-01-15.convertsToString() // true
+1.convertsToString() // true
+Patient.name.first().convertsToString() // false - not a type that supports toString() (assuming there was at least 1 name)
+{}.convertsToString() // empty - no input collection
+```
+
 #### Time Conversion Functions
 
 ##### toTime() : Time
@@ -1628,6 +1796,12 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
+For example:
+``` fhirpath
+'14:34:28'.toTime() // 14:34:28
+'10:00'.toTime() // 10:00 — partial time is preserved
+```
+
 ##### convertsToTime() : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
@@ -1641,12 +1815,17 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 If the input collection is empty, the result is empty.
 
+For example:
+``` fhirpath
+'14:34:28'.convertsToTime() // true
+'not a time'.convertsToTime() // false
+```
+
 ### String Manipulation
 
 The functions in this section operate on collections with a single item. If there is more than one item, or an item that is not a String, the evaluation of the expression will end and signal an error to the calling environment.
 
 To use these functions over a collection with multiple items, one may use filters like `where()` and `select()`:
-
 ``` fhirpath
 Patient.name.given.select(substring(0))
 ```
@@ -1663,6 +1842,7 @@ If the input or `substring` is empty (`{ }`), the result is empty (`{ }`).
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+For example:
 ``` fhirpath
 'abcdefg'.indexOf('bc') // 1
 'abcdefg'.indexOf('x') // -1
@@ -1687,6 +1867,8 @@ If the input or `substring` is empty (`{ }`), the result is empty (`{ }`).
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 'abcdefg'.lastIndexOf('bc') // 1
 'abcdefg'.lastIndexOf('x') // -1
@@ -1712,6 +1894,7 @@ If a negative or zero `length` is provided, the function returns an empty string
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+For example:
 ``` fhirpath
 'abcdefg'.substring(3) // 'defg'
 'abcdefg'.substring(1, 2) // 'bc'
@@ -1734,6 +1917,7 @@ If the input collection is empty, the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+For example:
 ``` fhirpath
 'abcdefg'.startsWith('abc') // true
 'abcdefg'.startsWith('xyz') // false
@@ -1749,6 +1933,7 @@ If the input collection is empty, the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+For example:
 ``` fhirpath
 'abcdefg'.endsWith('efg') // true
 'abcdefg'.endsWith('abc') // false
@@ -1764,6 +1949,7 @@ If the input collection is empty, the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+For example:
 ``` fhirpath
 'abc'.contains('b') // true
 'abc'.contains('bc') // true
@@ -1780,6 +1966,7 @@ If the input collection is empty, the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+For example:
 ``` fhirpath
 'abcdefg'.upper() // 'ABCDEFG'
 'AbCdefg'.upper() // 'ABCDEFG'
@@ -1793,6 +1980,7 @@ If the input collection is empty, the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+For example:
 ``` fhirpath
 'ABCDEFG'.lower() // 'abcdefg'
 'aBcDEFG'.lower() // 'abcdefg'
@@ -1806,6 +1994,7 @@ If the input collection, `pattern`, or `substitution` are empty, the result is e
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+For example:
 ``` fhirpath
 'abcdefg'.replace('cde', '123') // 'ab123fg'
 'abcdefg'.replace('cde', '') // 'abfg'
@@ -1828,6 +2017,7 @@ The optional `flags` parameter can be set to:
 * `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
 {:.stu}
 
+For example:
 ``` fhirpath
 'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matches('Library') // returns true
 'N8000123123'.matches('^N[0-9]{8}$') // returns false as the string is not an 8 char number (it has 10)
@@ -1857,6 +2047,8 @@ The optional `flags` parameter can be set to:
 * `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matchesFull('Library') // returns false
 'N8000123123'.matchesFull('N[0-9]{8}') // returns false as the string is not an 8 char number (it has 10)
@@ -1897,6 +2089,13 @@ Returns the number of characters in the input string. If the input collection is
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
+For example:
+``` fhirpath
+'abc'.length() // 3
+''.length() // 0
+'\u0065\u0301'.length() // 2 unicode encoded characters
+```
+
 #### toChars() : collection
 
 Returns the list of characters in the input string. If the input collection is empty (`{ }`), the result is empty.
@@ -1936,6 +2135,14 @@ If the input is empty, the result is empty.
 If no format is specified, the result is empty.
 {:.stu}
 
+For example:
+{:.stu}
+``` fhirpath
+'test'.encode('base64') // returns 'dGVzdA==' (testEncodeBase64A)
+'test'.encode('hex') // returns '74657374' (testEncodeHex)
+```
+{:.stu}
+
 #### decode(format : String) : String
 {:.stu}
 
@@ -1946,6 +2153,14 @@ If the input is empty, the result is empty.
 {:.stu}
 
 If no format is specified, the result is empty.
+{:.stu}
+
+For example:
+{:.stu}
+``` fhirpath
+'dGVzdA=='.decode('base64') // returns 'test' (testDecodeBase64A)
+'74657374'.decode('hex') // returns 'test' (testDecodeHex)
+```
 {:.stu}
 
 #### escape(target : String) : String
@@ -1966,6 +2181,14 @@ If the input is empty, the result is empty.
 If no target is specified, the result is empty.
 {:.stu}
 
+For example:
+{:.stu}
+``` fhirpath
+'A&B'.escape('html') // returns 'A&amp;B' (testEscapeHtmlAmpersand)
+'"1<2"'.escape('json') // returns '\"1<2\"' (testEscapeJson)
+```
+{:.stu}
+
 #### unescape(target : String) : String
 {:.stu}
 
@@ -1978,6 +2201,13 @@ If the input is empty, the result is empty.
 If no target is specified, the result is empty.
 {:.stu}
 
+For example:
+{:.stu}
+``` fhirpath
+'&quot;1&lt;2&quot;'.unescape('html') // returns '"1<2"' (testUnescapeHtml)
+```
+{:.stu}
+
 #### trim() : String
 {: .stu }
 
@@ -1985,6 +2215,14 @@ The trim function trims whitespace characters from the beginning and ending of t
 {:.stu}
 
 If the input is empty, the result is empty.
+{:.stu}
+
+For example:
+{:.stu}
+``` fhirpath
+' 123456 '.trim() // '123456'
+'  '.trim() // ''
+```
 {:.stu}
 
 #### split(separator: String) : collection
@@ -2068,6 +2306,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 (-5).abs() // 5
 (-5.5).abs() // 5.5
@@ -2094,6 +2334,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 1.ceiling() // 1
 1.1.ceiling() // 2
@@ -2119,6 +2361,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 0.exp() // 1.0
 (-0.0).exp() // 1.0
@@ -2144,6 +2388,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 1.floor() // 1
 2.1.floor() // 2
@@ -2169,6 +2415,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 1.ln() // 0.0
 1.0.ln() // 0.0
@@ -2197,6 +2445,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 16.log(2) // 4.0
 100.0.log(10.0) // 2.0
@@ -2224,6 +2474,8 @@ If the input is empty, or exponent is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 2.power(3) // 8
 2.5.power(2) // 6.25
@@ -2260,6 +2512,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 1.round() // 1
 3.14159.round(3) // 3.142
@@ -2287,6 +2541,8 @@ If the input collection contains multiple items, the evaluation of the expressio
 Note that this function is equivalent to raising a number of the power of 0.5 using the power() function.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 81.sqrt() // 9.0
 (-1).sqrt() // empty
@@ -2312,6 +2568,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 101.truncate() // 101
 1.00000001.truncate() // 1
@@ -2329,9 +2587,19 @@ If the input collection contains multiple items, the evaluation of the expressio
 
 Returns a collection with all immediate child nodes of all items in the input collection. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
 
+The following example returns all the children of the input collection:
+``` fhirpath
+Patient.gender.children() // the FHIR patient gender datatype is a FHIR code, which could have value, id and potentially extensions returned.
+```
+
 #### descendants() : collection
 
 Returns a collection with all descendant nodes of all items in the input collection. The result does not include the items in the input collection themselves. This function is a shorthand for `repeat(children())`. Note that the ordering of the children is undefined and using functions like `first()` on the result may return different results on different platforms.
+
+The following example returns all coded answers anywhere in a QuestionnaireResponse:
+``` fhirpath
+QuestionnaireResponse.descendants().answer.ofType(Coding)
+```
 
 > **Note:** Many of these functions will result in a set of items of different underlying types. It may be necessary to use [`ofType()`](#fn-oftype) as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
 
@@ -2347,11 +2615,10 @@ Adds a String representation of the input collection to the diagnostic log, usin
 
 If the `projection` argument is used, the trace would log the result of evaluating the project expression on the input, but still return the input to the trace function unchanged.
 
+The following example traces only the id elements of the result of the where:
 ``` fhirpath
 contained.where(criteria).trace('unmatched', id).empty()
 ```
-
-The above example traces only the id elements of the result of the where.
 
 <a name="fn-pathname"></a>
 #### pathname([short : Boolean]) : collection
@@ -2386,7 +2653,7 @@ item.item.item.where(linkId = 'i508').item.where(linkId='i534').answer.value.pat
 ```
 {:.stu}
 
-would return the following string *(which is also a valid fhirpath expression)* if only 1 node was at that location in the input QuestionnaireResponse.
+would return the following string *(which is also a valid fhirpath expression)* if only 1 node was at that location in the input QuestionnaireResponse:
 {:.stu}
 
 ``` fhirpath
@@ -2420,13 +2687,29 @@ To ensure deterministic evaluation, these operators should return the same value
 
 Returns the current date and time, including timezone offset.
 
+The following example demonstrates that `now()` returns a full DateTime including timezone:
+``` fhirpath
+now() // Could return values like @2026-02-25T14:31:39.096+11:00, @2026-02-25T03:31:44.306994+00:00, @2026-02-25T03:31:41.197Z
+```
+
 ##### timeOfDay() : Time
 
 Returns the current time.
 
+For example:
+``` fhirpath
+timeOfDay() // @T14:34:17.923 - only the time portion of the result of today. Equivalent to now().timeOf()
+timeOfDay() = timeOfDay() // true - timeOfDay should be deterministic within a single expression
+```
+
 ##### today() : Date
 
 Returns the current date.
+
+The following example demonstrates that `today()` returns a date in YYYY-MM-DD format:
+``` fhirpath
+today() // @2026-02-25 - equivalent to now().toDate()
+```
 
 <a name="definevariable"></a>
 #### defineVariable(name: String [, projection: collection])
@@ -2446,7 +2729,7 @@ Defines a variable named `name` that is accessible in subsequent expressions on 
 If the name already exists in the current expression scope, the evaluation will end and signal an error to the calling environment.
 {:.stu}
 
-Example:
+For example:
 {:.stu}
 ``` fhirpath
 group.select(
@@ -2489,6 +2772,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 1.587.lowBoundary() // 1.58650000
 1.587.lowBoundary(6) // 1.586500
@@ -2525,6 +2810,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 1.587.highBoundary() // 1.58750000
 1.587.highBoundary(6) // 1.587500
@@ -2558,12 +2845,15 @@ If the input collection contains multiple items, the evaluation of the expressio
 For Decimal values, the function returns the number of digits of precision after the decimal place in the input value.
 {:.stu}
 
+For example with decimal values:
+{:.stu}
 ``` fhirpath
 1.58700.precision() // 5
+100.precision() // 0 - no digits after the decimal place (integer implicitly converted to a decimal for processing)
 ```
 {:.stu}
 
-For Date and DateTime values, the function returns the number of digits of precision in the input value.
+For Date and DateTime values, the function returns the number of digits of precision in the input value:
 {:.stu}
 
 ``` fhirpath
@@ -2588,6 +2878,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2014-01-05T10:30:00.000.yearOf() // 2014
 ```
@@ -2605,12 +2897,14 @@ If the input collection is empty, or the month is not present in the value, the 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2014-01-05T10:30:00.000.monthOf() // 1
 ```
 {:.stu}
 
-If the component isn't present in the value, then the result is empty
+If the component isn't present in the value, then the result is empty:
 {:.stu}
 ``` fhirpath
 @2012.monthOf() // {} an empty collection
@@ -2629,6 +2923,8 @@ If the input collection is empty, or the day is not present in the value, the re
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2014-01-05T10:30:00.000.dayOf() // 5
 ```
@@ -2646,6 +2942,8 @@ If the input collection is empty, or the hour is not present in the value, the r
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2012-01-01T03:30:40.002-07:00.hourOf() // 3
 @2012-01-01T16:30:40.002-07:00.hourOf() // 16
@@ -2664,6 +2962,8 @@ If the input collection is empty, or the minute is not present in the value, the
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:40.002-07:00.minuteOf() // 30
 ```
@@ -2681,6 +2981,8 @@ If the input collection is empty, or the second is not present in the value, the
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:40.002-07:00.secondOf() // 40
 ```
@@ -2698,6 +3000,8 @@ If the input collection is empty, or the millisecond is not present in the value
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:00.002-07:00.millisecondOf() // 2
 ```
@@ -2715,6 +3019,8 @@ If the input collection is empty, or the timezone offset is not present in the v
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:00.000-07:00.timezoneOffsetOf() // -7.0
 @2012-01-01T12:30:00.000+08:45.timezoneOffsetOf() // 8.75 Eucla, Western Australia
@@ -2733,6 +3039,8 @@ If the input collection is empty, the result is empty.
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:00.000-07:00.dateOf() // @2012-01-01
 ```
@@ -2750,6 +3058,8 @@ If the input collection is empty, or the time is not present in the value, the r
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:00.000-07:00.timeOf() // @T12:30:00.000
 ```
@@ -2764,7 +3074,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 If there is more than one input item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
-#### duration(value: date | datetime | time, precision: identifier): Integer
+#### duration(value: Date | DateTime | Time, precision: String): Integer
 {:.stu}
 
 Returns the number of whole calendar periods at the specified `precision` between the given input value and the `value` argument. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional periods are dropped.
@@ -2790,7 +3100,6 @@ If either the input or `value` argument is empty, the result is empty.
 
 The following examples illustrate the behavior of the duration function:
 {:.stu}
-
 ```fhirpath
 @2025-01-02.duration(@2025-01-07, 'week') // 0 - hasn't passed 7 days duration
 @2025-01-01.duration(@2025-09-01, 'year') // 0 - baby is 9 months old
@@ -2799,7 +3108,7 @@ The following examples illustrate the behavior of the duration function:
 {:.stu}
 
 
-#### difference(value: date | datetime | time, precision: identifier): Integer
+#### difference(value: Date | DateTime | Time, precision: String): Integer
 {:.stu}
 
 Returns the number of boundaries crossed for the specified `precision` between the input value and the `value` arguments. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional boundaries are dropped.
@@ -2828,7 +3137,6 @@ If either the input or `value` argument is empty, the result is empty.
 
 The following examples illustrate the behavior of the difference function:
 {:.stu}
-
 ```fhirpath
 @2025-01-02.difference(@2025-01-07, 'week') // 1 - crossed a week boundary (Sunday)
 @2025-01-01.difference(@2025-09-01, 'year') // 0 - baby is 9 months old, but born this year
@@ -2839,14 +3147,15 @@ The following examples illustrate the behavior of the difference function:
 
 ## Operations
 
-Operators are allowed to be used between any kind of path expressions (e.g. expr op expr). Like functions, operators will generally propagate an empty collection in any of their operands. This is true even when comparing two empty collections using the equality operators, e.g.
+Operators are allowed to be used between any kind of path expressions (e.g. expr op expr). Like functions, operators will generally propagate an empty collection in any of their operands.
+This is true even when comparing two empty collections using the equality operators.
 
+For example:
 ``` fhirpath
 {} = {}
 true > {}
 {} != 'dummy'
 ```
-
 all result in `{}`.
 
 ### Equality
@@ -2857,7 +3166,7 @@ Returns `true` if the left collection is equal to the right collection:
 
 As noted above, if either operand is an empty collection, the result is an empty collection. Otherwise:
 
-If both operands are collections with a single item, they must be of the same type (or be implicitly convertible to the same type), and:
+If both operands are collections with a single item, they must be of the same type (or be [implicitly convertible](#conversion) to the same type), and:
 
 * For primitives:
   * `String`: comparison is based on Unicode values
@@ -2901,7 +3210,6 @@ Implementations that do support units shall do so as specified by [\[UCUM\]](#UC
 For `Date`, `DateTime` and `Time` equality, the comparison is performed by considering each precision in order, beginning with years (or hours for time values), and respecting timezone offsets. If the values are the same, comparison proceeds to the next precision; if the values are different, the comparison stops and the result is `false`. If one input has a value for the precision and the other does not, the comparison stops and the result is empty (`{ }`); if neither input has a value for the precision, or the last precision has been reached, the comparison stops and the result is `true`. For the purposes of comparison, seconds and milliseconds are considered a single precision using a decimal, with decimal equality semantics.
 
 For example:
-
 ``` fhirpath
 @2012 = @2012 // returns true
 @2012 = @2013 // returns false
@@ -2915,8 +3223,9 @@ For example:
 
 For `DateTime` values that do not have a timezone offsets, whether or not to provide a default timezone offset is a policy decision. In the simplest case, no default timezone offset is provided, but some implementations may use the client's or the evaluating system's timezone offset.
 
-To support comparison of DateTime values, either both values have no timezone offset specified, or both values are converted to a common timezone offset. The timezone offset to use is an implementation decision. In the simplest case, it's the timezone offset of the local server. The following examples illustrate expected behavior:
+To support comparison of DateTime values, either both values have no timezone offset specified, or both values are converted to a common timezone offset. The timezone offset to use is an implementation decision. In the simplest case, it's the timezone offset of the local server.
 
+The following examples illustrate expected behavior:
 ``` fhirpath
 @2017-11-05T01:30:00.0-04:00 > @2017-11-05T01:15:00.0-05:00 // false
 @2017-11-05T01:30:00.0-04:00 < @2017-11-05T01:15:00.0-05:00 // true
@@ -2930,7 +3239,7 @@ Additional functions to support more sophisticated timezone offset comparison (s
 
 Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }`{:.fhirpath} will result in `true`.
 
-If both operands are collections with a single item, they must be of the same type (or implicitly convertible to the same type), and:
+If both operands are collections with a single item, they must be of the same type (or [implicitly convertible](#conversion) to the same type), and:
 
 * For primitives
   * `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see [String Equivalence](#string-equivalence) for more details).
@@ -2952,7 +3261,6 @@ Note that this implies that if the collections have a different number of items 
 When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in `false`.
 
 For time-valued quantities, calendar durations and definite quantity durations are considered equivalent:
-
 ``` fhirpath
 1 year ~ 1 'a' // true
 1 second ~ 1 's' // true
@@ -2967,7 +3275,6 @@ Implementations that do support units shall do so as specified by [\[UCUM\]](#UC
 For `Date`, `DateTime` and `Time` equivalence, the comparison is the same as for equality, with the exception that if the input values have different levels of precision, the result is `false`, rather than empty (`{ }`). As with equality, the second and millisecond precisions are considered a single precision using a decimal, with decimal equivalence semantics.
 
 For example:
-
 ``` fhirpath
 @2012 ~ @2012 // returns true
 @2012 ~ @2013 // returns false
@@ -2996,7 +3303,7 @@ The converse of the equivalent operator, returning `true` if equivalent returns 
 * The comparison operators are defined for strings, integers, decimals, quantities, dates, datetimes and times.
 * If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
 * Both arguments must be collections with single values, and the evaluator will throw an error if either collection has more than one item.
-* Both arguments must be of the same type (or implicitly convertible to the same type), and the evaluator will throw an error if the types differ.
+* Both arguments must be of the same type (or [implicitly convertible](#conversion) to the same type), and the evaluator will throw an error if the types differ.
 * When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible.
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
 
@@ -3021,6 +3328,7 @@ See the [Equals](#equals) operator for discussion on respecting timezone offsets
 
 The greater than operator (`>`) returns `true` if the first operand is strictly greater than the second. The operands must be of the same type, or convertible to the same type using an [implicit conversion](#conversion).
 
+For example:
 ``` fhirpath
 10 > 5 // true
 10 > 5.0 // true; note the 10 is converted to a decimal to perform the comparison
@@ -3042,6 +3350,7 @@ The greater than operator (`>`) returns `true` if the first operand is strictly 
 
 The less than operator (`<`) returns `true` if the first operand is strictly less than the second. The operands must be of the same type, or convertible to the same type using [implicit conversion](#conversion).
 
+For example:
 ``` fhirpath
 10 < 5 // false
 10 < 5.0 // false - note the 10 is converted to a decimal to perform the comparison
@@ -3067,6 +3376,7 @@ The less than operator (`<`) returns `true` if the first operand is strictly les
 
 The less or equal operator (`<=`) returns `true` if the first operand is less than or equal to the second. The operands must be of the same type, or convertible to the same type using [implicit conversion](#conversion).
 
+For example:
 ``` fhirpath
 10 <= 5 // false
 10 <= 5.0 // false - note the 10 is converted to a decimal to perform the comparison
@@ -3092,6 +3402,7 @@ The less or equal operator (`<=`) returns `true` if the first operand is less th
 
 The greater or equal operator (`>=`) returns `true` if the first operand is greater than or equal to the second. The operands must be of the same type, or convertible to the same type using [implicit conversion](#conversion).
 
+For example:
 ``` fhirpath
 10 >= 5 // true
 10 >= 5.0 // true - note the 10 is converted to a decimal to perform the comparison
@@ -3126,6 +3437,8 @@ and the `system` is recognized by the FHIRPath implementation, and the codes are
 If either or both inputs are empty, or either input is not a single Quantity value, the result is empty (`{ }`).
 {:.stu}
 
+For example:
+{:.stu}
 ``` fhirpath
 1 'mg'.comparable(2 'mg') // true - these types are comparable
 1 'm'.comparable(20 'cm') // true - these types are both metric distance measures
@@ -3150,11 +3463,10 @@ If the left operand is a collection with a single item and the second operand is
 
 A _type specifier_ is an identifier that must resolve to the name of a type in a model. Type specifiers can have qualifiers, e.g. `FHIR.Patient`, where the qualifier is the name of the model.
 
+The following example returns `true` if all Observation resources in the bundle have a status of finished:
 ``` fhirpath
 Bundle.entry.resource.all($this is Observation implies status = 'finished')
 ```
-
-This example returns `true` if all Observation resources in the bundle have a status of finished.
 
 #### is(type : _type specifier_)
 
@@ -3172,6 +3484,7 @@ If the left operand is a collection with a single item and the second operand is
 
 A _type specifier_ is an identifier that must resolve to the name of a type in a model. Type specifiers can have qualifiers, e.g. `FHIR.Patient`, where the qualifier is the name of the model.
 
+For example:
 ``` fhirpath
 Observation.component.where(value as Quantity > 30 'mg')
 ```
@@ -3189,12 +3502,14 @@ Observation.component.where(value.as(Quantity) > 30 'mg')
 ### Collections
 
 #### | (union collections)
-Merge the two collections into a single collection, eliminating any duplicate values (using [equals](#equals) (`=`)) to determine equality). There is no expectation of order in the resulting collection.
+Merge the two collections into a single collection, eliminating any duplicate values *(items are considered duplicates if and only if the [equals](#equals) (`=`) operator returns `true`. i.e. `false` and empty both indicate that the items are not duplicates, and thus appear in the output collection)*.
+
+There is no expectation of order in the resulting collection.
 
 See the [union](#unionother-collection) function for more detail.
 
 #### in (membership) : Boolean
-If the left operand is a collection with a single item, this operator returns `true` if the item is in the right operand using equality semantics. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is `false`. If the left operand has multiple items, an exception is thrown.
+If the left operand is a collection with a single item, this operator returns `true` if the item is in the right operand using equality semantics *(items are considered equal if and only if the [equals](#equals) (`=`) operator returns `true`. i.e. `false` and empty both indicate that the items are not equal)*. If the left-hand side of the operator is empty, the result is empty, if the right-hand side is empty, the result is `false`. If the left operand has multiple items, an exception is thrown.
 
 The following example returns `true` if `'Joe'` is in the list of given names for the Patient:
 
@@ -3203,7 +3518,7 @@ The following example returns `true` if `'Joe'` is in the list of given names fo
 ```
 
 #### contains (containership) : Boolean
-If the right operand is a collection with a single item, this operator returns `true` if the item is in the left operand using equality semantics. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is `false`. This is the converse operation of `in`.
+If the right operand is a collection with a single item, this operator returns `true` if the item is in the left operand using equality semantics *(items are considered equal if and only if the [equals](#equals) (`=`) operator returns `true`. i.e. `false` and empty both indicate that the items are not equal)*. If the right-hand side of the operator is empty, the result is empty, if the left-hand side is empty, the result is `false`. This is the converse operation of `in`.
 
 The following example returns `true` if the list of given names for the Patient has `'Joe'` in it:
 
@@ -3298,7 +3613,7 @@ Note that implies may use short-circuit evaluation in the case that the first op
 
 ### Math
 
-The math operators require each operand to be a single item. Both operands must be of the same type, or of compatible types according to the rules for implicit conversion. Each operator below specifies which types are supported.
+The math operators require each operand to be a single item. Both operands must be of the same type, or of compatible types according to the rules for [implicit conversion](#conversion). Each operator below specifies which types are supported.
 
 If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -3340,8 +3655,7 @@ For division involving quantities, the resulting quantity will have an appropria
 
 For Integer, Decimal, and quantity, adds the operands. For strings, concatenates the right operand to the left operand.
 
-When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
-
+When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit:
 ``` fhirpath
 3 'm' + 3 'cm' // 303 'cm'
 ```
@@ -3370,6 +3684,7 @@ Performs truncated division of the left operand by the right operand (supported 
 
 Computes the remainder of the truncated division of its arguments (supported for Integer and Decimal).
 
+For example:
 ``` fhirpath
 5 mod 2 // 1
 5.5 mod 0.7 // 0.6
@@ -3380,6 +3695,7 @@ Computes the remainder of the truncated division of its arguments (supported for
 
 For strings, will concatenate the strings, where an empty operand is taken to be the empty string. This differs from `+` on two strings, which will result in an empty collection when one of the operands is empty. This operator is specifically included to simplify treating an empty collection as an empty string, a common use case in string manipulation.
 
+For example:
 ``` fhirpath
 'ABC' + 'DEF' // 'ABCDEF'
 'ABC' + { } + 'DEF' // { }
@@ -3433,6 +3749,7 @@ As `Time` is cyclic, the result of overflowing the time value will be wrapped ar
 {:.stu}
 ```fhirpath
 @T23:30:00 + 1 hour // @T00:30:00
+@T01:00:00 + 48 hour // @T01:00:00 (cycles through twice, but resulting time is the same)
 ```
 {:.stu}
 
@@ -3442,8 +3759,9 @@ Implementers SHOULD produce a warning when decimal fractions are ignored in date
 Authors SHOULD consider applying appropriate rounding functions (`round()`, `floor()`, `truncate()`, or `ceiling()`) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.
 {:.stu}
 
-For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value. For example:
+For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value.
 
+For example:
 ``` fhirpath
 @2014 + 24 months
 @2019-03-01 + 24 months // @2021-03-01
@@ -3520,7 +3838,7 @@ If the result of negating the number cannot be represented, the result is empty 
 If the input collection is empty, the result is empty (`{ }`).
 {:.stu}
 
-examples:
+For example:
 {:.stu}
 ``` fhirpath
 +5 // a simple literal 5 numeric value
@@ -3632,7 +3950,7 @@ All items in the input collection SHALL be the same type, otherwise an exception
 If the input collection is empty (`{ }`), the result is empty.
 {:.stu}
 
-The following examples illustrate the behavior of the `sum` function:
+For example:
 {:.stu}
 ``` fhirpath
 ( 1.0 | 2.0 | 3.0 | 4.0 | 5.0 ).sum() // 15.0
@@ -3654,7 +3972,7 @@ All items in the input collection SHALL be the same type, otherwise an exception
 If the input collection is empty (`{ }`), the result is empty.
 {:.stu}
 
-The following examples illustrate the behavior of the `min` function:
+For example:
 {:.stu}
 ``` fhirpath
 ( 2, 4, 8, 6 ).min() // 2
@@ -3677,7 +3995,7 @@ All items in the input collection SHALL be the same type, otherwise an exception
 If the input collection is empty (`{ }`), the result is empty.
 {:.stu}
 
-The following examples illustrate the behavior of the `max` function:
+For example:
 {:.stu}
 ``` fhirpath
 ( 2, 4, 8, 6 ).max() // 8
@@ -3703,7 +4021,7 @@ All items in the input collection SHALL be the same type, otherwise an exception
 If the input collection is empty (`{ }`), the result is empty.
 {:.stu}
 
-The following examples illustrate the behavior of the `avg` function:
+For example:
 {:.stu}
 ``` fhirpath
 ( 5.5 | 4.7 | 4.8 ).avg() // 5.0

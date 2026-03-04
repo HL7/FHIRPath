@@ -120,6 +120,12 @@ span.fhir-lighlight {
     position: relative;
 }
 
+p:has(+ pre.language-fhirpath) {
+    padding-bottom: 0;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
 .fhir-highlight::before {
     content: '';
     background-color: green;
@@ -131,6 +137,10 @@ span.fhir-lighlight {
     z-index: 10;
     opacity: 0.1;
     pointer-events: none;
+}
+
+p.fhir-highlight.stu::before {
+    left: 16px;
 }
 
 blockquote.fhir-highlight.stu::before {
