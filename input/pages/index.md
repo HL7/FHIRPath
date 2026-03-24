@@ -1720,13 +1720,13 @@ For example:
 
 If the input collection contains a single item, this function will return a single quantity if:
 
-* the item is an Integer, or Decimal, where the resulting quantity will have the default unit (`'1'`)
+* the item is an Integer, Long or Decimal, where the resulting quantity will have the default unit (`'1'`)
 * the item is a Quantity
 * the item is a String and is convertible to a Quantity using the regex format:
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ```
-As with integer and decimal, where the resulting quantity has no unit, it will have the default unit (`'1'`)
+As with integer, long, and decimal, where the resulting quantity has no unit, it will have the default unit (`'1'`)
 * the item is a Boolean, where `true` results in the quantity `1.0 '1'`, and `false` results in the quantity `0.0 '1'`
 
 If the item is not one of the above, the result is empty.
@@ -4047,17 +4047,23 @@ For example:
 
 #### div
 
-Performs truncated division of the left operand by the right operand (supported for Integer and Decimal). In other words, the division that ignores any remainder:
+Performs truncated division of the left operand by the right operand (supported for Integer, Long and Decimal). In other words, the division that ignores any remainder.
 
+The resulting datatype is the same as the input datatype *(after any [implicit conversions](#conversion) to make both operands the same type)*.
+
+For example:
 ``` fhirpath
-5 div 2 // 2
-5.5 div 0.7 // 7
+5 div 2 // 2 (integer)
+5.5 div 0.7 // 7 (decimal)
 5 div 0 // empty ({ })
+5L div 2 // 2L (long)
 ```
 
 #### mod
 
-Computes the remainder of the truncated division of its arguments (supported for Integer and Decimal).
+Computes the remainder of the truncated division of its arguments (supported for Integer, Long and Decimal).
+
+The resulting datatype is the same as the input datatype *(after any [implicit conversions](#conversion) to make both operands the same type)*.
 
 For example:
 ``` fhirpath
