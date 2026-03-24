@@ -3877,7 +3877,8 @@ Note that implies may use short-circuit evaluation in the case that the first op
 
 ### Math
 
-The math operators require each operand to be a single item. Both operands must be of the same type, or of compatible types according to the rules for [implicit conversion](#conversion). Each operator below specifies which types are supported.
+The math operators require each operand to be a single item. Both operands must be of the same type (using [implicit conversion](#conversion) where required). Each operator below specifies which types are supported.
+{:.fhir-highlight}
 
 Math operations on Date/Time types is defined in the [Date/Time Arithmetic](#datetime-arithmetic) section.
 {:.fhir-highlight}
@@ -3897,7 +3898,9 @@ Operations that cause arithmetic overflow or underflow will result in empty (`{ 
 
 #### * (multiplication)
 
-Multiplies both arguments (supported for Integer, Long, Decimal, and Quantity) with the result being the same as the input type.
+Multiplies both arguments (supported for Integer, Long, Decimal, and Quantity) with the result being the same as the input type *(after any [implicit conversions](#conversion) to make both operands the same type)*.
+{:.fhir-highlight}
+
 {:.fhir-highlight}
 
 For multiplication involving quantities, the resulting quantity will have an appropriate unit as determined by application of the [\[UCUM\]](#UCUM) specification.

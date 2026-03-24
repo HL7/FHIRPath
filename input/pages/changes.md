@@ -151,3 +151,4 @@
 * [FHIR-55946](https://jira.hl7.org/browse/FHIR-55946):  Extract Date/DateTime/Time components need to indicate what to do when invalid input type
 * [FHIR-55893](https://jira.hl7.org/browse/FHIR-55893):  resolve() function referenced, but not defined.
 * [FHIR-55935](https://jira.hl7.org/browse/FHIR-55935):  decode() and invalid Unicode
+* [FHIR-55471](https://jira.hl7.org/browse/FHIR-55471):  Arithmetic and toQuantity are not NOT explicitly define for Long
