@@ -125,7 +125,6 @@
 * [FHIR-49529](https://jira.hl7.org/browse/FHIR-49529):  Date time arithmetic with fractions - additional guidance
 * [FHIR-53076](https://jira.hl7.org/browse/FHIR-53076):  Equality semantics for collections
 * [FHIR-53159](https://jira.hl7.org/browse/FHIR-53159):  What should rounding to for negative numbers?
-* [FHIR-44601](https://jira.hl7.org/browse/FHIR-44601):  clarifying behaviour of iif
 * [FHIR-44774](https://jira.hl7.org/browse/FHIR-44774):  Better describe "iteration context" and impact on input collections/function execution - Scoped Functions
 * [FHIR-53196](https://jira.hl7.org/browse/FHIR-53196):  Update grammar to split NUMERIC into DECIMAL | INTEGER
 * [FHIR-33044](https://jira.hl7.org/browse/FHIR-33044):  Support constructor syntax
@@ -147,3 +146,4 @@
 * [FHIR-49531](https://jira.hl7.org/browse/FHIR-49531):  Incorrect example in reflection - significant simplification of functionality, removed elements properties.
 * [FHIR-55962](https://jira.hl7.org/browse/FHIR-55962):  Difference and duration functions precision parameter should be string not identifier
 * [FHIR-55911](https://jira.hl7.org/browse/FHIR-55911):  Missing what to do when equality returns empty for functions like distinct
+* [FHIR-44601](https://jira.hl7.org/browse/FHIR-44601):  clarifying behaviour of iif

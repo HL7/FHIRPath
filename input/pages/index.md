@@ -597,7 +597,7 @@ These are the fhirpath defined scoped functions: *(argument processing only, ref
 | [`sort`](#fn-sort) | Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is not defined in this context, it could be anywhere during any evaluation depending on algorithms selected. |
 | [`repeat`](#fn-repeat) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
 | [`repeatAll`](#fn-repeatall) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
-| [`iif`](#iif) | The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned. |
+| [`iif`](#iif) | The `criterion` argument is evaluated once (with `$this` set to the input value).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value) and returned,<br/> otherwise the `otherwise-result` argument is evaluated (with `$this` set to the input value) and returned. |
 | [`trace`](#fn-trace) | If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function. |
 | [`aggregate`](#aggregate) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values. |
 {:.list}
@@ -1286,21 +1286,72 @@ The following table lists the possible conversions supported, and whether the co
 The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
 
 <a name="iif"></a>
-#### iif(criterion: ($this, $index) => Boolean, true-result: ($this, $index) => collection [, otherwise-result: ($this, $index) => collection]) : collection
+#### iif(criterion: ($this) => Boolean, true-result: ($this) => collection [, otherwise-result: ($this) => collection]) : collection
 
-> This is a [scoped function](#scoped-functions): The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned.
+> This is a [scoped function](#scoped-functions): The `criterion` argument is evaluated once (with `$this` set to the input value).<br/>
+> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value) and returned,<br/>
+> otherwise the `otherwise-result` argument is evaluated (with `$this` set to the input value) and returned.<br/>
+> *Unlike any other scoped function, the `$index` variable is not set during evaluation of the arguments, so the value of `$index` would be that of an outer context.*
+{:.fhir-highlight}
+
 
 The `iif` function in FHIRPath is an _immediate if_, also known as a conditional operator (such as the C programming language's `? :` operator).
 
-The `criterion` expression is expected to evaluate to a Boolean.
-
-If `criterion` is `true`, the function returns the value of the `true-result` argument.
-
-If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
-
-Note that short-circuit behavior is expected in this function. In other words, `true-result` should only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` should only be evaluated otherwise. For implementations, this means delaying evaluation of the output arguments (specifically true-result and otherwise-result) to remove the chance that their evaluation throws an error and terminates the expression early.
+Unlike most other functions it can be called with no context (using the expression's evaluation input as the context), or with a single item context.
+{:.fhir-highlight}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+The `criterion` expression SHALL evaluate to a Boolean, consistent with [singleton evaluation of collections](#singleton-evaluation-of-collections).
+{:.fhir-highlight}
+
+If `criterion` evaluates to `true`, the function returns the value of the `true-result` argument, even if the input collection is empty.
+{:.fhir-highlight}
+
+If `criterion` evaluates to either `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
+
+Note that short-circuit behavior is expected in this function. 
+In other words, `true-result` should only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` should only be evaluated otherwise.
+The `criterion` is always evaluated, even when the input collection is empty.
+For implementations, this means delaying evaluation of the output arguments (specifically true-result and otherwise-result) to remove the chance that their evaluation throws an error and terminates the expression early.
+
+For example:
+{:.fhir-highlight}
+``` fhirpath
+// call with no context
+iif(true, 'It is true', 'It is false') // returns 'It is true'
+iif(false, 'It is true', 'It is false') // returns 'It is false'
+iif({}, 'It is true', 'It is false') // returns 'It is false'
+
+// call with input context
+// (example use on an identifier to read a specific identifier and perform some checks on it - could be a form field pre-population rule)
+Patient.identifier.where(system = 'http://example.org/special-id').first()
+  .iif(value.startsWith('555-').not(), value, value.substring(4))
+  .iif(exists(), $this, '(no special id)')
+
+// call with empty input context (and compare to using select)
+{}.iif(true, 'It is true', 'It is false')         // returns 'It is true'
+{}.select(iif(true, 'It is true', 'It is false')) // empty result, the iif is never evaluated
+
+// several ways to return the patient's birthDate, or '(unknown)' if no birthDate is present
+iif(birthDate.exists(), birthDate.toString(), '(unknown)') // $this is the Patient, so need to access the birthDate property
+birthDate.iif(exists(), $this.toString(), '(unknown)')     // $this is the birthDate
+birthDate.iif(exists(), toString(), '(unknown)')           // most concise form of the expression
+
+// examples showing $this context (evaluating on a Patient)
+Patient.birthDate.iif(true, $this)  // returns the birthdate value, which would also return empty if there was no birthDate
+iif(true, $this)                    // will return the evaluation context (e.g. the Patient)
+```
+{:.fhir-highlight}
+
+Note that [singleton evaluation of collections](#singleton-evaluation-of-collections) applies to the `criterion` parameter:
+{:.fhir-highlight}
+``` fhirpath
+iif(1, 'true', 'false')      // returns 'true' (not due to conversion to boolean)
+iif(0, 'true', 'false')      // returns 'true' (0 is a non-empty single item, not a Boolean false)
+iif('hi', 'true', 'false')   // returns 'true'
+```
+{:.fhir-highlight}
 
 #### Boolean Conversion Functions
 
