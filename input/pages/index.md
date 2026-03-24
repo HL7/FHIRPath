@@ -3012,7 +3012,7 @@ For Date and DateTime values, the function returns the number of digits of preci
 If the input collection contains a single Date or DateTime, this function will return the year component.
 {:.stu}
 
-If the input collection is empty, the result is empty.
+If the input collection is empty, or the value is not a Date or DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3031,7 +3031,7 @@ For example:
 If the input collection contains a single Date or DateTime, this function will return the month component.
 {:.stu}
 
-If the input collection is empty, or the month is not present in the value, the result is empty.
+If the input collection is empty, the month is not present in the value, or the value is not a Date or DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3057,7 +3057,7 @@ If the component isn't present in the value, then the result is empty:
 If the input collection contains a single Date or DateTime, this function will return the day component.
 {:.stu}
 
-If the input collection is empty, or the day is not present in the value, the result is empty.
+If the input collection is empty, the day is not present in the value, or the value is not a Date or DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3076,7 +3076,7 @@ For example:
 If the input collection contains a single DateTime or Time, this function will return the hour component.
 {:.stu}
 
-If the input collection is empty, or the hour is not present in the value, the result is empty.
+If the input collection is empty, the hour is not present in the value, or the value is not a DateTime or Time, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3096,7 +3096,7 @@ For example:
 If the input collection contains a single DateTime or Time, this function will return the minute component.
 {:.stu}
 
-If the input collection is empty, or the minute is not present in the value, the result is empty.
+If the input collection is empty, the minute is not present in the value, or the value is not a DateTime or Time, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3115,7 +3115,7 @@ For example:
 If the input collection contains a single DateTime or Time, this function will return the second component.
 {:.stu}
 
-If the input collection is empty, or the second is not present in the value, the result is empty.
+If the input collection is empty, the second is not present in the value, or the value is not a DateTime or Time, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3134,7 +3134,7 @@ For example:
 If the input collection contains a single DateTime or Time, this function will return the millisecond component.
 {:.stu}
 
-If the input collection is empty, or the millisecond is not present in the value, the result is empty.
+If the input collection is empty, the millisecond is not present in the value, or the value is not a DateTime or Time, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3153,7 +3153,7 @@ For example:
 If the input collection contains a single DateTime, this function will return the timezone offset component. It is expressed as the number of hours difference from UTC, with fractional hours expressed as decimal values (e.g. -7.5 for UTC-7:30).
 {:.stu}
 
-If the input collection is empty, or the timezone offset is not present in the value, the result is empty.
+If the input collection is empty, the timezone offset is not present in the value, or the value is not a DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3173,7 +3173,7 @@ For example:
 If the input collection contains a single Date or DateTime, this function will return the date component (up to the precision present in the input value).
 {:.stu}
 
-If the input collection is empty, the result is empty.
+If the input collection is empty, or the value is not a Date or DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3192,7 +3192,7 @@ For example:
 If the input collection contains a single DateTime, this function will return the time component.
 {:.stu}
 
-If the input collection is empty, or the time is not present in the value, the result is empty.
+If the input collection is empty, the time is not present in the value, or the value is not a DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
