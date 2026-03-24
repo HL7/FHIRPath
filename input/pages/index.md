@@ -2141,7 +2141,7 @@ The start/end of line markers `^`, `$` can be used to match the entire string.
 
 If the input collection or `regex` are empty, the result is empty (`{ }`).
 
-If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+If the input collection contains multiple items, or the flags parameter contains invalid values, the evaluation of the expression will end and signal an error to the calling environment.
 
 The optional `flags` parameter can be set to:
 {:.stu}
@@ -2153,7 +2153,11 @@ For example:
 ``` fhirpath
 'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matches('Library') // returns true
 'N8000123123'.matches('^N[0-9]{8}$') // returns false as the string is not an 8 char number (it has 10)
-'N8000123123'.matches('N[0-9]{8}') // returns true as the string has an 8 number sequence in it starting with `N`
+'N8000123123'.matches('N[0-9]{8}')   // returns true as the string has an 8 number sequence in it starting with `N`
+
+'first line\nsecond line'.matches('^second', 'm')   // true
+'first line\nsecond line'.matches('^second', '')    // false
+'first line\nsecond line'.matches('^SECOND', 'im')  // true ; combine flags
 ```
 
 #### matchesFull(regex : String, [flags : String]) : Boolean
@@ -2170,7 +2174,7 @@ Regular expressions should function consistently, regardless of any culture- and
 If the input collection or `regex` are empty, the result is empty (`{ }`).
 {:.stu}
 
-If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+If the input collection contains multiple items, or the flags parameter contains invalid values, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
 The optional `flags` parameter can be set to:

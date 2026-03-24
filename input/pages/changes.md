@@ -147,3 +147,4 @@
 * [FHIR-55962](https://jira.hl7.org/browse/FHIR-55962):  Difference and duration functions precision parameter should be string not identifier
 * [FHIR-55911](https://jira.hl7.org/browse/FHIR-55911):  Missing what to do when equality returns empty for functions like distinct
 * [FHIR-44601](https://jira.hl7.org/browse/FHIR-44601):  clarifying behaviour of iif
+* [FHIR-55931](https://jira.hl7.org/browse/FHIR-55931):  Matches and matchesFull should report error for invalid flags parameters
