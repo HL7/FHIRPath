@@ -2773,7 +2773,7 @@ using only element names and indexers. *Such that if you used that result on the
 {:.stu}
 
 If an item in the input collection was derived from computation (e.g. via `substring(..)`, `&`, or mathematical operations) rather than navigation it is excluded from the result.
-Items that are outside the input resource, such as those navigated to via resolve() are also excluded from the result, however if resolve()
+Items that are outside the input resource, such as those navigated to via FHIR's resolve() are also excluded from the result, however if resolve()
 references a resource contained within the input Resource then it is included (such as with FHIR bundles, or contained resources).
 {:.stu}
 

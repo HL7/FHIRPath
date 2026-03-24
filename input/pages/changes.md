@@ -149,3 +149,4 @@
 * [FHIR-44601](https://jira.hl7.org/browse/FHIR-44601):  clarifying behaviour of iif
 * [FHIR-55931](https://jira.hl7.org/browse/FHIR-55931):  Matches and matchesFull should report error for invalid flags parameters
 * [FHIR-55946](https://jira.hl7.org/browse/FHIR-55946):  Extract Date/DateTime/Time components need to indicate what to do when invalid input type
+* [FHIR-55893](https://jira.hl7.org/browse/FHIR-55893):  resolve() function referenced, but not defined.
