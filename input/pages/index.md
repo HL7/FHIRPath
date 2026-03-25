@@ -239,7 +239,14 @@ false
 ```
 
 #### String
-The `String` type represents string values up to 2<sup>31</sup>-1 characters in length and is UTF-8 encoded. String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
+The `String` type represents string values up to 2<sup>31</sup>-1 characters in length and is UTF-8 encoded.
+
+When parsing string literals, `\uXXXX` escape sequences represent UTF-16 code units; valid surrogate pairs are combined to form a single Unicode scalar value.
+After processing escapes, a FHIRPath string is defined as a sequence of Unicode scalar values, which are referred to elsewhere in this specification as `characters` (for example, in [toChars()](#tochars--collection)).<br/>
+This behaviour is consistent with the Unicode Standard and with the string literal processing rules used by most modern programming languages.
+{:.stu}
+
+String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
 
 | Escape | Character |
 | - | - |
@@ -251,15 +258,14 @@ The `String` type represents string values up to 2<sup>31</sup>-1 characters in 
 | `\t` | Tab |
 | `\f` | Form Feed |
 | `\\` | Backslash |
-| `\uXXXX` | Unicode character, where XXXX is the hexadecimal representation of the character |
+| `\uXXXX` | Unicode character escape, where XXXX is a four‑digit hexadecimal value representing a 16‑bit Unicode code unit. If the escape sequence represents a surrogate code unit, it must be paired with a corresponding high or low surrogate to form a valid Unicode scalar value. |
 {: .grid}
 
 No other escape sequences besides those listed above are recognized.
 
 Note that Unicode is supported in both string literals and delimited [Identifiers](#identifiers).
 
-> Note: The UTF-8 encoding is consistent with XML and JSON specifications, as well as the base FHIR specification.
-
+For example:
 ``` fhirpath
 'test string'
 'urn:oid:3.4.5.6.7.8'
@@ -274,6 +280,24 @@ define TestEscape3: '\3' // '3'
 define TestEscape4: '\u005' // 'u005'
 define TestEscape5: '\' // ''
 ```
+
+##### Unicode and String Operations
+{:.stu}
+
+String functions such as [`length()`](#length--integer), [`indexOf()`](#indexofsubstring--string--integer), [`substring()`](#substringstart--integer--length--integer--string), and [`toChars()`](#tochars--collection) operate on characters (Unicode scalar values), not on visual characters (grapheme clusters). This distinction matters when strings contain combining characters:
+{:.stu}
+
+| Visual Representation | Encoded String Literal | Unicode Scalar Value(s) | `length()` | Description |
+| - | - | - | - | - |
+| `'é'` (precomposed) | `'\u00E9'` | U+00E9 | 1 | Single character |
+| `'é'` (combining) | `'\u0065\u0301'` | U+0065 U+0301 | 2 | Two characters: 'e' + combining acute accent |
+| `🔥` (flame emoji) | `'\uD83D\uDD25'` | U+1F525 | 1 | Single character: A scalar value encoded using a UTF‑16 surrogate pair |
+{: .grid}
+{:.stu}
+
+Both precomposed and combining representations are valid and may appear in data. Authors should be aware that the same visual character may have different lengths depending on its Unicode representation. When consistent string length behavior is required, data should be normalized (e.g., to NFC or NFD form) before processing, though such normalization is outside the scope of FHIRPath.
+{:.stu}
+
 
 #### Integer
 
@@ -1965,6 +1989,7 @@ This example returns a collection containing the first character of all the give
 #### indexOf(substring : String) : Integer
 
 Returns the 0-based index of the first position `substring` is found in the input string, or -1 if it is not found.
+The returned index is measured in characters (Unicode scalar values).
 
 If `substring` is an empty string (`''`), the function returns 0.
 
@@ -1986,6 +2011,7 @@ For example:
 {: .stu-note }
 
 Returns the 0-based index of the last position `substring` is found in the input string, or -1 if it is not found.
+The returned index is measured in characters (Unicode scalar values).
 {:.stu}
 
 If `substring` is an empty string (`''`), the function returns the length of the string.
@@ -2013,6 +2039,7 @@ For example:
 #### substring(start : Integer [, length : Integer]) : String
 
 Returns the part of the string starting at position `start` (zero-based). If `length` is given, will return at most `length` number of characters from the input string.
+Both `start` and `length` are measured in characters (Unicode scalar values).
 
 If `start` lies outside the length of the string, the function returns empty (`{ }`). If there are less remaining characters in the string than indicated by `length`, the function returns just the remaining characters.
 
@@ -2221,25 +2248,30 @@ This example locates all the instances of `aa` and surrounds them with double qu
 
 #### length() : Integer
 
-Returns the number of characters in the input string. If the input collection is empty (`{ }`), the result is empty.
+Returns the number of characters (Unicode scalar values) in the input string. If the input collection is empty (`{ }`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+Note that `length()` counts characters (Unicode scalar values), not visual characters (grapheme clusters). For example, the string `'é'` encoded as U+0065 + U+0301 (combining form) has a length of 2, while `'é'` encoded as U+00E9 (precomposed form) has a length of 1.
+{:.stu}
 
 For example:
 ``` fhirpath
 'abc'.length() // 3
 ''.length() // 0
-'\u0065\u0301'.length() // 2 unicode encoded characters
+'\u0065\u0301'.length() // 2 characters (Unicode scalar values)
+'\uD83D\uDD25'.length() // 1 character (Uingle unicode scalar value encoded using a UTF-16 surrogate pair)
 ```
 
 #### toChars() : collection
 
-Returns the list of characters in the input string. If the input collection is empty (`{ }`), the result is empty.
+Returns the list of characters in the input string as individual single-character strings. If the input collection is empty (`{ }`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 ``` fhirpath
 'abc'.toChars() // { 'a', 'b', 'c' }
+'\u0065\u0301'.toChars() // { 'e', '\u0301' } ; the combining form of 'é' returns two characters
 ```
 
 ### Additional String Functions
