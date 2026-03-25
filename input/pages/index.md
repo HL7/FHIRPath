@@ -2293,6 +2293,7 @@ If no format is specified, the result is empty.
 
 If the content being decoded is not a valid UTF-8 value, the result will be empty.
 *It should not replace with the unicode replacement character or allow ill formed UTF-8 content.*
+{:.stu}
 
 For example:
 {:.stu}
