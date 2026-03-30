@@ -813,9 +813,9 @@ This means that if the input collection is empty (`{ }`), the result is `true`.
 
 For example:
 ``` fhirpath
-(1 | 2 | 3).isDistinct() // true
-(1 | 2 | 3 | 2).isDistinct() // false ; the 2 appears twice in the input collection
-(1 'm' | 100 'cm').isDistinct() // false ; both quantities are the same (via unit conversion)
+1.combine(2).combine(3).isDistinct() // true
+1.combine(2).combine(3).combine(2).isDistinct() // false ; the 2 appears twice in the input collection
+1 'm'.combine(100 'cm').isDistinct() // false ; both quantities are the same (via unit conversion)
 ```
 
 ### Filtering and projection
@@ -993,11 +993,12 @@ The following examples illustrate the use of the `sort()` function:
 {:.stu}
 
 ``` fhirpath
-(3 | 1 | 2).sort() // (1 | 2 | 3) ; natural numeric ordering
-(3 | 1 | 2).sort($this) // (1 | 2 | 3) ; explicit ascending
-(3 | 1 | 2).sort($this desc) // (3 | 2 | 1) ; descending
-('c' | 'a' | 'b').sort() // ('a' | 'b' | 'c') ; default string ordering
-('c' | 'a' | 'b').sort($this desc) // ('c' | 'b' | 'a') ; descending
+(3 | 1 | 2).sort() // 1, 2, 3 ; natural numeric ordering
+(3 | 1 | 2).sort($this) // 1, 2, 3 ; explicit ascending
+(3 | 1 | 2).sort($this desc) // 3, 2, 1 ; descending
+('c' | 'a' | 'b').sort() // 'a', 'b', 'c' ; default string ordering
+('c' | 'a' | 'b').sort($this desc) // 'c', 'b', 'a' ; descending
+('3' | '1' | '10').sort() // '1', '10', '3' ; default string ordering (not numeric)
 Patient.name.sort(family desc, given.first()) // sort by family name descending, then by first given name ascending
 Patient.telecom.sort(system, use desc) // sort by system ascending, then by use descending
 ```
@@ -4012,7 +4013,7 @@ Addition for Date/Time types is defined in the [Date/Time Arithmetic](#datetime-
 
 > **Note:** Performing addition with mixed type parameters of either Integer, Long or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Numeric argument to a Quantity (with the special UCUM code `'1'`).
 This effectively makes the operation a simple decimal operation on the 2 values, and returns a Quantity with the same unit as the Quantity argument.
-For example, `1 + 2 'cm'` would be evaluated as `1 '1' * 2 'cm'`, which would return `3 'cm'`. This is a common use case for math operations with quantities, and allows for simple math operations on quantities without needing to explicitly convert the non-quantity argument to a quantity.
+For example, `1 + 2 'cm'` would be evaluated as `1 '1' + 2 'cm'`, which would return `3 'cm'`. This is a common use case for math operations with quantities, and allows for simple math operations on quantities without needing to explicitly convert the non-quantity argument to a quantity.
 {:.fhir-highlight}
 
 Otherwise when adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit. 
