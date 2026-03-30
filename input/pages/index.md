@@ -408,16 +408,15 @@ Consult the [formal grammar](grammar.html) for more details.
 
 The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` is represented as a `String` that is required to be either a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or one of the calendar duration keywords, singular or plural.
 
-The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) **case-sensitive** string representing a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or calendar duration keyword.
+The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) **case-sensitive**{:.fhir-highlight} string representing a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or calendar duration keyword.
 If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
-{:.fhir-highlight}
+
 
 ``` fhirpath
 4.5 'mg'      // UCUM milligrams
 100 '[degF]'  // UCUM temperature in Fahrenheit
 2 years       // Calendar units
 ```
-{:.fhir-highlight}
 
 Implementations shall support [equality](#quantity-equality), [equivalence](#quantity-equivalence), [comparison](#comparison) and [arithmetic](#math-1) operations on quantities with units where the units are the same value, case-sensitively.
 {:.fhir-highlight}
@@ -429,7 +428,6 @@ Implementations should support UCUM conversion either explicitly through [toQuan
 {:.fhir-highlight}
 
 For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
-{:.fhir-highlight}
 
 > **Note:** The UCUM specification defines what unit codes are valid, how units are composed/decomposed when performing multiplication and division, 
 > and, where applicable, scalar conversion factors between commensurable units (e.g. between a single dimension such as length).<br/>
@@ -453,9 +451,9 @@ For time-valued quantities, in addition to the definite duration UCUM units, FHI
 | `millisecond`/`milliseconds` | `'millisecond'` | `= 1 'ms'` |
 {: .grid}
 
-The table above defines the equality/equivalence relationship between calendar and definite duration quantities. For example, `1 year` is not [equal](#-equals) to `1 'a'` (i.e. results in empty), but it is [equivalent](#-equivalent) to `1 'a'`.<br/>
+The table above defines the equality/equivalence relationship between calendar and definite duration quantities.
+For example, `1 year` is not [equal](#-equals) to `1 'a'` <span class="fhir-highlight">(i.e. results in empty)</span>, but it is [equivalent](#-equivalent) to `1 'a'`.<br/>
 See the [Date/Time Arithmetic](#datetime-arithmetic) section for details on addition and subtraction of time-valued quantities to date/time values.
-{:.fhir-highlight}
 
 UCUM defines the conversion factors between UCUM units, and FHIRPath defines [conversion factors](#fn-toquantity-conversion-factors) for calendar units.
 {:.fhir-highlight}
@@ -1290,7 +1288,7 @@ The following table lists the possible conversions supported, and whether the co
 |- |- |- |- |- |- |- |- |- | - |
 |**Boolean** |N/A |Explicit | *Explicit*{:.stu-bg} |Explicit |*Explicit*{:.stu-bg} |Explicit |- |- |- |
 |**Integer** |Explicit |N/A | *Implicit*{:.stu-bg} |Implicit |Implicit |Explicit |- |- |- |
-|**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*-*{:.stu-bg} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
+|**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*Implicit*{:.stu-bg .fhir-highlight} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
 |**Decimal** |Explicit |- | *-*{:.stu-bg} |N/A |Implicit |Explicit |- |- |- |
 |**Quantity** |- |- | *-*{:.stu-bg} |- |N/A |Explicit |- |- |- |
 |**String** |Explicit |Explicit | *Explicit*{:.stu-bg} |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
@@ -1304,7 +1302,7 @@ The following table lists the possible conversions supported, and whether the co
 * N/A - Not applicable
 * \- No conversion is defined
 
-**Note:** When an integer or decimal is implicitly converted to a Quantity, the resulting quantity will have the default unit ('1').
+**Note:** When an integer, long or decimal is implicitly converted to a Quantity, the resulting quantity will have the default unit ('1').
 {:.fhir-highlight}
 
 The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
@@ -1750,7 +1748,7 @@ If the input collection contains a single item, this function will return a sing
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ```
-As with integer, long, and decimal, where the resulting quantity has no unit, it will have the default unit (`'1'`)
+<span class="fhir-highlight">As with integer, long, and decimal, where the resulting quantity has no unit, it will have the default unit (`'1'`)</span>
 * the item is a Boolean, where `true` results in the quantity `1.0 '1'`, and `false` results in the quantity `0.0 '1'`
 
 If the item is not one of the above, the result is empty.
@@ -1772,10 +1770,11 @@ then the unit of result should be set to the unit argument provided, and no furt
 *(providing a way to indicate the unit of a numeric value)*.
 {:.fhir-highlight}
 
-If the input can be [**converted**](#unit-conversions), the result is the converted quantity, otherwise the result is empty.
+If the `unit` argument is provided and the input can be [**converted**](#unit-conversions), the result is the converted quantity, otherwise the result is empty.
 {:.fhir-highlight}
 
 For example:
+{:.fhir-highlight}
 ``` fhirpath
 52 'cm'.toQuantity('m') // 0.52 'm'
 45.toQuantity('m')      // 45 'm' ; this literal value 45 is recorded in meters.
@@ -1829,7 +1828,8 @@ FHIRPath defines the following conversion factors for calendar durations and the
 These conversion factors (apart from years/months) are the same as UCUM, so can be used interchangeably.
 {:.fhir-highlight}
 
-When explicitly converting between UCUM definite durations and calendar units of differing magnitudes (e.g. days and weeks), perform the conversion within the unit system oof the source, then change to the matching target unit:
+When explicitly converting between UCUM definite durations and calendar units of differing magnitudes (e.g. days and weeks), perform the conversion within the unit system of the source,
+then change the unit to the corresponding target unit:
 {:.fhir-highlight}
 ```fhirpath
 7 days.toQuantity('wk')  // 7 days → 1 week → 1 'wk'
@@ -3390,8 +3390,7 @@ name = name // true ; its the same object, and thus will have all the same prope
 ##### Quantity Equality
 
 When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the same unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
-This is referred to as the units being commensurable in UCUM.
-{:.fhir-highlight}
+<span class="fhir-highlight">This is referred to as the units being commensurable in UCUM.</span>
 
 When the units are different the quantity values must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equality comparison is empty (`{ }`).
@@ -3503,8 +3502,7 @@ name ~ name // true ; its the same object, and thus will have all the same prope
 ##### Quantity Equivalence
 
 When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the same unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
-This is referred to as the units being commensurable in UCUM.
-{:.fhir-highlight}
+<span class="fhir-highlight">This is referred to as the units being commensurable in UCUM.</span>
 
 When the units are different the quantity values must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
 Since the equivalence comparison for decimals is rounded to the least precise operand, choosing the unit with the highest conversion factor of the 2 being compared (the least granular) will ensure that the precision of the comparison is not artificially increased by the conversion *(e.g. For 10 kg ~ 10000 g convert g to kg)*. 
@@ -3573,18 +3571,17 @@ The converse of the equivalent operator, returning `true` if equivalent returns 
 
 ### Comparison
 
-* The comparison operators are defined for strings, integers, decimals, quantities, dates, datetimes and times.
+* The comparison operators are defined for strings, integers, <span class="fhir-highlight">longs</span>, decimals, quantities, dates, datetimes and times.
 * If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
 * Both arguments must be collections with single values, and the evaluator will throw an error if either collection has more than one item.
 * Both arguments must be of the same type (or [implicitly convertible](#conversion) to the same type), and the evaluator will throw an error if the types differ.
-* When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible.<br/>
+* When comparing integers or longs to decimals, the integer/long value will be implicitly converted to a decimal to make comparison possible.<br/>
   *arguments are compared ignoring trailing zeroes after the decimal point (same as with equality)*{:.fhir-highlight}
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
 
 When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
 For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. 
-This is referred to as the units being commensurable in UCUM.
-{:.fhir-highlight}
+<span class="fhir-highlight">This is referred to as the units being commensurable in UCUM.</span>
 
 When quantity units are different the quantities must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the comparison is empty (`{ }`).
@@ -3722,9 +3719,9 @@ For example:
 Returns `true` if the input Quantity can be compared with the `other` Quantity and their relationship to each other determined.
 Comparable means that both have values, and the units are the same (irrespective of the system), or both have `code` and `system` values,
 and the `system` is recognized by the FHIRPath implementation, and the codes are comparable within that system
-(e.g. `'d'` (days) and `'h'` (hours), or `'[in_i]'` (inches) and `'cm'` (centimeters)). This is referred to as the units being commensurable in UCUM.
+(e.g. `'d'` (days) and `'h'` (hours), or `'[in_i]'` (inches) and `'cm'` (centimeters)). 
+<span class="fhir-highlight">This is referred to as the units being commensurable in UCUM.</span>
 {:.stu}
-{:.fhir-highlight}
 
 If either or both inputs are empty, or either input is not a single Quantity value, the result is empty (`{ }`).
 {:.stu}
