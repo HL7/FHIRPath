@@ -424,7 +424,7 @@ Implementations shall support [equality](#quantity-equality), [equivalence](#qua
 Implementations that do NOT support UCUM unit conversion may return empty (`{ }`) for calculations involving quantities with different units.
 {:.fhir-highlight}
 
-Implementations should support UCUM conversion either explicitly through [toQuantity(unit)](#fn-toquantity), or implicitly where operations between quantities with different units are performed.
+Implementations should support UCUM conversion that can be invoked explicitly through [toQuantity(unit)](#fn-toquantity), or implicitly where operations between quantities with different units are performed.
 {:.fhir-highlight}
 
 For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
