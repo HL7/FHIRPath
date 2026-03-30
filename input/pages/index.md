@@ -2002,6 +2002,9 @@ For example:
 'abcdefg'.indexOf('bc') // 1
 'abcdefg'.indexOf('x') // -1
 'abcdefg'.indexOf('abcdefg') // 0
+'a🔥b'.indexOf('🔥') // 1
+'a🔥b'.indexOf('b')  // 2  (not 3, because 🔥 is 1 character)
+'a\uD83D\uDD25b'.indexOf('b')  // 2  (not 3, because the surrogate pair is 1 character)
 ```
 
 #### lastIndexOf(substring : String) : Integer
@@ -2260,7 +2263,7 @@ For example:
 'abc'.length() // 3
 ''.length() // 0
 '\u0065\u0301'.length() // 2 characters (Unicode scalar values)
-'\uD83D\uDD25'.length() // 1 character (Uingle unicode scalar value encoded using a UTF-16 surrogate pair)
+'\uD83D\uDD25'.length() // 1 character (single Unicode scalar value encoded using a UTF-16 surrogate pair)
 ```
 
 #### toChars() : collection
@@ -2270,8 +2273,9 @@ Returns the list of characters in the input string as individual single-characte
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 ``` fhirpath
-'abc'.toChars() // { 'a', 'b', 'c' }
+'abc'.toChars()          // { 'a', 'b', 'c' }
 '\u0065\u0301'.toChars() // { 'e', '\u0301' } ; the combining form of 'é' returns two characters
+'a\uD83D\uDD25b'.toChars()        // { 'a', '🔥', 'b' } ; note that the surrogate pair is a single character in the output collection (don't split the surrogate pairs as separate characters)
 ```
 
 ### Additional String Functions
