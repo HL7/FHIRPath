@@ -1357,7 +1357,7 @@ Patient.identifier.where(system = 'http://example.org/special-id').first()
 {}.select(iif(true, 'It is true', 'It is false')) // empty result, the iif is never evaluated
 
 // several ways to return the patient's birthDate, or '(unknown)' if no birthDate is present
-iif(birthDate.exists(), birthDate.toString(), '(unknown)') // $this is the Patient, so need to access the birthDate property
+iif(birthDate.exists(), birthDate.toString(), '(unknown)') // $this is the Patient, so need to access the birthDate element
 birthDate.iif(exists(), $this.toString(), '(unknown)')     // $this is the birthDate
 birthDate.iif(exists(), toString(), '(unknown)')           // most concise form of the expression
 
@@ -3560,7 +3560,21 @@ For example:
 
 ##### String Equivalence
 
-For strings, equivalence returns `true` if the strings are the same value while ignoring case and locale, and normalizing whitespace. Normalizing whitespace means that all whitespace characters are treated as equivalent, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
+For strings, equivalence returns `true` if the strings are the same value while ignoring case and locale, and normalizing whitespace.
+
+Normalizing whitespace means treating as equivalent all characters in the Unicode White_Space character class (as defined in https://www.unicode.org/Public/UCD/latest/ucd/PropList.txt) -
+*this set includes the characters in the whitespace lexical category*.
+{:.stu}
+
+> **Note:** Multiple whitespace characters in sequence are not collapsed to a single character. 
+> This could be done by using `replaceMatches('\\s+', ' ')` on both sides, which would normalize the whitespace to a single space.
+> However, not all regex implementations cover the same set of whitespace characters with `\s`; this inconsistency is outside the scope of FHIRPath.<br/>
+> To simply trim the start and end of content, use the [`trim()`](#trim--string) function.
+
+For example:
+```
+'a b' ~ 'a\tb' // true
+```
 
 #### != (Not Equals)
 
