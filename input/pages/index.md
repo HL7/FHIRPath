@@ -2065,7 +2065,8 @@ For example:
                            //     this can happen when the -1 was the result of a calculation rather than explicitly provided)
 'abcdefg'.substring(3, 0) // '' (empty string)
 'abcdefg'.substring(3, -1) // '' (empty string)
-'abcdefg'.substring(-1, -1) // {} (start position is outside the string)
+'abcdefg'.substring(-1, -1) // { } (start position is outside the string)
+''.substring(0) // { } (start position is outside the string)
 ```
 
 #### startsWith(prefix : String) : Boolean

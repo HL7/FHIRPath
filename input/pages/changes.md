@@ -153,3 +153,4 @@
 * [FHIR-55935](https://jira.hl7.org/browse/FHIR-55935):  decode() and invalid Unicode
 * [FHIR-55471](https://jira.hl7.org/browse/FHIR-55471):  Arithmetic and toQuantity are not NOT explicitly define for Long
 * [FHIR-55473](https://jira.hl7.org/browse/FHIR-55473):  FHIRPath String Equivalence Ambiguities
+* [FHIR-56286](https://jira.hl7.org/browse/FHIR-56286):  Add an example to clarify result of ''.substring(0)
