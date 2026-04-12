@@ -2162,6 +2162,8 @@ For example:
 'abcdefg'.replace('cde', '123') // 'ab123fg'
 'abcdefg'.replace('cde', '') // 'abfg'
 'abc'.replace('', 'x') // 'xaxbxcx'
+'a\uD83D\uDD25c'.replace('', 'x') // 'xax🔥xcx' ; the unicode character should remain in tact (even if it was constructed via surrogates)
+'a🔥c'.replace('', 'x') // 'xax🔥xcx'
 ```
 
 <a name="fn-matches"></a>
