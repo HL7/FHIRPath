@@ -3597,6 +3597,8 @@ Normalizing whitespace means treating as equivalent all characters in the Unicod
 For example:
 ```
 'a b' ~ 'a\tb' // true
+'a     b' ~ 'a b' // false ; the whitespace isn't collapsed
+'a b' ~ 'A B' // true ; case insensitive test
 ```
 
 #### != (Not Equals)
