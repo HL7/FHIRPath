@@ -2065,7 +2065,7 @@ For example:
 Returns the part of the string starting at position `start` (zero-based). If `length` is given, will return at most `length` number of characters from the input string.
 Both `start` and `length` are measured in characters (Unicode scalar values).
 
-If `start` lies outside the length of the string, the function returns empty (`{ }`). If there are less remaining characters in the string than indicated by `length`, the function returns just the remaining characters.
+If `start` lies outside, or equal to, the length of the string, the function returns empty (`{ }`). If there are less remaining characters in the string than indicated by `length`, the function returns just the remaining characters.
 
 If the input or `start` is empty, the result is empty.
 
@@ -3432,7 +3432,7 @@ For example:
 1 'cm' = 10.0 'mm' // true ; UCUM conversion gives the same decimal value (ignoring trailing zeros after the decimal place)
 1 'cm' = 1 'm' // false ; UCUM conversion yields the difference
 1 'cm' = 1 's' // empty ({ }) ; invalid comparison of different dimensions
-23 'Cel' = 73.4 'degF' // empty ({ }) ; invalid comparison of "special" units on non-ratio scales
+23 'Cel' = 73.4 '[degF]' // empty ({ }) ; invalid comparison of "special" units on non-ratio scales
 ```
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, years and months are not equal across UCUM definite durations and calendar units. Hence when the arguments are a mix of these, the result is empty as they are considered un-comparable.<br/>
@@ -3548,7 +3548,7 @@ For example:
 4 'g' ~ 4000 'mg'   // true ; convert to 'g' (4 ~ 4.000), round to least precise and compare (4 = 4)
 4 'g' ~ 4040 'mg'   // true ; convert to 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
 1 'inch' ~ 2.5 'cm' // true ; convert to 'inch' (1 ~ 0.98..), round to least precise and compare (1 = 1)
-23 'Cel' ~ 73.4 'degF' // empty ({ }) ; invalid comparison of "special" units on non-ratio scales
+23 'Cel' ~ 73.4 '[degF]' // empty ({ }) ; invalid comparison of "special" units on non-ratio scales
 ```
 {:.fhir-highlight}
 
@@ -3780,7 +3780,7 @@ For example:
 1.comparable(2) // true ; these will both convert to quantities with the same system/code, hence are comparable
 1 'in_i'.comparable(1 'cm') // true ; These UCUM units can be compared/converted
 1 year.comparable(1 'a') // false ; these units are equivalent, not equal hence not comparable
-23 'Cel'.comparable(73.4 'degF') // false ; these "special" units on non-ratio scales are not comparable
+23 'Cel'.comparable(73.4 '[degF]') // false ; these "special" units on non-ratio scales are not comparable
 ```
 {:.stu}
 
