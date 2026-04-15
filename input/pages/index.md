@@ -1799,7 +1799,23 @@ This is often a simple fixed conversion factor applied to convert between specif
 If units are not commensurable, the result of conversion is empty (`{ }`).
 {:.fhir-highlight}
 
-UCUM does not support conversion with differing ["Special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the unit into base units. 
+When an operation requires one of its arguments to be converted, the "most granular" unit is the one that provides the most precise whole number representation without needing fractions or decimals.
+For example if selecting between `mm` and `cm`, then `mm` is the most granular unit.<br/>
+This can be generically evaluated by selecting the conversion factor that is less than 1 when converting from one unit to the other.
+If the conversion factor is greater than 1, then the other unit is more granular.<br/>
+e.g. for our example above, the conversion factor from `mm` to `cm` is 0.1, which is less than 1, so `mm` is the most granular unit.<br/>
+Conversely, the conversion factor from `in_i` to `cm` is 2.54, which is greater than 1, so `cm` is the most granular of those two units.<br/>
+This also applies to complex composite units such as velocities (`m/s`) or other ratios (`J/s`) where the rules of the UCUM specification define how to calculate the conversion factor.<br/>
+The "least granular" is the opposite of this.<br/>
+If the conversion factors are 1 *(the units are equal)*, then choose the unit of the operator's left argument.<br/>
+*This is required for both [quantity addition](#-addition) (most granular) and [quantity equivalence](#quantity-equivalence) (least granular)*.
+{:.fhir-highlight}
+
+> **Note:** Implementers should refer to the [UCUM specification](https://ucum.org/ucum#baseunits) for guidance, and also to the [NLM Unit Conversion](https://ucum.nlm.nih.gov/ucum-service.html#toBaseUnits) service for more information.
+
+{:.fhir-highlight}
+
+UCUM does not support conversion with differing ["Special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
 Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
 {:.fhir-highlight}
 
@@ -3482,7 +3498,7 @@ If both operands are collections with a single item, they must be of the same ty
   * `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision.
   * `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).<br/>*(see [Date/Time Equivalence](#datetime-equivalence) for more details)*
   * `Boolean`: the values must be the same
-* <span class="fhir-highlight">`Quantity`: value comparison based on decimal as described above, after [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.</span><br/><span class="fhir-highlight">*(See [Quantity Equivalence](#quantity-equivalence) for more details)*</span>
+* <span class="fhir-highlight">`Quantity`: value comparison based on decimal as described above, after [**conversion**](#unit-conversions) to the least granular unit before comparison.</span><br/><span class="fhir-highlight">*(See [Quantity Equivalence](#quantity-equivalence) for more details)*</span>
 * For complex types, equivalence requires all child elements to be equivalent, recursively.
 
 If both operands are collections with multiple items:
@@ -3512,8 +3528,8 @@ name ~ name // true ; its the same object, and thus will have all the same prope
 When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the same unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
 <span class="fhir-highlight">This is referred to as the units being commensurable in UCUM.</span>
 
-When the units are different the quantity values must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
-Since the equivalence comparison for decimals is rounded to the least precise operand, choosing the unit with the highest conversion factor of the 2 being compared (the least granular) will ensure that the precision of the comparison is not artificially increased by the conversion *(e.g. For 10 kg ~ 10000 g convert g to kg)*. 
+When the units are different the quantity values must be [**converted**](#unit-conversions) to the least granular unit before comparison.<br/>
+*(using the least granular unit ensures that the precision of the converted value is not artificially increased by the conversion, and thus doesn't impact the rounded decimal comparison)*<br/>
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equality comparison is empty (`{ }`).
 {:.fhir-highlight}
 
@@ -3749,7 +3765,7 @@ If either or both inputs are empty, or either input is not a single Quantity val
 {:.stu}
 
 > Returning true from this function indicates that a result from [equality](#equality) or [comparison](#comparison) functions will succeed, and not return empty.
-> These functions perform [**unit conversion**](#unit-conversions) to the same unit where required.
+> These functions consider [**unit conversion**](#unit-conversions) where required.
 {:.stu}
 {:.fhir-highlight}
 
@@ -4034,17 +4050,16 @@ The resulting datatype is the same as the input datatype *(after any [implicit c
 Addition for Date/Time types is defined in the [Date/Time Arithmetic](#datetime-arithmetic) section.
 {:.fhir-highlight}
 
-> **Note:** Performing addition with mixed type parameters of either Integer, Long or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Numeric argument to a Quantity (with the UCUM default unit `'1'`).
-This effectively makes the operation a simple decimal operation on the 2 values, and returns a Quantity with the same unit as the Quantity argument.
-For example, `1 + 2 'cm'` would be evaluated as `1 '1' + 2 'cm'`, which would return `3 'cm'`. This is a common use case for math operations with quantities, and allows for simple math operations on quantities without needing to explicitly convert the non-quantity argument to a quantity.
-{:.fhir-highlight}
-
-Otherwise when adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit. 
+When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit. 
 For example, units of 'cm' and 'm' can be added, but units of 'kg' and 'cm' cannot. This is referred to as the units being commensurable in UCUM.
 {:.fhir-highlight}
 
-When the units are different the quantity values must be [**converted**](#unit-conversions) to the unit of the left operand.
+When the units of quantity arguments are different, the quantity values must be [**converted**](#unit-conversions) to the most granular unit, then simple addition on the values can be performed.
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the addition is empty (`{ }`).
+{:.fhir-highlight}
+
+> **Note:** Performing addition with mixed type parameters of either Integer, Long or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Numeric argument to a Quantity (with the UCUM default unit `'1'`).
+This means that unless the unit of the quantity was `'1'` too, the addition will return empty as the units are not commensurate.
 {:.fhir-highlight}
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
@@ -4055,9 +4070,11 @@ For example:
 ``` fhirpath
 1 + 2          // 3 ; simple numeric addition
 5L + 4.5       // 9.5 ; implicit conversion from long to decimal then addition
-3 'm' + 3 'cm' // 3.03 'm' ; via ucum conversion
-3 'cm' + 3 'm' // 303 'cm' ; via ucum conversion
-1 + 2 'cm'     // 3 'cm' ; via implicit conversion
+3 'm' + 3 'cm' // 303 'cm' ; via ucum conversion to most granular unit
+3 'cm' + 3 'm' // 303 'cm' ; via ucum conversion to most granular unit
+(3 'm' + 3 'cm').toQuantity('m') // 3.03 'm' ; as above except explicitly convert the result to meters
+2 + 2 'cm'     // empty ({ }) ; implicit conversion to UCUM default units 2 '1', these units are not commensurate
+2 + 2 '1'      // 4 '1' ; implicit conversion, then simple addition of same unit values
 ```
 {:.fhir-highlight}
 

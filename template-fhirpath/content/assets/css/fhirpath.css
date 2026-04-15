@@ -112,8 +112,12 @@ blockquote.stu {
     margin-left: 20px;
 }
 
-span.fhir-lighlight {
+span.fhir-highlight {
     background-color: rgba(0, 128, 0, 0.1);
+}
+
+.strikeout {
+    text-decoration: line-through;
 }
 
 .fhir-highlight {
@@ -282,4 +286,54 @@ code.language-typescript, code.language-regex, code.language-txt {
 
 .language-antlr4 .token.punctuation {
     color: #6e6e6e;
+}
+
+@media (min-width: 768px) {
+    div.markdown-toc {
+        margin: 8px;
+        margin-right: calc(384px - 50vw);
+    }
+}
+
+@media (min-width: 992px) {
+    div.markdown-toc {
+        margin: 8px;
+        margin-right: calc(496px - 50vw);
+    }
+}
+
+@media (min-width: 1100px) {
+    div.markdown-toc {
+        margin: 8px;
+        margin-right: calc(550px - 50vw + 20px);
+    }
+}
+
+@media (min-width: 1810px) {
+    div.markdown-toc {
+        position: sticky;
+        right: 0;
+        top: 12px;
+        bottom: 12px;
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+    }
+}
+
+/* 
+Over-ride the new-content styling for spans
+span's are inline content, just want the fancy background coloring
+not interfering with other layout and spacing of the content.
+*/
+span.new-content {
+    margin: -8px;
+    padding: 8px;
+    color: unset;
+    background-color: rgba(0,255,0,0.3);
+    border: unset;
+}
+/* don't want "New Content" label splatted in the middle of narrative content*/
+span.new-content::before {
+    content: unset;
+    display: none;
 }
