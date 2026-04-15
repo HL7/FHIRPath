@@ -4116,8 +4116,8 @@ Handling subtraction of quantities is the same as adding with a negative value, 
 
 For example:
 ``` fhirpath
-3 'm' - 3 'cm'    // 2.97 'm' ; ucum conversion to meters
-3 'cm' - 3 'm'    // -297 'cm' ; ucum conversion to centimeters
+3 'm' - 3 'cm'    // 297 'cm' ; ucum conversion to centimeters (most granular unit)
+3 'cm' - 3 'm'    // -297 'cm' ; ucum conversion to centimeters (most granular unit)
 1 minute - 30 's' // 0.5 minute ; seconds converted to minutes, then value subtraction
 ```
 {:.fhir-highlight}
