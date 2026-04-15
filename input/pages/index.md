@@ -241,7 +241,7 @@ false
 #### String
 The `String` type represents string values up to 2<sup>31</sup>-1 characters in length and is UTF-8 encoded.
 
-When parsing string literals, `\uXXXX` escape sequences represent UTF-16 code units; valid surrogate pairs are combined to form a single Unicode scalar value.
+When parsing string literals, `\uXXXX` escape sequences represent [UTF-16](https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G31699) code units; valid surrogate pairs are combined to form a single Unicode scalar value.
 After processing escapes, a FHIRPath string is defined as a sequence of Unicode scalar values, which are referred to elsewhere in this specification as `characters` (for example, in [toChars()](#tochars--collection)).<br/>
 This behaviour is consistent with the Unicode Standard and with the string literal processing rules used by most modern programming languages.
 {:.stu}
