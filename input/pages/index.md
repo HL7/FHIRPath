@@ -3560,7 +3560,7 @@ For example:
 {:.fhir-highlight}
 ``` fhirpath
 1 year ~ 1 'a' // true ; by definition in equivalent
-1 year ~ 11 months // true ; convert to 'year' (1 ~ 0.9166666), round to least precise and compare (1 = 1)
+1 year ~ 11 months // true ; convert to least granular 'year' (1 ~ 0.9166666), round to least precise and compare (1 = 1)
 1 second ~ 1 's' // true ; by definition in equal
 ```
 {:.fhir-highlight}
