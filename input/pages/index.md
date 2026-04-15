@@ -430,8 +430,10 @@ Implementations should support UCUM conversion that can be invoked explicitly th
 For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
 
 > **Note:** The UCUM specification defines what unit codes are valid, how units are composed/decomposed when performing multiplication and division, 
-> and, where applicable, scalar conversion factors between commensurable units (e.g. between a single dimension such as length).<br/>
-> It does not specify how precision, rounding or comparisons are evaluated, FHIRPath specifies that in each section where required.
+> and, where applicable, scalar conversion factors between commensurable units (e.g. between a single dimension such as length).
+>
+> UCUM does not specify how precision, rounding or comparisons are evaluated, FHIRPath specifies this in each section where required.<br>
+> UCUM does not specify *which* operand should be converted when an operation has 2 operands of different units.
 {:.fhir-highlight}
 
 
@@ -454,6 +456,11 @@ For time-valued quantities, in addition to the definite duration UCUM units, FHI
 The table above defines the equality/equivalence relationship between calendar and definite duration quantities.
 For example, `1 year` is not [equal](#-equals) to `1 'a'` <span class="fhir-highlight">(i.e. results in empty)</span>, but it is [equivalent](#-equivalent) to `1 'a'`.<br/>
 See the [Date/Time Arithmetic](#datetime-arithmetic) section for details on addition and subtraction of time-valued quantities to date/time values.
+
+> **Note:** A calendar `day` is not technically equal/equivalent to a UCUM 'd', due to the possibility  of daylight saving time. 
+> However for practical reasons it considers them to be equal.
+> Authors should take care to ensure calendar days are used in applications that are sensitive to this difference.
+{:.fhir-highlight}
 
 UCUM defines the conversion factors between UCUM units, and FHIRPath defines [conversion factors](#fn-toquantity-conversion-factors) for calendar units.
 {:.fhir-highlight}
@@ -1303,7 +1310,7 @@ The following table lists the possible conversions supported, and whether the co
 * N/A - Not applicable
 * \- No conversion is defined
 
-**Note:** When an integer, long or decimal is implicitly converted to a Quantity, the resulting quantity will have the default unit ('1').
+**Note:** When an integer, long or decimal is implicitly converted to a Quantity, the resulting quantity will have the UCUM default unit ('1').
 {:.fhir-highlight}
 
 The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
@@ -1743,13 +1750,13 @@ For example:
 
 If the input collection contains a single item, this function will return a single quantity if:
 
-* the item is an Integer, Long or Decimal, where the resulting quantity will have the default unit (`'1'`)
+* the item is an Integer, Long or Decimal, where the resulting quantity will have the UCUM default unit (`'1'`)
 * the item is a Quantity
 * the item is a String and is convertible to a Quantity using the regex format:
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ```
-<span class="fhir-highlight">As with integer, long, and decimal, where the resulting quantity has no unit, it will have the default unit (`'1'`)</span>
+<span class="fhir-highlight">As with integer, long, and decimal, where the resulting quantity has no unit, it will have the UCUM default unit (`'1'`)</span>
 * the item is a Boolean, where `true` results in the quantity `1.0 '1'`, and `false` results in the quantity `0.0 '1'`
 
 If the item is not one of the above, the result is empty.
@@ -1766,11 +1773,6 @@ For example, the following are valid quantity strings used with toQuantity:
 
 If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword).
 
-If the input quantity, or the result of converting the input to a quantity, has the default unit (`'1'`), 
-then the unit of result should be set to the unit argument provided, and no further actual conversion need be performed
-*(providing a way to indicate the unit of a numeric value)*.
-{:.fhir-highlight}
-
 If the `unit` argument is provided and the input can be [**converted**](#unit-conversions), the result is the converted quantity, otherwise the result is empty.
 {:.fhir-highlight}
 
@@ -1778,11 +1780,13 @@ For example:
 {:.fhir-highlight}
 ``` fhirpath
 52 'cm'.toQuantity('m') // 0.52 'm'
-45.toQuantity('m')      // 45 'm' ; this literal value 45 is recorded in meters.
+45.toQuantity('m')      // { } empty ; There is no conversion from the UCUM default unit to meters.
+                        //             Can instead use multiplication 45 * 1 'm'
 q.toQuantity('g')       // returns the value of q converted to grams according to UCUM conversion rules
 24 'm'.toQuantity('kg') // empty ; there is no conversion between these units in UCUM
 1 'a'.toQuantity('d')   // 365.25 'd' ; UCUM conversion for definite durations
 1 'wk'.toQuantity('d')  // 7 'd' ; UCUM conversion for definite durations
+42.toQuantity()         // 42 '1' ; A quantity with the UCUM default unit
 ```
 {:.fhir-highlight}
 
@@ -3958,10 +3962,10 @@ Multiplies both arguments (supported for Integer, Long, Decimal, and Quantity) w
 For multiplication involving quantities, the resulting quantity will have an appropriate unit as determined by application of the [\[UCUM\]](#UCUM) specification.
 {:.fhir-highlight}
 
-Multiplication involving calendar units (apart from the special UCUM `'1'` unit) will return empty
+Multiplication involving calendar units (apart from the UCUM default unit `'1'`) will return empty
 {:.fhir-highlight}
 
-> **Note:** Performing multiplication with mixed type parameters of either Integer or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Integer/Decimal argument to a Quantity (with the special UCUM code `'1'`).
+> **Note:** Performing multiplication with mixed type parameters of either Integer or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Integer/Decimal argument to a Quantity (with the UCUM default unit `'1'`).
 > This effectively makes the operation a simple decimal multiplication of the 2 values, and returns a Quantity with the same unit as the Quantity argument.<br/>
 > For example, `2 * 2 'cm'` would be evaluated as `2 '1' * 2 'cm'`, which would return `4 'cm'`, as would `2 'cm' * 2`.<br/>
 > This is a common use case for math operations with quantities, and allows for simple math operations on quantities without needing to explicitly convert the non-quantity argument to a quantity.
@@ -3973,7 +3977,9 @@ For example:
 12 'cm' * 3 'cm'  // 36 'cm2' ; multiply 12 by 3 and ucum handling for these units results in square cms.
 3 'cm' * 12 'cm2' // 36 'cm3' ; multiply 12 by 3 and ucum handling for these units results in cubic cms.
 10 'm/s' * 10 's' // 100 'm' ; multiply 10 by 10 and ucum handling for these units results in meters as seconds cancel out.
-3 * 2 'cm'        // 6 'cm' via implicit conversion of 3 to the quantity 3 '1', and results using cm.
+3 * 2 'cm'        // 6 'cm' ; via implicit conversion of 3 to the quantity 3 '1', and results using cm.
+42 * 1 'm'        // 42 'm' ; via implicit conversion of 42 to the quantity 42 '1', and results using m, 
+                  //        this is a convenient way to provide the units for a numeric value.
 12 day * 45 'm'   // empty ( { } ) ; multiplication with calendar units is not supported
 ```
 {:.fhir-highlight}
@@ -3989,7 +3995,7 @@ For division involving quantities, the resulting quantity will have an appropria
 e.g. `km` / `h` => `km/h`
 {:.fhir-highlight}
 
-Division involving calendar units (apart from the special UCUM `'1'` unit) will return empty
+Division involving calendar units (apart from the UCUM default unit `'1'`) will return empty
 {:.fhir-highlight}
 
 If an attempt is made to divide by zero, the result is empty.
@@ -4000,11 +4006,11 @@ For example:
 4 / 2  // 2
 2 / 4  // 0.5
 12 / 0 // empty ({ })
-0 / 0  // empty ({ }) ; div by zero error result
+0 / 0  // empty ({ }) ; div by zero error result reported as empty (not reporting an error)
 ```
 {:.fhir-highlight}
 
-> **Note:** Performing division with mixed type parameters of either Integer or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Integer/Decimal argument to a Quantity (with the special UCUM code `'1'`).
+> **Note:** Performing division with mixed type parameters of either Integer or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Integer/Decimal argument to a Quantity (with the UCUM default unit `'1'`).
 {:.fhir-highlight}
 
 Division examples involving quantities:
@@ -4028,7 +4034,7 @@ The resulting datatype is the same as the input datatype *(after any [implicit c
 Addition for Date/Time types is defined in the [Date/Time Arithmetic](#datetime-arithmetic) section.
 {:.fhir-highlight}
 
-> **Note:** Performing addition with mixed type parameters of either Integer, Long or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Numeric argument to a Quantity (with the special UCUM code `'1'`).
+> **Note:** Performing addition with mixed type parameters of either Integer, Long or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Numeric argument to a Quantity (with the UCUM default unit `'1'`).
 This effectively makes the operation a simple decimal operation on the 2 values, and returns a Quantity with the same unit as the Quantity argument.
 For example, `1 + 2 'cm'` would be evaluated as `1 '1' + 2 'cm'`, which would return `3 'cm'`. This is a common use case for math operations with quantities, and allows for simple math operations on quantities without needing to explicitly convert the non-quantity argument to a quantity.
 {:.fhir-highlight}
@@ -4140,6 +4146,9 @@ For example:
 
 Date and time arithmetic operators are used to add time-valued quantities to date/time values. The left operand must be a `Date`, `DateTime`, or `Time` value, and the right operand must be a [`Quantity`](#quantity) with a time-valued unit.
 
+The decimal portion of the time-valued quantity is only applied for second or millisecond precisions; for all other precisions, the decimal portion is ignored, since date/time arithmetic is performed with calendar duration semantics.
+{:.fhir-highlight}
+
 Within FHIRPath, calculations involving date/times and calendar durations shall use calendar semantics as specified in [\[ISO8601\]](#ISO8601). Specifically:
 
 | Datatype(s) | Quantity Unit(s) | Description |
@@ -4167,9 +4176,6 @@ Partial input values may require [unit conversion](#fn-toquantity-conversion-fac
 If the date/time value only has years present then when adding month quantities; use the direct conversion from months to years, otherwise convert the quantity to days, then to years (chaining as needed).
 For all other partial precisions, convert as required chaining conversions where required.
 Examples of this are in the operations below.
-{:.fhir-highlight}
-
-The decimal portion of the time-valued quantity is only applied for second or millisecond precisions; for all other precisions, the decimal portion is ignored, since date/time arithmetic is performed with calendar duration semantics.
 {:.fhir-highlight}
 
 Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.<br/>
