@@ -424,7 +424,7 @@ Implementations shall support [equality](#quantity-equality), [equivalence](#qua
 Implementations that do NOT support UCUM unit conversion may return empty (`{ }`) for calculations involving quantities with different units.
 {:.fhir-highlight}
 
-Implementations should support UCUM conversion that can be invoked explicitly through [toQuantity(unit)](#fn-toquantity), or implicitly where operations between quantities with different units are performed.
+Implementations that DO support UCUM conversions SHALL support UCUM conversion that can be invoked explicitly through [toQuantity(unit)](#fn-toquantity), and implicitly where operations between quantities with different units are performed.
 {:.fhir-highlight}
 
 For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
@@ -3413,8 +3413,9 @@ name = name // true ; its the same object, and thus will have all the same prope
 
 ##### Quantity Equality
 
-When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the same unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
+When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the same unit.
 <span class="fhir-highlight">This is referred to as the units being commensurable in UCUM.</span>
+For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
 
 When the units are different the quantity values must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equality comparison is empty (`{ }`).
