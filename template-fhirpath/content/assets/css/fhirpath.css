@@ -115,7 +115,7 @@ blockquote.stu {
 /* HR styles to get a graduated background that fades to transaprent */
 .hr-pre-approved-warning {
     height: 8px;
-    width: 33%;
+    width: 50%;
     padding: 0;
     margin: 0;
     border: none;
@@ -123,9 +123,21 @@ blockquote.stu {
 }
 
 .pre-applied-warning {
+    position: relative;
     margin-bottom: 0;
     border-left-color: rgb(195,164,207);
-    border-left-width: 12px;
+    border-left-width: 16px;
+}
+
+.pre-applied-warning::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -12px;
+    width: 12px; /* border + shadow spill */
+    background: linear-gradient(to right, transparent 50%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
 }
 
 span.fhir-approved {
