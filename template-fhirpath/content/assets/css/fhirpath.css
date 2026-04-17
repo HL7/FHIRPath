@@ -112,14 +112,35 @@ blockquote.stu {
     margin-left: 20px;
 }
 
+/* HR styles to get a graduated background that fades to transaprent */
+.hr-pre-approved-warning {
+    height: 8px;
+    width: 33%;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: linear-gradient(to right, rgb(195,164,207), transparent);
+}
+
+.pre-applied-warning {
+    margin-bottom: 0;
+    border-left-color: rgb(195,164,207);
+    border-left-width: 12px;
+}
+
+span.fhir-approved {
+    background-color: rgba(173, 212, 160, 0.5);
+}
+
 span.fhir-highlight {
-    background-color: rgba(0, 128, 0, 0.1);
+    background-color: rgba(195,164,207, 0.5);
 }
 
 .strikeout {
     text-decoration: line-through;
 }
 
+.fhir-approved,
 .fhir-highlight {
     position: relative;
 }
@@ -130,23 +151,34 @@ p:has(+ pre.language-fhirpath) {
     margin-bottom: 0;
 }
 
+.fhir-approved::before {
+    background-color: rgb(173, 212, 160);
+    opacity: 0.5;
+}
+
+.fhir-highlight::before {
+    background-color: rgb(195,164,207);
+    opacity: 0.5;
+}
+
+.fhir-approved::before,
 .fhir-highlight::before {
     content: '';
-    background-color: green;
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 10;
-    opacity: 0.1;
     pointer-events: none;
 }
 
+p.fhir-approved.stu::before,
 p.fhir-highlight.stu::before {
     left: 16px;
 }
 
+blockquote.fhir-approved.stu::before,
 blockquote.fhir-highlight.stu::before {
     width: unset;
 }
