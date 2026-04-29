@@ -15,6 +15,8 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 >   *(green background)*{:.fhir-approved}
 > * Changes that have NOT had sufficient review, or are considered possibly controversial and require detailed review<br/>
 >   *(purple background)*{:.fhir-highlight}
+>
+> *This coloring and note will be removed once the content is reviewed and voted on by committee*
 {:.pre-applied-warning}
 
 <hr class="hr-pre-approved-warning" />
@@ -1865,7 +1867,7 @@ Implementers SHOULD produce a warning if this type of conversion is performed.
 {:.fhir-highlight}
 
 When implicitly converting quantities across UCUM definite duration and calendar units, convert the UCUM value to the UCUM unit that matches the calendar unit.
-The operation that is processing the result of the implicit conversion will define the appropriate behavior (e.g. 'a' != year, but 'a' ~ year )
+The operation that is processing the result of the implicit conversion will define the appropriate behavior (e.g. 'a' != year, 'a' ~ year, 1 day > 23 'h', 1 year + 12 'mo' )
 {:.fhir-highlight}
 
 > **Note:** Unit conversion is not required for [Date/Time arithmetic](#datetime-arithmetic) except when adding/subtracting from partial dates and the 
@@ -1896,7 +1898,7 @@ For example:
 ``` fhirpath
 '1 day'.convertsToQuantity() // true
 10 'mg'.convertsToQuantity() // true
-10 'Cel'.convertsToQuantity('degF') // false can't convert UCUM Special units
+10 'Cel'.convertsToQuantity('[degF]') // false can't convert UCUM Special units
 ```
 {:.fhir-approved}
 
@@ -3564,9 +3566,9 @@ Hence when the arguments are a mix of these, the results can be compared.
 For example:
 {:.fhir-highlight}
 ``` fhirpath
-1 year ~ 1 'a' // true ; by definition in equivalent
+1 year ~ 1 'a' // true ; by definition is equivalent
 1 year ~ 11 months // true ; convert to least granular 'year' (1 ~ 0.9166666), round to least precise and compare (1 = 1)
-1 second ~ 1 's' // true ; by definition in equal
+1 second ~ 1 's' // true ; by definition is equal
 ```
 {:.fhir-highlight}
 
@@ -4441,9 +4443,9 @@ If the input collection is empty (`{ }`), the result is empty.
 For example:
 {:.stu}
 ``` fhirpath
-( 2, 4, 8, 6 ).min() // 2
-( 2L, 4L, 8L, 6L ).min() // 2L
-( @2012-12-31, @2013-01-01, @2012-01-01 ).min() // @2012-01-01
+( 2 | 4 | 8 | 6 ).min() // 2
+( 2L | 4L | 8L | 6L ).min() // 2L
+( @2012-12-31 | @2013-01-01 | @2012-01-01 ).min() // @2012-01-01
 ```
 {:.stu}
 
@@ -4464,9 +4466,9 @@ If the input collection is empty (`{ }`), the result is empty.
 For example:
 {:.stu}
 ``` fhirpath
-( 2, 4, 8, 6 ).max() // 8
-( 2L, 4L, 8L, 6L ).max() // 8L
-( @2012-12-31, @2013-01-01, @2012-01-01 ).max() // @2013-01-01
+( 2 | 4 | 8 | 6 ).max() // 8
+( 2L | 4L | 8L | 6L ).max() // 8L
+( @2012-12-31 | @2013-01-01 | @2012-01-01 ).max() // @2013-01-01
 ```
 {:.stu}
 
