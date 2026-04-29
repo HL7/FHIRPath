@@ -302,8 +302,8 @@ String functions such as [`length()`](#length--integer), [`indexOf()`](#indexofs
 
 | Visual Representation | Encoded String Literal | Unicode Scalar Value(s) | `length()` | Description |
 | - | - | - | - | - |
-| `'é'` (precomposed) | `'\u00E9'` | U+00E9 | 1 | Single character |
-| `'é'` (combining) | `'\u0065\u0301'` | U+0065 U+0301 | 2 | Two characters: 'e' + combining acute accent |
+| `é` (precomposed) | `'\u00E9'` | U+00E9 | 1 | Single character |
+| `é` (combining) | `'\u0065\u0301'` | U+0065 U+0301 | 2 | Two characters: 'e' + combining acute accent |
 | `🔥` (flame emoji) | `'\uD83D\uDD25'` | U+1F525 | 1 | Single character: A scalar value encoded using a UTF‑16 surrogate pair |
 {: .grid}
 {:.stu}
