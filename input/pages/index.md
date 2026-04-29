@@ -284,14 +284,13 @@ For example:
 'urn:oid:3.4.5.6.7.8'
 ```
 
-If a `\` is used at the beginning of a non-escape sequence, it will be ignored and will not appear in the sequence.
-
-``` txt
-define TestEscape1: '\p' // 'p'
-define TestEscape2: '\\p' // '\p'
-define TestEscape3: '\3' // '3'
-define TestEscape4: '\u005' // 'u005'
-define TestEscape5: '\' // ''
+If a `\` is used at the beginning of a non-escape sequence, it will be ignored and will not appear in the sequence:
+``` fhirpath
+'\p' // 'p'
+'\\p' // '\p' ; normal escaped backslash
+'\3' // '3'
+'\u005' // 'u005' ; unicode escape sequences have 4 characters, not 3, hence not detected as an escaped sequence
+'\' // '' ; an empty string
 ```
 
 ##### Unicode and String Operations
