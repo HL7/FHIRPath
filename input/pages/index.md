@@ -436,7 +436,7 @@ Implementations that do NOT support UCUM unit conversion may return empty (`{ }`
 {:.fhir-approved}
 
 Implementations that DO support UCUM conversions SHALL support implicit conversions where operations between quantities with different units are performed, and also explicitly through [toQuantity(unit)](#fn-toquantity).
-{:.fhir-highlight}
+{:.fhir-approved}
 
 For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
 
@@ -490,7 +490,9 @@ Whereas the following quantities are _definite duration_ quantities:
 4 'd'
 ```
 
-> **Note:** In FHIR representations, UCUM is represented with the system `http://unitsofmeasure.org` and Calendar Units with the system [http://hl7.org/fhirpath/CodeSystem/calendar-units](CodeSystem-calendar-units.html)
+> **Note:** UCUM is represented with the system `http://unitsofmeasure.org` and Calendar Units with the system [http://hl7.org/fhirpath/CodeSystem/calendar-units](CodeSystem-calendar-units.html).
+> These systems may be used in contexts that interact with FHIRPath Quantities, such as the FHIR `Quantity` datatype. 
+> Note that the FHIR [`Duration`](http://hl7.org/fhir/datatypes.html#Duration) datatype is an exception; it only supports UCUM units.
 {:.fhir-approved}
 
 ### Operators
@@ -1307,7 +1309,7 @@ The following table lists the possible conversions supported, and whether the co
 |- |- |- |- |- |- |- |- |- | - |
 |**Boolean** |N/A |Explicit | *Explicit*{:.stu-bg} |Explicit |*Explicit*{:.stu-bg} |Explicit |- |- |- |
 |**Integer** |Explicit |N/A | *Implicit*{:.stu-bg} |Implicit |Implicit |Explicit |- |- |- |
-|**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*Implicit*{:.stu-bg .fhir-highlight} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
+|**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*Implicit*{:.stu-bg .fhir-approved} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
 |**Decimal** |Explicit |- | *-*{:.stu-bg} |N/A |Implicit |Explicit |- |- |- |
 |**Quantity** |- |- | *-*{:.stu-bg} |- |N/A |Explicit |- |- |- |
 |**String** |Explicit |Explicit | *Explicit*{:.stu-bg} |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
@@ -1801,48 +1803,48 @@ This is often a simple fixed conversion factor applied to convert between specif
 If units are not commensurable, the result of conversion is empty (`{ }`).
 {:.fhir-approved}
 
-When an operation requires one of its arguments to be converted, the "most granular" unit is the one that provides the most precise whole number representation without needing fractions or decimals.
-For example if selecting between `mm` and `cm`, then `mm` is the most granular unit.<br/>
-This can be generically evaluated by selecting the conversion factor that is less than 1 when converting from one unit to the other.
-If the conversion factor is greater than 1, then the other unit is more granular.<br/>
-e.g. for our example above, the conversion factor from `mm` to `cm` is 0.1, which is less than 1, so `mm` is the most granular unit.<br/>
-Conversely, the conversion factor from `in_i` to `cm` is 2.54, which is greater than 1, so `cm` is the most granular of those two units.<br/>
-This also applies to complex composite units such as velocities (`m/s`) or other ratios (`J/s`) where the rules of the UCUM specification define how to calculate the conversion factor.<br/>
-The "least granular" is the opposite of this.<br/>
-If the conversion factors are 1 *(the units are equal)*, then choose the unit of the operator's left argument.<br/>
-*This is required for both [quantity addition](#-addition) (most granular) and [quantity equivalence](#quantity-equivalence) (least granular)*.
-{:.fhir-highlight}
-
-> **Note:** Implementers should refer to the [UCUM specification](https://ucum.org/ucum#baseunits) for guidance, and also to the [NLM Unit Conversion](https://ucum.nlm.nih.gov/ucum-service.html#toBaseUnits) service for more information.
+> ***Most/Least Granular Unit:***<br/>
+> When an operation requires one of its arguments to be converted to the "most granular" unit, implementations SHALL select the smaller unit of measurement.
+> For example if selecting between `mm` and `cm`, then `mm` is the most granular unit.<br/>
+> This can be generically evaluated by selecting the conversion factor that is less than 1 when converting from one unit to the other.
+> If the conversion factor is greater than 1, then the other unit is more granular.<br/>
+> e.g. for our example above, the conversion factor from `mm` to `cm` is 0.1, which is less than 1, so `mm` is the most granular unit.<br/>
+> Conversely, the conversion factor from `in_i` to `cm` is 2.54, which is greater than 1, so `cm` is the most granular of those two units.<br/>
+> This also applies to complex composite units such as velocities (`m/s`) or other ratios (`J/s`) where the rules of the UCUM specification define how to calculate the conversion factor.<br/>
+> The "least granular" is the opposite of this.<br/>
+> If the conversion factors are 1 *(the units are equal)*, then choose the unit of the operator's left argument.<br/>
+> *This is required for both [quantity addition](#-addition) (most granular) and [quantity equivalence](#quantity-equivalence) (least granular)*.
+>
+> ***Note:*** *Implementers should refer to the [UCUM specification](https://ucum.org/ucum#baseunits) for guidance, and also to the [NLM Unit Conversion](https://ucum.nlm.nih.gov/ucum-service.html#toBaseUnits) service for more information.*
 {:.fhir-highlight}
 
 UCUM does not support conversion with differing ["Special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
 Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
-{:.fhir-approved}
+{:.fhir-highlight}
 
 There is no expectation to perform rounding on the result of applying the UCUM conversion factor to the input value, and thus the output value may have more significant figures that then input value.
 Applying rounding too early can result in un-intended inaccuracies and should be explicitly applied when desired.
 {:.fhir-approved}
 
-> **Note:** Implementations are not required to support a complete UCUM implementation, and may return empty (`{ }`) when the units are different, or not handled.
+> **Note:** Implementations are not required to support a UCUM implementation, and may return empty (`{ }`) when the units are different, or not handled.
 {:.fhir-approved}
 
 ###### Time-valued unit conversions
 The relationship between Calendar units and the Definite Duration UCUM Units is documented in the [Time-valued Quantities](#time-valued-quantities) section, which can be used to match a UCUM definite duration unit to/from a calendar unit, noting that `a` and `mo` are not equal to their calendar unit counterparts.
-{:.fhir-highlight}
-
-<a name="fn-toquantity-conversion-factors"></a>
-FHIRPath defines the following conversion factors for calendar durations and the associated UCUM definite duration conversion factors (also included in the table):
 {:.fhir-approved}
 
-| Calendar duration | Conversion factor | UCUM Conversion factor |
+<a name="fn-toquantity-conversion-factors"></a>
+FHIRPath defines the following conversion factors for calendar durations. For comparison the associated UCUM definite duration conversion factors are also included in the table:
+{:.fhir-approved}
+
+| Calendar duration | Conversion factor | *UCUM Conversion factor* |
 | - | -| - |
-| `1 year` | `12 months` or `365 days` | `1 'a'` or `365.25 'd'` |
-| `1 month` | `30 days` | `30.4375 'd'` or `1 'mo'` |
-| `1 week` | `7 days` | `7 'd'` |
-| `1 day` | `24 hours` | `1 'd'` |
-| `1 hour` | `60 minutes` | `60 'min'` |
-| `1 minute` | `60 seconds` | `60 's'` |
+| `1 year` | `12 months` or `365 days` | *`1 'a'` or `365.25 'd'`* |
+| `1 month` | `30 days` | *`30.4375 'd'` or `1 'mo'`* |
+| `1 week` | `7 days` | *`7 'd'` or `1 'wk'`* |
+| `1 day` | `24 hours` | *`1 'd'` or `24 'h'`* |
+| `1 hour` | `60 minutes` | *`60 'min'`* |
+| `1 minute` | `60 seconds` | *`60 's'`* |
 | `1 second` | | `1 's'` |
 {: .grid}
 {:.fhir-approved}
@@ -1863,7 +1865,7 @@ If converting to/from years or months you shall use the shortest conversion chai
 Implementers SHOULD produce a warning if this type of conversion is performed. 
 {:.fhir-highlight}
 
-When implicitly converting quantities across UCUM definite duration and calendar units, convert the right value to the matching unit, but don't change the unit code system. 
+When implicitly converting quantities across UCUM definite duration and calendar units, convert the UCUM value to the UCUM unit that matches the calendar unit.
 The operation that is processing the result of the implicit conversion will define the appropriate behavior (e.g. 'a' != year, but 'a' ~ year )
 {:.fhir-highlight}
 
@@ -3626,8 +3628,8 @@ The converse of the equivalent operator, returning `true` if equivalent returns 
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
 
 When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
-For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. 
 <span class="fhir-approved">This is referred to as the units being commensurable in UCUM.</span>
+For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. 
 
 When quantity units are different the quantities must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the comparison is empty (`{ }`).
@@ -3647,9 +3649,9 @@ Note that Explicit conversion using [`toQuantity()`](#fn-toquantity) will change
 For example:
 {:.fhir-highlight}
 ``` fhirpath
-1 year > 1 `a` // empty ({ }) ; these units are un-comparable
+1 year > 1 'a' // empty ({ }) ; these units are un-comparable
 10 seconds > 1 's' // true
-2 year.toQuantity('a') > 1 `a` // true ; as the units have been explicitly converted, these are now comparable
+2 year.toQuantity('a') > 1 'a' // true ; as the units have been explicitly converted, these are now comparable
 6 months > 1 year  // false ; convert to 'year' (0.5 > 1) and compare
 ```
 {:.fhir-highlight}
