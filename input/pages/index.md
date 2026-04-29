@@ -364,8 +364,8 @@ The following examples illustrate the use of the `Date` literal:
 
 ``` fhirpath
 @2014-01-25
-@2014-01
-@2014
+@2014-01 // partial date (year-month)
+@2014    // partial date (year only)
 ```
 
 Consult the [formal grammar](grammar.html) for more details.
@@ -382,8 +382,8 @@ The `Time` literal uses a subset of [\[ISO8601\]](#ISO8601):
 The following examples illustrate the use of the `Time` literal:
 
 ``` fhirpath
-@T12:00
-@T14:30:14.559
+@T14:30:14.559 // full Time including milliseconds
+@T12:00        // partial time (hour and minute)
 ```
 
 Consult the [formal grammar](grammar.html) for more details.
@@ -730,7 +730,7 @@ Takes a collection of Boolean values and returns `true` if all the items are `tr
 The following example returns `true` if all of the components of the Observation have a value greater than 90 mm[Hg]:
 
 ``` fhirpath
-Observation.select(component.value > 90 'mm[Hg]').allTrue()
+Observation.value.select(component > 90 'mm[Hg]').allTrue()
 ```
 
 #### anyTrue() : Boolean
@@ -740,7 +740,7 @@ Takes a collection of Boolean values and returns `true` if any of the items are 
 The following example returns `true` if any of the components of the Observation have a value greater than 90 mm[Hg]:
 
 ``` fhirpath
-Observation.select(component.value > 90 'mm[Hg]').anyTrue()
+Observation.component.select(value > 90 'mm[Hg]').anyTrue()
 ```
 
 #### allFalse() : Boolean
@@ -750,7 +750,7 @@ Takes a collection of Boolean values and returns `true` if all the items are `fa
 The following example returns `true` if none of the components of the Observation have a value greater than 90 mm[Hg]:
 
 ``` fhirpath
-Observation.select(component.value > 90 'mm[Hg]').allFalse()
+Observation.component.select(value > 90 'mm[Hg]').allFalse()
 ```
 
 #### anyFalse() : Boolean
@@ -760,7 +760,7 @@ Takes a collection of Boolean values and returns `true` if any of the items are 
 The following example returns `true` if any of the components of the Observation have a value that is not greater than 90 mm[Hg]:
 
 ``` fhirpath
-Observation.select(component.value > 90 'mm[Hg]').anyFalse()
+Observation.component.select(value > 90 'mm[Hg]').anyFalse()
 ```
 
 #### subsetOf(other : collection) : Boolean
@@ -971,7 +971,7 @@ CodeableConcept {
 // create a codeable concept that contains all of the codes selected
 // multiple codings come from the answers in the questionnaire
 QuestionnaireResponse.item.where(linkId='coded-q')
-.select( CodeableConcept { coding: answer.value.ofType(coding) } )
+.select( CodeableConcept { coding: answer.value.ofType(Coding) } )
 ```
 {:.stu}
 
@@ -1096,8 +1096,8 @@ Questionnaire.repeatAll(item)
 Some unsafe expressions:
 {:.stu}
 ``` fhirpath
-Questionnaire.repeatAll('item') // this is a common mistake where the "expression" was in a string, which then just keeps getting called.
-'abc'.repeatAll(replace('a', 'A')) // does not rely on the resource structure for termination
+Questionnaire.repeatAll('item') // this is a common mistake where the element name is accidentally provided as a string, not an identifier, so each iteration re-evaluates the same string constant and the function never terminates.
+'abc'.repeatAll(replace('a', 'A')) // the projection always returns a value (after the first iteration it produces 'Abc'), and since repeatAll does not remove duplicates, the same item keeps being re-added and the function never terminates.
 ```
 {:.stu}
 
@@ -1150,14 +1150,13 @@ Another common case is to select a specific coding in a CodeableConcept if it is
 {:.stu}
 ``` fhirpath
 iif( code.coding.where(system='http://snomed.info/sct').exists(),
-        code.coding.where(system='http://snomed.info/sct')),
+        code.coding.where(system='http://snomed.info/sct'),
             code.coding)
     .first().code
 // could equivalently be written as:
 coalesce(code.coding.where(system='http://snomed.info/sct'), code.coding).first().code
 ```
 {:.stu}
-
 
 
 ### Subsetting
@@ -1422,7 +1421,7 @@ For example:
 ``` fhirpath
 'true'.toBoolean()  // true
 1.toBoolean()       // true
-'hello'.toBoolean() // empty { } — not a recognized boolean representation
+'hello'.toBoolean() // empty { } ; not a recognized boolean representation
 ```
 
 ##### convertsToBoolean() : Boolean
@@ -1445,7 +1444,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 'true'.convertsToBoolean() // true
-'abc'.convertsToBoolean()  // false — not a recognized boolean representation
+'abc'.convertsToBoolean()  // false ; not a recognized boolean representation
 ```
 
 #### Integer Conversion Functions
@@ -1469,7 +1468,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 '1'.toInteger()  // 1
-'st'.toInteger() // empty { } — not convertible to an integer
+'st'.toInteger() // empty { } ; not convertible to an integer
 ```
 
 ##### convertsToInteger() : Boolean
@@ -1489,7 +1488,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 '1'.convertsToInteger()   // true
-'1.0'.convertsToInteger() // false — decimal strings are not convertible to integer
+'1.0'.convertsToInteger() // false ; decimal strings are not convertible to integer
 ```
 
 ##### toLong() : Long
@@ -1521,7 +1520,7 @@ For example:
 ``` fhirpath
 42.toLong()    // 42
 '123'.toLong() // 123
-'abc'.toLong() // empty { } — not convertible to a long
+'abc'.toLong() // empty { } ; not convertible to a long
 ```
 {:.stu}
 
@@ -1674,7 +1673,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 '2015-02-04T14:34:28Z'.toDateTime() // @2015-02-04T14:34:28Z
-'2012-01-01T10:00'.toDateTime() // @2012-01-01T10:00 — partial datetime is preserved
+'2012-01-01T10:00'.toDateTime() // @2012-01-01T10:00 ; partial datetime is preserved
 ```
 
 ##### convertsToDateTime([format : string]) : Boolean
@@ -1723,7 +1722,7 @@ For example:
 ``` fhirpath
 '1.1'.toDecimal() // 1.1
 '42'.toDecimal() // 42 (as a decimal value)
-'st'.toDecimal() // empty { } — not convertible to a decimal
+'st'.toDecimal() // empty { } ; not convertible to a decimal
 ```
 
 ##### convertsToDecimal() : Boolean
@@ -1977,7 +1976,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 '14:34:28'.toTime() // 14:34:28
-'10:00'.toTime() // 10:00 — partial time is preserved
+'10:00'.toTime() // 10:00 ; partial time is preserved
 ```
 
 ##### convertsToTime() : Boolean
@@ -2005,10 +2004,8 @@ The functions in this section operate on collections with a single item. If ther
 
 To use these functions over a collection with multiple items, one may use filters like `where()` and `select()`:
 ``` fhirpath
-Patient.name.given.select(substring(0))
+Patient.name.given.select(substring(0, 1)) // returns a collection containing the first character of all the given names for a patient
 ```
-
-This example returns a collection containing the first character of all the given names for a patient.
 
 #### indexOf(substring : String) : Integer
 
@@ -2682,7 +2679,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 For example:
 {:.stu}
 ``` fhirpath
-2.power(3) // 8
+2.power(3) // 8 (as a decimal)
 2.5.power(2) // 6.25
 2.power(-1) // 0.5
 (-1).power(0.5) // empty ({ })
@@ -2721,7 +2718,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 For example:
 {:.stu}
 ``` fhirpath
-1.round() // 1
+1.round() // 1 (as a decimal)
 3.14159.round(3) // 3.142
 ```
 {:.stu}
@@ -2805,7 +2802,7 @@ Returns a collection with all descendant nodes of all items in the input collect
 
 The following example returns all coded answers anywhere in a QuestionnaireResponse:
 ``` fhirpath
-QuestionnaireResponse.descendants().answer.ofType(Coding)
+QuestionnaireResponse.descendants().answer.value.ofType(Coding)
 ```
 
 > **Note:** Many of these functions will result in a set of items of different underlying types. It may be necessary to use [`ofType()`](#fn-oftype) as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
@@ -2905,8 +2902,8 @@ Returns the current time.
 
 For example:
 ``` fhirpath
-timeOfDay() // @T14:34:17.923 ; only the time portion of the result of today. Equivalent to now().timeOf()
-timeOfDay() = timeOfDay() // true ; timeOfDay should be deterministic within a single expression
+timeOfDay() // @T14:34:17.923 ; only the time portion of the result of now(). Equivalent to now().timeOf().
+timeOfDay() = timeOfDay() // true ; timeOfDay is deterministic within a single expression
 ```
 
 ##### today() : Date
@@ -3027,7 +3024,7 @@ For example:
 (-1.587).highBoundary() // -1.58650000
 (-1.587).highBoundary(6) // -1.586500
 (-1.587).highBoundary(2) // -1.58
-(-1.587).highBoundary(0) // 1
+(-1.587).highBoundary(0) // -1
 @2014.highBoundary(6) // @2014-12
 @2014-01-01T08.highBoundary(17) // @2014-01-01T08:59:59.999
 @T10:30.highBoundary(9) // @T10:30:59.999
@@ -4353,7 +4350,7 @@ Because the invocation operator (`.`) has a higher precedence than the unary neg
 Use parentheses to ensure the unary negation applies to the `7`:
 
 ``` fhirpath
-(-7).combine(3) // { -7, 3 }
+(-7).combine(3) // -7, 3
 ```
 
 ## Aggregates
