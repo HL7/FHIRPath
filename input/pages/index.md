@@ -1818,10 +1818,6 @@ If units are not commensurable, the result of conversion is empty (`{ }`).
 > ***Note:*** *Implementers should refer to the [UCUM specification](https://ucum.org/ucum#baseunits) for guidance, and also to the [NLM Unit Conversion](https://ucum.nlm.nih.gov/ucum-service.html#toBaseUnits) service for more information.*
 {:.fhir-highlight}
 
-UCUM does not support conversion with differing ["Special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
-Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
-{:.fhir-highlight}
-
 There is no expectation to perform rounding on the result of applying the UCUM conversion factor to the input value, and thus the output value may have more significant figures that then input value.
 Applying rounding too early can result in un-intended inaccuracies and should be explicitly applied when desired.
 {:.fhir-approved}
@@ -1897,7 +1893,9 @@ For example:
 ``` fhirpath
 '1 day'.convertsToQuantity() // true
 10 'mg'.convertsToQuantity() // true
-10 'Cel'.convertsToQuantity('[degF]') // false can't convert UCUM Special units
+2 '[in_i]'.convertsToQuantity('cm') // true ; can convert inches to centimeters (commensurate units)
+10 'Cel'.convertsToQuantity('[degF]') // true ; ucum "special" units are also commensurate
+5 'm',convertsToQuantity('kg') // false ; the units meters and kilograms are not commensurate
 ```
 {:.fhir-approved}
 
@@ -3436,7 +3434,7 @@ For example:
 1 'cm' = 10.0 'mm' // true ; UCUM conversion gives the same decimal value (ignoring trailing zeros after the decimal place)
 1 'cm' = 1 'm' // false ; UCUM conversion yields the difference
 1 'cm' = 1 's' // empty ({ }) ; invalid comparison of different dimensions
-23 'Cel' = 73.4 '[degF]' // empty ({ }) ; invalid comparison of "special" units on non-ratio scales
+23 'Cel' = 73.4 '[degF]' // true ; comparison of ucum "special" units on non-ratio scales
 ```
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, years and months are not equal across UCUM definite durations and calendar units. Hence when the arguments are a mix of these, the result is empty as they are considered un-comparable.<br/>
@@ -3554,7 +3552,7 @@ For example:
 4 'g' ~ 4000 'mg'   // true ; convert to 'g' (4 ~ 4.000), round to least precise and compare (4 = 4)
 4 'g' ~ 4040 'mg'   // true ; convert to 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
 1 'inch' ~ 2.5 'cm' // true ; convert to 'inch' (1 ~ 0.98..), round to least precise and compare (1 = 1)
-23 'Cel' ~ 73.4 '[degF]' // empty ({ }) ; invalid comparison of "special" units on non-ratio scales
+23 'Cel' ~ 73.4 '[degF]' // true ; comparison of ucum "special" units on non-ratio scales
 ```
 {:.fhir-highlight}
 
@@ -3789,7 +3787,7 @@ For example:
 ``` fhirpath
 1 'in_i'.comparable(1 'cm') // true ; These UCUM units can be compared/converted
 1 year.comparable(1 'a') // false ; these units are equivalent, not equal hence not comparable
-23 'Cel'.comparable(73.4 '[degF]') // false ; these "special" units on non-ratio scales are not comparable
+23 'Cel'.comparable(73.4 '[degF]') // true ; ucum "special" units are comparable
 ```
 {:.stu}
 {:.fhir-approved}
@@ -3973,6 +3971,10 @@ As with the other operators, the math operators will return an empty collection 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
 Implementations that do support units shall do so as specified by the [\[UCUM\]](#UCUM) specification.
+
+UCUM does not support math operations with differing ["special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
+Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
+{:.fhir-highlight}
 
 Implementations that to not support processing UCUM units shall return empty when unable to correctly handle the units.
 {:.fhir-approved}
