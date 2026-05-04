@@ -3816,9 +3816,9 @@ For example:
 ```
 {:.stu}
 ``` fhirpath
-1 'in_i'.comparable(1 'cm') // true ; These UCUM units can be compared/converted
+1 'in_i'.comparable(1 'cm') // true ; these UCUM units can be compared/converted
 1 year.comparable(1 'a') // false ; these units are equivalent, not equal hence not comparable
-23 'Cel'.comparable(73.4 '[degF]') // true ; ucum "special" units are comparable
+1 'Cel'.comparable(1 '[degF]') // true ; these ucum "special" units are comparable
 ```
 {:.stu}
 {:.fhir-approved}
