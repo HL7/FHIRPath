@@ -4099,17 +4099,19 @@ For example:
 > and the author should be intentional about accepting that approximation in a computed result.
 {:.fhir-highlight}
 
-When both operands are in the same time-valued unit system (both calendar or both UCUM), the [most granular](#unit-conversions) rule applies normally.
-When operands are in different time-valued unit systems, [implicit cross-system conversion](#time-valued-unit-conversions) converts the right operand to the magnitude matching the left operand (within the right operand's own unit system). Since both operands are then at matching magnitude (conversion factor of 1), the result uses the left operand's unit.
+When both operands are time-valued quantities, the [most granular](#unit-conversions) rule applies as with other quantities,
+where the most granular of the two units is the one appearing lower in the [time-valued unit conversion table](#fn-toquantity-conversion-factors).<br/>
+When the operands come from different time-valued unit systems, the result is expressed in calendar units.
 {:.fhir-highlight}
 
 Quantity addition examples with time based units:
 {:.fhir-highlight}
 ``` fhirpath
 2 minutes + 60 seconds  // 180 seconds ; calendar conversion to most granular unit (seconds)
-60 's' + 2 minutes      // 180 's' ; cross-system: right converted to match left's magnitude, result in left's unit
+60 's' + 2 minutes      // 180 seconds ; cross-system: most granular unit conversion (2 minutes to 120 seconds, then add), result in calendar units
+1 'wk' + 2 days    // 9 days ; cross-system, result in calendar units
 1 year + 12 months // empty ( {} ) ; month/year unit conversion is equivalent and needs explicit unit conversion
-1 year + 12 'mo'   // empty ( {} )
+1 year + 12 'mo'   // empty ( {} ) ; year/month requires explicit conversion (UCUM 'mo' doesn't change this)
 1 year.toQuantity('month') + 12 months // 24 months ; explicit conversion to months, then addition with the same unit
 1 week + 14 days   // 21 days ; calendar conversion to most granular unit (days)
 3 'd' + 1 'wk'     // 10 'd' ; UCUM conversion from 'wk' to 'd' then add
