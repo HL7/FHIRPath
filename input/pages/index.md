@@ -1422,7 +1422,7 @@ For example:
 ``` fhirpath
 'true'.toBoolean()  // true
 1.toBoolean()       // true
-'hello'.toBoolean() // empty { } ; not a recognized boolean representation
+'hello'.toBoolean() // empty ({ }) ; not a recognized boolean representation
 ```
 
 ##### convertsToBoolean() : Boolean
@@ -1469,7 +1469,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 '1'.toInteger()  // 1
-'st'.toInteger() // empty { } ; not convertible to an integer
+'st'.toInteger() // empty ({ }) ; not convertible to an integer
 ```
 
 ##### convertsToInteger() : Boolean
@@ -1521,7 +1521,7 @@ For example:
 ``` fhirpath
 42.toLong()    // 42
 '123'.toLong() // 123
-'abc'.toLong() // empty { } ; not convertible to a long
+'abc'.toLong() // empty ({ }) ; not convertible to a long
 ```
 {:.stu}
 
@@ -1723,7 +1723,7 @@ For example:
 ``` fhirpath
 '1.1'.toDecimal() // 1.1
 '42'.toDecimal() // 42 (as a decimal value)
-'st'.toDecimal() // empty { } ; not convertible to a decimal
+'st'.toDecimal() // empty ({ }) ; not convertible to a decimal
 ```
 
 ##### convertsToDecimal() : Boolean
