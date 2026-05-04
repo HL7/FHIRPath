@@ -1826,7 +1826,7 @@ Applying rounding too early can result in un-intended inaccuracies and should be
 {:.fhir-approved}
 
 ###### Time-valued unit conversions
-The relationship between Calendar units and the Definite Duration UCUM Units is documented in the [Time-valued Quantities](#time-valued-quantities) section, which can be used to match a UCUM definite duration unit to/from a calendar unit, noting that `a` and `mo` are not equal to their calendar unit counterparts.
+The relationship between Calendar units and the Definite Duration UCUM Units is documented in the [Time-valued Quantities](#time-valued-quantities) section, which can be used to match a UCUM definite duration unit to/from a calendar unit, noting that the ucum `a` and `mo` units are not equal to their calendar unit counterparts.
 {:.fhir-approved}
 
 <a name="fn-toquantity-conversion-factors"></a>
@@ -3529,8 +3529,9 @@ name ~ name // true ; its the same object, and thus will have all the same prope
 
 ##### Quantity Equivalence
 
-When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the same unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
+When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the same unit.
 <span class="fhir-approved">This is referred to as the units being commensurable in UCUM.</span>
+For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
 
 When the units are different the quantity values must be [**converted**](#unit-conversions) to the least granular unit before comparison.<br/>
 *(using the least granular unit ensures that the precision of the converted value is not artificially increased by the conversion, and thus doesn't impact the rounded decimal comparison)*<br/>
