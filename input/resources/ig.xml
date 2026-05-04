@@ -89,7 +89,7 @@
     </parameter>
     <parameter>
       <code value="releaselabel"/>
-      <value value="STU3"/>
+      <value value="STU 3"/>
     </parameter>
     <parameter>
       <code value="copyrightyear"/>
