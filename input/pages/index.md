@@ -49,7 +49,9 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - combine](#fn-combine) - additional optional parameter `preserveOrder`
 > * [Date Conversion Functions](#date-conversion-functions) - inclusion of string format codes and `format` parameter
 > * [Functions - String (matches)](#fn-matches) - additional optional parameter `flags`
-> * [Unary Operators](#unary-operators) - this is a new section, however they have been implied as defined since the normative version via other parts of the specification and grammar. 
+> * [Operations - Quantity Equality / Equivalence (time-valued)](#quantity-equality) - refined cross-system calendar/UCUM comparisons
+> * [Operations - Math](#math-1) - refined handling of quantity operations - particularly with time based quanties
+> * [Unary Operators](#unary-operators) - this is a new section, however they have been implied as defined since the normative version via other parts of the specification and grammar
 >
 > In addition, the appendices are included as additional documentation and are informative content.
 {: .stu-note }
@@ -271,7 +273,7 @@ String literals are surrounded by single-quotes and may use `\`-escapes to escap
 | `\t` | Tab |
 | `\f` | Form Feed |
 | `\\` | Backslash |
-| `\uXXXX` | Unicode character escape, where XXXX is a four‑digit hexadecimal value representing a 16‑bit Unicode code unit. If the escape sequence represents a surrogate code unit, it must be paired with a corresponding high or low surrogate to form a valid Unicode scalar value. |
+| `\uXXXX` | Unicode character escape, where XXXX is a four‑digit hexadecimal value representing a 16‑bit Unicode code unit.<br/><span class="stu">If the escape sequence represents a surrogate code unit, it must be paired with a corresponding high or low surrogate to form a valid Unicode scalar value.</span> |
 {: .grid}
 
 No other escape sequences besides those listed above are recognized.
@@ -475,6 +477,7 @@ See the [Date/Time Arithmetic](#datetime-arithmetic) section for details on addi
 {:.fhir-approved}
 
 UCUM defines the conversion factors between UCUM units, and FHIRPath defines [conversion factors](#fn-toquantity-conversion-factors) for calendar units.
+{:.stu}
 {:.fhir-approved}
 
 For example, the following quantities are _calendar duration_ quantities:
@@ -494,6 +497,7 @@ Whereas the following quantities are _definite duration_ quantities:
 > **Note:** UCUM is represented with the system `http://unitsofmeasure.org` and Calendar Units with the system [http://hl7.org/fhirpath/CodeSystem/calendar-units](CodeSystem-calendar-units.html).
 > These systems may be used in contexts that interact with FHIRPath Quantities, such as the FHIR `Quantity` datatype. 
 > Note that the FHIR [`Duration`](http://hl7.org/fhir/datatypes.html#Duration) datatype is an exception; it only supports UCUM units.
+{:.stu}
 {:.fhir-approved}
 
 ### Operators
@@ -1816,6 +1820,7 @@ If units are not commensurable, the result of conversion is empty (`{ }`).
 > *This is required for both [quantity addition](#-addition) (most granular) and [quantity equivalence](#quantity-equivalence) (least granular)*.
 >
 > ***Note:*** *Implementers should refer to the [UCUM specification](https://ucum.org/ucum#baseunits) for guidance, and also to the [NLM Unit Conversion](https://ucum.nlm.nih.gov/ucum-service.html#toBaseUnits) service for more information.*
+{:.stu}
 {:.fhir-highlight}
 
 There is no expectation to perform rounding on the result of applying the UCUM conversion factor to the input value, and thus the output value may have more significant figures that then input value.
@@ -3419,6 +3424,7 @@ When comparing quantities for equality, the dimensions of each quantity must be 
 For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
 
 When the units are different the quantity values must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
+Any commensurable target unit may be chosen, since trailing zeroes after the decimal point are ignored when comparing the resulting decimal values *(see [Quantity Equivalence](#quantity-equivalence) for the contrasting rule, where the choice of unit affects the rounded comparison)*.
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equality comparison is empty (`{ }`).
 {:.fhir-highlight}
 
@@ -3432,30 +3438,49 @@ Once the units are the same, the values can be compared using simple decimal com
 For example:
 ```fhirpath
 1 'cm' = 10.0 'mm' // true ; UCUM conversion gives the same decimal value (ignoring trailing zeros after the decimal place)
-1 'cm' = 1 'm' // false ; UCUM conversion yields the difference
-1 'cm' = 1 's' // empty ({ }) ; invalid comparison of different dimensions
+1 'cm' = 1 'm' // false ; convert to a common unit (1 'm' → 100 'cm'); 1 ≠ 100
+1 'cm' = 1 's' // empty ({ }) ; different dimensions are not commensurable
 23 'Cel' = 73.4 '[degF]' // true ; comparison of ucum "special" units on non-ratio scales
 ```
 
-As noted in the [Time-valued Quantities](#time-valued-quantities) section, years and months are not equal across UCUM definite durations and calendar units. Hence when the arguments are a mix of these, the result is empty as they are considered un-comparable.<br/>
-Note that Explicit conversion will change code-systems to permit intentionally permitting this equality.
+When comparing time-valued quantities the quantity values must be converted to the least granular unit
+*(without changing code system)*, then compare as described above with other quantities.<br/>
+This is particularly important when the time-valued quantities involve calendar units to ensure consistency across implementations,
+as calendar conversions are not transitive 
+(e.g. 1 year ~ 12 months and 1 month = 30 days, but 1 year ≠ 360 days).
 {:.fhir-highlight}
+{:.stu}
+
+As noted in the [Time-valued Quantities](#time-valued-quantities) section, years and months are not equal across UCUM definite durations and calendar units. Hence when the arguments are a mix of these, the result is empty as they are not comparable.<br/>
+Note that explicit conversion using [`toQuantity()`](#fn-toquantity) will change code-systems to intentionally perform this equality.
+{:.fhir-highlight}
+{:.stu}
 
 For example:
 {:.fhir-highlight}
+{:.stu}
 ``` fhirpath
 1 'h' = 3600 's'  // true ; ucum conversion
-1 hour = 3600 's' // true ; 1 hour → 3600 second → 3600 's'
-1 year = 1 'a'    // empty {} ; comparisons between calendar and UCUM definite-time duration units for years or months result in empty
-1 year.toQuantity('a') = 1 'a' // true ; intentionally converting to unum units
+1 hour = 3600 's' // true ; 3600 's' → 1 'h' (ucum), and 1 'h' = 1 hour (calendar)
+1 year = 1 'a'    // empty ({ }) ; calendar/UCUM year is not comparable
+1 year.toQuantity('a') = 1 'a' // true ; intentionally converting to UCUM units
 1 year = 12 months // true ; calendar unit conversion
-1 year = 12 'mo' // empty {} ; comparisons between calendar and UCUM definite-time duration units for years or months result in empty 
-1 week = 1 'wk'  // true
-1 second = 1 's' // true
-7 days = 1 'wk'  // true ; 7 days → 1 week → 1 'wk'
-1 week = 7 'd'   // true ; 1 week → 7 days → 7 'd'
+1 year = 12 'mo' // empty ({ }) ; 12 'mo' → 1 'a'; calendar/UCUM year is not comparable
+1 week = 1 'wk'  // true ; week and 'wk' are equal by definition
+1 second = 1 's' // true ; second and 's' are equal by definition
 ```
 {:.fhir-highlight}
+{:.stu}
+
+Where the time-valued quantities are being compared, convert to the least granular unit (the one appearing higher in the [time-valued unit conversion table](#fn-toquantity-conversion-factors), matching across code systems):
+{:.fhir-highlight}
+{:.stu}
+``` fhirpath
+7 days = 1 'wk'  // true ; convert to week: 7 days → 1 week (calendar), and 1 week = 1 'wk'
+1 week = 7 'd'   // true ; convert to 'wk': 7 'd' → 1 'wk' (UCUM); 1 'wk' = 1 week
+```
+{:.fhir-highlight}
+{:.stu}
 
 ##### Date/Time Equality
 
@@ -3535,8 +3560,9 @@ For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and
 
 When the units are different the quantity values must be [**converted**](#unit-conversions) to the least granular unit before comparison.<br/>
 *(using the least granular unit ensures that the precision of the converted value is not artificially increased by the conversion, and thus doesn't impact the rounded decimal comparison)*<br/>
-If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equality comparison is empty (`{ }`).
+If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equivalence comparison is empty (`{ }`).
 {:.fhir-highlight}
+{:.stu}
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
@@ -3548,27 +3574,31 @@ Once the units are the same, the values can be compared using decimal equivalenc
 For example:
 {:.fhir-highlight}
 ```fhirpath
-2.1 'cm' ~ 21 'mm'  // true ; convert to 'cm' (2.1 ~ 2.1), round to least precise and compare (2.1 = 2.1)
-21 'mm' ~ 2 'cm'    // true ; convert to 'cm' (2.1 ~ 2), round to least precise and compare (2 = 2)
-4 'g' ~ 4000 'mg'   // true ; convert to 'g' (4 ~ 4.000), round to least precise and compare (4 = 4)
-4 'g' ~ 4040 'mg'   // true ; convert to 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
-1 'inch' ~ 2.5 'cm' // true ; convert to 'inch' (1 ~ 0.98..), round to least precise and compare (1 = 1)
-23 'Cel' ~ 73.4 '[degF]' // true ; comparison of ucum "special" units on non-ratio scales
+2.1 'cm' ~ 21 'mm'  // true ; convert to least granular 'cm' (2.1 ~ 2.1), round to least precise and compare (2.1 = 2.1)
+21 'mm' ~ 2 'cm'    // true ; convert to least granular 'cm' (2.1 ~ 2), round to least precise and compare (2 = 2)
+4 'g' ~ 4000 'mg'   // true ; convert to least granular 'g' (4 ~ 4.000), round to least precise and compare (4 = 4)
+4 'g' ~ 4040 'mg'   // true ; convert to least granular 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
+1 '[in_i]' ~ 2.5 'cm' // true ; convert to least granular '[in_i]' (1 ~ 0.98..), round to least precise and compare (1 = 1)
+23 'Cel' ~ 73.4 '[degF]' // true ; comparison of UCUM "special" units on non-ratio scales (23 'Cel' = 73.4 '[degF]' exactly)
 ```
 {:.fhir-highlight}
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, all units are considered either equal or equivalent across UCUM definite durations and calendar units.
 Hence when the arguments are a mix of these, the results can be compared.
 {:.fhir-highlight}
+{:.stu}
 
 For example:
 {:.fhir-highlight}
+{:.stu}
 ``` fhirpath
-1 year ~ 1 'a' // true ; by definition is equivalent
-1 year ~ 11 months // true ; convert to least granular 'year' (1 ~ 0.9166666), round to least precise and compare (1 = 1)
-1 second ~ 1 's' // true ; by definition is equal
+1 year ~ 1 'a' // true ; year and 'a' are equivalent by definition
+1 year ~ 12 'mo' // true ; convert to least granular 'a': 12 'mo' → 1 'a' (UCUM), and 'a' ~ year by definition
+1 year ~ 11 months // true ; convert to least granular year (1 ~ 0.9166666), round to least precise and compare (1 = 1)
+1 second ~ 1 's' // true ; second and 's' are equal by definition (thus equivalent)
 ```
 {:.fhir-highlight}
+{:.stu}
 
 ##### Date/Time Equivalence
 
@@ -3640,13 +3670,13 @@ Once the units are the same, the values can be compared using simple decimal com
 {:.fhir-highlight}
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, years and months are not comparable across UCUM definite durations and calendar units. Hence when the arguments are a mix of these, the result is empty as they are considered un-comparable.<br/>
-Note that Explicit conversion using [`toQuantity()`](#fn-toquantity) will change code-systems to permit intentionally permitting this comparison.
+Note that explicit conversion using [`toQuantity()`](#fn-toquantity) will change code-systems to intentionally perform this comparison.
 {:.fhir-highlight}
 
 For example:
 {:.fhir-highlight}
 ``` fhirpath
-1 year > 1 'a' // empty ({ }) ; these units are un-comparable
+1 year > 1 'a' // empty ({ }) ; these units are not comparable
 10 seconds > 1 's' // true
 2 year.toQuantity('a') > 1 'a' // true ; as the units have been explicitly converted, these are now comparable
 6 months > 1 year  // false ; convert to 'year' (0.5 > 1) and compare
@@ -3976,6 +4006,7 @@ Implementations that do support units shall do so as specified by the [\[UCUM\]]
 UCUM does not support math operations with differing ["special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
 Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
 {:.fhir-highlight}
+{:.stu}
 
 Implementations that to not support processing UCUM units shall return empty when unable to correctly handle the units.
 {:.fhir-approved}

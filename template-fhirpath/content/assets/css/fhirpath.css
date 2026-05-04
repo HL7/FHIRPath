@@ -82,6 +82,19 @@ table.stu:after {
     left: -15.5px;
 }
 
+td span.stu {
+    display: block;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 12px;
+}
+
+td span.stu:after {
+    left: 1px;
+    top: -1px;
+    bottom: -1px;
+}
+
 .stu.dragon {
     padding-left: 150px;
     margin-left: 24px;
