@@ -571,8 +571,8 @@
             }
           ],
           "returnType": "collection",
-          "emptyInputResult": "empty",
-          "errorOnMultipleInput": false,
+          "emptyInputResult": "criterion-dependent",
+          "errorOnMultipleInput": true,
           "inputTypes": [],
           "typeMapping": [
             "Any-Any"
@@ -1823,7 +1823,7 @@
         },
         {
           "functionName": "defineVariable",
-          "description": "Defines a variable named `name` that is accessible in subsequent expressions and has the value of `expr` if present, otherwise the value of the input collection.",
+          "description": "Defines a variable named `name` that is accessible in subsequent expressions on the output collection and has the value of `projection` if present, otherwise the value of the input collection. In either case the function does not change the input and the output is the same as the input collection.",
           "arguments": [
             {
               "name": "name",
@@ -1831,9 +1831,9 @@
               "description": "Name of the variable"
             },
             {
-              "name": "expr",
-              "type": "expression",
-              "description": "Optional expression for the variable's value",
+              "name": "projection",
+              "type": "collection",
+              "description": "Optional value for the variable; if not provided, the input collection is used",
               "optional": true
             }
           ],

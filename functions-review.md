@@ -2,6 +2,9 @@
 
 Review of all functions defined in the FHIRPath specification (index.md - N2-STU1) against `functions.json` and the normative specification at https://hl7.org/fhirpath/N1/index.html (N1).
 
+> Note: The emptyInputResult column now has a new possible value: 'criterion-dependent'
+>       *(the other valid values are true/false/0/empty)*
+
 **Legend:**
 * N1 Column function status in N1 specification
     - `✅` - the function is normative
@@ -84,133 +87,134 @@ Review of all functions defined in the FHIRPath specification (index.md - N2-STU
 | 44 | `toDecimal() : Decimal` | 5.5.6.1 | ✅ | |
 | 45 | `convertsToDecimal() : Boolean` | 5.5.6.2 | ✅ | |
 | 46 | `toQuantity([unit : String]) : Quantity` | 5.5.7.1 | ✅ | |
-| 47 | `convertsToQuantity([unit : String]) : Boolean` | 5.5.7.2 | ✅ | |
-| 48 | `toString() : String` | 5.5.8.1 | ✅ | |
-| 49 | `convertsToString() : Boolean` | 5.5.8.2 | ✅ | |
-| 50 | `toTime() : Time` | 5.5.9.1 | ✅ | |
-| 51 | `convertsToTime() : Boolean` | 5.5.9.2 | ✅ | |
+| 47 | Unit Conversions (not a function) | 5.5.7.2 | No | STU |
+| 48 | `convertsToQuantity([unit : String]) : Boolean` | 5.5.7.3 | ✅ | |
+| 49 | `toString() : String` | 5.5.8.1 | ✅ | |
+| 50 | `convertsToString() : Boolean` | 5.5.8.2 | ✅ | |
+| 51 | `toTime() : Time` | 5.5.9.1 | ✅ | |
+| 52 | `convertsToTime() : Boolean` | 5.5.9.2 | ✅ | |
 
 ## 5.6 String Manipulation
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|-----|
-| 52 | `indexOf(substring : String) : Integer` | 5.6.1 | ✅ | |
-| 53 | `lastIndexOf(substring : String) : Integer` | 5.6.2 | No | STU |
-| 54 | `substring(start : Integer [, length : Integer]) : String` | 5.6.3 | ✅ | |
-| 55 | `startsWith(prefix : String) : Boolean` | 5.6.4 | ✅ | |
-| 56 | `endsWith(suffix : String) : Boolean` | 5.6.5 | ✅ | |
-| 57 | `contains(substring : String) : Boolean` | 5.6.6 | ✅ | |
-| 58 | `upper() : String` | 5.6.7 | ✅ | |
-| 59 | `lower() : String` | 5.6.8 | ✅ | |
-| 60 | `replace(pattern : String, substitution : String) : String` | 5.6.9 | ✅ | |
-| 61 | `matches(regex : String, [flags : String]) : Boolean` | 5.6.10 | ✅ | * |
-| 62 | `matchesFull(regex : String, [flags : String]) : Boolean` | 5.6.11 | No | STU |
-| 63 | `replaceMatches(regex : String, substitution: String, [flags : String]) : String` | 5.6.12 | ✅ | * |
-| 64 | `length() : Integer` | 5.6.13 | ✅ | |
-| 65 | `toChars() : collection` | 5.6.14 | ✅ | |
+| 53 | `indexOf(substring : String) : Integer` | 5.6.1 | ✅ | |
+| 54 | `lastIndexOf(substring : String) : Integer` | 5.6.2 | No | STU |
+| 55 | `substring(start : Integer [, length : Integer]) : String` | 5.6.3 | ✅ | |
+| 56 | `startsWith(prefix : String) : Boolean` | 5.6.4 | ✅ | |
+| 57 | `endsWith(suffix : String) : Boolean` | 5.6.5 | ✅ | |
+| 58 | `contains(substring : String) : Boolean` | 5.6.6 | ✅ | |
+| 59 | `upper() : String` | 5.6.7 | ✅ | |
+| 60 | `lower() : String` | 5.6.8 | ✅ | |
+| 61 | `replace(pattern : String, substitution : String) : String` | 5.6.9 | ✅ | |
+| 62 | `matches(regex : String, [flags : String]) : Boolean` | 5.6.10 | ✅ | * |
+| 63 | `matchesFull(regex : String, [flags : String]) : Boolean` | 5.6.11 | No | STU |
+| 64 | `replaceMatches(regex : String, substitution: String, [flags : String]) : String` | 5.6.12 | ✅ | * |
+| 65 | `length() : Integer` | 5.6.13 | ✅ | |
+| 66 | `toChars() : collection` | 5.6.14 | ✅ | |
 
 ## 5.7 Additional String Functions (STU)
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 66 | `encode(format : String) : String` | 5.7.1 | No | STU |
-| 67 | `decode(format : String) : String` | 5.7.2 | No | STU |
-| 68 | `escape(target : String) : String` | 5.7.3 | No | STU |
-| 69 | `unescape(target : String) : String` | 5.7.4 | No | STU |
-| 70 | `trim() : String` | 5.7.5 | No | STU |
-| 71 | `split(separator: String) : collection` | 5.7.6 | No | STU |
-| 72 | `join([separator: String]) : String` | 5.7.7 | No | STU |
+| 67 | `encode(format : String) : String` | 5.7.1 | No | STU |
+| 68 | `decode(format : String) : String` | 5.7.2 | No | STU |
+| 69 | `escape(target : String) : String` | 5.7.3 | No | STU |
+| 70 | `unescape(target : String) : String` | 5.7.4 | No | STU |
+| 71 | `trim() : String` | 5.7.5 | No | STU |
+| 72 | `split(separator: String) : collection` | 5.7.6 | No | STU |
+| 73 | `join([separator: String]) : String` | 5.7.7 | No | STU |
 
 ## 5.8 Math (STU)
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 73 | `abs() : Integer \| Long \| Decimal \| Quantity` | 5.8.1 | STU | STU |
-| 74 | `ceiling() : Integer \| Quantity` | 5.8.2 | STU | STU |
-| 75 | `exp() : Decimal` | 5.8.3 | STU | STU |
-| 76 | `floor() : Integer \| Quantity` | 5.8.4 | STU | STU |
-| 77 | `ln() : Decimal` | 5.8.5 | STU | STU |
-| 78 | `log(base : Decimal) : Decimal` | 5.8.6 | STU | STU |
-| 79 | `power(exponent : Integer \| Decimal) : Decimal` | 5.8.7 | STU | STU |
-| 80 | `round([precision : Integer]) : Decimal \| Quantity` | 5.8.8 | STU | STU |
-| 81 | `sqrt() : Decimal` | 5.8.9 | STU | STU |
-| 82 | `truncate() : Integer \| Quantity` | 5.8.10 | STU | STU |
+| 74 | `abs() : Integer \| Long \| Decimal \| Quantity` | 5.8.1 | STU | STU |
+| 75 | `ceiling() : Integer \| Quantity` | 5.8.2 | STU | STU |
+| 76 | `exp() : Decimal` | 5.8.3 | STU | STU |
+| 77 | `floor() : Integer \| Quantity` | 5.8.4 | STU | STU |
+| 78 | `ln() : Decimal` | 5.8.5 | STU | STU |
+| 79 | `log(base : Decimal) : Decimal` | 5.8.6 | STU | STU |
+| 80 | `power(exponent : Integer \| Decimal) : Decimal` | 5.8.7 | STU | STU |
+| 81 | `round([precision : Integer]) : Decimal \| Quantity` | 5.8.8 | STU | STU |
+| 82 | `sqrt() : Decimal` | 5.8.9 | STU | STU |
+| 83 | `truncate() : Integer \| Quantity` | 5.8.10 | STU | STU |
 
 ## 5.9 Tree navigation
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 83 | `children() : collection` | 5.9.1 | ✅ | |
-| 84 | `descendants() : collection` | 5.9.2 | ✅ | |
+| 84 | `children() : collection` | 5.9.1 | ✅ | |
+| 85 | `descendants() : collection` | 5.9.2 | ✅ | |
 
 ## 5.10 Utility functions
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|-----|
-| 85 | `trace(name : String [, projection]) : collection` | 5.10.1 | ✅ | |
-| 86 | `pathname([short : Boolean]) : collection` | 5.10.2 | No | STU |
-| 87 | `now() : DateTime` | 5.10.3.1 | ✅ | |
-| 88 | `timeOfDay() : Time` | 5.10.3.2 | ✅ | |
-| 89 | `today() : Date` | 5.10.3.3 | ✅ | |
-| 90 | `defineVariable(name: String [, projection]) : collection` | 5.10.4 | No | STU |
-| 91 | `lowBoundary([precision: Integer]) : Decimal \| Date \| DateTime \| Time` | 5.10.5 | No | STU |
-| 92 | `highBoundary([precision: Integer]) : Decimal \| Date \| DateTime \| Time` | 5.10.6 | No | STU |
-| 93 | `precision() : Integer` | 5.10.7 | No | STU |
+| 86 | `trace(name : String [, projection]) : collection` | 5.10.1 | ✅ | |
+| 87 | `pathname([short : Boolean]) : collection` | 5.10.2 | No | STU |
+| 88 | `now() : DateTime` | 5.10.3.1 | ✅ | |
+| 89 | `timeOfDay() : Time` | 5.10.3.2 | ✅ | |
+| 90 | `today() : Date` | 5.10.3.3 | ✅ | |
+| 91 | `defineVariable(name: String [, projection]) : collection` | 5.10.4 | No | STU |
+| 92 | `lowBoundary([precision: Integer]) : Decimal \| Date \| DateTime \| Time` | 5.10.5 | No | STU |
+| 93 | `highBoundary([precision: Integer]) : Decimal \| Date \| DateTime \| Time` | 5.10.6 | No | STU |
+| 94 | `precision() : Integer` | 5.10.7 | No | STU |
 
 ### 5.10.8 Extract Date/DateTime/Time Components (STU)
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|-----|
-| 94 | `yearOf() : Integer` | 5.10.8.1 | No | STU |
-| 95 | `monthOf() : Integer` | 5.10.8.2 | No | STU |
-| 96 | `dayOf() : Integer` | 5.10.8.3 | No | STU |
-| 97 | `hourOf() : Integer` | 5.10.8.4 | No | STU |
-| 98 | `minuteOf() : Integer` | 5.10.8.5 | No | STU |
-| 99 | `secondOf() : Integer` | 5.10.8.6 | No | STU |
-| 100 | `millisecondOf() : Integer` | 5.10.8.7 | No | STU |
-| 101 | `timezoneOffsetOf() : Decimal` | 5.10.8.8 | No | STU |
-| 102 | `dateOf() : Date` | 5.10.8.9 | No | STU |
-| 103 | `timeOf() : Time` | 5.10.8.10 | No | STU |
+| 95 | `yearOf() : Integer` | 5.10.8.1 | No | STU |
+| 96 | `monthOf() : Integer` | 5.10.8.2 | No | STU |
+| 97 | `dayOf() : Integer` | 5.10.8.3 | No | STU |
+| 98 | `hourOf() : Integer` | 5.10.8.4 | No | STU |
+| 99 | `minuteOf() : Integer` | 5.10.8.5 | No | STU |
+| 100 | `secondOf() : Integer` | 5.10.8.6 | No | STU |
+| 101 | `millisecondOf() : Integer` | 5.10.8.7 | No | STU |
+| 102 | `timezoneOffsetOf() : Decimal` | 5.10.8.8 | No | STU |
+| 103 | `dateOf() : Date` | 5.10.8.9 | No | STU |
+| 104 | `timeOf() : Time` | 5.10.8.10 | No | STU |
 
 ## 5.11 Date and Time Interval Functions (STU)
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 104 | `duration(value, precision) : Integer` | 5.11.1 | No | STU |
-| 105 | `difference(value, precision) : Integer` | 5.11.2 | No | STU |
+| 105 | `duration(value, precision) : Integer` | 5.11.1 | No | STU |
+| 106 | `difference(value, precision) : Integer` | 5.11.2 | No | STU |
 
 ## 6.2 Comparison (Operations)
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 106 | `comparable(other : Quantity) : Boolean` | 6.2.5 | No | STU |
+| 107 | `comparable(other : Quantity) : Boolean` | 6.2.5 | No | STU |
 
 ## 6.3 Types (Operations)
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 107 | `is(type : type specifier) : Boolean` | 6.3.2 | ✅ | |
-| 108 | `as(type : type specifier) : collection` | 6.3.4 | ✅ | |
+| 108 | `is(type : type specifier) : Boolean` | 6.3.2 | ✅ | |
+| 109 | `as(type : type specifier) : collection` | 6.3.4 | ✅ | |
 
 ## 6.5 Boolean Logic (Operations)
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 109 | `not() : Boolean` | 6.5.3 | ✅ | |
+| 110 | `not() : Boolean` | 6.5.3 | ✅ | |
 
 ## 7 Aggregates (STU)
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 110 | `aggregate(aggregator : ($total, $this, $index) => collection [, init : collection]) : collection` | 7.1 | STU | STU |
-| 111 | `sum() : Integer \| Long \| Decimal \| Quantity` | 7.2 | No | STU |
-| 112 | `min() : Integer \| Long \| Decimal \| Quantity \| Date \| DateTime \| Time \| String` | 7.3 | No | STU |
-| 113 | `max() : Integer \| Long \| Decimal \| Quantity \| Date \| DateTime \| Time \| String` | 7.4 | No | STU |
-| 114 | `avg() : Decimal \| Quantity` | 7.5 | No | STU |
+| 111 | `aggregate(aggregator : ($total, $this, $index) => collection [, init : collection]) : collection` | 7.1 | STU | STU |
+| 112 | `sum() : Integer \| Long \| Decimal \| Quantity` | 7.2 | No | STU |
+| 113 | `min() : Integer \| Long \| Decimal \| Quantity \| Date \| DateTime \| Time \| String` | 7.3 | No | STU |
+| 114 | `max() : Integer \| Long \| Decimal \| Quantity \| Date \| DateTime \| Time \| String` | 7.4 | No | STU |
+| 115 | `avg() : Decimal \| Quantity` | 7.5 | No | STU |
 
 ## 10.2 Reflection (Types and Reflection)
 
 | # | Function | Section | N1 | N2-STU1 |
 |---|----------|---------|-----|----|
-| 115 | `type() : collection` | 10.2.2 | STU | STU |
+| 116 | `type() : collection` | 10.2.2 | STU | STU |
 
