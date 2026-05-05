@@ -15,7 +15,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.name.empty() // returns true if the patient has no names\n```",
+          "exampleOfUse": "```fhirpath\nPatient.link.empty() // returns true if the patient has no link elements\n```",
           "sectionNumber": "5.1.1"
         },
         {
@@ -166,7 +166,7 @@
           "typeMapping": [
             "Any-Integer"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.name.count() // returns the number of name elements\n```",
+          "exampleOfUse": "```fhirpath\nPatient.name.count() // returns the number of name elements\n```",
           "sectionNumber": "5.1.10"
         },
         {
@@ -194,7 +194,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.identifier.isDistinct() // returns true if all identifiers are unique\n```",
+          "exampleOfUse": "```fhirpath\n1.combine(2).combine(3).isDistinct() // true\n```",
           "sectionNumber": "5.1.12"
         }
       ]
@@ -345,7 +345,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.coalesce(name.where(use='official'), name.where(use='usual'), name.first()).text // preferentially select name via use\nPatient.name.select(coalesce(family & ' ' & given.join(', '), text, 'unknown')) // select is required to process each name separately\ncoalesce(Patient.identifier.where(system = 'http://example.org/identifier').value.first(), 'unknown')\n```",
+          "exampleOfUse": "```fhirpath\nPatient.coalesce(name.where(use='official'), name.where(use='usual'), name.first()).text // preferentially select name via use\nPatient.name.select(coalesce(family & ' ' & given.join(', '), text, 'unknown')) // select is required to process each name separately\ncoalesce(Patient.identifier.where(system = 'http://example.org/identifier').value.first(), 'unknown')\n```",
           "sectionNumber": "5.2.8",
           "status": "STU"
         }
@@ -380,7 +380,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.name.first() // returns the first name element\n```",
+          "exampleOfUse": "```fhirpath\nPatient.name.first() // equivalent to Patient.name[0]\n```",
           "sectionNumber": "5.3.3"
         },
         {
@@ -394,7 +394,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.name.last() // returns the last name element\n```",
+          "exampleOfUse": "```fhirpath\nPatient.name.last() // returns the last name element in the collection\n```",
           "sectionNumber": "5.3.4"
         },
         {
@@ -408,7 +408,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.name.tail() // returns all but the first name element\n```",
+          "exampleOfUse": "```fhirpath\n(0 | 1 | 2).tail() // 1, 2\n```",
           "sectionNumber": "5.3.5"
         },
         {
@@ -428,7 +428,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.name.skip(1) // skips the first name element\n```",
+          "exampleOfUse": "```fhirpath\n(0 | 1 | 2).skip(1) // 1, 2\n(0 | 1 | 2).skip(2) // 2\n```",
           "sectionNumber": "5.3.6"
         },
         {
@@ -448,7 +448,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.name.take(2) // takes the first 2 name elements\n```",
+          "exampleOfUse": "```fhirpath\n(0 | 1 | 2).take(2) // 0, 1\n(0 | 1 | 2).take(5) // 0, 1, 2\n```",
           "sectionNumber": "5.3.7"
         },
         {
@@ -468,7 +468,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.name.given.intersect(Patient.name.family) // returns elements that are both given and family names\n```",
+          "exampleOfUse": "```fhirpath\n(1 | 2 | 3).intersect(2 | 4) // 2\n```",
           "sectionNumber": "5.3.8"
         },
         {
@@ -577,7 +577,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\niif(Patient.active, 'Active', 'Inactive') // returns 'Active' if patient is active, 'Inactive' otherwise\n```",
+          "exampleOfUse": "```fhirpath\niif(true, 'It is true', 'It is false') // returns 'It is true'\nbirthDate.iif(exists(), toString(), '(unknown)') // returns the birthDate as a string, or '(unknown)' if not present\n```",
           "sectionNumber": "5.5.1"
         },
         {
@@ -599,7 +599,7 @@
             "Decimal-Boolean",
             "String-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'true'.toBoolean() // returns true\n```",
+          "exampleOfUse": "```fhirpath\n'true'.toBoolean() // true\n1.toBoolean() // true\n```",
           "sectionNumber": "5.5.2.1"
         },
         {
@@ -613,7 +613,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'true'.convertsToBoolean() // returns true\n'invalid'.convertsToBoolean() // returns false\n```",
+          "exampleOfUse": "```fhirpath\n'true'.convertsToBoolean() // true\n```",
           "sectionNumber": "5.5.2.2"
         },
         {
@@ -633,7 +633,7 @@
             "Integer-Integer",
             "String-Integer"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'123'.toInteger() // returns 123\n```",
+          "exampleOfUse": "```fhirpath\n'1'.toInteger() // 1\n```",
           "sectionNumber": "5.5.3.1"
         },
         {
@@ -647,7 +647,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'123'.convertsToInteger() // returns true\n'abc'.convertsToInteger() // returns false\n```",
+          "exampleOfUse": "```fhirpath\n'1'.convertsToInteger() // true\n```",
           "sectionNumber": "5.5.3.2"
         },
         {
@@ -669,7 +669,7 @@
             "Long-Long",
             "String-Long"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'123'.toLong() // returns 123L\ntrue.toLong() // returns 1L\n```",
+          "exampleOfUse": "```fhirpath\n42.toLong() // 42\n'123'.toLong() // 123\n```",
           "sectionNumber": "5.5.3.3",
           "status": "STU"
         },
@@ -684,7 +684,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'123'.convertsToLong() // returns true\n'abc'.convertsToLong() // returns false\n```",
+          "exampleOfUse": "```fhirpath\n'123'.convertsToLong() // true\n```",
           "sectionNumber": "5.5.3.4",
           "status": "STU"
         },
@@ -712,7 +712,7 @@
             "DateTime-Date",
             "String-Date"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'2022-01-01'.toDate() // returns @2022-01-01\n```",
+          "exampleOfUse": "```fhirpath\n@2024-01-15T23:30:00-05:00.toDate() // @2024-01-15\n'2024-01-15'.toDate() // @2024-01-15\n'150124'.toDate('ddMMyy') // @2024-01-15\n'15-01-2024'.toDate('dd-MM-yyyy') // @2024-01-15\n```",
           "sectionNumber": "5.5.4.2"
         },
         {
@@ -733,7 +733,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'2022-01-01'.convertsToDate() // returns true\n'invalid'.convertsToDate() // returns false\n```",
+          "exampleOfUse": "```fhirpath\n'2015-02-04'.convertsToDate() // true\n```",
           "sectionNumber": "5.5.4.3"
         },
         {
@@ -760,7 +760,7 @@
             "Date-DateTime",
             "String-DateTime"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'2022-01-01T12:00:00Z'.toDateTime() // returns @2022-01-01T12:00:00Z\n```",
+          "exampleOfUse": "```fhirpath\n'2015-02-04T14:34:28Z'.toDateTime() // @2015-02-04T14:34:28Z\n'2012-01-01T10:00'.toDateTime() // @2012-01-01T10:00 ; partial datetime is preserved\n```",
           "sectionNumber": "5.5.5.1"
         },
         {
@@ -781,7 +781,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'2022-01-01T12:00:00Z'.convertsToDateTime() // returns true\n'invalid'.convertsToDateTime() // returns false\n```",
+          "exampleOfUse": "```fhirpath\n'2015-02-04T14:34:28'.convertsToDateTime() // true\n```",
           "sectionNumber": "5.5.5.2"
         },
         {
@@ -803,7 +803,7 @@
             "String-Decimal",
             "Boolean-Decimal"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'123.45'.toDecimal() // returns 123.45\n```",
+          "exampleOfUse": "```fhirpath\n'1.1'.toDecimal() // 1.1\n'42'.toDecimal() // 42 (as a decimal value)\n```",
           "sectionNumber": "5.5.6.1"
         },
         {
@@ -817,7 +817,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'123.45'.convertsToDecimal() // returns true\n'abc'.convertsToDecimal() // returns false\n```",
+          "exampleOfUse": "```fhirpath\n'1.0'.convertsToDecimal() // true\n'42'.convertsToDecimal() // true\n```",
           "sectionNumber": "5.5.6.2"
         },
         {
@@ -869,8 +869,8 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'10 mg'.convertsToQuantity() // returns true\n'abc'.convertsToQuantity() // returns false\n```",
-          "sectionNumber": "5.5.7.2"
+          "exampleOfUse": "```fhirpath\n'1 day'.convertsToQuantity() // true\n10 'mg'.convertsToQuantity() // true\n2 '[in_i]'.convertsToQuantity('cm') // true ; can convert inches to centimeters (commensurate units)\n```",
+          "sectionNumber": "5.5.7.3"
         },
         {
           "functionName": "toString",
@@ -899,7 +899,7 @@
             "Quantity-String",
             "Boolean-String"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n123.toString() // returns '123'\n```",
+          "exampleOfUse": "```fhirpath\n42.toString() // '42'\n3.14.toString() // '3.14'\ntrue.toString() // 'true'\n(53 'km').toString() // '53 \\'km\\''\n@2020-01-01.toString() // '2020-01-01'\n```",
           "sectionNumber": "5.5.8.1"
         },
         {
@@ -913,7 +913,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n123.convertsToString() // returns true\n```",
+          "exampleOfUse": "```fhirpath\n@2025-01-15.convertsToString() // true\n1.convertsToString() // true\n```",
           "sectionNumber": "5.5.8.2"
         },
         {
@@ -931,7 +931,7 @@
             "Time-Time",
             "String-Time"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'12:00:00'.toTime() // returns @T12:00:00\n```",
+          "exampleOfUse": "```fhirpath\n'14:34:28'.toTime() // @T14:34:28\n'10:00'.toTime() // @T10:00 ; partial time is preserved\n```",
           "sectionNumber": "5.5.9.1"
         },
         {
@@ -945,7 +945,7 @@
           "typeMapping": [
             "Any-Boolean"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'12:00:00'.convertsToTime() // returns true\n'invalid'.convertsToTime() // returns false\n```",
+          "exampleOfUse": "```fhirpath\n'14:34:28'.convertsToTime() // true\n```",
           "sectionNumber": "5.5.9.2"
         }
       ]
@@ -1299,7 +1299,7 @@
           "typeMapping": [
             "String-String"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'test'.encode('hex') // returns hexadecimal representation\n```",
+          "exampleOfUse": "```fhirpath\n'test'.encode('base64') // 'dGVzdA=='\n'test'.encode('hex') // '74657374'\n```",
           "sectionNumber": "5.7.1",
           "status": "STU"
         },
@@ -1322,7 +1322,7 @@
           "typeMapping": [
             "String-String"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'74657374'.decode('hex') // returns 'test'\n```",
+          "exampleOfUse": "```fhirpath\n'dGVzdA=='.decode('base64') // 'test'\n'74657374'.decode('hex') // 'test'\n```",
           "sectionNumber": "5.7.2",
           "status": "STU"
         },
@@ -1345,7 +1345,7 @@
           "typeMapping": [
             "String-String"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'\"test\"'.escape('json') // returns '\\\"test\\\"'\n```",
+          "exampleOfUse": "```fhirpath\n'A&B'.escape('html') // 'A&amp;B'\n'\"1<2\"'.escape('json') // '\\\"1<2\\\"'\n```",
           "sectionNumber": "5.7.3",
           "status": "STU"
         },
@@ -1368,7 +1368,7 @@
           "typeMapping": [
             "String-String"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\n'\\\"test\\\"'.unescape('json') // returns '\"test\"'\n```",
+          "exampleOfUse": "```fhirpath\n'&quot;1&lt;2&quot;'.unescape('html') // '\"1<2\"'\n```",
           "sectionNumber": "5.7.4",
           "status": "STU"
         },
@@ -1708,7 +1708,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.children() // returns all immediate child elements of Patient\n```",
+          "exampleOfUse": "```fhirpath\nPatient.gender.children() // the FHIR patient gender datatype is a FHIR code, which could have value, id and potentially extensions returned.\n```",
           "sectionNumber": "5.9.1"
         },
         {
@@ -1722,7 +1722,7 @@
           "typeMapping": [
             "Any-Any"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nPatient.descendants() // returns all descendant elements of Patient\n```",
+          "exampleOfUse": "```fhirpath\nQuestionnaireResponse.descendants().answer.value.ofType(Coding) // returns all coded answers anywhere in a QuestionnaireResponse\n```",
           "sectionNumber": "5.9.2"
         }
       ]
@@ -1790,7 +1790,7 @@
           "typeMapping": [
             "Any-DateTime"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\nnow() // returns the current date and time\n```",
+          "exampleOfUse": "```fhirpath\nnow() // Could return values like @2026-02-25T14:31:39.096+11:00, @2026-02-25T03:31:44.306994+00:00, @2026-02-25T03:31:41.197Z\n```",
           "sectionNumber": "5.10.3.1"
         },
         {
@@ -1804,7 +1804,7 @@
           "typeMapping": [
             "Any-Time"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\ntimeOfDay() // returns the current time\n```",
+          "exampleOfUse": "```fhirpath\ntimeOfDay() // @T14:34:17.923 ; only the time portion of the result of now(). Equivalent to now().timeOf().\ntimeOfDay() = timeOfDay() // true ; timeOfDay is deterministic within a single expression\n```",
           "sectionNumber": "5.10.3.2"
         },
         {
@@ -1818,7 +1818,7 @@
           "typeMapping": [
             "Any-Date"
           ],
-          "exampleOfUse": "HINT: ```fhirpath\ntoday() // returns the current date\n```",
+          "exampleOfUse": "```fhirpath\ntoday() // @2026-02-25 ; equivalent to now().toDate()\n```",
           "sectionNumber": "5.10.3.3"
         },
         {
