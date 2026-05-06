@@ -4003,7 +4003,7 @@ Implementations are not required to fully support operations on units, but they 
 
 Implementations that do support units shall do so as specified by the [\[UCUM\]](#UCUM) specification.
 
-UCUM does not support math operations with differing ["special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
+UCUM does not support math operations with ["special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
 Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
 {:.fhir-highlight}
 {:.stu}
