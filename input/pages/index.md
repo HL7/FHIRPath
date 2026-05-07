@@ -714,7 +714,7 @@ Takes a collection of Boolean values and returns `true` if all the items are `tr
 The following example returns `true` if all of the components of the Observation have a value greater than 90 mm[Hg]:
 
 ``` fhirpath
-Observation.value.select(component > 90 'mm[Hg]').allTrue()
+Observation.component.select(value > 90 'mm[Hg]').allTrue()
 ```
 
 #### anyTrue() : Boolean
