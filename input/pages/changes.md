@@ -154,3 +154,8 @@
 * [FHIR-55471](https://jira.hl7.org/browse/FHIR-55471):  Arithmetic and toQuantity are not NOT explicitly define for Long
 * [FHIR-55473](https://jira.hl7.org/browse/FHIR-55473):  FHIRPath String Equivalence Ambiguities
 * [FHIR-56286](https://jira.hl7.org/browse/FHIR-56286):  Add an example to clarify result of ''.substring(0)
+* [FHIR-49528](https://jira.hl7.org/browse/FHIR-49528):  Date time arithmetic with UCUM
+* [FHIR-56190](https://jira.hl7.org/browse/FHIR-56190):  Extensive clarifications of handling quantities, and specifically unit conversions and calendar/time valued quantities
+* [FHIR-49525](https://jira.hl7.org/browse/FHIR-49525):  Quantity math and unit conversion
+* [FHIR-53249](https://jira.hl7.org/browse/FHIR-53249):  Quantity equivalence is ambiguous
+* [FHIR-53250](https://jira.hl7.org/browse/FHIR-53250):  Calendar duration equivalence has conflicts
