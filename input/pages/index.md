@@ -36,9 +36,13 @@ Looking for implementations? See [FHIRPath Implementations on the HL7 confluence
 > * [Functions - combine](#fn-combine) - additional optional parameter `preserveOrder`
 > * [Date Conversion Functions](#date-conversion-functions) - inclusion of string format codes and `format` parameter
 > * [Functions - String (matches)](#fn-matches) - additional optional parameter `flags`
-> * [Unary Operators](#unary-operators) - this is a new section, however they have been implied as defined since the normative version via other parts of the specification and grammar. 
+> * [Operations - Quantity Equality / Equivalence (time-valued)](#quantity-equality) - refined cross-system calendar/UCUM comparisons
+> * [Operations - Math](#math-1) - refined handling of quantity operations - particularly with time based quanties
+> * [Unary Operators](#unary-operators) - this is a new section, however they have been implied as defined since the normative version via other parts of the specification and grammar
 >
 > In addition, the appendices are included as additional documentation and are informative content.
+>
+> All content that appears with this pink stripe to the left is marked as Standard for Trial Use (STU) 
 {: .stu-note }
 
 
@@ -239,7 +243,14 @@ false
 ```
 
 #### String
-The `String` type represents string values up to 2<sup>31</sup>-1 characters in length and is UTF-8 encoded. String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
+The `String` type represents string values up to 2<sup>31</sup>-1 characters in length and is UTF-8 encoded.
+
+When parsing string literals, `\uXXXX` escape sequences represent [UTF-16](https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G31699) code units; valid surrogate pairs are combined to form a single Unicode scalar value.
+After processing escapes, a FHIRPath string is defined as a sequence of Unicode scalar values, which are referred to elsewhere in this specification as `characters` (for example, in [toChars()](#tochars--collection)).<br/>
+This behaviour is consistent with the Unicode Standard and with the string literal processing rules used by most modern programming languages.
+{:.stu}
+
+String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
 
 | Escape | Character |
 | - | - |
@@ -251,29 +262,45 @@ The `String` type represents string values up to 2<sup>31</sup>-1 characters in 
 | `\t` | Tab |
 | `\f` | Form Feed |
 | `\\` | Backslash |
-| `\uXXXX` | Unicode character, where XXXX is the hexadecimal representation of the character |
+| `\uXXXX` | Unicode character escape, where XXXX is a four‑digit hexadecimal value representing a 16‑bit Unicode code unit.<br/><span class="stu">If the escape sequence represents a surrogate code unit, it must be paired with a corresponding high or low surrogate to form a valid Unicode scalar value.</span> |
 {: .grid}
 
 No other escape sequences besides those listed above are recognized.
 
 Note that Unicode is supported in both string literals and delimited [Identifiers](#identifiers).
 
-> Note: The UTF-8 encoding is consistent with XML and JSON specifications, as well as the base FHIR specification.
-
+For example:
 ``` fhirpath
 'test string'
 'urn:oid:3.4.5.6.7.8'
 ```
 
-If a `\` is used at the beginning of a non-escape sequence, it will be ignored and will not appear in the sequence.
-
-``` txt
-define TestEscape1: '\p' // 'p'
-define TestEscape2: '\\p' // '\p'
-define TestEscape3: '\3' // '3'
-define TestEscape4: '\u005' // 'u005'
-define TestEscape5: '\' // ''
+If a `\` is used at the beginning of a non-escape sequence, it will be ignored and will not appear in the sequence:
+``` fhirpath
+'\p' // 'p'
+'\\p' // '\p' ; normal escaped backslash
+'\3' // '3'
+'\u005' // 'u005' ; unicode escape sequences have 4 characters, not 3, hence not detected as an escaped sequence
+'\' // '' ; an empty string
 ```
+
+##### Unicode and String Operations
+{:.stu}
+
+String functions such as [`length()`](#length--integer), [`indexOf()`](#indexofsubstring--string--integer), [`substring()`](#substringstart--integer--length--integer--string), and [`toChars()`](#tochars--collection) operate on characters (Unicode scalar values), not on visual characters (grapheme clusters). This distinction matters when strings contain combining characters:
+{:.stu}
+
+| Visual Representation | Encoded String Literal | Unicode Scalar Value(s) | length() | Description |
+| - | - | - | - | - |
+| `é` (precomposed) | `'\u00E9'` | U+00E9 | 1 | Single character |
+| `é` (combining) | `'\u0065\u0301'` | U+0065 U+0301 | 2 | Two characters: 'e' + combining acute accent |
+| `🔥` (flame emoji) | `'\uD83D\uDD25'` | U+1F525 | 1 | Single character: A scalar value encoded using a UTF‑16 surrogate pair |
+{: .grid}
+{:.stu}
+
+Both precomposed and combining representations are valid and may appear in data. Authors should be aware that the same visual character may have different lengths depending on its Unicode representation. When consistent string length behavior is required, data should be normalized (e.g., to NFC or NFD form) before processing, though such normalization is outside the scope of FHIRPath.
+{:.stu}
+
 
 #### Integer
 
@@ -310,7 +337,7 @@ The `Decimal` type represents real values in the range (-10<sup>28</sup>+1)/10<s
 3.14159265
 ```
 
-Decimal literals cannot use exponential notation. There is enough additional complexity associated with enabling exponential notation that this is outside the scope of what FHIRPath is intended to support (namely graph traversal).
+> **Note:** Decimal literals cannot use exponential notation. There is enough additional complexity associated with enabling exponential notation that this is outside the scope of what FHIRPath is intended to support (namely graph traversal).
 
 #### Date
 
@@ -329,8 +356,8 @@ The following examples illustrate the use of the `Date` literal:
 
 ``` fhirpath
 @2014-01-25
-@2014-01
-@2014
+@2014-01 // partial date (year-month)
+@2014    // partial date (year only)
 ```
 
 Consult the [formal grammar](grammar.html) for more details.
@@ -347,8 +374,8 @@ The `Time` literal uses a subset of [\[ISO8601\]](#ISO8601):
 The following examples illustrate the use of the `Time` literal:
 
 ``` fhirpath
-@T12:00
-@T14:30:14.559
+@T14:30:14.559 // full Time including milliseconds
+@T12:00        // partial time (hour and minute)
 ```
 
 Consult the [formal grammar](grammar.html) for more details.
@@ -384,7 +411,9 @@ Consult the [formal grammar](grammar.html) for more details.
 
 The `Quantity` type represents quantities with a specified unit, where the `value` component is defined as a `Decimal`, and the `unit` is represented as a `String` that is required to be either a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or one of the calendar duration keywords, singular or plural.
 
-The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) string representing a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or calendar duration keyword. If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
+The `Quantity` literal is a number (integer or decimal), followed by a (single-quoted) **case-sensitive** string representing a valid Unified Code for Units of Measure [\[UCUM\]](#UCUM) unit or calendar duration keyword.
+If the value literal is an Integer, it will be implicitly converted to a Decimal in the resulting Quantity value:
+
 
 ``` fhirpath
 4.5 'mg'      // UCUM milligrams
@@ -392,27 +421,29 @@ The `Quantity` literal is a number (integer or decimal), followed by a (single-q
 2 years       // Calendar units
 ```
 
-> Implementations must respect UCUM units, meaning that they must not ignore UCUM units in calculations involving quantities, including comparison, conversion, and arithmetic operations. For implementations that do not support unit conversion, this means that the calculation need only be supported if the units are the same value, case-sensitively.
+Implementations shall support [equality](#quantity-equality), [equivalence](#quantity-equivalence), [comparison](#comparison) and [arithmetic](#math-1) operations on quantities with units where the units are the same value, case-sensitively.
+
+Implementations that do NOT support UCUM unit conversion may return empty (`{ }`) for calculations involving quantities with different units.
+
+Implementations that DO support UCUM conversions SHALL support implicit conversions where operations between quantities with different units are performed, and also explicitly through [toQuantity(unit)](#fn-toquantity).
+
+For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
+
+> **Note:** The UCUM specification defines what unit codes are valid, how units are composed/decomposed when performing multiplication and division, 
+> and, where applicable, scalar conversion factors between commensurable units (e.g. between a single dimension such as length).
 >
-> When using [\[UCUM\]](#UCUM) units within FHIRPath, implementations shall use case-sensitive comparisons.
->
-> Implementations shall support comparison and arithmetic operations on quantities with units where the units are the same.
->
-> Implementations should support other unit functionality as specified by UCUM, including unit conversion.
->
-> Implementations that do NOT support complete UCUM functionality may return empty (`{ }`) for calculations involving quantities with units where the units are different.
->
-> For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
+> UCUM does not specify how precision, rounding or comparisons are evaluated, FHIRPath specifies this in each section where required.<br>
+> UCUM does not specify *which* operand should be converted when an operation has 2 operands of different units.
+
 
 ##### Time-valued Quantities
 
 For time-valued quantities, in addition to the definite duration UCUM units, FHIRPath defines calendar duration keywords for calendar duration units:
 
-
 | Calendar Duration | Unit Representation | Relationship to Definite Duration UCUM Unit |
 | - | - | - |
-| `year`/`years` | `'year'` | `~ 1 'a'` |
-| `month`/`months` | `'month'` | `~ 1 'mo'` |
+| `year`/`years` | `'year'` | `~ 1 'a'` *(mean Julian year)* |
+| `month`/`months` | `'month'` | `~ 1 'mo'` *(mean Julian month)* |
 | `week`/`weeks` | `'week'` | `= 1 'wk'` |
 | `day`/`days` | `'day'` | `= 1 'd'` |
 | `hour`/`hours` | `'hour'` | `= 1 'h'` |
@@ -420,6 +451,16 @@ For time-valued quantities, in addition to the definite duration UCUM units, FHI
 | `second`/`seconds` | `'second'` | `= 1 's'` |
 | `millisecond`/`milliseconds` | `'millisecond'` | `= 1 'ms'` |
 {: .grid}
+
+The table above defines the equality/equivalence relationship between calendar and definite duration quantities.
+For example, `1 year` is not [equal](#-equals) to `1 'a'` (i.e. results in empty), but it is [equivalent](#-equivalent) to `1 'a'`.<br/>
+See the [Date/Time Arithmetic](#datetime-arithmetic) section for details on addition and subtraction of time-valued quantities to date/time values.
+
+> **Note:** A calendar `day` is not technically equal/equivalent to a UCUM 'd', due to the possibility  of daylight saving time. 
+> However for practical reasons it considers them to be equal.
+> Authors should take care to ensure calendar days are used in applications that are sensitive to this difference.
+
+UCUM defines the conversion factors between UCUM units, and FHIRPath defines [conversion factors](#fn-toquantity-conversion-factors) for calendar units.
 
 For example, the following quantities are _calendar duration_ quantities:
 
@@ -435,7 +476,10 @@ Whereas the following quantities are _definite duration_ quantities:
 4 'd'
 ```
 
-The table above defines the equality/equivalence relationship between calendar and definite duration quantities. For example, `1 year` is not equal to `1 'a'`, but it is equivalent to `1 'a'`. See [Date/Time Arithmetic](#datetime-arithmetic) for more information on using time-valued quantities in FHIRPath.
+> **Note:** UCUM is represented with the system `http://unitsofmeasure.org` and Calendar Units with the system [http://hl7.org/fhirpath/CodeSystem/calendar-units](CodeSystem-calendar-units.html).
+> These systems may be used in contexts that interact with FHIRPath Quantities, such as the FHIR `Quantity` datatype. 
+> Note that the FHIR [`Duration`](http://hl7.org/fhir/datatypes.html#Duration) datatype is an exception; it only supports UCUM units.
+{:.stu}
 
 ### Operators
 
@@ -473,11 +517,9 @@ In general, functions in FHIRPath operate on collections and return new collecti
 Patient.telecom.where(use = 'official').union(Patient.contact.telecom.where(use = 'official')).exists().not()
 ```
 
-However not all functions support multiple items in the input collection, some expect only a single item and will be explicitly documented. Further details are available in the ["singleton evaluation of collections"](#singleton-evaluation-of-collections) section.
-{:.stu}
+However, not all functions support multiple items in the input collection, some expect only a single item and will be explicitly documented. Further details are available in the ["singleton evaluation of collections"](#singleton-evaluation-of-collections) section.
 
 Singleton only functions can be run on collections by using the function inside a [`select(...)`](#fn-select) to evaluate the function for each item in the collection.
-{:.stu}
 
 For a complete listing of the functions defined in FHIRPath, refer to the [Functions](#functions) section.
 
@@ -581,7 +623,7 @@ These are the fhirpath defined scoped functions: *(argument processing only, ref
 | [`sort`](#fn-sort) | Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is not defined in this context, it could be anywhere during any evaluation depending on algorithms selected. |
 | [`repeat`](#fn-repeat) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
 | [`repeatAll`](#fn-repeatall) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
-| [`iif`](#iif) | The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned. |
+| [`iif`](#iif) | The `criterion` argument is evaluated once (with `$this` set to the input value).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value) and returned,<br/> otherwise the `otherwise-result` argument is evaluated (with `$this` set to the input value) and returned. |
 | [`trace`](#fn-trace) | If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function. |
 | [`aggregate`](#aggregate) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values. |
 {:.list}
@@ -672,7 +714,7 @@ Takes a collection of Boolean values and returns `true` if all the items are `tr
 The following example returns `true` if all of the components of the Observation have a value greater than 90 mm[Hg]:
 
 ``` fhirpath
-Observation.select(component.value > 90 'mm[Hg]').allTrue()
+Observation.component.select(value > 90 'mm[Hg]').allTrue()
 ```
 
 #### anyTrue() : Boolean
@@ -682,7 +724,7 @@ Takes a collection of Boolean values and returns `true` if any of the items are 
 The following example returns `true` if any of the components of the Observation have a value greater than 90 mm[Hg]:
 
 ``` fhirpath
-Observation.select(component.value > 90 'mm[Hg]').anyTrue()
+Observation.component.select(value > 90 'mm[Hg]').anyTrue()
 ```
 
 #### allFalse() : Boolean
@@ -692,7 +734,7 @@ Takes a collection of Boolean values and returns `true` if all the items are `fa
 The following example returns `true` if none of the components of the Observation have a value greater than 90 mm[Hg]:
 
 ``` fhirpath
-Observation.select(component.value > 90 'mm[Hg]').allFalse()
+Observation.component.select(value > 90 'mm[Hg]').allFalse()
 ```
 
 #### anyFalse() : Boolean
@@ -702,7 +744,7 @@ Takes a collection of Boolean values and returns `true` if any of the items are 
 The following example returns `true` if any of the components of the Observation have a value that is not greater than 90 mm[Hg]:
 
 ``` fhirpath
-Observation.select(component.value > 90 'mm[Hg]').anyFalse()
+Observation.component.select(value > 90 'mm[Hg]').anyFalse()
 ```
 
 #### subsetOf(other : collection) : Boolean
@@ -775,9 +817,9 @@ This means that if the input collection is empty (`{ }`), the result is `true`.
 
 For example:
 ``` fhirpath
-(1 | 2 | 3).isDistinct() // true
-(1 | 2 | 3 | 2).isDistinct() // false - the 2 appears twice in the input collection
-(1 'm' | 100 'cm').isDistinct() // false - both quantities are the same (via unit conversion)
+1.combine(2).combine(3).isDistinct() // true
+1.combine(2).combine(3).combine(2).isDistinct() // false ; the 2 appears twice in the input collection
+1 'm'.combine(100 'cm').isDistinct() // false ; both quantities are the same (via unit conversion)
 ```
 
 ### Filtering and projection
@@ -913,7 +955,7 @@ CodeableConcept {
 // create a codeable concept that contains all of the codes selected
 // multiple codings come from the answers in the questionnaire
 QuestionnaireResponse.item.where(linkId='coded-q')
-.select( CodeableConcept { coding: answer.value.ofType(coding) } )
+.select( CodeableConcept { coding: answer.value.ofType(Coding) } )
 ```
 {:.stu}
 
@@ -955,11 +997,12 @@ The following examples illustrate the use of the `sort()` function:
 {:.stu}
 
 ``` fhirpath
-(3 | 1 | 2).sort() // (1 | 2 | 3) - natural numeric ordering
-(3 | 1 | 2).sort($this) // (1 | 2 | 3) - explicit ascending
-(3 | 1 | 2).sort($this desc) // (3 | 2 | 1) - descending
-('c' | 'a' | 'b').sort() // ('a' | 'b' | 'c') - default string ordering
-('c' | 'a' | 'b').sort($this desc) // ('c' | 'b' | 'a') - descending
+(3 | 1 | 2).sort() // 1, 2, 3 ; natural numeric ordering
+(3 | 1 | 2).sort($this) // 1, 2, 3 ; explicit ascending
+(3 | 1 | 2).sort($this desc) // 3, 2, 1 ; descending
+('c' | 'a' | 'b').sort() // 'a', 'b', 'c' ; default string ordering
+('c' | 'a' | 'b').sort($this desc) // 'c', 'b', 'a' ; descending
+('3' | '1' | '10').sort() // '1', '10', '3' ; default string ordering (not numeric)
 Patient.name.sort(family desc, given.first()) // sort by family name descending, then by first given name ascending
 Patient.telecom.sort(system, use desc) // sort by system ascending, then by use descending
 ```
@@ -1037,8 +1080,8 @@ Questionnaire.repeatAll(item)
 Some unsafe expressions:
 {:.stu}
 ``` fhirpath
-Questionnaire.repeatAll('item') // this is a common mistake where the "expression" was in a string, which then just keeps getting called.
-'abc'.repeatAll(replace('a', 'A')) // does not rely on the resource structure for termination
+Questionnaire.repeatAll('item') // this is a common mistake where the element name is accidentally provided as a string, not an identifier, so each iteration re-evaluates the same string constant and the function never terminates.
+'abc'.repeatAll(replace('a', 'A')) // the projection always returns a value (after the first iteration it produces 'Abc'), and since repeatAll does not remove duplicates, the same item keeps being re-added and the function never terminates.
 ```
 {:.stu}
 
@@ -1091,14 +1134,13 @@ Another common case is to select a specific coding in a CodeableConcept if it is
 {:.stu}
 ``` fhirpath
 iif( code.coding.where(system='http://snomed.info/sct').exists(),
-        code.coding.where(system='http://snomed.info/sct')),
+        code.coding.where(system='http://snomed.info/sct'),
             code.coding)
     .first().code
 // could equivalently be written as:
 coalesce(code.coding.where(system='http://snomed.info/sct'), code.coding).first().code
 ```
 {:.stu}
-
 
 
 ### Subsetting
@@ -1225,9 +1267,9 @@ When `preserveOrder` is `false`, or not supplied, there is no expectation of ord
 For example, considering the same two lists of integers used in the union example `A: 1, 1, 2, 3` and `B: 2, 3`:
 {: .stu}
 ```fhirpath
-A.combine(B)       // 1, 1, 2, 2, 3, 3 - order is not guaranteed to be preserved (could be in any order)
-A.combine(B, true) // 1, 1, 2, 3, 2, 3 - The order is preserved using the `preserveOrder` argument
-A.combine( {} )    // 1, 1, 2, 3       - combining an empty collection with a non-empty collection returns the non-empty collection
+A.combine(B)       // 1, 1, 2, 2, 3, 3 ; order is not guaranteed to be preserved (could be in any order)
+A.combine(B, true) // 1, 1, 2, 3, 2, 3 ; The order is preserved using the `preserveOrder` argument
+A.combine( {} )    // 1, 1, 2, 3       ; combining an empty collection with a non-empty collection returns the non-empty collection
 ```
 {: .stu}
 Note that the duplicate `1`s are not removed from the collection using combine, where using `union` or `|` they would have been.
@@ -1250,7 +1292,7 @@ The following table lists the possible conversions supported, and whether the co
 |- |- |- |- |- |- |- |- |- | - |
 |**Boolean** |N/A |Explicit | *Explicit*{:.stu-bg} |Explicit |*Explicit*{:.stu-bg} |Explicit |- |- |- |
 |**Integer** |Explicit |N/A | *Implicit*{:.stu-bg} |Implicit |Implicit |Explicit |- |- |- |
-|**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*-*{:.stu-bg} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
+|**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*Implicit*{:.stu-bg} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
 |**Decimal** |Explicit |- | *-*{:.stu-bg} |N/A |Implicit |Explicit |- |- |- |
 |**Quantity** |- |- | *-*{:.stu-bg} |- |N/A |Explicit |- |- |- |
 |**String** |Explicit |Explicit | *Explicit*{:.stu-bg} |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
@@ -1264,24 +1306,68 @@ The following table lists the possible conversions supported, and whether the co
 * N/A - Not applicable
 * \- No conversion is defined
 
+**Note:** When an integer, long or decimal is implicitly converted to a Quantity, the resulting quantity will have the UCUM default unit ('1').
+
 The functions in this section operate on collections with a single item. If there is more than one item, the evaluation of the expression will end and signal an error to the calling environment.
 
 <a name="iif"></a>
-#### iif(criterion: ($this, $index) => Boolean, true-result: ($this, $index) => collection [, otherwise-result: ($this, $index) => collection]) : collection
+#### iif(criterion: ($this) => Boolean, true-result: ($this) => collection [, otherwise-result: ($this) => collection]) : collection
 
-> This is a [scoped function](#scoped-functions): The `criterion` argument is evaluated once (with `$this` set to the input value, and $index will be set to `0`).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned,<br/> otherwise the `false-result` argument is evaluated (with `$this` set to the input value, and `$index` set to `0`) and returned.
+> This is a [scoped function](#scoped-functions): The `criterion` argument is evaluated once (with `$this` set to the input value).<br/>
+> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value) and returned,<br/>
+> otherwise the `otherwise-result` argument is evaluated (with `$this` set to the input value) and returned.<br/>
+> *Unlike any other scoped function, the `$index` variable is not set during evaluation of the arguments, so the value of `$index` would be that of an outer context.*
 
 The `iif` function in FHIRPath is an _immediate if_, also known as a conditional operator (such as the C programming language's `? :` operator).
 
-The `criterion` expression is expected to evaluate to a Boolean.
-
-If `criterion` is `true`, the function returns the value of the `true-result` argument.
-
-If `criterion` is `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
-
-Note that short-circuit behavior is expected in this function. In other words, `true-result` should only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` should only be evaluated otherwise. For implementations, this means delaying evaluation of the output arguments (specifically true-result and otherwise-result) to remove the chance that their evaluation throws an error and terminates the expression early.
+Unlike most other functions it can be called with no context (using the expression's evaluation input as the context), or with a single item context.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+The `criterion` expression SHALL evaluate to a Boolean, consistent with [singleton evaluation of collections](#singleton-evaluation-of-collections).
+
+If `criterion` evaluates to `true`, the function returns the value of the `true-result` argument, even if the input collection is empty.
+
+If `criterion` evaluates to either `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
+
+Note that short-circuit behavior is expected in this function. 
+In other words, `true-result` should only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` should only be evaluated otherwise.
+The `criterion` is always evaluated, even when the input collection is empty.
+For implementations, this means delaying evaluation of the output arguments (specifically true-result and otherwise-result) to remove the chance that their evaluation throws an error and terminates the expression early.
+
+For example:
+``` fhirpath
+// call with no context
+iif(true, 'It is true', 'It is false') // returns 'It is true'
+iif(false, 'It is true', 'It is false') // returns 'It is false'
+iif({}, 'It is true', 'It is false') // returns 'It is false'
+
+// call with input context
+// (example use on an identifier to read a specific identifier and perform some checks on it - could be a form field pre-population rule)
+Patient.identifier.where(system = 'http://example.org/special-id').first()
+  .iif(value.startsWith('555-').not(), value, value.substring(4))
+  .iif(exists(), $this, '(no special id)')
+
+// call with empty input context (and compare to using select)
+{}.iif(true, 'It is true', 'It is false')         // returns 'It is true'
+{}.select(iif(true, 'It is true', 'It is false')) // empty result, the iif is never evaluated
+
+// several ways to return the patient's birthDate, or '(unknown)' if no birthDate is present
+iif(birthDate.exists(), birthDate.toString(), '(unknown)') // $this is the Patient, so need to access the birthDate element
+birthDate.iif(exists(), $this.toString(), '(unknown)')     // $this is the birthDate
+birthDate.iif(exists(), toString(), '(unknown)')           // most concise form of the expression
+
+// examples showing $this context (evaluating on a Patient)
+Patient.birthDate.iif(true, $this)  // returns the birthdate value, which would also return empty if there was no birthDate
+iif(true, $this)                    // will return the evaluation context (e.g. the Patient)
+```
+
+Note that [singleton evaluation of collections](#singleton-evaluation-of-collections) applies to the `criterion` parameter:
+``` fhirpath
+iif(1, 'true', 'false')      // returns 'true' (not due to conversion to boolean)
+iif(0, 'true', 'false')      // returns 'true' (0 is a non-empty single item, not a Boolean false)
+iif('hi', 'true', 'false')   // returns 'true'
+```
 
 #### Boolean Conversion Functions
 
@@ -1318,7 +1404,7 @@ For example:
 ``` fhirpath
 'true'.toBoolean()  // true
 1.toBoolean()       // true
-'hello'.toBoolean() // empty { } — not a recognized boolean representation
+'hello'.toBoolean() // empty ({ }) ; not a recognized boolean representation
 ```
 
 ##### convertsToBoolean() : Boolean
@@ -1341,7 +1427,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 'true'.convertsToBoolean() // true
-'abc'.convertsToBoolean()  // false — not a recognized boolean representation
+'abc'.convertsToBoolean()  // false ; not a recognized boolean representation
 ```
 
 #### Integer Conversion Functions
@@ -1365,7 +1451,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 '1'.toInteger()  // 1
-'st'.toInteger() // empty { } — not convertible to an integer
+'st'.toInteger() // empty ({ }) ; not convertible to an integer
 ```
 
 ##### convertsToInteger() : Boolean
@@ -1385,7 +1471,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 '1'.convertsToInteger()   // true
-'1.0'.convertsToInteger() // false — decimal strings are not convertible to integer
+'1.0'.convertsToInteger() // false ; decimal strings are not convertible to integer
 ```
 
 ##### toLong() : Long
@@ -1417,7 +1503,7 @@ For example:
 ``` fhirpath
 42.toLong()    // 42
 '123'.toLong() // 123
-'abc'.toLong() // empty { } — not convertible to a long
+'abc'.toLong() // empty ({ }) ; not convertible to a long
 ```
 {:.stu}
 
@@ -1570,7 +1656,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 '2015-02-04T14:34:28Z'.toDateTime() // @2015-02-04T14:34:28Z
-'2012-01-01T10:00'.toDateTime() // @2012-01-01T10:00 — partial datetime is preserved
+'2012-01-01T10:00'.toDateTime() // @2012-01-01T10:00 ; partial datetime is preserved
 ```
 
 ##### convertsToDateTime([format : string]) : Boolean
@@ -1619,7 +1705,7 @@ For example:
 ``` fhirpath
 '1.1'.toDecimal() // 1.1
 '42'.toDecimal() // 42 (as a decimal value)
-'st'.toDecimal() // empty { } — not convertible to a decimal
+'st'.toDecimal() // empty ({ }) ; not convertible to a decimal
 ```
 
 ##### convertsToDecimal() : Boolean
@@ -1650,51 +1736,113 @@ For example:
 
 If the input collection contains a single item, this function will return a single quantity if:
 
-* the item is an Integer, or Decimal, where the resulting quantity will have the default unit (`'1'`)
+* the item is an Integer, Long or Decimal, where the resulting quantity will have the UCUM default unit (`'1'`)
 * the item is a Quantity
 * the item is a String and is convertible to a Quantity using the regex format:
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
 ```
+As with integer, long, and decimal, where the resulting quantity has no unit, it will have the UCUM default unit (`'1'`)
 * the item is a Boolean, where `true` results in the quantity `1.0 '1'`, and `false` results in the quantity `0.0 '1'`
 
 If the item is not one of the above, the result is empty.
-
-For example, the following are valid quantity strings:
-
-``` fhirpath
-'4 days'
-'10 \'mg[Hg]\''
-```
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 If the input collection is empty, the result is empty.
 
-If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is the converted quantity, otherwise, the result is empty.
-
-<a name="fn-toquantity-conversion-factors"></a>
-For calendar durations, FHIRPath defines the following conversion factors:
-
-| Calendar duration | Conversion factor |
-| - | -|
-| `1 year` | `12 months` or `365 days` |
-| `1 month` | `30 days` |
-| `1 week` | `7 days` |
-| `1 day` | `24 hours` |
-| `1 hour` | `60 minutes` |
-| `1 minute` | `60 seconds` |
-| `1 second` | `1 's'` |
-{: .grid}
-
-Note that calendar duration conversion factors are only used when time-valued quantities appear in unanchored calculations. See [Date/Time Arithmetic](#datetime-arithmetic) for more information on using time-valued quantities in FHIRPath.
-
-If `q` is a Quantity of `'kg'` and one wants to convert to a Quantity in `'g'` (grams):
+For example, the following are valid quantity strings used with toQuantity:
 ``` fhirpath
-q.toQuantity('g') // changes the value and units in the quantity according to UCUM conversion rules
+'4 days'.toQuantity()
+'10 \'mm[Hg]\''.toQuantity()
 ```
 
-> Implementations are not required to support a complete UCUM implementation, and may return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
+If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword).
+
+If the `unit` argument is provided and the input can be [**converted**](#unit-conversions), the result is the converted quantity, otherwise the result is empty.
+
+For example:
+``` fhirpath
+52 'cm'.toQuantity('m') // 0.52 'm'
+45.toQuantity('m')      // { } empty ; There is no conversion from the UCUM default unit to meters.
+                        //             Can instead use multiplication 45 * 1 'm'
+q.toQuantity('g')       // returns the value of q converted to grams according to UCUM conversion rules
+24 'm'.toQuantity('kg') // empty ; there is no conversion between these units in UCUM
+1 'a'.toQuantity('d')   // 365.25 'd' ; UCUM conversion for definite durations
+1 'wk'.toQuantity('d')  // 7 'd' ; UCUM conversion for definite durations
+42.toQuantity()         // 42 '1' ; A quantity with the UCUM default unit
+```
+
+##### Unit Conversions
+Unit conversion can impact operations on quantity values including: [equality](#quantity-equality), [equivalence](#quantity-equivalence), [comparison](#comparison) and [arithmetic](#math-1).
+
+Unit conversions between UCUM units is defined by the [\[UCUM\] specification](#UCUM) for commensurable units (i.e. between a single dimension such as length).
+This is often a simple fixed conversion factor applied to convert between specific units, though may require multiple calculations.
+If units are not commensurable, the result of conversion is empty (`{ }`).
+
+> ***Most/Least Granular Unit:***<br/>
+> When an operation requires one of its arguments to be converted to the "most granular" unit, implementations SHALL select the smaller unit of measurement.
+> For example if selecting between `mm` and `cm`, then `mm` is the most granular unit.<br/>
+> This can be generically evaluated by selecting the conversion factor that is less than 1 when converting from one unit to the other.
+> If the conversion factor is greater than 1, then the other unit is more granular.<br/>
+> e.g. for our example above, the conversion factor from `mm` to `cm` is 0.1, which is less than 1, so `mm` is the most granular unit.<br/>
+> Conversely, the conversion factor from `in_i` to `cm` is 2.54, which is greater than 1, so `cm` is the most granular of those two units.<br/>
+> This also applies to complex composite units such as velocities (`m/s`) or other ratios (`J/s`) where the rules of the UCUM specification define how to calculate the conversion factor.<br/>
+> The "least granular" is the opposite of this.<br/>
+> If the conversion factors are 1 *(the units are equal)*, then choose the unit of the operator's left argument.<br/>
+> *This is required for both [quantity addition](#-addition) (most granular) and [quantity equivalence](#quantity-equivalence) (least granular)*.
+>
+> ***Note:*** *Implementers should refer to the [UCUM specification](https://ucum.org/ucum#baseunits) for guidance, and also to the [NLM Unit Conversion](https://ucum.nlm.nih.gov/ucum-service.html#toBaseUnits) service for more information.*
+{:.stu}
+
+There is no expectation to perform rounding on the result of applying the UCUM conversion factor to the input value, and thus the output value may have more significant figures that then input value.
+Applying rounding too early can result in un-intended inaccuracies and should be explicitly applied when desired.
+{:.stu}
+
+> **Note:** Implementations are not required to support a UCUM implementation, and may return empty (`{ }`) when the units are different, or not handled.
+{:.stu}
+
+###### Time-valued unit conversions
+The relationship between Calendar units and the Definite Duration UCUM Units is documented in the [Time-valued Quantities](#time-valued-quantities) section, which can be used to match a UCUM definite duration unit to/from a calendar unit, noting that the ucum `a` and `mo` units are not equal to their calendar unit counterparts.
+{:.stu}
+
+<a name="fn-toquantity-conversion-factors"></a>
+FHIRPath defines the following conversion factors for calendar durations. For comparison the associated UCUM definite duration conversion factors are also included in the table:
+
+| Calendar duration | Conversion factor | *UCUM Conversion factor* |
+| - | -| - |
+| `1 year` | `12 months` or `365 days` | *`1 'a'` or `365.25 'd'`* |
+| `1 month` | `30 days` | *`30.4375 'd'` or `1 'mo'`* |
+| `1 week` | `7 days` | *`7 'd'` or `1 'wk'`* |
+| `1 day` | `24 hours` | *`1 'd'` or `24 'h'`* |
+| `1 hour` | `60 minutes` | *`60 'min'`* |
+| `1 minute` | `60 seconds` | *`60 's'`* |
+| `1 second` | | `1 's'` |
+{: .grid}
+
+These conversion factors (apart from years/months) are the same as UCUM, so can be used interchangeably.
+{:.stu}
+
+When explicitly converting between UCUM definite durations and calendar units of differing magnitudes (e.g. days and weeks), perform the conversion within the unit system of the source,
+then change the unit to the corresponding target unit:
+{:.stu}
+```fhirpath
+7 days.toQuantity('wk')  // 7 days → 1 week → 1 'wk'
+182.5 days.toQuantity('a') // 182.5 days → 0.5 year → 0.5 'a'
+182.5 'd'.toQuantity('a') // 0.4996577686516085 'a' ; UCUM conversion result
+```
+{:.stu}
+If converting to/from years or months you shall use the shortest conversion chain possible (i.e. don't convert from days to months to years when you can go from direct days to years).
+Implementers SHOULD produce a warning if this type of conversion is performed. 
+{:.stu}
+
+When implicitly converting quantities across UCUM definite duration and calendar units, convert the UCUM value to the UCUM unit that matches the calendar unit.
+The operation that is processing the result of the implicit conversion will define the appropriate behavior (e.g. 'a' != year, 'a' ~ year, 1 day > 23 'h', 1 year + 12 'mo' )
+{:.stu}
+
+> **Note:** Unit conversion is not required for [Date/Time arithmetic](#datetime-arithmetic) except when adding/subtracting from partial dates and the 
+> level of granularity is not present in the value. e.g. `@2026 + 24 months`.
+{:.stu}
 
 ##### convertsToQuantity([unit : String]) : Boolean
 
@@ -1713,14 +1861,15 @@ If the item is not one of the above, the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword), and is used to determine whether the input quantity can be converted to the given unit, according to the unit conversion rules specified by UCUM. If the input quantity can be converted, the result is `true`, otherwise, the result is `false`.
-
-> Implementations are not required to support a complete UCUM implementation, and may return empty (`{ }`) when the `unit` argument is used and it is different than the input quantity unit.
+If the `unit` argument is provided, it should be handled in the same way it is in the [toQuantity()](#fn-toquantity) function above, except that where an empty result would result, false is returned.
 
 For example:
 ``` fhirpath
 '1 day'.convertsToQuantity() // true
 10 'mg'.convertsToQuantity() // true
+2 '[in_i]'.convertsToQuantity('cm') // true ; can convert inches to centimeters (commensurate units)
+10 'Cel'.convertsToQuantity('[degF]') // true ; ucum "special" units are also commensurate
+5 'm',convertsToQuantity('kg') // false ; the units meters and kilograms are not commensurate
 ```
 
 #### String Conversion Functions
@@ -1773,8 +1922,8 @@ For example:
 ``` fhirpath
 @2025-01-15.convertsToString() // true
 1.convertsToString() // true
-Patient.name.first().convertsToString() // false - not a type that supports toString() (assuming there was at least 1 name)
-{}.convertsToString() // empty - no input collection
+Patient.name.first().convertsToString() // false ; not a type that supports toString() (assuming there was at least 1 name)
+{}.convertsToString() // empty ; no input collection
 ```
 
 #### Time Conversion Functions
@@ -1799,7 +1948,7 @@ If the input collection is empty, the result is empty.
 For example:
 ``` fhirpath
 '14:34:28'.toTime() // 14:34:28
-'10:00'.toTime() // 10:00 — partial time is preserved
+'10:00'.toTime() // 10:00 ; partial time is preserved
 ```
 
 ##### convertsToTime() : Boolean
@@ -1827,14 +1976,13 @@ The functions in this section operate on collections with a single item. If ther
 
 To use these functions over a collection with multiple items, one may use filters like `where()` and `select()`:
 ``` fhirpath
-Patient.name.given.select(substring(0))
+Patient.name.given.select(substring(0, 1)) // returns a collection containing the first character of all the given names for a patient
 ```
-
-This example returns a collection containing the first character of all the given names for a patient.
 
 #### indexOf(substring : String) : Integer
 
 Returns the 0-based index of the first position `substring` is found in the input string, or -1 if it is not found.
+The returned index is measured in characters (Unicode scalar values).
 
 If `substring` is an empty string (`''`), the function returns 0.
 
@@ -1847,6 +1995,9 @@ For example:
 'abcdefg'.indexOf('bc') // 1
 'abcdefg'.indexOf('x') // -1
 'abcdefg'.indexOf('abcdefg') // 0
+'a🔥b'.indexOf('🔥') // 1
+'a🔥b'.indexOf('b')  // 2  (not 3, because 🔥 is 1 character)
+'a\uD83D\uDD25b'.indexOf('b')  // 2  (not 3, because the surrogate pair is 1 character)
 ```
 
 #### lastIndexOf(substring : String) : Integer
@@ -1856,6 +2007,7 @@ For example:
 {: .stu-note }
 
 Returns the 0-based index of the last position `substring` is found in the input string, or -1 if it is not found.
+The returned index is measured in characters (Unicode scalar values).
 {:.stu}
 
 If `substring` is an empty string (`''`), the function returns the length of the string.
@@ -1883,8 +2035,9 @@ For example:
 #### substring(start : Integer [, length : Integer]) : String
 
 Returns the part of the string starting at position `start` (zero-based). If `length` is given, will return at most `length` number of characters from the input string.
+Both `start` and `length` are measured in characters (Unicode scalar values).
 
-If `start` lies outside the length of the string, the function returns empty (`{ }`). If there are less remaining characters in the string than indicated by `length`, the function returns just the remaining characters.
+If `start` lies outside, or equal to, the length of the string, the function returns empty (`{ }`). If there are less remaining characters in the string than indicated by `length`, the function returns just the remaining characters.
 
 If the input or `start` is empty, the result is empty.
 
@@ -1904,7 +2057,8 @@ For example:
                            //     this can happen when the -1 was the result of a calculation rather than explicitly provided)
 'abcdefg'.substring(3, 0) // '' (empty string)
 'abcdefg'.substring(3, -1) // '' (empty string)
-'abcdefg'.substring(-1, -1) // {} (start position is outside the string)
+'abcdefg'.substring(-1, -1) // { } (start position is outside the string)
+''.substring(0) // { } (start position is outside the string)
 ```
 
 #### startsWith(prefix : String) : Boolean
@@ -1958,6 +2112,7 @@ For example:
 
 > **Note:** The `.contains()` function described here is a string function that looks for a substring in a string. This is different than the [`contains`](#contains-containership--boolean) operator, which is a list operator that looks for an item in a list.
 
+<a name="fn-upper"></a>
 #### upper() : String
 
 Returns the input string with all characters converted to upper case.
@@ -1972,6 +2127,7 @@ For example:
 'AbCdefg'.upper() // 'ABCDEFG'
 ```
 
+<a name="fn-lower"></a>
 #### lower() : String
 
 Returns the input string with all characters converted to lower case.
@@ -1999,6 +2155,8 @@ For example:
 'abcdefg'.replace('cde', '123') // 'ab123fg'
 'abcdefg'.replace('cde', '') // 'abfg'
 'abc'.replace('', 'x') // 'xaxbxcx'
+'a\uD83D\uDD25c'.replace('', 'x') // 'xax🔥xcx' ; the unicode character should remain in tact (even if it was constructed via surrogates)
+'a🔥c'.replace('', 'x') // 'xax🔥xcx'
 ```
 
 <a name="fn-matches"></a>
@@ -2009,7 +2167,7 @@ The start/end of line markers `^`, `$` can be used to match the entire string.
 
 If the input collection or `regex` are empty, the result is empty (`{ }`).
 
-If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+If the input collection contains multiple items, or the flags parameter contains invalid values, the evaluation of the expression will end and signal an error to the calling environment.
 
 The optional `flags` parameter can be set to:
 {:.stu}
@@ -2021,7 +2179,11 @@ For example:
 ``` fhirpath
 'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matches('Library') // returns true
 'N8000123123'.matches('^N[0-9]{8}$') // returns false as the string is not an 8 char number (it has 10)
-'N8000123123'.matches('N[0-9]{8}') // returns true as the string has an 8 number sequence in it starting with `N`
+'N8000123123'.matches('N[0-9]{8}')   // returns true as the string has an 8 number sequence in it starting with `N`
+
+'first line\nsecond line'.matches('^second', 'm')   // true
+'first line\nsecond line'.matches('^second', '')    // false
+'first line\nsecond line'.matches('^SECOND', 'im')  // true ; combine flags
 ```
 
 #### matchesFull(regex : String, [flags : String]) : Boolean
@@ -2038,7 +2200,7 @@ Regular expressions should function consistently, regardless of any culture- and
 If the input collection or `regex` are empty, the result is empty (`{ }`).
 {:.stu}
 
-If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+If the input collection contains multiple items, or the flags parameter contains invalid values, the evaluation of the expression will end and signal an error to the calling environment.
 {:.stu}
 
 The optional `flags` parameter can be set to:
@@ -2085,25 +2247,31 @@ This example locates all the instances of `aa` and surrounds them with double qu
 
 #### length() : Integer
 
-Returns the number of characters in the input string. If the input collection is empty (`{ }`), the result is empty.
+Returns the number of characters (Unicode scalar values) in the input string. If the input collection is empty (`{ }`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+
+Note that `length()` counts characters (Unicode scalar values), not visual characters (grapheme clusters). For example, the string `'é'` encoded as U+0065 + U+0301 (combining form) has a length of 2, while `'é'` encoded as U+00E9 (precomposed form) has a length of 1.
+{:.stu}
 
 For example:
 ``` fhirpath
 'abc'.length() // 3
 ''.length() // 0
-'\u0065\u0301'.length() // 2 unicode encoded characters
+'\u0065\u0301'.length() // 2 characters (Unicode scalar values)
+'\uD83D\uDD25'.length() // 1 character (single Unicode scalar value encoded using a UTF-16 surrogate pair)
 ```
 
 #### toChars() : collection
 
-Returns the list of characters in the input string. If the input collection is empty (`{ }`), the result is empty.
+Returns the list of characters in the input string as individual single-character strings. If the input collection is empty (`{ }`), the result is empty.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 ``` fhirpath
-'abc'.toChars() // { 'a', 'b', 'c' }
+'abc'.toChars()          // { 'a', 'b', 'c' }
+'\u0065\u0301'.toChars() // { 'e', '\u0301' } ; the combining form of 'é' returns two characters
+'a\uD83D\uDD25b'.toChars()        // { 'a', '🔥', 'b' } ; note that the surrogate pair is a single character in the output collection (don't split the surrogate pairs as separate characters)
 ```
 
 ### Additional String Functions
@@ -2153,6 +2321,10 @@ If the input is empty, the result is empty.
 {:.stu}
 
 If no format is specified, the result is empty.
+{:.stu}
+
+If the content being decoded is not a valid UTF-8 value, the result will be empty.
+*It should not replace with the unicode replacement character or allow ill formed UTF-8 content.*
 {:.stu}
 
 For example:
@@ -2315,6 +2487,7 @@ For example:
 ```
 {:.stu}
 
+<a name="fn-ceiling"></a>
 #### ceiling() : Integer | Quantity
 {:.stu}
 
@@ -2369,6 +2542,7 @@ For example:
 ```
 {:.stu}
 
+<a name="fn-floor"></a>
 #### floor() : Integer | Quantity
 {:.stu}
 
@@ -2477,13 +2651,14 @@ If the input collection contains multiple items, the evaluation of the expressio
 For example:
 {:.stu}
 ``` fhirpath
-2.power(3) // 8
+2.power(3) // 8 (as a decimal)
 2.5.power(2) // 6.25
 2.power(-1) // 0.5
 (-1).power(0.5) // empty ({ })
 ```
 {:.stu}
 
+<a name="fn-round"></a>
 #### round([precision : Integer]) : Decimal | Quantity
 {:.stu}
 
@@ -2515,7 +2690,7 @@ If the input collection contains multiple items, the evaluation of the expressio
 For example:
 {:.stu}
 ``` fhirpath
-1.round() // 1
+1.round() // 1 (as a decimal)
 3.14159.round(3) // 3.142
 ```
 {:.stu}
@@ -2549,6 +2724,7 @@ For example:
 ```
 {:.stu}
 
+<a name="fn-truncate"></a>
 #### truncate() : Integer | Quantity
 {:.stu}
 
@@ -2598,7 +2774,7 @@ Returns a collection with all descendant nodes of all items in the input collect
 
 The following example returns all coded answers anywhere in a QuestionnaireResponse:
 ``` fhirpath
-QuestionnaireResponse.descendants().answer.ofType(Coding)
+QuestionnaireResponse.descendants().answer.value.ofType(Coding)
 ```
 
 > **Note:** Many of these functions will result in a set of items of different underlying types. It may be necessary to use [`ofType()`](#fn-oftype) as described in the previous section to maintain type safety. See [Type safety and strict evaluation](#type-safety-and-strict-evaluation) for more information about type safe use of FHIRPath expressions.
@@ -2633,7 +2809,7 @@ using only element names and indexers. *Such that if you used that result on the
 {:.stu}
 
 If an item in the input collection was derived from computation (e.g. via `substring(..)`, `&`, or mathematical operations) rather than navigation it is excluded from the result.
-Items that are outside the input resource, such as those navigated to via resolve() are also excluded from the result, however if resolve()
+Items that are outside the input resource, such as those navigated to via FHIR's resolve() are also excluded from the result, however if resolve()
 references a resource contained within the input Resource then it is included (such as with FHIR bundles, or contained resources).
 {:.stu}
 
@@ -2698,8 +2874,8 @@ Returns the current time.
 
 For example:
 ``` fhirpath
-timeOfDay() // @T14:34:17.923 - only the time portion of the result of today. Equivalent to now().timeOf()
-timeOfDay() = timeOfDay() // true - timeOfDay should be deterministic within a single expression
+timeOfDay() // @T14:34:17.923 ; only the time portion of the result of now(). Equivalent to now().timeOf().
+timeOfDay() = timeOfDay() // true ; timeOfDay is deterministic within a single expression
 ```
 
 ##### today() : Date
@@ -2708,7 +2884,7 @@ Returns the current date.
 
 The following example demonstrates that `today()` returns a date in YYYY-MM-DD format:
 ``` fhirpath
-today() // @2026-02-25 - equivalent to now().toDate()
+today() // @2026-02-25 ; equivalent to now().toDate()
 ```
 
 <a name="definevariable"></a>
@@ -2820,7 +2996,7 @@ For example:
 (-1.587).highBoundary() // -1.58650000
 (-1.587).highBoundary(6) // -1.586500
 (-1.587).highBoundary(2) // -1.58
-(-1.587).highBoundary(0) // 1
+(-1.587).highBoundary(0) // -1
 @2014.highBoundary(6) // @2014-12
 @2014-01-01T08.highBoundary(17) // @2014-01-01T08:59:59.999
 @T10:30.highBoundary(9) // @T10:30:59.999
@@ -2849,7 +3025,7 @@ For example with decimal values:
 {:.stu}
 ``` fhirpath
 1.58700.precision() // 5
-100.precision() // 0 - no digits after the decimal place (integer implicitly converted to a decimal for processing)
+100.precision() // 0 ; no digits after the decimal place (integer implicitly converted to a decimal for processing)
 ```
 {:.stu}
 
@@ -2872,7 +3048,7 @@ For Date and DateTime values, the function returns the number of digits of preci
 If the input collection contains a single Date or DateTime, this function will return the year component.
 {:.stu}
 
-If the input collection is empty, the result is empty.
+If the input collection is empty, or the value is not a Date or DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -2891,7 +3067,7 @@ For example:
 If the input collection contains a single Date or DateTime, this function will return the month component.
 {:.stu}
 
-If the input collection is empty, or the month is not present in the value, the result is empty.
+If the input collection is empty, the month is not present in the value, or the value is not a Date or DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -2917,7 +3093,7 @@ If the component isn't present in the value, then the result is empty:
 If the input collection contains a single Date or DateTime, this function will return the day component.
 {:.stu}
 
-If the input collection is empty, or the day is not present in the value, the result is empty.
+If the input collection is empty, the day is not present in the value, or the value is not a Date or DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -2936,7 +3112,7 @@ For example:
 If the input collection contains a single DateTime or Time, this function will return the hour component.
 {:.stu}
 
-If the input collection is empty, or the hour is not present in the value, the result is empty.
+If the input collection is empty, the hour is not present in the value, or the value is not a DateTime or Time, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -2956,7 +3132,7 @@ For example:
 If the input collection contains a single DateTime or Time, this function will return the minute component.
 {:.stu}
 
-If the input collection is empty, or the minute is not present in the value, the result is empty.
+If the input collection is empty, the minute is not present in the value, or the value is not a DateTime or Time, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -2975,7 +3151,7 @@ For example:
 If the input collection contains a single DateTime or Time, this function will return the second component.
 {:.stu}
 
-If the input collection is empty, or the second is not present in the value, the result is empty.
+If the input collection is empty, the second is not present in the value, or the value is not a DateTime or Time, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -2994,7 +3170,7 @@ For example:
 If the input collection contains a single DateTime or Time, this function will return the millisecond component.
 {:.stu}
 
-If the input collection is empty, or the millisecond is not present in the value, the result is empty.
+If the input collection is empty, the millisecond is not present in the value, or the value is not a DateTime or Time, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3013,7 +3189,7 @@ For example:
 If the input collection contains a single DateTime, this function will return the timezone offset component. It is expressed as the number of hours difference from UTC, with fractional hours expressed as decimal values (e.g. -7.5 for UTC-7:30).
 {:.stu}
 
-If the input collection is empty, or the timezone offset is not present in the value, the result is empty.
+If the input collection is empty, the timezone offset is not present in the value, or the value is not a DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3033,7 +3209,7 @@ For example:
 If the input collection contains a single Date or DateTime, this function will return the date component (up to the precision present in the input value).
 {:.stu}
 
-If the input collection is empty, the result is empty.
+If the input collection is empty, or the value is not a Date or DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3052,7 +3228,7 @@ For example:
 If the input collection contains a single DateTime, this function will return the time component.
 {:.stu}
 
-If the input collection is empty, or the time is not present in the value, the result is empty.
+If the input collection is empty, the time is not present in the value, or the value is not a DateTime, the result is empty.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
@@ -3101,9 +3277,9 @@ If either the input or `value` argument is empty, the result is empty.
 The following examples illustrate the behavior of the duration function:
 {:.stu}
 ```fhirpath
-@2025-01-02.duration(@2025-01-07, 'week') // 0 - hasn't passed 7 days duration
-@2025-01-01.duration(@2025-09-01, 'year') // 0 - baby is 9 months old
-@2024-12-01.duration(@2025-09-01, 'year') // 0 - baby is 10 months old
+@2025-01-02.duration(@2025-01-07, 'week') // 0 ; hasn't passed 7 days duration
+@2025-01-01.duration(@2025-09-01, 'year') // 0 ; baby is 9 months old
+@2024-12-01.duration(@2025-09-01, 'year') // 0 ; baby is 10 months old
 ```
 {:.stu}
 
@@ -3138,9 +3314,9 @@ If either the input or `value` argument is empty, the result is empty.
 The following examples illustrate the behavior of the difference function:
 {:.stu}
 ```fhirpath
-@2025-01-02.difference(@2025-01-07, 'week') // 1 - crossed a week boundary (Sunday)
-@2025-01-01.difference(@2025-09-01, 'year') // 0 - baby is 9 months old, but born this year
-@2024-12-01.difference(@2025-09-01, 'year') // 1 - baby is 10 months old, but born last year
+@2025-01-02.difference(@2025-01-07, 'week') // 1 ; crossed a week boundary (Sunday)
+@2025-01-01.difference(@2025-09-01, 'year') // 0 ; baby is 9 months old, but born this year
+@2024-12-01.difference(@2025-09-01, 'year') // 1 ; baby is 10 months old, but born last year
 ```
 {:.stu}
 
@@ -3173,9 +3349,10 @@ If both operands are collections with a single item, they must be of the same ty
   * `Integer`: values must be exactly equal
   * `Decimal`: values must be equal, trailing zeroes after the decimal are ignored
   * `Boolean`: values must be the same
-  * `Date`: must be exactly the same
-  * `DateTime`: must be exactly the same, respecting the timezone offset (though +00:00 = -00:00 = Z)
-  * `Time`: must be exactly the same
+  * `Date`: must be exactly the same<br/>*(see [Date/Time Equality](#datetime-equality) for more details)*
+  * `DateTime`: must be exactly the same, respecting the timezone offset (though +00:00 = -00:00 = Z)<br/>*(see [Date/Time Equality](#datetime-equality) for more details)*
+  * `Time`: must be exactly the same<br/>*(see [Date/Time Equality](#datetime-equality) for more details)*
+* `Quantity`: value comparison based on decimal as described above, after [conversion](#unit-conversions) to a common unit if required.<br/>*(See [Quantity Equality](#quantity-equality) for more details)*
 * For complex types, equality requires all child elements to be equal, recursively.
 
 If both operands are collections with multiple items, check the equality of each pair of items in order:
@@ -3190,20 +3367,78 @@ Typically, this operator is used with single fixed values as operands. This mean
 
 If one or both of the operands is the empty collection, this operation returns an empty collection.
 
+For example:
+```fhirpath
+1.10 = 1.1 // true ; zeros after the decimal place are ignored
+1.2 / 1.8 = 0.67 // false ; division results in a decimal with recurring digits, 
+                 //        these are not equal to 0.67 
+0.0 = 0 // true ; zeros after the decimal place are ignored
+{} = {} // empty ; as explicitly defined above
+name = name // true ; its the same object, and thus will have all the same properties recursively
+(1 | 2 | 3) = (3 | 2 | 1) // false ; all items are in both collections, but order doesn't match
+(1 | 2 | 3) = (1 | 2 | 3) // true ; all items are in both collections, and order matches
+'a' = 'A' // false ; case is NOT ignored for equality
+23 = 23 '1' // true ; integer implicitly converts to Quantity with unit '1', thus compares exactly here
+```
+***Note:** The above examples involving collections are for illustrative purposes, the order of the `|` operator is undefined, so an engine may have different results here, however engines with simple collections like this do retain the order as constructed.*
+{:.fhir-highlight}
+
 ##### Quantity Equality
 
-When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+When comparing quantities for equality, the dimensions of each quantity must be the same, but not necessarily the same unit.
+This is referred to as the units being commensurable in UCUM.
+For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
 
-For time-valued quantities, note that calendar durations and definite quantity durations above days (and weeks) are considered un-comparable:
-
-``` fhirpath
-1 year = 1 'a' // {} an empty collection
-1 second = 1 's' // true
-```
+When the units are different the quantity values must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
+Any commensurable target unit may be chosen, since trailing zeroes after the decimal point are ignored when comparing the resulting decimal values *(see [Quantity Equivalence](#quantity-equivalence) for the contrasting rule, where the choice of unit affects the rounded comparison)*.
+If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equality comparison is empty (`{ }`).
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by [\[UCUM\]](#UCUM), as well as the calendar durations as defined in the toQuantity function.
+Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Once the units are the same, the values can be compared using simple decimal comparison, ignoring trailing zeroes after the decimal point (as described above).
+
+For example:
+```fhirpath
+1 'cm' = 10.0 'mm' // true ; UCUM conversion gives the same decimal value (ignoring trailing zeros after the decimal place)
+1 'cm' = 1 'm' // false ; convert to a common unit (1 'm' → 100 'cm'); 1 ≠ 100
+1 'cm' = 1 's' // empty ({ }) ; different dimensions are not commensurable
+23 'Cel' = 73.4 '[degF]' // true ; comparison of ucum "special" units on non-ratio scales
+```
+
+When comparing time-valued quantities the quantity values must be converted to the least granular unit
+*(without changing code system)*, then compare as described above with other quantities.<br/>
+This is particularly important when the time-valued quantities involve calendar units to ensure consistency across implementations,
+as calendar conversions are not transitive 
+(e.g. 1 year ~ 12 months and 1 month = 30 days, but 1 year ≠ 360 days).
+{:.stu}
+
+As noted in the [Time-valued Quantities](#time-valued-quantities) section, years and months are not equal across UCUM definite durations and calendar units. Hence when the arguments are a mix of these, the result is empty as they are not comparable.<br/>
+Note that explicit conversion using [`toQuantity()`](#fn-toquantity) will change code-systems to intentionally perform this equality.
+{:.stu}
+
+For example:
+{:.stu}
+``` fhirpath
+1 'h' = 3600 's'  // true ; ucum conversion
+1 hour = 3600 's' // true ; 3600 's' → 1 'h' (ucum), and 1 'h' = 1 hour (calendar)
+1 year = 1 'a'    // empty ({ }) ; calendar/UCUM year is not comparable
+1 year.toQuantity('a') = 1 'a' // true ; intentionally converting to UCUM units
+1 year = 12 months // true ; calendar unit conversion
+1 year = 12 'mo' // empty ({ }) ; 12 'mo' → 1 'a'; calendar/UCUM year is not comparable
+1 week = 1 'wk'  // true ; week and 'wk' are equal by definition
+1 second = 1 's' // true ; second and 's' are equal by definition
+```
+{:.stu}
+
+Where the time-valued quantities are being compared, convert to the least granular unit (the one appearing higher in the [time-valued unit conversion table](#fn-toquantity-conversion-factors), matching across code systems):
+{:.stu}
+``` fhirpath
+7 days = 1 'wk'  // true ; convert to week: 7 days → 1 week (calendar), and 1 week = 1 'wk'
+1 week = 7 'd'   // true ; convert to 'wk': 7 'd' → 1 'wk' (UCUM); 1 'wk' = 1 week
+```
+{:.stu}
 
 ##### Date/Time Equality
 
@@ -3211,15 +3446,16 @@ For `Date`, `DateTime` and `Time` equality, the comparison is performed by consi
 
 For example:
 ``` fhirpath
-@2012 = @2012 // returns true
-@2012 = @2013 // returns false
-@2012-01 = @2012 // returns empty ({ })
-@2012-01-01T10:30 = @2012-01-01T10:30 // returns true
-@2012-01-01T10:30 = @2012-01-01T10:31 // returns false
-@2012-01-01T10:30:31 = @2012-01-01T10:30 // returns empty ({ })
-@2012-01-01T10:30:31.0 = @2012-01-01T10:30:31 // returns true
-@2012-01-01T10:30:31.1 = @2012-01-01T10:30:31 // returns false
+@2012 = @2012 // true
+@2012 = @2013 // false
+@2012-01 = @2012 // empty ({ }) ; different date precision
+@2012-01-01T10:30 = @2012-01-01T10:30 // true
+@2012-01-01T10:30 = @2012-01-01T10:31 // false
+@2012-01-01T10:30:31 = @2012-01-01T10:30 // empty ({ }) ; different datetime precision
+@2012-01-01T10:30:31.0 = @2012-01-01T10:30:31 // true
+@2012-01-01T10:30:31.1 = @2012-01-01T10:30:31 // false
 ```
+
 
 For `DateTime` values that do not have a timezone offsets, whether or not to provide a default timezone offset is a policy decision. In the simplest case, no default timezone offset is provided, but some implementations may use the client's or the evaluating system's timezone offset.
 
@@ -3242,11 +3478,12 @@ Returns `true` if the collections are the same. In particular, comparing empty c
 If both operands are collections with a single item, they must be of the same type (or [implicitly convertible](#conversion) to the same type), and:
 
 * For primitives
-  * `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace (see [String Equivalence](#string-equivalence) for more details).
+  * `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace.<br/>*(see [String Equivalence](#string-equivalence) for more details)*
   * `Integer`: exactly equal
   * `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision.
-  * `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).
+  * `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).<br/>*(see [Date/Time Equivalence](#datetime-equivalence) for more details)*
   * `Boolean`: the values must be the same
+* `Quantity`: value comparison based on decimal as described above, after [**conversion**](#unit-conversions) to the least granular unit before comparison.<br/>*(See [Quantity Equivalence](#quantity-equivalence) for more details)*
 * For complex types, equivalence requires all child elements to be equivalent, recursively.
 
 If both operands are collections with multiple items:
@@ -3256,19 +3493,61 @@ If both operands are collections with multiple items:
 
 Note that this implies that if the collections have a different number of items to compare, or if one input is a value and the other is empty (`{ }`), the result will be `false`.
 
+For example:
+```fhirpath
+1.10 ~ 1.1  // true ; round to 1 decimal place, then compare values
+1.2 / 1.8 ~ 0.67 // true ; division results in a decimal with recurring digits, 
+                 //        equivalence rounds to the 2 digits and then compares the values
+0.0 ~ 0     // true ; implicit conversion to decimals, then rounding to the least precise operand (0) results in both sides being 0
+{} ~ {}     // true ; as explicitly defined above
+name ~ name // true ; its the same object, and thus will have all the same properties recursively
+(1 | 2 | 3) ~ (3 | 2 | 1) // true ; all items are in both collections irrespective of order
+'a' ~ 'A'   // true ; case is ignored for equivalence
+23 ~ 23 '1' // true ; integer implicitly converts to Quantity with unit '1', thus compares exactly here
+```
+***Note:** The above examples involving collections are for illustrative purposes, the order of the `|` operator is undefined, so an engine may have different results here, however engines with simple collections like this do retain the order as constructed.*
+{:.fhir-highlight}
+
 ##### Quantity Equivalence
 
-When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in `false`.
+When comparing quantities for equivalence, the dimensions of each quantity must be the same, but not necessarily the same unit.
+This is referred to as the units being commensurable in UCUM.
+For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot.
 
-For time-valued quantities, calendar durations and definite quantity durations are considered equivalent:
-``` fhirpath
-1 year ~ 1 'a' // true
-1 second ~ 1 's' // true
-```
+When the units are different the quantity values must be [**converted**](#unit-conversions) to the least granular unit before comparison.<br/>
+*(using the least granular unit ensures that the precision of the converted value is not artificially increased by the conversion, and thus doesn't impact the rounded decimal comparison)*<br/>
+If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equivalence comparison is empty (`{ }`).
+{:.stu}
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by [\[UCUM\]](#UCUM) as well as the calendar durations as defined in the toQuantity function.
+Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+Once the units are the same, the values can be compared using decimal equivalence: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision (as described above).
+
+For example:
+```fhirpath
+2.1 'cm' ~ 21 'mm'  // true ; convert to least granular 'cm' (2.1 ~ 2.1), round to least precise and compare (2.1 = 2.1)
+21 'mm' ~ 2 'cm'    // true ; convert to least granular 'cm' (2.1 ~ 2), round to least precise and compare (2 = 2)
+4 'g' ~ 4000 'mg'   // true ; convert to least granular 'g' (4 ~ 4.000), round to least precise and compare (4 = 4)
+4 'g' ~ 4040 'mg'   // true ; convert to least granular 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
+1 '[in_i]' ~ 2.5 'cm' // true ; convert to least granular '[in_i]' (1 ~ 0.98..), round to least precise and compare (1 = 1)
+23 'Cel' ~ 73.4 '[degF]' // true ; comparison of UCUM "special" units on non-ratio scales (23 'Cel' = 73.4 '[degF]' exactly)
+```
+
+As noted in the [Time-valued Quantities](#time-valued-quantities) section, all units are considered either equal or equivalent across UCUM definite durations and calendar units.
+Hence when the arguments are a mix of these, the results can be compared.
+{:.stu}
+
+For example:
+{:.stu}
+``` fhirpath
+1 year ~ 1 'a' // true ; year and 'a' are equivalent by definition
+1 year ~ 12 'mo' // true ; convert to least granular 'a': 12 'mo' → 1 'a' (UCUM), and 'a' ~ year by definition
+1 year ~ 11 months // true ; convert to least granular year (1 ~ 0.9166666), round to least precise and compare (1 = 1)
+1 second ~ 1 's' // true ; second and 's' are equal by definition (thus equivalent)
+```
+{:.stu}
 
 ##### Date/Time Equivalence
 
@@ -3276,19 +3555,35 @@ For `Date`, `DateTime` and `Time` equivalence, the comparison is the same as for
 
 For example:
 ``` fhirpath
-@2012 ~ @2012 // returns true
-@2012 ~ @2013 // returns false
-@2012-01 ~ @2012 // returns false as well
-@2012-01-01T10:30 ~ @2012-01-01T10:30 // returns true
-@2012-01-01T10:30 ~ @2012-01-01T10:31 // returns false
-@2012-01-01T10:30:31 ~ @2012-01-01T10:30 // returns false as well
-@2012-01-01T10:30:31.0 ~ @2012-01-01T10:30:31 // returns true
-@2012-01-01T10:30:31.1 ~ @2012-01-01T10:30:31 // returns false
+@2012 ~ @2012 // true
+@2012 ~ @2013 // false
+@2012-01 ~ @2012 // false ; different precision
+@2012-01-01T10:30 ~ @2012-01-01T10:30 // true
+@2012-01-01T10:30 ~ @2012-01-01T10:31 // false
+@2012-01-01T10:30:31 ~ @2012-01-01T10:30 // false ; different precision
+@2012-01-01T10:30:31.0 ~ @2012-01-01T10:30:31 // true
+@2012-01-01T10:30:31.1 ~ @2012-01-01T10:30:31 // false
 ```
 
 ##### String Equivalence
 
-For strings, equivalence returns `true` if the strings are the same value while ignoring case and locale, and normalizing whitespace. Normalizing whitespace means that all whitespace characters are treated as equivalent, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
+For strings, equivalence returns `true` if the strings are the same value while ignoring case and locale, and normalizing whitespace.
+
+Normalizing whitespace means treating as equivalent all characters in the Unicode White_Space character class (as defined in https://www.unicode.org/Public/UCD/latest/ucd/PropList.txt) -
+*this set includes the characters in the whitespace lexical category*.
+{:.stu}
+
+> **Note:** Multiple whitespace characters in sequence are not collapsed to a single character. 
+> This could be done by using `replaceMatches('\\s+', ' ')` on both sides, which would normalize the whitespace to a single space.
+> However, not all regex implementations cover the same set of whitespace characters with `\s`; this inconsistency is outside the scope of FHIRPath.<br/>
+> To simply trim the start and end of content, use the [`trim()`](#trim--string) function.
+
+For example:
+```
+'a b' ~ 'a\tb' // true
+'a     b' ~ 'a b' // false ; the whitespace isn't collapsed
+'a b' ~ 'A B' // true ; case insensitive test
+```
 
 #### != (Not Equals)
 
@@ -3300,25 +3595,38 @@ The converse of the equivalent operator, returning `true` if equivalent returns 
 
 ### Comparison
 
-* The comparison operators are defined for strings, integers, decimals, quantities, dates, datetimes and times.
+* The comparison operators are defined for strings, integers, longs, decimals, quantities, dates, datetimes and times.
 * If one or both of the arguments is an empty collection, a comparison operator will return an empty collection.
 * Both arguments must be collections with single values, and the evaluator will throw an error if either collection has more than one item.
 * Both arguments must be of the same type (or [implicitly convertible](#conversion) to the same type), and the evaluator will throw an error if the types differ.
-* When comparing integers and decimals, the integer will be converted to a decimal to make comparison possible.
+* When comparing integers or longs to decimals, the integer/long value will be implicitly converted to a decimal to make comparison possible.<br/>
+  *arguments are compared ignoring trailing zeroes after the decimal point (same as with equality)*
 * String ordering is strictly lexical and is based on the Unicode value of the individual characters.
 
-When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. The comparison will be made using the most granular unit of either input. Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+When comparing quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
+This is referred to as the units being commensurable in UCUM.
+For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and `'cm'` cannot. 
 
-For time-valued quantities, note that calendar durations and definite quantity durations above days (and weeks) are considered un-comparable:
-
-``` fhirpath
-1 year > 1 `a` // { } (empty)
-10 seconds > 1 's' // true
-```
+When quantity units are different the quantities must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
+If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the comparison is empty (`{ }`).
+{:.stu}
 
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by [\[UCUM\]](#UCUM) as well as the calendar durations as defined in the toQuantity function.
+Attempting to compare quantities with invalid units will result in empty (`{ }`).
+
+Once the units are the same, the values can be compared using simple decimal comparison, ignoring trailing zeroes after the decimal point (as described above).
+
+As noted in the [Time-valued Quantities](#time-valued-quantities) section, years and months are not comparable across UCUM definite durations and calendar units. Hence when the arguments are a mix of these, the result is empty as they are considered un-comparable.<br/>
+Note that explicit conversion using [`toQuantity()`](#fn-toquantity) will change code-systems to intentionally perform this comparison.
+
+For example:
+``` fhirpath
+1 year > 1 'a' // empty ({ }) ; these units are not comparable
+10 seconds > 1 's' // true
+2 year.toQuantity('a') > 1 'a' // true ; as the units have been explicitly converted, these are now comparable
+6 months > 1 year  // false ; convert to 'year' (0.5 > 1) and compare
+```
 
 For partial Date, DateTime, and Time values, the comparison is performed by comparing the values at each precision, beginning with years, and proceeding to the finest precision specified in either input, and respecting timezone offsets. If one value is specified to a different level of precision than the other, the result is empty (`{ }`) to indicate that the result of the comparison is unknown. As with equality and equivalence, the second and millisecond precisions are considered a single precision using a decimal, with decimal comparison semantics.
 
@@ -3335,15 +3643,15 @@ For example:
 'abc' > 'ABC' // true
 4 'm' > 4 'cm' // true (or { } if the implementation does not support unit conversion)
 
-@2018-03-01 > @2018-01-01 // true - same precision
-@2018-03 > @2018-03-01 // empty ({ }) - different precisions
+@2018-03-01 > @2018-01-01 // true ; same precision
+@2018-03 > @2018-03-01 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 > @2018-03-01T10:00:00 // true
-@2018-03-01T10 > @2018-03-01T10:30 // empty ({ }) - different precisions
+@2018-03-01T10 > @2018-03-01T10:30 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 > @2018-03-01T10:30:00.0 // false (values are equal to seconds, trailing zeroes after the decimal are ignored)
 
 @T10:30:00 > @T10:00:00 // true
-@T10 > @T10:30 // empty ({ }) - different precisions
-@T10:30:00 > @T10:30:00.0 // false - values are equal to seconds, trailing zeroes after the decimal are ignored
+@T10 > @T10:30 // empty ({ }) ; different precisions
+@T10:30:00 > @T10:30:00.0 // false ; values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
 #### &lt; (Less Than)
@@ -3353,23 +3661,23 @@ The less than operator (`<`) returns `true` if the first operand is strictly les
 For example:
 ``` fhirpath
 10 < 5 // false
-10 < 5.0 // false - note the 10 is converted to a decimal to perform the comparison
+10 < 5.0 // false ; note the 10 is converted to a decimal to perform the comparison
 'abc' < 'ABC' // false
 4 'm' < 4 'cm' // false (or { } if the implementation does not support unit conversion)
 
 @2018-03-01 < @2018-01-01 // false
-@2018-01-01 < @2018-01-01 // false - same precision
-@2018-03 < @2018-03-01 // empty ({ }) - different precisions
+@2018-01-01 < @2018-01-01 // false ; same precision
+@2018-03 < @2018-03-01 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 < @2018-03-01T10:00:00 // false
-@2018-03-01T10 < @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 < @2018-03-01T10:30:00.0 // false - values are equal to seconds, trailing zeroes after the decimal are ignored
+@2018-03-01T10 < @2018-03-01T10:30 // empty ({ }) ; different precisions
+@2018-03-01T10:30:00 < @2018-03-01T10:30:00.0 // false ; values are equal to seconds, trailing zeroes after the decimal are ignored
 
 @2018-01-01T16:00:00+11:00 < @2018-01-01T15:00:00.0+10:00 // false (same moment in diff timezones)
 @2018-01-01T16:00:00+12:00 < @2018-01-01T15:00:00.0+10:00 // true (4pm+12 is less than 5pm+10 when timezones are considered)
 
 @T10:30:00 < @T10:00:00 // false
-@T10 < @T10:30 // empty ({ }) - different precisions
-@T10:30:00 < @T10:30:00.0 // false - values are equal to seconds, trailing zeroes after the decimal are ignored
+@T10 < @T10:30 // empty ({ }) ; different precisions
+@T10:30:00 < @T10:30:00.0 // false ; values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
 #### &lt;= (Less or Equal)
@@ -3379,22 +3687,22 @@ The less or equal operator (`<=`) returns `true` if the first operand is less th
 For example:
 ``` fhirpath
 10 <= 5 // false
-10 <= 5.0 // false - note the 10 is converted to a decimal to perform the comparison
+10 <= 5.0 // false ; note the 10 is converted to a decimal to perform the comparison
 'abc' <= 'ABC' // false
 4 'm' <= 4 'cm' // false (or { } if the implementation does not support unit conversion)
 
 @2018-03-01 <= @2018-01-01 // false
-@2018-01-01 <= @2018-01-01 // true - equal with same precision
-@2018-03 <= @2018-03-01 // empty ({ }) - different precisions
+@2018-01-01 <= @2018-01-01 // true ; equal with same precision
+@2018-03 <= @2018-03-01 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 <= @2018-03-01T10:00:00 // false
-@2018-03-01T10 <= @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
+@2018-03-01T10 <= @2018-03-01T10:30 // empty ({ }) ; different precisions
+@2018-03-01T10:30:00 <= @2018-03-01T10:30:00.0 // true ; values are equal to seconds, trailing zeroes after the decimal are ignored
 
 @2018-01-01T16:00:00+11:00 <= @2018-01-01T15:00:00.0+10:00 // true (same moment in diff timezones)
 @2018-01-01T16:00:00+12:00 <= @2018-01-01T15:00:00.0+10:00 // true (4pm+12 is less than 5pm+10 when timezones are considered)
 
 @T10:30:00 <= @T10:00:00 // false
-@T10 <= @T10:30 // empty ({ }) - different precisions
+@T10 <= @T10:30 // empty ({ }) ; different precisions
 @T10:30:00 <= @T10:30:00.0 // true
 ```
 
@@ -3405,20 +3713,20 @@ The greater or equal operator (`>=`) returns `true` if the first operand is grea
 For example:
 ``` fhirpath
 10 >= 5 // true
-10 >= 5.0 // true - note the 10 is converted to a decimal to perform the comparison
+10 >= 5.0 // true ; note the 10 is converted to a decimal to perform the comparison
 'abc' >= 'ABC' // true
 4 'm' >= 4 'cm' // true (or { } if the implementation does not support unit conversion)
 
 @2018-03-01 >= @2018-01-01 // true
-@2018-01-01 >= @2018-01-01 // true - equal with same precision
-@2018-03 >= @2018-03-01 // empty ({ }) - different precisions
+@2018-01-01 >= @2018-01-01 // true ; equal with same precision
+@2018-03 >= @2018-03-01 // empty ({ }) ; different precisions
 @2018-03-01T10:30:00 >= @2018-03-01T10:00:00 // true
-@2018-03-01T10 >= @2018-03-01T10:30 // empty ({ }) - different precisions
-@2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
+@2018-03-01T10 >= @2018-03-01T10:30 // empty ({ }) ; different precisions
+@2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0 // true ; values are equal to seconds, trailing zeroes after the decimal are ignored
 
 @T10:30:00 >= @T10:00:00 // true
-@T10 >= @T10:30 // empty ({ }) - different precisions
-@T10:30:00 >= @T10:30:00.0 // true - values are equal to seconds, trailing zeroes after the decimal are ignored
+@T10 >= @T10:30 // empty ({ }) ; different precisions
+@T10:30:00 >= @T10:30:00.0 // true ; values are equal to seconds, trailing zeroes after the decimal are ignored
 ```
 
 <a name="fn-comparable"></a>
@@ -3431,27 +3739,38 @@ For example:
 Returns `true` if the input Quantity can be compared with the `other` Quantity and their relationship to each other determined.
 Comparable means that both have values, and the units are the same (irrespective of the system), or both have `code` and `system` values,
 and the `system` is recognized by the FHIRPath implementation, and the codes are comparable within that system
-(e.g. `'d'` (days) and `'h'` (hours), or `'[in_i]'` (inches) and `'cm'` (centimeters)).
+(e.g. `'d'` (days) and `'h'` (hours), or `'[in_i]'` (inches) and `'cm'` (centimeters)). 
+This is referred to as the units being commensurable in UCUM.
 {:.stu}
 
 If either or both inputs are empty, or either input is not a single Quantity value, the result is empty (`{ }`).
 {:.stu}
 
+> Returning true from this function indicates that a result from [equality](#equality) or [comparison](#comparison) functions will succeed, and not return empty.<br/>
+> These functions consider [**unit conversion**](#unit-conversions) where required.
+{:.stu}
+
 For example:
 {:.stu}
 ``` fhirpath
-1 'mg'.comparable(2 'mg') // true - these types are comparable
-1 'm'.comparable(20 'cm') // true - these types are both metric distance measures
-2 '1'.comparable(3) // true - the integer will implicitly convert to a Quantity with unit `'1'` which is the same system/code so is comparable
-1.comparable(2) // true - these will both convert to quantities with the same system/code, hence are comparable
+1 'mg'.comparable(2 'mg') // true ; these types are comparable
+1 'm'.comparable(20 'cm') // true ; these types are both metric distance measures
+2 '1'.comparable(3) // true ; the integer will implicitly convert to a Quantity with unit `'1'` which is the same system/code so is comparable
+1.comparable(2) // true ; these will both convert to quantities with the same system/code, hence are comparable
+```
+{:.stu}
+``` fhirpath
+1 'in_i'.comparable(1 'cm') // true ; these UCUM units can be compared/converted
+1 year.comparable(1 'a') // false ; these units are equivalent, not equal hence not comparable
+1 'Cel'.comparable(1 '[degF]') // true ; these ucum "special" units are comparable
 ```
 {:.stu}
 
-This function can be used to guard comparison operations to prevent returning empty results when the quantities are not comparable:
+This function can be used to guard [comparison operations](#comparison) to prevent returning empty results when the quantities are not comparable:
 {:.stu}
 
 ``` fhirpath
-iif(Observation.value.comparable(2 'mg'), Observation.value < 2 'mg', {})
+iif(Observation.value.comparable(2 'mg'), Observation.value < 2 'mg', false)
 ```
 {:.stu}
 
@@ -3613,76 +3932,177 @@ Note that implies may use short-circuit evaluation in the case that the first op
 
 ### Math
 
-The math operators require each operand to be a single item. Both operands must be of the same type, or of compatible types according to the rules for [implicit conversion](#conversion). Each operator below specifies which types are supported.
+The math operators require each operand to be a single item. Both operands must be of the same type (using [implicit conversion](#conversion) where required). Each operator below specifies which types are supported.
 
-If there is more than one item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
+Math operations on Date/Time types is defined in the [Date/Time Arithmetic](#datetime-arithmetic) section.
+
+If there is more than one item, or incompatible items, the evaluation of the expression will end and signal an error to the calling environment.
 
 As with the other operators, the math operators will return an empty collection if one or both of the operands are empty.
 
-When operating on quantities, the dimensions of each quantity must be the same, but not necessarily the unit. For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and  `'cm'` cannot. The unit of the result will be the most granular unit of either input. 
-However this is not supported with differing ["Special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the unit into base units. 
-Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
-
 Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
 
-Implementations that do support units shall do so as specified by [\[UCUM\]](#UCUM) as well as the calendar durations as defined in the toQuantity function.
+Implementations that do support units shall do so as specified by the [\[UCUM\]](#UCUM) specification.
+
+UCUM does not support math operations with ["special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
+Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
+{:.stu}
+
+Implementations that to not support processing UCUM units shall return empty when unable to correctly handle the units.
+{:.stu}
 
 Operations that cause arithmetic overflow or underflow will result in empty (`{ }`).
 
 #### * (multiplication)
 
-Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication involving quantities, the resulting quantity will have an appropriate unit as determined by application of the UCUM specification:
+Multiplies both arguments (supported for Integer, Long, Decimal, and Quantity) with the result being the same as the input type *(after any [implicit conversions](#conversion) to make both operands the same type)*.
 
+For multiplication involving quantities, the resulting quantity will have an appropriate unit as determined by application of the [\[UCUM\]](#UCUM) specification.
+
+Multiplication involving calendar units (apart from the UCUM default unit `'1'`) will return empty.
+
+> **Note:** Performing multiplication with mixed type parameters of either Integer or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Integer/Decimal argument to a Quantity (with the UCUM default unit `'1'`).
+> This effectively makes the operation a simple decimal multiplication of the 2 values, and returns a Quantity with the same unit as the Quantity argument.<br/>
+> For example, `2 * 2 'cm'` would be evaluated as `2 '1' * 2 'cm'`, which would return `4 'cm'`, as would `2 'cm' * 2`.<br/>
+> This is a common use case for math operations with quantities, and allows for simple math operations on quantities without needing to explicitly convert the non-quantity argument to a quantity.
+
+For example:
 ``` fhirpath
-12 'cm' * 3 'cm' // 36 'cm2'
-3 'cm' * 12 'cm2' // 36 'cm3'
+12 'cm' * 3 'cm'  // 36 'cm2' ; multiply 12 by 3 and ucum handling for these units results in square cms.
+3 'cm' * 12 'cm2' // 36 'cm3' ; multiply 12 by 3 and ucum handling for these units results in cubic cms.
+10 'm/s' * 10 's' // 100 'm' ; multiply 10 by 10 and ucum handling for these units results in meters as seconds cancel out.
+3 * 2 'cm'        // 6 'cm' ; via implicit conversion of 3 to the quantity 3 '1', and results using cm.
+42 * 1 'm'        // 42 'm' ; via implicit conversion of 42 to the quantity 42 '1', and results using m, 
+                  //        this is a convenient way to provide the units for a numeric value.
+12 day * 45 'm'   // empty ( { } ) ; multiplication with calendar units is not supported
 ```
 
 #### / (division)
 
-Divides the left operand by the right operand (supported for Integer, Decimal, and Quantity). The result of a division is always Decimal, even if the inputs are both Integer. For integer division, use the `div` operator.
+Divides the left operand *(numerator)* by the right operand *(denominator)* (supported for Integer, Long, Decimal, and Quantity).
+The result of a division is always either Decimal *(Numeric inputs)* or Quantity *(for Quantity inputs)*.
+For integer division, use the `div` operator.
+
+For division involving quantities, the resulting quantity will have an appropriate unit as determined by application of the [\[UCUM\]](#UCUM) specification.
+e.g. `km` / `h` => `km/h`
+
+Division involving calendar units (apart from the UCUM default unit `'1'`) will return empty
 
 If an attempt is made to divide by zero, the result is empty.
 
-For division involving quantities, the resulting quantity will have an appropriate unit:
+For example:
+```fhirpath
+4 / 2  // 2 ; as a decimal value
+2 / 4  // 0.5
+12 / 0 // empty ({ })
+0 / 0  // empty ({ }) ; div by zero error result reported as empty (not reporting an error)
+```
 
+> **Note:** Performing division with mixed type parameters of either Integer, Long or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the numeric argument to a Quantity (with the UCUM default unit `'1'`).
+
+Division examples involving quantities:
 ``` fhirpath
 12 'cm2' / 3 'cm' // 4.0 'cm'
-12 / 0 // empty ({ })
+120 'm' / 60 's'  // 2 'm/s'
+60 / 1 's'        // 60 '/s' ; note the unit here is not "seconds", it is "per second", as the seconds are on the denominator as determined by the UCUM specification.
+60 's' / 2        // 30 's' ; simple division of the integer value
 ```
 
 #### + (addition)
 
-For Integer, Decimal, and quantity, adds the operands. For strings, concatenates the right operand to the left operand.
+For Integer, Long, Decimal, and Quantity, adds the operands. For strings, concatenates the right operand to the end of the left operand.
 
-When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit:
+The resulting datatype is the same as the input datatype *(after any [implicit conversions](#conversion) to make both operands the same type)*.
+
+Addition for Date/Time types is defined in the [Date/Time Arithmetic](#datetime-arithmetic) section.
+
+When adding quantities, the dimensions of each quantity must be the same, but not necessarily the unit. 
+This is referred to as the units being commensurable in UCUM.
+For example, units of 'cm' and 'm' can be added, but units of 'kg' and 'cm' cannot.
+
+When the units of quantity arguments are different, the quantity values must be [**converted**](#unit-conversions) to the most granular unit, then simple addition on the values can be performed.
+If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the addition is empty (`{ }`).
+{:.stu}
+
+> **Note:** Performing addition with mixed type parameters of either Integer, Long or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Numeric argument to a Quantity (with the UCUM default unit `'1'`).
+This means that unless the unit of the quantity was `'1'` too, the addition will return empty as the units are not commensurate.
+
+Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+
+Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+
+For example:
 ``` fhirpath
-3 'm' + 3 'cm' // 303 'cm'
+1 + 2          // 3 ; simple numeric addition
+1 + 5L          // 6L ; implicit conversion to long then simple numeric addition
+5L + 4.5       // 9.5 ; implicit conversion from long to decimal then addition
+3 'm' + 3 'cm' // 303 'cm' ; via ucum conversion to most granular unit
+3 'cm' + 3 'm' // 303 'cm' ; via ucum conversion to most granular unit
+(3 'm' + 3 'cm').toQuantity('m') // 3.03 'm' ; as above except explicitly convert the result to meters
+2 + 2 'cm'     // empty ({ }) ; implicit conversion to UCUM default units 2 '1', these units are not commensurate
+2 + 2 '1'      // 4 '1' ; implicit conversion, then simple addition of same unit values
+```
+
+> **Note:** Quantity addition with month or year units requires explicit conversion, otherwise the result is empty.
+> While calendar unit conversion is performed implicitly for [equality](#quantity-equality) and [comparison](#comparison)
+> (e.g. `1 year = 12 months` returns `true`), quantity addition and subtraction require the author to convert explicitly
+> using [`toQuantity()`](#fn-toquantity), since the calendar conversion factors are approximate ([equivalent](#quantity-equivalence))
+> and the author should be intentional about accepting that approximation in a computed result.
+{:.stu}
+
+When both operands are time-valued quantities, the [most granular](#unit-conversions) rule applies as with other quantities,
+where the most granular of the two units is the one appearing lower in the [time-valued unit conversion table](#fn-toquantity-conversion-factors).<br/>
+When the operands come from different time-valued unit systems, the result is expressed in calendar units.
+{:.stu}
+
+Quantity addition examples with time based units:
+``` fhirpath
+2 minutes + 60 seconds  // 180 seconds ; calendar conversion to most granular unit (seconds)
+60 's' + 2 minutes      // 180 seconds ; cross-system: most granular unit conversion (2 minutes to 120 seconds, then add), result in calendar units
+1 'wk' + 2 days    // 9 days ; cross-system, result in calendar units
+1 year + 12 months // empty ( {} ) ; month/year unit conversion is equivalent and needs explicit unit conversion
+1 year + 12 'mo'   // empty ( {} ) ; year/month requires explicit conversion (UCUM 'mo' doesn't change this)
+1 year.toQuantity('month') + 12 months // 24 months ; explicit conversion to months, then addition with the same unit
+1 week + 14 days   // 21 days ; calendar conversion to most granular unit (days)
+3 'd' + 1 'wk'     // 10 'd' ; UCUM conversion from 'wk' to 'd' then add
 ```
 
 #### - (subtraction)
 
-Subtracts the right operand from the left operand (supported for Integer, Decimal, and Quantity).
+Subtracts the right operand from the left operand (supported for Integer, Long, Decimal, and Quantity).
 
-When subtracting quantities, the dimensions of each quantity must be the same, but not necessarily the unit.
+The resulting datatype is the same as the input datatype *(after any [implicit conversions](#conversion) to make both operands the same type)*.
 
+Subtraction for Date/Time types is defined in the [Date/Time Arithmetic](#datetime-arithmetic) section.
+
+Handling subtraction of quantities is the same as adding with a negative value, as such refer to [addition](#-addition) for quantity unit conversion handling.
+
+For example:
 ``` fhirpath
-3 'm' - 3 'cm' // 297 'cm'
+3 'm' - 3 'cm'    // 297 'cm' ; ucum conversion to centimeters (most granular unit)
+3 'cm' - 3 'm'    // -297 'cm' ; ucum conversion to centimeters (most granular unit)
+1 minute - 30 's' // 0.5 minute ; seconds converted to minutes, then value subtraction
 ```
 
 #### div
 
-Performs truncated division of the left operand by the right operand (supported for Integer and Decimal). In other words, the division that ignores any remainder:
+Performs truncated division of the left operand by the right operand (supported for Integer, Long and Decimal). In other words, the division that ignores any remainder.
 
+The resulting datatype is the same as the input datatype *(after any [implicit conversions](#conversion) to make both operands the same type)*.
+
+For example:
 ``` fhirpath
-5 div 2 // 2
-5.5 div 0.7 // 7
+5 div 2 // 2 (integer)
+5.5 div 0.7 // 7 (decimal)
 5 div 0 // empty ({ })
+5L div 2 // 2L (long)
 ```
 
 #### mod
 
-Computes the remainder of the truncated division of its arguments (supported for Integer and Decimal).
+Computes the remainder of the truncated division of its arguments (supported for Integer, Long and Decimal).
+
+The resulting datatype is the same as the input datatype *(after any [implicit conversions](#conversion) to make both operands the same type)*.
 
 For example:
 ``` fhirpath
@@ -3705,113 +4125,94 @@ For example:
 
 ### Date/Time Arithmetic
 
-Date and time arithmetic operators are used to add time-valued quantities to date/time values. The left operand must be a `Date`, `DateTime`, or `Time` value, and the right operand must be a `Quantity` with a time-valued unit:
+Date and time arithmetic operators are used to add time-valued quantities to date/time values. The left operand must be a `Date`, `DateTime`, or `Time` value, and the right operand must be a [`Quantity`](#quantity) with a time-valued unit.
 
-* `year`, `years`
-* `month`, `months`
-* `week`, `weeks`
-* `day`, `days`
-* `hour`, `hours`
-* `minute`, `minutes`
-* `second`, `seconds`, or `'s'`
-* `millisecond`, `milliseconds`, or `'ms'`
-
-To avoid the potential confusion of calendar-based date/time arithmetic with definite duration date/time arithmetic, FHIRPath defines definite-duration date/time arithmetic for seconds and below, and calendar-based date/time arithmetic for seconds and above. At the second, calendar-based and definite-duration-based date/time arithmetic are identical. If a definite-quantity duration above seconds appears in a date/time arithmetic calculation, the evaluation will end and signal an error to the calling environment.
+The decimal portion of the time-valued quantity is only applied for second or millisecond precisions; for all other precisions, the decimal portion is ignored, since date/time arithmetic is performed with calendar duration semantics.
 
 Within FHIRPath, calculations involving date/times and calendar durations shall use calendar semantics as specified in [\[ISO8601\]](#ISO8601). Specifically:
 
-|year |The year, positive or negative, is added to the year component of the date or time value. If the resulting year is out of range, an error is thrown. If the month and day of the date or time value is not a valid date in the resulting year, the last day of the calendar month is used. |
-| = |
-|month |The month, positive or negative is divided by 12, and the integer portion of the result is added to the year component. The remaining portion of months is added to the month component. If the resulting date is not a valid date in the resulting year, the last day of the resulting calendar month is used.|
-|week |The week, positive or negative, is multiplied by 7, and the resulting value is added to the day component, respecting calendar month and calendar year lengths.|
-|day |The day, positive or negative, is added to the day component, respecting calendar month and calendar year lengths.|
-|hour |The hours, positive or negative, are added to the hour component, with each 24 hour block counting as a calendar day, and respecting calendar month and calendar year lengths.|
-|minute |The minutes, positive or negative, are added to the minute component, with each 60 minute block counting as an hour, and respecting calendar month and calendar year lengths.|
-|second |The seconds, positive or negative, are added to the second component, with each 60 second block counting as a minute, and respecting calendar month and calendar year lengths.|
-|millisecond |The milliseconds, positive or negative, are added to the millisecond component, with each 1000 millisecond block counting as a second, and respecting calendar month and calendar year lengths.|
+| Datatype(s) | Quantity Unit(s) | Description |
+| ----------- | ------- | ----- |
+| `Date`, `DateTime` | `year`, `years` | The year, positive or negative, is added to the year component of the date or time value. If the resulting year is out of range, an error is thrown. If the month and day of the date or time value is not a valid date in the resulting year, the last day of the calendar month is used.<br/>*(using `'a'` will signal an error)* |
+| `Date`, `DateTime` | `month`, `months` | The month, positive or negative is divided by 12, and the integer portion of the result is added to the year component. The remaining portion of months is added to the month component. If the resulting date is not a valid date in the resulting year, the last day of the resulting calendar month is used.<br/>*(using `'mo'` will signal an error)* |
+| `Date`, `DateTime` | `week`, `weeks`, or `'wk'` | The week, positive or negative, is multiplied by 7, and the resulting value is added to the day component, respecting calendar month and calendar year lengths. |
+| `Date`, `DateTime` | `day`, `days`, or `'d'` | The day, positive or negative, is added to the day component, respecting calendar month and calendar year lengths. |
+| `DateTime`, `Time` | `hour`, `hours`, or `'h'` | The hours, positive or negative, are added to the hour component, with each 24 hour block counting as a calendar day, and respecting calendar month and calendar year lengths. |
+| `DateTime`, `Time` | `minute`, `minutes`, or `'min'` | The minutes, positive or negative, are added to the minute component, with each 60 minute block counting as an hour, and respecting calendar month and calendar year lengths. |
+| `DateTime`, `Time` | `second`, `seconds`, or `'s'` | The seconds, positive or negative, are added to the second component, with each 60 second block counting as a minute, and respecting calendar month and calendar year lengths. |
+| `DateTime`, `Time` | `millisecond`, `milliseconds`, or `'ms'` | The milliseconds, positive or negative, are added to the millisecond component, with each 1000 millisecond block counting as a second, and respecting calendar month and calendar year lengths. |
 {:.grid}
 
-If there is more than one item, or an item of an incompatible type, the evaluation of the expression will end and signal an error to the calling environment.
+> **Note:** For all but years and months, calendar durations are both equal and equivalent to the corresponding UCUM definite-time duration unit.
+> Note that due to the possibility of leap seconds, this is not totally accurate, however, for practical reasons, implementations typically ignore leap seconds when performing date/time arithmetic.
+
+If there is more than one item, an item of an incompatible type, or an unsupported unit for the type, the evaluation of the expression will end and signal an error to the calling environment.
 
 If either or both arguments are empty (`{ }`), the result is empty (`{ }`).
 
-#### + (addition)
-
-Returns the value of the given `Date`, `DateTime`, or `Time`, incremented by the time-valued quantity, respecting variable length periods for calendar years and months.
-
-For `Date` values, the quantity unit must be one of: `years`, `months`, `weeks`, or `days`
-
-For `DateTime` values, the quantity unit must be one of: `years`, `months`, `weeks`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
-
-For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
-
-As `Time` is cyclic, the result of overflowing the time value will be wrapped around the beginning of the day, so that adding 1 hour to `@T23:30:00` will result in `@T00:30:00` of the previous day, which is consistent with the behaviour of `DateTime` values.
+Partial input values may require [unit conversion](#fn-toquantity-conversion-factors) where the unit being added is not present in the input value.
+If the date/time value only has years present then when adding month quantities; use the direct conversion from months to years, otherwise convert the quantity to days, then to years (chaining as needed).
+For all other partial precisions, convert as required chaining conversions where required.
+Examples of this are in the operations below.
 {:.stu}
-```fhirpath
-@T23:30:00 + 1 hour // @T00:30:00
-@T01:00:00 + 48 hour // @T01:00:00 (cycles through twice, but resulting time is the same)
-```
-{:.stu}
-
-For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
 
 Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.<br/>
-Authors SHOULD consider applying appropriate rounding functions (`round()`, `floor()`, `truncate()`, or `ceiling()`) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.
+Authors SHOULD consider applying appropriate rounding functions ([`round()`](#fn-round), [`floor()`](#fn-floor), [`truncate()`](#fn-truncate), or [`ceiling()`](#fn-ceiling)) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.
 {:.stu}
 
-For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then adding to the date/time value.
+As `Time` is cyclic, using arithmetic operations `+` or `-` on `Time` types can result in overflowing the time value, which will wrap around the beginning of the day.
+So adding 1 hour to `@T23:30:00` will wrap around to `@T00:30:00`, which is consistent with the behaviour of `DateTime` values.
+{:.stu}
 
-For example:
-``` fhirpath
-@2014 + 24 months
-@2019-03-01 + 24 months // @2021-03-01
+#### + (addition)
+
+Returns the value of the given `Date`, `DateTime`, or `Time`, incremented by the time-valued quantity, subject to all the rules and calendar semantics described [above](#datetime-arithmetic).
+
+For Example:
+```fhirpath
+@1973-12-25 + 7 days    // @1974-01-01
+@1973-12-25 + 7.9 days  // @1974-01-01 ; same as above as the decimal is truncated (though a warning may be triggered)
+@1973-12-25 + 1 week    // @1974-01-01
+@2019-03-01 + 24 months // @2021-03-01 ; month value overflows into years
+@2026-01-31 + 1 month   // @2026-02-28 ; 31st day isn't valid in february, so revert to last day in the month
+@2026-01-01T13:00:00 + 30 minutes // @2026-01-01T13:30:00
+@1973-12-25T00:00:00.000+10:00 + 42.53 seconds // @1973-12-25T00:00:42.530+10:00
+@1973-12-25 + 1 'd'     // @1973-12-26 ; ucum days handled as calendar units
+@T23:30:00 + 1 hour     // @T00:30:00 ; overflow midnight
+@T01:00:00 + 48 hour    // @T01:00:00 ; cycles through twice, but resulting time is the same
 ```
 
-The first example above will evaluate to the value `@2016` even though the date/time value is not specified to the level of precision of the time-valued quantity. The second example will evaluate to `@2021-03-01`.
-
+For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (truncating any decimal fraction) and then adding to the date/time value. For example:
 ``` fhirpath
-@2014 + 23 months
-@2016 + 365 days
+@2014 + 24 months  // @2016 ; 24/12 → 2 years (converting the quantity value to the highest precision in the partial date value)
+@2014 + 23 months  // @2015 ; 23 months only constitutes one year (23/12 = 1.9167 → 1 year, remainder ignored)
+@2016 + 365 days   // @2017 ; even though 2016 is a leap-year, the time-valued quantity (`365 days`) is converted to `1 year`, a standard calendar year of 365 days
+@2014 + 11 months  // @2014 ; 11/12 = 0.9167 → 0 years, remainder ignored
+@2026-02 + 5 weeks // @2026-03 ; 5 weeks is converted to 35 days, which are then converted to months 35/30 = 1.1667 → 1 month, remainder ignored
+@2026-02 + 4 weeks // @2026-02 ; 4 weeks is converted to 28 days, which are then converted to months 28/30 = 0.9333 → 0 month, remainder ignored
 ```
 
-The first example above returns @2015, because 23 months only constitutes one year. The second example returns 2017 because even though 2016 is a leap-year, the time-valued quantity (`365 days`) is converted to `1 year`, a standard calendar year of 365 days.
-
-Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
 
 #### - (subtraction)
 
-Returns the value of the given `Date`, `DateTime`, or `Time`, decremented by the time-valued quantity, respecting variable length periods for calendar years and months.
+Returns the value of the given `Date`, `DateTime`, or `Time`, decremented by the time-valued quantity, subject to all the rules and calendar semantics described [above](#datetime-arithmetic).
 
-For `Date` values, the quantity unit must be one of: `years`, `months`, `weeks`, or `days`
-
-For `DateTime` values, the quantity unit must be one of: `years`, `months`, `weeks`, `days`, `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
-
-For `Time` values, the quantity unit must be one of: `hours`, `minutes`, `seconds`, or `milliseconds` (or an equivalent unit), or the evaluation will end and signal an error to the calling environment.
-
-As `Time` is cyclic, the result of overflowing the time value will be wrapped around the beginning of the day, so that subtracting 1 hour from `@T00:30:00` will result in `@T23:30:00` of the previous day, which is consistent with the behaviour of `DateTime` values.
-{:.stu}
+For example:
 ```fhirpath
 @T00:30:00 - 1 hour // @T23:30:00
 @T01:00:00 - 2 hours // @T23:00:00
 ```
+
+For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (truncating any decimal fraction) and then subtracting from the date/time value.
 {:.stu}
 
-For precisions above `seconds`, the decimal portion of the time-valued quantity is ignored, since date/time arithmetic above seconds is performed with calendar duration semantics.
-
-Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.<br/>
-Authors SHOULD consider applying appropriate rounding functions (`round()`, `floor()`, `truncate()`, or `ceiling()`) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.
-{:.stu}
-
-For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (removing any decimal value off) and then subtracting from the date/time value. For example:
-
+For example:
 ``` fhirpath
-@2014 - 24 months
+@2014 - 24 months       // @2012 ; even though the date/time value is not specified to the level of precision of the time-valued quantity
 @2019-03-01 - 24 months // @2017-03-01
+@2014 - 1 month         // @2014 ; Partial date calculation 1/12 = 0.0833 → 0 years, remainder ignored
+@2026-02 - 1 day        // @2026-02 ; Partial date calculation 1/30 = 0.0333 → 0 months, remainder ignored
 ```
-
-The first example above will evaluate to the value `@2012` even though the date/time value is not specified to the level of precision of the time-valued quantity. The second example will evaluate to `@2017-03-01`.
-
-Calculations involving weeks are equivalent to multiplying the number of weeks by 7 and performing the calculation for the resulting number of days.
 
 <a name="unary-operators"></a>
 ### Unary operators (`+` and `-`)
@@ -3884,7 +4285,7 @@ Because the invocation operator (`.`) has a higher precedence than the unary neg
 Use parentheses to ensure the unary negation applies to the `7`:
 
 ``` fhirpath
-(-7).combine(3) // { -7, 3 }
+(-7).combine(3) // -7, 3
 ```
 
 ## Aggregates
@@ -3975,9 +4376,9 @@ If the input collection is empty (`{ }`), the result is empty.
 For example:
 {:.stu}
 ``` fhirpath
-( 2, 4, 8, 6 ).min() // 2
-( 2L, 4L, 8L, 6L ).min() // 2L
-( @2012-12-31, @2013-01-01, @2012-01-01 ).min() // @2012-01-01
+( 2 | 4 | 8 | 6 ).min() // 2
+( 2L | 4L | 8L | 6L ).min() // 2L
+( @2012-12-31 | @2013-01-01 | @2012-01-01 ).min() // @2012-01-01
 ```
 {:.stu}
 
@@ -3998,9 +4399,9 @@ If the input collection is empty (`{ }`), the result is empty.
 For example:
 {:.stu}
 ``` fhirpath
-( 2, 4, 8, 6 ).max() // 8
-( 2L, 4L, 8L, 6L ).max() // 8L
-( @2012-12-31, @2013-01-01, @2012-01-01 ).max() // @2013-01-01
+( 2 | 4 | 8 | 6 ).max() // 8
+( 2L | 4L | 8L | 6L ).max() // 8L
+( @2012-12-31 | @2013-01-01 | @2012-01-01 ).max() // @2013-01-01
 ```
 {:.stu}
 

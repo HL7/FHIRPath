@@ -1,11 +1,11 @@
 {
     "package-id" : "hl7.fhirpath",
-    "version" : "3.0.0-ballot",
-    "path" : "http://hl7.org/fhirpath/2025Jan",
-    "mode": "working",
-    "status" : "ballot",
+    "version" : "3.0.0",
+    "path" : "http://hl7.org/fhirpath/STU3",
+    "mode": "milestone",
+    "status" : "trial-use",
     "sequence" : "R2",
-    "desc" : "R2 STU1 Ballot (v3.0.0-ballot)",
-    "descmd" : "Release 2 STU1 Ballot applying implementer feedback, additional functions and capabilities, as well as clarifications and corrections throughout.",
+    "desc" : "First milestone STU release of FHIRPath since normative publication, containing implementer feedback and additional functions and capabilities, as well as clarifications and corrections throughout. Additions have been clearly marked as STU.",
+    "descmd": "First milestone STU release of FHIRPath since normative publication, containing implementer feedback and additional functions and capabilities, as well as clarifications and corrections throughout. Additions have been clearly marked as STU.\n\nHighlights include:\n* Added new functions: `coalesce()`, `sort()`, `repeatAll()`, `defineVariable()`, `matchesFull()`, `indexOf()`, `lastIndexOf()`, `comparable()`, `pathname()`\n* Added aggregate functions: `sum()`, `min()`, `max()`, `avg()`\n* Added date/time component extraction functions: `yearOf()`, `monthOf()`, `dayOf()`, `hourOf()`, `minuteOf()`, `secondOf()`, `millisecondOf()`, `timezoneOffsetOf()`, `dateOf()`, `timeOf()`\n* Added boundary and precision functions: `lowBoundary()`, `highBoundary()`, `precision()`\n* Added support for Long (integer64) type with required `L` suffix\n* Added constructor syntax support for type instantiation\n* Added date/time subtraction operations\n* Added `combine()` function with `preserveOrder` parameter\n* Added case-sensitivity options to regex functions\n* Clarified singleton evaluation rules and function behavior for multi-item collections\n* Clarified iteration context and scoped function behavior\n* Clarified `iif()` delayed argument evaluation semantics\n* Clarified date/time arithmetic edge cases (overflow, fractions, subtraction)\n* Clarified quantity unit handling and UCUM conformance\n* Clarified equality semantics for collections\n* Clarified rounding behavior for negative numbers\n* Improved conversion documentation and `toString()` representations\n* Defined calendar duration units code system\n* Corrected numerous examples throughout\n* Updated implementation references\n* Added authors and contributors list\n* Typographical corrections throughout\n* Documentation source format changed from asciidoc to markdown\n* Simplified reflection capabilities - removed element information returned from `type()`\n* Added many new examples for functions that did not previously have examples\n\nsee [Change Notes](changes.html) for more details and related issue numbers.",
     "first" : false
-  }
+ }
