@@ -3380,8 +3380,7 @@ name = name // true ; its the same object, and thus will have all the same prope
 'a' = 'A' // false ; case is NOT ignored for equality
 23 = 23 '1' // true ; integer implicitly converts to Quantity with unit '1', thus compares exactly here
 ```
-***Note:** The above examples involving collections are for illustrative purposes, the order of the `|` operator is undefined, so an engine may have different results here, however engines with simple collections like this do retain the order as constructed.*
-{:.fhir-highlight}
+***Note:** The collection examples above are illustrative only. The `|` operator does not guarantee the order of its result, so engines may legitimately return these items in a different order. In practice, many engines preserve the construction order for simple collections like these.*
 
 ##### Quantity Equality
 
@@ -3505,8 +3504,7 @@ name ~ name // true ; its the same object, and thus will have all the same prope
 'a' ~ 'A'   // true ; case is ignored for equivalence
 23 ~ 23 '1' // true ; integer implicitly converts to Quantity with unit '1', thus compares exactly here
 ```
-***Note:** The above examples involving collections are for illustrative purposes, the order of the `|` operator is undefined, so an engine may have different results here, however engines with simple collections like this do retain the order as constructed.*
-{:.fhir-highlight}
+***Note:** The collection examples above are illustrative only. The `|` operator does not guarantee the order of its result, so engines may legitimately return these items in a different order. In practice, many engines preserve the construction order for simple collections like these.*
 
 ##### Quantity Equivalence
 
