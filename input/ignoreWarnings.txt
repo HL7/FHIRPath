@@ -1,6 +1,6 @@
 == Suppressed Messages ==
 
-# The TSMG has approved this code system as an exemption from moving to THO on 7th May 2026. This code system is appropriately defined in the FHIRPath specification as it is similar to a required code binding in FHIR.
+# The TSMG has approved this code system as an exemption from moving to THO on 7th May 2026. This code system is appropriately defined in the FHIRPath specification as it is similar to a required code binding in FHIR. https://confluence.hl7.org/spaces/TSMG/pages/453915259/2026-05-07+TSMG+Agenda+and+Minutes
 INFORMATION: CodeSystem/calendar-units: CodeSystem: Most code systems defined in HL7 IGs will need to move to THO later during the process. Consider giving this code system a THO URL now (See https://confluence.hl7.org/display/TSMG/Terminology+Play+Book, and/or talk to TSMG)
 
 # This specification pre-dates the conformance clause marking functionality, it may be added in a future publication
