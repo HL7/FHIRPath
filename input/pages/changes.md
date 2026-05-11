@@ -1,5 +1,5 @@
 
-### Release 2 STU1 Change Summary
+### Release 3 STU3 Change Summary
 **Summary of Changes:**
 * Added new functions: `coalesce()`, `sort()`, `repeatAll()`, `defineVariable()`, `matchesFull()`, `indexOf()`, `lastIndexOf()`, `comparable()`, `pathname()`
 * Added aggregate functions: `sum()`, `min()`, `max()`, `avg()`
@@ -28,7 +28,8 @@
 * Added many new examples for functions that did not previously have examples
 
 
-### Release 2 STU1 Ballot (version 3.0.0-ballot)
+#### Issues Released in 3.0.0-ballot
+*(issues addressed before Jan 2025 ballot)*
 
 * [FHIR-44803](https://jira.hl7.org/browse/FHIR-44803): Spelling errors and typos
 * [FHIR-37705](https://jira.hl7.org/browse/FHIR-37705): Clarify behavior when the 2nd argument to substring() is negative
@@ -71,7 +72,8 @@
 * [FHIR-27757](https://jira.hl7.org/browse/FHIR-27757): More string manipulation functions
 
 
-### Ballot reconciliation issues
+#### Issues Released in 3.0.0
+*(resolved during ballot reconciliation)*
 
 * [FHIR-49237](https://jira.hl7.org/browse/FHIR-49237):  toString if type is not applicable, then result should be empty, not false
 * [FHIR-28122](https://jira.hl7.org/browse/FHIR-28122):  Conversion table misses bool->quantity
