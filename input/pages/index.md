@@ -1436,7 +1436,7 @@ For example:
 
 If the input collection contains a single item, this function will return a single integer if:
 
-* the item is an Integer
+* the item is an Integer or Long
 * the item is a String and is convertible to an integer
 * the item is a Boolean, where `true` results in a 1 and `false` results in a 0.
 
@@ -1452,13 +1452,14 @@ For example:
 ``` fhirpath
 '1'.toInteger()  // 1
 'st'.toInteger() // empty ({ }) ; not convertible to an integer
+42L.toInteger()  // 42 ; as an integer
 ```
 
 ##### convertsToInteger() : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
 
-* the item is an Integer
+* the item is an Integer or Long
 * the item is a String and is convertible to an Integer
 * the item is a Boolean
 
@@ -1689,7 +1690,7 @@ For example:
 
 If the input collection contains a single item, this function will return a single decimal if:
 
-* the item is an Integer or Decimal
+* the item is an Integer, Long or Decimal
 * the item is a String and is convertible to a Decimal
 * the item is a Boolean, where `true` results in a `1.0` and `false` results in a `0.0`.
 
@@ -1705,6 +1706,7 @@ For example:
 ``` fhirpath
 '1.1'.toDecimal() // 1.1
 '42'.toDecimal() // 42 (as a decimal value)
+'42L'.toDecimal() // 42 (as a decimal value)
 'st'.toDecimal() // empty ({ }) ; not convertible to a decimal
 ```
 
@@ -1712,7 +1714,7 @@ For example:
 
 If the input collection contains a single item, this function will `true` if:
 
-* the item is an Integer or Decimal
+* the item is an Integerm Long or Decimal
 * the item is a String and is convertible to a Decimal
 * the item is a Boolean
 
@@ -1726,6 +1728,7 @@ For example:
 ``` fhirpath
 '1.0'.convertsToDecimal() // true
 '42'.convertsToDecimal()  // true
+'42L'.convertsToDecimal()  // true
 '1.a'.convertsToDecimal() // false
 ```
 
@@ -1848,7 +1851,7 @@ The operation that is processing the result of the implicit conversion will defi
 
 If the input collection contains a single item, this function will return `true` if:
 
-* the item is an Integer, Decimal, or Quantity
+* the item is an Integer, Long, Decimal, or Quantity
 * the item is a String that is convertible to a Quantity using the regex format:
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
@@ -1879,7 +1882,7 @@ For example:
 If the input collection contains a single item, this function will return a single String if:
 
 * the item in the input collection is a String
-* the item in the input collection is an Integer, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation *(as shown in the table below)*
+* the item in the input collection is an Integer, Long, Decimal, Date, Time, DateTime, or Quantity the output will contain its String representation *(as shown in the table below)*
 * the item is a Boolean, where `true` results in `'true'` and `false` in `'false'`.
 
 If the item is not one of the above types, the result is empty.
@@ -1890,6 +1893,7 @@ The String representation uses the following formats:
 |-|-|-|
 |**Boolean** |`true` or `false`| `true.toString()`{:.fhirpath} returns `true`|
 |**Integer** |`(-)?#0`{:.formatted}| `42.toString()`{:.fhirpath} returns `42`|
+|**Long** |`(-)?#0`{:.formatted}| `42L.toString()`{:.fhirpath} returns `42`|
 |**Decimal** |`(-)?#0.0#`{:.formatted}| `3.14.toString()`{:.fhirpath} returns `3.14`|
 |**Quantity** |`(-)?#0.0# (('«unit»')|(«unit»))`{:.formatted} | `(53 'km').toString()`{:.fhirpath} returns `53 'km'` *(ucum units include quotes)*<br/>`(4 days).toString()`{:.fhirpath} returns `4 days` *(calendar duration units don't include quotes)*|
 |**Date** |`yyyy-MM-DD`{:.formatted}| `@2020-01-01.toString()`{:.fhirpath} returns `2020-01-01`|
@@ -1908,7 +1912,7 @@ If the input collection is empty, the result is empty.
 If the input collection contains a single item, this function will return `true` if:
 
 * the item is a String
-* the item is an Integer, Decimal, Date, Time, or DateTime
+* the item is an Integer, Long, Decimal, Date, Time, or DateTime
 * the item is a Boolean
 * the item is a Quantity
 
@@ -3347,6 +3351,7 @@ If both operands are collections with a single item, they must be of the same ty
 * For primitives:
   * `String`: comparison is based on Unicode values
   * `Integer`: values must be exactly equal
+  * `Long`: values must be exactly equal
   * `Decimal`: values must be equal, trailing zeroes after the decimal are ignored
   * `Boolean`: values must be the same
   * `Date`: must be exactly the same<br/>*(see [Date/Time Equality](#datetime-equality) for more details)*
@@ -3479,6 +3484,7 @@ If both operands are collections with a single item, they must be of the same ty
 * For primitives
   * `String`: the strings must be the same, ignoring case and locale, and normalizing whitespace.<br/>*(see [String Equivalence](#string-equivalence) for more details)*
   * `Integer`: exactly equal
+  * `Long`: exactly equal
   * `Decimal`: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision.
   * `Date`, `DateTime` and `Time`: values must be equal, except that if the input values have different levels of precision, the comparison returns `false`, not empty (`{ }`).<br/>*(see [Date/Time Equivalence](#datetime-equivalence) for more details)*
   * `Boolean`: the values must be the same

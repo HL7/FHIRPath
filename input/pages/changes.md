@@ -161,3 +161,5 @@
 * [FHIR-49525](https://jira.hl7.org/browse/FHIR-49525):  Quantity math and unit conversion
 * [FHIR-53249](https://jira.hl7.org/browse/FHIR-53249):  Quantity equivalence is ambiguous
 * [FHIR-53250](https://jira.hl7.org/browse/FHIR-53250):  Calendar duration equivalence has conflicts
+* [FHIR-56938](https://jira.hl7.org/browse/FHIR-56938):  Clarify relationship of calendar durations code system
+* [FHIR-57038](https://jira.hl7.org/browse/FHIR-57038):  Add Long support for equality and equivalence
