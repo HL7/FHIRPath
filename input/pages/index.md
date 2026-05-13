@@ -1436,7 +1436,7 @@ For example:
 
 If the input collection contains a single item, this function will return a single integer if:
 
-* the item is an Integer
+* the item is an Integer or Long
 * the item is a String and is convertible to an integer
 * the item is a Boolean, where `true` results in a 1 and `false` results in a 0.
 
@@ -1452,13 +1452,14 @@ For example:
 ``` fhirpath
 '1'.toInteger()  // 1
 'st'.toInteger() // empty ({ }) ; not convertible to an integer
+42L.toInteger()  // 42 ; as an integer
 ```
 
 ##### convertsToInteger() : Boolean
 
 If the input collection contains a single item, this function will return `true` if:
 
-* the item is an Integer
+* the item is an Integer or Long
 * the item is a String and is convertible to an Integer
 * the item is a Boolean
 
@@ -1689,7 +1690,7 @@ For example:
 
 If the input collection contains a single item, this function will return a single decimal if:
 
-* the item is an Integer or Decimal
+* the item is an Integer, Long or Decimal
 * the item is a String and is convertible to a Decimal
 * the item is a Boolean, where `true` results in a `1.0` and `false` results in a `0.0`.
 
@@ -1705,6 +1706,7 @@ For example:
 ``` fhirpath
 '1.1'.toDecimal() // 1.1
 '42'.toDecimal() // 42 (as a decimal value)
+'42L'.toDecimal() // 42 (as a decimal value)
 'st'.toDecimal() // empty ({ }) ; not convertible to a decimal
 ```
 
@@ -1712,7 +1714,7 @@ For example:
 
 If the input collection contains a single item, this function will `true` if:
 
-* the item is an Integer or Decimal
+* the item is an Integerm Long or Decimal
 * the item is a String and is convertible to a Decimal
 * the item is a Boolean
 
@@ -1726,6 +1728,7 @@ For example:
 ``` fhirpath
 '1.0'.convertsToDecimal() // true
 '42'.convertsToDecimal()  // true
+'42L'.convertsToDecimal()  // true
 '1.a'.convertsToDecimal() // false
 ```
 
@@ -1848,7 +1851,7 @@ The operation that is processing the result of the implicit conversion will defi
 
 If the input collection contains a single item, this function will return `true` if:
 
-* the item is an Integer, Decimal, or Quantity
+* the item is an Integer, Long, Decimal, or Quantity
 * the item is a String that is convertible to a Quantity using the regex format:
 ``` regex
 (?'value'(\+|-)?\d+(\.\d+)?)\s*('(?'unit'[^']+)'|(?'time'[a-zA-Z]+))?
@@ -1909,7 +1912,7 @@ If the input collection is empty, the result is empty.
 If the input collection contains a single item, this function will return `true` if:
 
 * the item is a String
-* the item is an Integer, Decimal, Date, Time, or DateTime
+* the item is an Integer, Long, Decimal, Date, Time, or DateTime
 * the item is a Boolean
 * the item is a Quantity
 
