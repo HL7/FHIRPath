@@ -621,8 +621,8 @@ These are the fhirpath defined scoped functions: *(argument processing only, ref
 | [`where`](#fn-where) | The `criteria` argument is evaluated for each item (setting `$this` and `$index` before each iteration); those that return `true` are included in the output collection. |
 | [`select`](#fn-select) | The `projection` argument is evaluated for each item (setting `$this` and `$index` before each iteration); and the results are included in the output collection. |
 | [`sort`](#fn-sort) | Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is not defined in this context, it could be anywhere during any evaluation depending on algorithms selected. |
-| [`repeat`](#fn-repeat) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
-| [`repeatAll`](#fn-repeatall) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
+| [`repeat`](#fn-repeat) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then evaluated on the new items from the previous iteration, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
+| [`repeatAll`](#fn-repeatall) | The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then evaluated on the new items from the previous iteration, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here. |
 | [`iif`](#iif) | The `criterion` argument is evaluated once (with `$this` set to the input value).<br/> If it returns `true`, then the `true-result` argument is evaluated (with `$this` set to the input value) and returned,<br/> otherwise the `otherwise-result` argument is evaluated (with `$this` set to the input value) and returned. |
 | [`trace`](#fn-trace) | If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function. |
 | [`aggregate`](#aggregate) | The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/> The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values. |
@@ -1011,7 +1011,7 @@ Patient.telecom.sort(system, use desc) // sort by system ascending, then by use 
 <a name="fn-repeat"></a>
 #### repeat(projection: ($this) => collection) : collection
 
-> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then evaluated on new items from the previous iteration, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
 
 A version of `select` that will repeat the `projection` and add items to the output collection only if they are not already in the output collection as determined by the [equals](#equals) (`=`) operator returning `true` *(i.e. `false` and empty both indicate that the values are not equal and thus added to the output)*.
 
@@ -1041,13 +1041,18 @@ which would find *any* descendants called `item`, not just the ones nested insid
 
 The order of items returned by the `repeat()` function is undefined.
 
+> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it navigates to child elements within the hierarchical structure.
+> If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.
+{:.dragon}
+
+
 <a name="fn-repeatall"></a>
 #### repeatAll(projection: ($this) => collection) : collection
 {:.stu}
 > **Note:** The contents of this section are Standard for Trial Use (STU)
 {: .stu-note }
 
-> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then re-evaluated on the output collection, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
+> This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then evaluated on the new items from the previous iteration, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
 {:.stu}
 
 A version of `repeat` that allows duplicate items in the output collection. Unlike `repeat`, this function does not check whether items are already present in the output collection before adding them.
@@ -4150,7 +4155,9 @@ Within FHIRPath, calculations involving date/times and calendar durations shall 
 > **Note:** For all but years and months, calendar durations are both equal and equivalent to the corresponding UCUM definite-time duration unit.
 > Note that due to the possibility of leap seconds, this is not totally accurate, however, for practical reasons, implementations typically ignore leap seconds when performing date/time arithmetic.
 
-If there is more than one item, an item of an incompatible type, or an unsupported unit for the type, the evaluation of the expression will end and signal an error to the calling environment.
+If there is more than one item, an item of an incompatible type, or an unsupported unit for the type, the evaluation of the expression will end and signal an error to the calling environment. This includes attempting to add date components to a Time.
+
+Attempting to add time components to a Date will implicitly convert the Date to a DateTime (and the result of the function will be a DateTime value).
 
 If either or both arguments are empty (`{ }`), the result is empty (`{ }`).
 
