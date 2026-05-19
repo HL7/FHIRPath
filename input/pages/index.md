@@ -4155,7 +4155,9 @@ Within FHIRPath, calculations involving date/times and calendar durations shall 
 > **Note:** For all but years and months, calendar durations are both equal and equivalent to the corresponding UCUM definite-time duration unit.
 > Note that due to the possibility of leap seconds, this is not totally accurate, however, for practical reasons, implementations typically ignore leap seconds when performing date/time arithmetic.
 
-If there is more than one item, an item of an incompatible type, or an unsupported unit for the type, the evaluation of the expression will end and signal an error to the calling environment.
+If there is more than one item, an item of an incompatible type, or an unsupported unit for the type, the evaluation of the expression will end and signal an error to the calling environment. This includes attempting to add date components to a Time.
+
+Attempting to add time components to a Date will implicitly convert the Date to a DateTime (and the result of the function will be a DateTime value).
 
 If either or both arguments are empty (`{ }`), the result is empty (`{ }`).
 

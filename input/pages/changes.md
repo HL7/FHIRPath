@@ -164,3 +164,4 @@
 * [FHIR-56938](https://jira.hl7.org/browse/FHIR-56938):  Clarify relationship of calendar durations code system
 * [FHIR-57038](https://jira.hl7.org/browse/FHIR-57038):  Add Long support for equality and equivalence
 * [FHIR-57251](https://jira.hl7.org/browse/FHIR-57251):  Definition of repeatAll incorrectly describes evaluation
+* [FHIR-57256](https://jira.hl7.org/browse/FHIR-57256):  Clarify behavior of Date addition
