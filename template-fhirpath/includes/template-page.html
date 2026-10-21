@@ -1,13 +1,13 @@
-{% include fragment-pagebegin.html %}
+{% assign localPage = page.path | split: "/" | last %}{% include fragment-pagebegin.html lang=include.lang %}
 
 <div class="col-12">
   <!--ReleaseHeader--><p id="publish-box">Publish Box goes here</p><!--EndReleaseHeader-->
-  <h2>{{site.data.pages[page.path].title | escape_once}}</h2>
-  {% if page.path == 'index.html' %}
-  {% include fragment-igTable.html %}
+  <h2>{{site.data.pages[localPage].titlelang[include.lang] | escape_once}}</h2>
+  {% if localPage == 'index.html' %}
+  {% include fragment-igTable.html lang=include.lang %}
   {% endif %}
-  {% include fragment-pageTable.html %}
+  {% include fragment-pageTable.html lang=include.lang %}
   {% assign path = page.path | split: '.html' %}
   {% include {{path}}.xml %}
 </div>
-{% include fragment-pageend.html %}
+{% include fragment-pageend.html lang=include.lang %}

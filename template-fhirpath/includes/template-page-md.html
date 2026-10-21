@@ -1,4 +1,4 @@
-{% include fragment-pagebegin.html %}
+{% assign localPage = page.path | split: "/" | last %}{% include fragment-pagebegin.html lang=include.lang %}
 <div class="col-12">
   <!--ReleaseHeader--><p id="publish-box">Publish Box goes here</p><!--EndReleaseHeader-->
 
@@ -12,7 +12,7 @@
 {% include {{path}}.md %}
 {% endcapture %}
 
-{% include fragment-pageTable.html %}
+{% include fragment-pageTable.html lang=include.lang %}
 
 {% capture no-toc-content %} <!-- white space is critical inside of capture -->
 <div>
@@ -31,4 +31,4 @@
 {% endif %}
 
 </div>
-{% include fragment-pageend.html %}
+{% include fragment-pageend.html lang=include.lang %}

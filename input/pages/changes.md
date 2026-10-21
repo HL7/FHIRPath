@@ -165,3 +165,6 @@
 * [FHIR-57038](https://jira.hl7.org/browse/FHIR-57038):  Add Long support for equality and equivalence
 * [FHIR-57251](https://jira.hl7.org/browse/FHIR-57251):  Definition of repeatAll incorrectly describes evaluation
 * [FHIR-57256](https://jira.hl7.org/browse/FHIR-57256):  Clarify behavior of Date addition
+
+#### Issues Included since 3.0.0 (targetting 3.1)
+* [FHIR-57822](https://jira.hl7.org/browse/FHIR-57822):  Typo in page title
