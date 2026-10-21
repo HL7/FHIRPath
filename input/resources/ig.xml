@@ -78,6 +78,11 @@
         <title value="Changes"/>
         <generation value="markdown"/>
       </page>
+      <page>
+        <nameUrl value="conformance.html"/>
+        <title value="Conformance Language References"/>
+        <generation value="markdown"/>
+      </page>
     </page>
     <parameter>
       <code value="autoload-resources"/>
