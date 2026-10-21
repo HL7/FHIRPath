@@ -168,3 +168,4 @@
 
 #### Issues Included since 3.0.0 (targetting 3.1)
 * [FHIR-57822](https://jira.hl7.org/browse/FHIR-57822):  Typo in page title
+* [FHIR-58739](https://jira.hl7.org/browse/FHIR-58739):  Include support for anonymous types in the instance selector

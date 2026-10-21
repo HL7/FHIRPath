@@ -874,14 +874,15 @@ used to convert the input collection into a different output collection. Its sub
 {:.stu}
 
 > ```
-> «typename» { element : value, element : value, ...  } : «typename»
+> [«typename»] { element : value, element : value, ...  } : «typename»
 > ```
-> `«typename»` is the name of the type to create (optionally prefixed with a namespace)<br/>
+> `«typename»` is the optional name of the type to create (optionally prefixed with a namespace)<br/>
 > `element` is the name *(identifier)* of an element of the type being created<br/>
-> `value` is any fhirpath expression (including literals) to set to the associated `element`
+> `value` is any fhirpath expression (including literals) to set to the associated `element`<br/>
 {:.stu}
 
-Creates a new object of type `«typename»` and returns that to the output collection. 
+Creates a new object of type `«typename»` and returns that to the output collection.
+If the `«typename»` is omitted, an implementation may use a type appropriate to the context, or an anonymous type.<br/> 
 Any elements listed within the parentheses are set as children on the newly created object.
 {:.stu}
 
@@ -909,17 +910,19 @@ Coding { system : 'http://example.org/demo', code : 'c1' }
 FHIR.Identifier { system : 'http://example.org/demo', value : 'N0001231' }
 
 // create an MRN identifier similar to the one in the patient example at https://hl7.org/fhir/patient-example.json.html
+// (no explicit types on the child properties in the creation, there's only 1 valid type for each context here - so can be derived)
 Identifier { 
-  type : CodeableConcept { coding: Coding { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' } },
+  type : { coding: { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' } },
   system : 'urn:oid:1.2.36.146.595.217.0.1',
   value : '12345',
-  period : Period { start: @2001-05-06 }
+  period : { start: @2001-05-06 }
 }
 
 // create an empty Period
 Period {:}
 ```
 {:.stu}
+{:.fhir-approved}
 
 Instance Selectors are usually used to manipulate existing elements into another datatype:
 {:.stu}
@@ -932,8 +935,12 @@ Patient.select(
 
 // Convert a set of concepts from a code system into Codings
 CodeSystem.concept.select(Coding { system: %resource.url, code: code, display: display })
+
+// Create an anonymous type with 2 properties
+{ foo: 'bar', mol: 42 }
 ```
 {:.stu}
+{:.fhir-approved}
 
 **Note:** Primitive types can be created and set using a special element name `value` if specifically required.
 The evaluating fhirpath engine is responsible for performing any type conversions from fhirpath primitives to the target object/type system as required.
