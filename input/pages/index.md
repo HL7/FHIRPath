@@ -425,11 +425,11 @@ If the value literal is an Integer, it will be implicitly converted to a Decimal
 
 §q1:Implementations SHALL support [equality](#quantity-equality), [equivalence](#quantity-equivalence), [comparison](#comparison) and [arithmetic](#math-1) operations on quantities with units where the units are the same value, case-sensitively.§
 
-§q2:Implementations that do NOT support UCUM unit conversion MAY return empty (`{ }`) for calculations involving quantities with different units.§
+§q2:Implementations that do NOT support UCUM unit conversion MAY return empty (`{ }`) for calculations involving quantities with different units, except for [equivalence](#quantity-equivalence), which returns `false` when a required conversion is not supported.§
 
 §q3:Implementations that DO support UCUM conversions SHALL support implicit conversions where operations between quantities with different units are performed, and also explicitly through [toQuantity(unit)](#fn-toquantity).§
 
-For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
+For Implementations that DO support UCUM conversion, if an operation other than [equivalence](#quantity-equivalence) is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
 
 > **Note:** The UCUM specification defines what unit codes are valid, how units are composed/decomposed when performing multiplication and division, 
 > and, where applicable, scalar conversion factors between commensurable units (e.g. between a single dimension such as length).
@@ -1814,7 +1814,7 @@ There is no expectation to perform rounding on the result of applying the UCUM c
 Applying rounding too early can result in un-intended inaccuracies and should be explicitly applied when desired.
 {:.stu}
 
-> **Note:** Implementations are not required to support a UCUM implementation, and may return empty (`{ }`) when the units are different, or not handled.
+> **Note:** Implementations are not required to support a UCUM implementation, and may return empty (`{ }`) when the units are different, or not handled. For [equivalence](#quantity-equivalence), an empty conversion result instead produces `false`.
 {:.stu}
 
 ###### Time-valued unit conversions
@@ -3491,6 +3491,8 @@ Additional functions to support more sophisticated timezone offset comparison (s
 
 Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }`{:.fhirpath} will result in `true`.
 
+The equivalence operator returns either `true` or `false`, never an empty collection.
+
 If both operands are collections with a single item, they must be of the same type (or [implicitly convertible](#conversion) to the same type), and:
 
 * For primitives
@@ -3532,12 +3534,12 @@ For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and
 
 When the units are different the quantity values must be [**converted**](#unit-conversions) to the least granular unit before comparison.<br/>
 *(using the least granular unit ensures that the precision of the converted value is not artificially increased by the conversion, and thus doesn't impact the rounded decimal comparison)*<br/>
-If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equivalence comparison is empty (`{ }`).
+If this process returns empty (e.g. because the units are not valid, not commensurable, or conversion is not supported), then the result of the equivalence comparison is `false`.
 {:.stu}
 
 §q7:Implementations are not required to fully support operations on units, but they SHALL at least respect units, recognizing when units differ.§
 
-Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+Attempting to operate on quantities with invalid units will result in `false`.
 
 Once the units are the same, the values can be compared using decimal equivalence: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision (as described above).
 
@@ -3549,6 +3551,8 @@ For example:
 4 'g' ~ 4040 'mg'   // true ; convert to least granular 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
 1 '[in_i]' ~ 2.5 'cm' // true ; convert to least granular '[in_i]' (1 ~ 0.98..), round to least precise and compare (1 = 1)
 23 'Cel' ~ 73.4 '[degF]' // true ; comparison of UCUM "special" units on non-ratio scales (23 'Cel' = 73.4 '[degF]' exactly)
+1 'cm' ~ 1 's' // false
+(1 'cm' | 2 'g') ~ (1 's' | 2 'g') // false
 ```
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, all units are considered either equal or equivalent across UCUM definite durations and calendar units.

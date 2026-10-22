@@ -29,7 +29,7 @@
         },
         {
           "operationName": "~",
-          "description": "Returns `true` if the collections are equivalent. Similar to equals but with different semantics: String comparison ignores case and locale and normalizes whitespace (without collapsing sequences), Decimal comparison uses precision of least precise operand, Date/DateTime/Time comparison returns `false` (not empty) for different precisions. For Quantity, values are converted to the least granular unit before comparison and rounded to the precision of the least precise operand; calendar units and UCUM definite-duration units are equivalent (year ~ 'a', month ~ 'mo'). For collections with multiple items, comparison is not order dependent.",
+          "description": "Returns `true` if the collections are equivalent. Returns either `true` or `false`, never an empty collection. Similar to equals but with different semantics: String comparison ignores case and locale and normalizes whitespace (without collapsing sequences), Decimal comparison uses precision of least precise operand, Date/DateTime/Time comparison returns `false` (not empty) for different precisions. For Quantity, values are converted to the least granular unit before comparison and rounded to the precision of the least precise operand; equivalence returns `false` if either unit is invalid, the units are not commensurable, or a required conversion is not supported. Calendar units and UCUM definite-duration units are equivalent (year ~ 'a', month ~ 'mo'). For collections with multiple items, comparison is not order dependent.",
           "leftArgument": "Any",
           "rightArgument": "Any",
           "returnType": "Boolean",
