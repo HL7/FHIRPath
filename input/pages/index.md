@@ -924,7 +924,6 @@ Identifier {
 Period {:}
 ```
 {:.stu}
-{:.fhir-approved}
 
 Instance Selectors are usually used to manipulate existing elements into another datatype:
 {:.stu}
@@ -942,7 +941,6 @@ CodeSystem.concept.select(Coding { system: %resource.url, code: code, display: d
 { foo: 'bar', mol: 42 }
 ```
 {:.stu}
-{:.fhir-approved}
 
 **Note:** Primitive types can be created and set using a special element name `value` if specifically required.
 The evaluating fhirpath engine is responsible for performing any type conversions from fhirpath primitives to the target object/type system as required.
