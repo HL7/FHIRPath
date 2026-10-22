@@ -1,3 +1,5 @@
+# Appendices
+
 ## Dependencies
 
 {% include dependency-table-short.xhtml %}
