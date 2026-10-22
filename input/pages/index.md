@@ -2943,13 +2943,16 @@ group.select(
 > **Note:** this could be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
 {:.stu}
 
-#### lowBoundary([precision: Integer]): Decimal | Date | DateTime | Time
+#### lowBoundary([precision: Integer]): Decimal | Quantity | Date | DateTime | Time
 {:.stu}
 
 The least possible value of the input to the specified precision.
 {:.stu}
 
-The function can only be used with Decimal, Date, DateTime, and Time values, and returns the same type as the value in the input collection.
+The function can be used with Decimal, Quantity, Date, DateTime, and Time values, and returns the same type as the value in the input collection. For a Quantity, the function applies the Decimal boundary operation to the numeric value and returns a Quantity with the resulting value and the original unit.
+{:.stu}
+
+Integer or Long inputs are implicitly converted to Decimal with zero fractional digits of input precision, and the result is Decimal.
 {:.stu}
 
 If no precision is specified, the greatest precision of the type of the input value is used (i.e. at least 8 for Decimal, 4 for Date, at least 17 for DateTime, and at least 9 for Time).
@@ -2971,6 +2974,8 @@ For example:
 1.587.lowBoundary(6) // 1.586500
 1.587.lowBoundary(2) // 1.58
 1.587.lowBoundary(0) // 1
+1.lowBoundary(2) // 0.50
+2.1 'cm'.lowBoundary(2) // 2.05 'cm'
 (-1.587).lowBoundary() // -1.58750000
 (-1.587).lowBoundary(6) // -1.587500
 (-1.587).lowBoundary(2) // -1.59
@@ -2981,13 +2986,16 @@ For example:
 ```
 {:.stu}
 
-#### highBoundary([precision: Integer]): Decimal | Date | DateTime | Time
+#### highBoundary([precision: Integer]): Decimal | Quantity | Date | DateTime | Time
 {:.stu}
 
 The greatest possible value of the input to the specified precision.
 {:.stu}
 
-The function can only be used with Decimal, Date, DateTime, and Time values, and returns the same type as the value in the input collection.
+The function can be used with Decimal, Quantity, Date, DateTime, and Time values, and returns the same type as the value in the input collection. For a Quantity, the function applies the Decimal boundary operation to the numeric value and returns a Quantity with the resulting value and the original unit.
+{:.stu}
+
+Integer or Long inputs are implicitly converted to Decimal with zero fractional digits of input precision, and the result is Decimal.
 {:.stu}
 
 If no precision is specified, the greatest precision of the type of the input value is used (i.e. at least 8 for Decimal, 4 for Date, at least 17 for DateTime, and at least 9 for Time).
@@ -3009,6 +3017,8 @@ For example:
 1.587.highBoundary(6) // 1.587500
 1.587.highBoundary(2) // 1.59
 1.587.highBoundary(0) // 2
+1.highBoundary(2) // 1.50
+2.1 'cm'.highBoundary(2) // 2.15 'cm'
 (-1.587).highBoundary() // -1.58650000
 (-1.587).highBoundary(6) // -1.586500
 (-1.587).highBoundary(2) // -1.58
@@ -3025,7 +3035,7 @@ For example:
 If the input collection contains a single item, this function will return the number of digits of precision.
 {:.stu}
 
-The function can only be used with Decimal, Date, DateTime, and Time values.
+The function can be used with Decimal, Quantity, Date, DateTime, and Time values. For a Quantity, it returns the number of digits of precision in the numeric value, including trailing fractional zeroes.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -3042,6 +3052,7 @@ For example with decimal values:
 ``` fhirpath
 1.58700.precision() // 5
 100.precision() // 0 ; no digits after the decimal place (integer implicitly converted to a decimal for processing)
+(1.00 'mg').precision() // 2
 ```
 {:.stu}
 

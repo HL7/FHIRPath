@@ -171,3 +171,4 @@
 * [FHIR-58739](https://jira.hl7.org/browse/FHIR-58739):  Include support for anonymous types in the instance selector
 * [FHIR-49510](https://jira.hl7.org/browse/FHIR-49510):  Conformance language is not consistently used
 * [FHIR-59626](https://jira.hl7.org/browse/FHIR-59626):  Quantity equivalence returns false rather than empty for invalid or incomparable units
+* [FHIR-59620](https://jira.hl7.org/browse/FHIR-59620):  Clarify Quantity and Integer support for FHIRPath boundary functions
