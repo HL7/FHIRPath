@@ -75,7 +75,7 @@ paramList
 
 // Instance selector (FHIRPath object construction syntax - same as in CQL)
 instanceSelector
-        : qualifiedIdentifier '{' (':' | (instanceElementSelector (',' instanceElementSelector)*)) '}'
+        : qualifiedIdentifier? '{' (':' | (instanceElementSelector (',' instanceElementSelector)*)) '}'
         ;
 
 instanceElementSelector

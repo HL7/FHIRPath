@@ -12,7 +12,12 @@
 {% include {{path}}.md %}
 {% endcapture %}
 
+{% if localPage == 'index.html' %}
+{% assign resource_ = igId %}
+{% include fragment-simpletable.html lang=include.lang %}
+{% else %}
 {% include fragment-pageTable.html lang=include.lang %}
+{% endif %}
 
 {% capture no-toc-content %} <!-- white space is critical inside of capture -->
 <div>

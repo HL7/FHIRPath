@@ -2,6 +2,9 @@
 <!--Hidden IG for de facto IG publishing-->
 <ImplementationGuide xmlns="http://hl7.org/fhir">
   <id value="hl7.fhirpath"/>
+  <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+    <valueCode value="normative"/>
+  </extension>
   <url value="http://hl7.org/fhirpath/ImplementationGuide/hl7.fhirpath"/>
   <version value="3.1.0"/>
   <name value="FHIRPath"/>
@@ -50,33 +53,67 @@
       </reference>
     </resource>
     <page>
+      <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+        <valueCode value="informative"/>
+      </extension>
       <nameUrl value="toc.html"/>
       <title value="Table of contents"/>
       <generation value="html"/>
       <page>
+        <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+          <valueCode value="normative"/>
+        </extension>
         <nameUrl value="index.html"/>
         <title value="FHIRPath Specification"/>
         <generation value="markdown"/>
       </page>
       <page>
+        <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+          <valueCode value="informative"/>
+        </extension>
         <nameUrl value="grammar.html"/>
         <title value="FHIRPath Antlr 4.0 Grammar"/>
         <generation value="markdown"/>
       </page>
       <page>
+        <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+          <valueCode value="informative"/>
+        </extension>
         <nameUrl value="tests.html"/>
         <title value="Fhirpath Tests"/>
         <generation value="markdown"/>
       </page>
       <page>
+        <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+          <valueCode value="informative"/>
+        </extension>
         <nameUrl value="appendices.html"/>
         <title value="Appendices"/>
         <generation value="markdown"/>
       </page>
       <page>
+        <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+          <valueCode value="informative"/>
+        </extension>
         <nameUrl value="changes.html"/>
         <title value="Changes"/>
         <generation value="markdown"/>
+      </page>
+      <page>
+        <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+          <valueCode value="informative"/>
+        </extension>
+        <nameUrl value="conformance.html"/>
+        <title value="Conformance Language References"/>
+        <generation value="markdown"/>
+      </page>
+      <page>
+        <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+          <valueCode value="informative"/>
+        </extension>
+        <nameUrl value="artifacts.html"/>
+        <title value="Artifacts Summary"/>
+        <generation value="html"/>
       </page>
     </page>
     <parameter>
@@ -94,6 +131,10 @@
     <parameter>
       <code value="copyrightyear"/>
       <value value="2014+"/>
+    </parameter>
+    <parameter>
+      <code value="auto-oid-root"/>
+      <value value="2.16.840.1.113883.4.642.40.102"/>
     </parameter>
   </definition>
 </ImplementationGuide>
