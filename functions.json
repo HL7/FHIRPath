@@ -618,7 +618,7 @@
         },
         {
           "functionName": "toInteger",
-          "description": "If the input collection contains a single item, this function will return a single integer if the item is an Integer, a String convertible to an integer, or a Boolean.",
+          "description": "If the input collection contains a single item, this function will return a single integer if the item is an Integer or Long, a String convertible to an integer, or a Boolean.",
           "arguments": [],
           "returnType": "Integer",
           "emptyInputResult": "empty",
@@ -626,11 +626,13 @@
           "inputTypes": [
             "Boolean",
             "Integer",
+            "Long",
             "String"
           ],
           "typeMapping": [
             "Boolean-Integer",
             "Integer-Integer",
+            "Long-Integer",
             "String-Integer"
           ],
           "exampleOfUse": "```fhirpath\n'1'.toInteger() // 1\n```",
@@ -786,19 +788,21 @@
         },
         {
           "functionName": "toDecimal",
-          "description": "If the input collection contains a single item, this function will return a single decimal if the item is an Integer or Decimal, a String convertible to a Decimal, or a Boolean.",
+          "description": "If the input collection contains a single item, this function will return a single decimal if the item is an Integer, Long or Decimal, a String convertible to a Decimal, or a Boolean.",
           "arguments": [],
           "returnType": "Decimal",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
             "Integer",
+            "Long",
             "Decimal",
             "String",
             "Boolean"
           ],
           "typeMapping": [
             "Integer-Decimal",
+            "Long-Decimal",
             "Decimal-Decimal",
             "String-Decimal",
             "Boolean-Decimal"
@@ -808,7 +812,7 @@
         },
         {
           "functionName": "convertsToDecimal",
-          "description": "If the input collection contains a single item, this function will true if the item can be converted to a Decimal value.",
+          "description": "If the input collection contains a single item, this function will return true if the item can be converted to a Decimal value.",
           "arguments": [],
           "returnType": "Boolean",
           "emptyInputResult": "empty",
@@ -822,7 +826,7 @@
         },
         {
           "functionName": "toQuantity",
-          "description": "If the input collection contains a single item, this function will return a single quantity if the item is an Integer or Decimal, a Quantity, a String convertible to a Quantity, or a Boolean.",
+          "description": "If the input collection contains a single item, this function will return a single quantity if the item is an Integer, Long or Decimal, a Quantity, a String convertible to a Quantity, or a Boolean. Integer, Long and Decimal inputs produce a Quantity with the UCUM default unit ('1').",
           "arguments": [
             {
               "name": "unit",
@@ -836,6 +840,7 @@
           "errorOnMultipleInput": true,
           "inputTypes": [
             "Integer",
+            "Long",
             "Decimal",
             "Quantity",
             "String",
@@ -843,6 +848,7 @@
           ],
           "typeMapping": [
             "Integer-Quantity",
+            "Long-Quantity",
             "Decimal-Quantity",
             "Quantity-Quantity",
             "String-Quantity",
@@ -874,7 +880,7 @@
         },
         {
           "functionName": "toString",
-          "description": "If the input collection contains a single item, this function will return a single String if the item is a String, an Integer, Decimal, Date, Time, DateTime, or Quantity, or a Boolean.",
+          "description": "If the input collection contains a single item, this function will return a single String if the item is a String, an Integer, Long, Decimal, Date, Time, DateTime, or Quantity, or a Boolean.",
           "arguments": [],
           "returnType": "String",
           "emptyInputResult": "empty",
@@ -882,6 +888,7 @@
           "inputTypes": [
             "String",
             "Integer",
+            "Long",
             "Decimal",
             "Date",
             "Time",
@@ -892,6 +899,7 @@
           "typeMapping": [
             "String-String",
             "Integer-String",
+            "Long-String",
             "Decimal-String",
             "Date-String",
             "Time-String",
@@ -1467,18 +1475,24 @@
         },
         {
           "functionName": "ceiling",
-          "description": "Returns the first integer greater than or equal to the input.",
+          "description": "Returns the first integer greater than or equal to the input. Accepts Decimal or Quantity; Integer and Long inputs are implicitly converted to Decimal. Decimal inputs return Integer, while Quantity inputs return a Quantity with the same unit and the rounded numeric value.",
           "arguments": [],
           "returnType": "Integer | Quantity",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
             "Integer",
+            "Long",
             "Decimal",
             "Quantity"
           ],
+          "inputTypeViaImplicitCasting": [
+            "Integer",
+            "Long"
+          ],
           "typeMapping": [
             "Integer-Integer",
+            "Long-Integer",
             "Decimal-Integer",
             "Quantity-Quantity"
           ],
@@ -1513,18 +1527,24 @@
         },
         {
           "functionName": "floor",
-          "description": "Returns the first integer less than or equal to the input.",
+          "description": "Returns the first integer less than or equal to the input. Accepts Decimal or Quantity; Integer and Long inputs are implicitly converted to Decimal. Decimal inputs return Integer, while Quantity inputs return a Quantity with the same unit and the rounded numeric value.",
           "arguments": [],
           "returnType": "Integer | Quantity",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
             "Integer",
+            "Long",
             "Decimal",
             "Quantity"
           ],
+          "inputTypeViaImplicitCasting": [
+            "Integer",
+            "Long"
+          ],
           "typeMapping": [
             "Integer-Integer",
+            "Long-Integer",
             "Decimal-Integer",
             "Quantity-Quantity"
           ],
@@ -1672,18 +1692,24 @@
         },
         {
           "functionName": "truncate",
-          "description": "Returns the integer portion of the input.",
+          "description": "Returns the integer portion of the input. Accepts Decimal or Quantity; Integer and Long inputs are implicitly converted to Decimal. Decimal inputs return Integer, while Quantity inputs return a Quantity with the same unit and the truncated numeric value.",
           "arguments": [],
           "returnType": "Integer | Quantity",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
             "Integer",
+            "Long",
             "Decimal",
             "Quantity"
           ],
+          "inputTypeViaImplicitCasting": [
+            "Integer",
+            "Long"
+          ],
           "typeMapping": [
             "Integer-Integer",
+            "Long-Integer",
             "Decimal-Integer",
             "Quantity-Quantity"
           ],
@@ -1781,7 +1807,7 @@
         },
         {
           "functionName": "now",
-          "description": "Returns the current date and time, including timezone offset.",
+          "description": "Returns the current date and time, including timezone offset, independently of the input collection, including when it is empty.",
           "arguments": [],
           "returnType": "DateTime",
           "emptyInputResult": "empty",
@@ -1795,7 +1821,7 @@
         },
         {
           "functionName": "timeOfDay",
-          "description": "Returns the current time.",
+          "description": "Returns the current time independently of the input collection, including when it is empty.",
           "arguments": [],
           "returnType": "Time",
           "emptyInputResult": "empty",
@@ -1809,7 +1835,7 @@
         },
         {
           "functionName": "today",
-          "description": "Returns the current date.",
+          "description": "Returns the current date independently of the input collection, including when it is empty.",
           "arguments": [],
           "returnType": "Date",
           "emptyInputResult": "empty",
@@ -1850,7 +1876,7 @@
         },
         {
           "functionName": "lowBoundary",
-          "description": "The least possible value of the input to the specified precision. The function can only be used with Decimal, Date, DateTime, and Time values, and returns the same type as the value in the input collection.",
+          "description": "The least possible value of the input to the specified precision. The function can be used with Decimal, Quantity, Date, DateTime, and Time values, and returns the same type as the value in the input collection. For a Quantity, it applies the Decimal boundary operation to the numeric value and returns a Quantity with the resulting value and the original unit. Integer or Long inputs are implicitly converted to Decimal with zero fractional digits of input precision, and the result is Decimal.",
           "arguments": [
             {
               "name": "precision",
@@ -1859,17 +1885,27 @@
               "optional": true
             }
           ],
-          "returnType": "Decimal | Date | DateTime | Time",
+          "returnType": "Decimal | Quantity | Date | DateTime | Time",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
+            "Integer",
+            "Long",
             "Decimal",
+            "Quantity",
             "Date",
             "DateTime",
             "Time"
           ],
+          "inputTypeViaImplicitCasting": [
+            "Integer",
+            "Long"
+          ],
           "typeMapping": [
+            "Integer-Decimal",
+            "Long-Decimal",
             "Decimal-Decimal",
+            "Quantity-Quantity",
             "Date-Date",
             "DateTime-DateTime",
             "Time-Time"
@@ -1880,7 +1916,7 @@
         },
         {
           "functionName": "highBoundary",
-          "description": "The greatest possible value of the input to the specified precision. The function can only be used with Decimal, Date, DateTime, and Time values, and returns the same type as the value in the input collection.",
+          "description": "The greatest possible value of the input to the specified precision. The function can be used with Decimal, Quantity, Date, DateTime, and Time values, and returns the same type as the value in the input collection. For a Quantity, it applies the Decimal boundary operation to the numeric value and returns a Quantity with the resulting value and the original unit. Integer or Long inputs are implicitly converted to Decimal with zero fractional digits of input precision, and the result is Decimal.",
           "arguments": [
             {
               "name": "precision",
@@ -1889,17 +1925,27 @@
               "optional": true
             }
           ],
-          "returnType": "Decimal | Date | DateTime | Time",
+          "returnType": "Decimal | Quantity | Date | DateTime | Time",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
+            "Integer",
+            "Long",
             "Decimal",
+            "Quantity",
             "Date",
             "DateTime",
             "Time"
           ],
+          "inputTypeViaImplicitCasting": [
+            "Integer",
+            "Long"
+          ],
           "typeMapping": [
+            "Integer-Decimal",
+            "Long-Decimal",
             "Decimal-Decimal",
+            "Quantity-Quantity",
             "Date-Date",
             "DateTime-DateTime",
             "Time-Time"
@@ -1910,19 +1956,29 @@
         },
         {
           "functionName": "precision",
-          "description": "If the input collection contains a single item, this function will return the number of digits of precision. The function can only be used with Decimal, Date, DateTime, and Time values.",
+          "description": "If the input collection contains a single item, this function will return the number of digits of precision. The function can be used with Decimal, Quantity, Date, DateTime, and Time values. For Decimal, it returns the number of fractional digits, including trailing zeroes. For Quantity, it returns the precision of the numeric value, including trailing fractional zeroes. Integer and Long inputs are implicitly converted to Decimal and have zero fractional digits. For Date, DateTime, and Time, it returns the number of digits of precision in the value.",
           "arguments": [],
           "returnType": "Integer",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
+            "Integer",
+            "Long",
             "Decimal",
+            "Quantity",
             "Date",
             "DateTime",
             "Time"
           ],
+          "inputTypeViaImplicitCasting": [
+            "Integer",
+            "Long"
+          ],
           "typeMapping": [
+            "Integer-Integer",
+            "Long-Integer",
             "Decimal-Integer",
+            "Quantity-Integer",
             "Date-Integer",
             "DateTime-Integer",
             "Time-Integer"
@@ -1990,18 +2046,16 @@
         },
         {
           "functionName": "hourOf",
-          "description": "If the input collection contains a single Date, DateTime or Time, this function will return the hour component.",
+          "description": "If the input collection contains a single DateTime or Time, this function will return the hour component. If the input is empty, the hour is absent, or the value is not a DateTime or Time, the result is empty.",
           "arguments": [],
           "returnType": "Integer",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
-            "Date",
             "DateTime",
             "Time"
           ],
           "typeMapping": [
-            "Date-Integer",
             "DateTime-Integer",
             "Time-Integer"
           ],
@@ -2011,18 +2065,16 @@
         },
         {
           "functionName": "minuteOf",
-          "description": "If the input collection contains a single Date, DateTime or Time, this function will return the minute component.",
+          "description": "If the input collection contains a single DateTime or Time, this function will return the minute component. If the input is empty, the minute is absent, or the value is not a DateTime or Time, the result is empty.",
           "arguments": [],
           "returnType": "Integer",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
-            "Date",
             "DateTime",
             "Time"
           ],
           "typeMapping": [
-            "Date-Integer",
             "DateTime-Integer",
             "Time-Integer"
           ],
@@ -2032,18 +2084,16 @@
         },
         {
           "functionName": "secondOf",
-          "description": "If the input collection contains a single Date, DateTime or Time, this function will return the second component.",
+          "description": "If the input collection contains a single DateTime or Time, this function will return the second component. If the input is empty, the second is absent, or the value is not a DateTime or Time, the result is empty.",
           "arguments": [],
           "returnType": "Integer",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
-            "Date",
             "DateTime",
             "Time"
           ],
           "typeMapping": [
-            "Date-Integer",
             "DateTime-Integer",
             "Time-Integer"
           ],
@@ -2053,18 +2103,16 @@
         },
         {
           "functionName": "millisecondOf",
-          "description": "If the input collection contains a single Date, DateTime or Time, this function will return the millisecond component.",
+          "description": "If the input collection contains a single DateTime or Time, this function will return the millisecond component. If the input is empty, the millisecond is absent, or the value is not a DateTime or Time, the result is empty.",
           "arguments": [],
           "returnType": "Integer",
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
-            "Date",
             "DateTime",
             "Time"
           ],
           "typeMapping": [
-            "Date-Integer",
             "DateTime-Integer",
             "Time-Integer"
           ],
@@ -2193,7 +2241,7 @@
       "functions": [
         {
           "functionName": "comparable",
-          "description": "Returns `true` if the input Quantity can be compared with the `other` Quantity and their relationship to each other determined. Comparable means that both have values, and the units are the same (irrespective of the system), or both have `code` and `system` values, and the `system` is recognized by the FHIRPath implementation, and the codes are comparable within that system.",
+          "description": "Returns `true` if the input Quantity can be compared with the `other` Quantity and their relationship to each other determined. Comparable means that both have values, and the units are the same (irrespective of the system), or both have `code` and `system` values, and the `system` is recognized by the FHIRPath implementation, and the codes are comparable within that system. Integer, Long and Decimal values are implicitly converted to Quantity with the UCUM default unit ('1'). If either input is empty or is not a single Quantity after implicit conversion, the result is empty.",
           "arguments": [
             {
               "name": "other",
@@ -2205,9 +2253,20 @@
           "emptyInputResult": "empty",
           "errorOnMultipleInput": true,
           "inputTypes": [
+            "Integer",
+            "Long",
+            "Decimal",
             "Quantity"
           ],
+          "inputTypeViaImplicitCasting": [
+            "Integer",
+            "Long",
+            "Decimal"
+          ],
           "typeMapping": [
+            "Integer-Boolean",
+            "Long-Boolean",
+            "Decimal-Boolean",
             "Quantity-Boolean"
           ],
           "exampleOfUse": "```fhirpath\n1 'mg'.comparable(2 'mg') // true - these types are comparable\n1 'm'.comparable(20 'cm') // true - these types are both metric distance measures\niif(Observation.value.comparable(2 'mg'), Observation.value < 2 'mg', {})\n```",

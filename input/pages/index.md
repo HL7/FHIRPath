@@ -3562,8 +3562,8 @@ For example:
 4 'g' ~ 4040 'mg'   // true ; convert to least granular 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
 1 '[in_i]' ~ 2.5 'cm' // true ; convert to least granular '[in_i]' (1 ~ 0.98..), round to least precise and compare (1 = 1)
 23 'Cel' ~ 73.4 '[degF]' // true ; comparison of UCUM "special" units on non-ratio scales (23 'Cel' = 73.4 '[degF]' exactly)
-1 'cm' ~ 1 's' // false
-(1 'cm' | 2 'g') ~ (1 's' | 2 'g') // false
+1 'cm' ~ 1 's' // false ; incompatible dimensions (length vs time), so quantities are not equivalent
+(1 'cm' | 2 'g') ~ (1 's' | 2 'g') // false ; collections require equivalent items regardless of order; 2 'g' matches, but 1 'cm' and 1 's' are not equivalent
 ```
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, all units are considered either equal or equivalent across UCUM definite durations and calendar units.
