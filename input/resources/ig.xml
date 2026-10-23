@@ -132,5 +132,9 @@
       <code value="copyrightyear"/>
       <value value="2014+"/>
     </parameter>
+    <parameter>
+      <code value="auto-oid-root"/>
+      <value value="2.16.840.1.113883.4.642.40.102"/>
+    </parameter>
   </definition>
 </ImplementationGuide>
