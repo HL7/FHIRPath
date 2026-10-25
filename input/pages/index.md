@@ -97,7 +97,7 @@ Throughout this specification, formatting patterns for Date, Time, and DateTime 
 * `fff`{:.formatted} - A fractional millisecond value (0..999)
 
 and formatting patterns for numeric types are described using an informal description with these markers:
-* `0`{:.formatted} - Any digit MUST appear at this location in the format string
+* `0`{:.formatted} - Any digit shall appear at this location in the format string
 * `#`{:.formatted} - Any digits may appear at this location in the format string
 * `?`{:.formatted} - The immediately preceding pattern is optional
 * `( )`{:.formatted} - Used to group patterns
@@ -110,12 +110,14 @@ These formatting patterns are set in `bold`{:.formatted} to distinguish them typ
 
 #### Conformance Language
 
-This specification uses the conformance verbs SHALL, MUST, SHOULD, and MAY as defined in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt). Unlike RFC 2119, however, this specification allows that different applications might not be able to interoperate because of how they use optional features. In particular:
+<div data-fhir="generated" markdown="1">
+This specification uses the conformance verbs SHALL, SHOULD, and MAY as defined in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt). Unlike RFC 2119, however, this specification allows that different applications might not be able to interoperate because of how they use optional features. In particular:
 
-* SHALL/MUST: An absolute requirement for all implementations
-* SHALL/MUST NOT: An absolute prohibition against inclusion for all implementations
-* SHOULD/SHOULD NOT: A best practice or recommendation to be considered by implementers within the context of their particular implementation; there may be valid reasons to ignore an item, but the full implications must be understood and carefully weighed before choosing a different course
-* MAY: This is truly optional language for an implementation; can be included or omitted as the implementer decides with no implications.
+* **SHALL**: An absolute requirement for all implementations
+* **SHALL NOT**: An absolute prohibition against inclusion for all implementations
+* **SHOULD/SHOULD NOT**: A best practice or recommendation to be considered by implementers within the context of their particular implementation; there may be valid reasons to ignore an item, but the full implications must be understood and carefully weighed before choosing a different course
+* **MAY**: This is truly optional language for an implementation; can be included or omitted as the implementer decides with no implications.
+</div>
 
 ### Credits
 This implementation guide represents significant person-hours of discussion, development work, and testing. The following are some of the key participants in the work, but many more have assisted through connectathons testing, asking questions and participating in conference calls.
@@ -330,7 +332,7 @@ The `Long` type represents whole numbers in the range -2<sup>63</sup> to 2<sup>6
 
 #### Decimal
 
-The `Decimal` type represents real values in the range (-10<sup>28</sup>+1)/10<sup>8</sup> to (10<sup>28</sup>-1)/10<sup>8</sup> with a step size of 10<sup>-8</sup>. This range is defined based on a survey of decimal-value implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger decimals and higher precision, but must provide at least the range and precision defined here. In addition, implementations should use [fixed-precision decimal](https://en.wikipedia.org/wiki/Fixed-point_arithmetic) formats to ensure that decimal values are accurately represented.
+The `Decimal` type represents real values in the range (-10<sup>28</sup>+1)/10<sup>8</sup> to (10<sup>28</sup>-1)/10<sup>8</sup> with a step size of 10<sup>-8</sup>. This range is defined based on a survey of decimal-value implementations and is based on the most useful lowest common denominator. §dec1:Implementations can provide support for larger decimals and higher precision, but SHALL provide at least the range and precision defined here.§ §dec2:In addition, implementations SHOULD use [fixed-precision decimal](https://en.wikipedia.org/wiki/Fixed-point_arithmetic) formats to ensure that decimal values are accurately represented.§
 
 ``` fhirpath
 0.0
@@ -364,7 +366,7 @@ Consult the [formal grammar](grammar.html) for more details.
 
 #### Time
 
-The `Time` type represents time-of-day and partial time-of-day values in the range @T00:00:00.000 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. Implementations can provide support for higher precision, but must provide at least the range and precision defined here. Time values in FHIRPath do not have a timezone or timezone offset.
+The `Time` type represents time-of-day and partial time-of-day values in the range @T00:00:00.000 to @T23:59:59.999 with a step size of 1 millisecond. This range is defined based on a survey of time implementations and is based on the most useful lowest common denominator. §tm1:Implementations can provide support for higher precision, but SHALL provide at least the range and precision defined here.§ Time values in FHIRPath do not have a timezone or timezone offset.
 
 The `Time` literal uses a subset of [\[ISO8601\]](#ISO8601):
 
@@ -382,7 +384,7 @@ Consult the [formal grammar](grammar.html) for more details.
 
 #### DateTime
 
-The `DateTime` type represents date/time and partial date/time values in the range `@0001-01-01T00:00:00.000 to @9999-12-31T23:59:59.999` with a 1 millisecond step size. This range is defined based on a survey of datetime implementations and is based on the most useful lowest common denominator. Implementations can provide support for larger ranges and higher precision, but must provide at least the range and precision defined here.
+The `DateTime` type represents date/time and partial date/time values in the range `@0001-01-01T00:00:00.000 to @9999-12-31T23:59:59.999` with a 1 millisecond step size. This range is defined based on a survey of datetime implementations and is based on the most useful lowest common denominator. §dt1:Implementations can provide support for larger ranges and higher precision, but SHALL provide at least the range and precision defined here.§
 
 The `DateTime` literal combines the `Date` and `Time` literals and is a subset of [\[ISO8601\]](#ISO8601):
 
@@ -421,13 +423,13 @@ If the value literal is an Integer, it will be implicitly converted to a Decimal
 2 years       // Calendar units
 ```
 
-Implementations shall support [equality](#quantity-equality), [equivalence](#quantity-equivalence), [comparison](#comparison) and [arithmetic](#math-1) operations on quantities with units where the units are the same value, case-sensitively.
+§q1:Implementations SHALL support [equality](#quantity-equality), [equivalence](#quantity-equivalence), [comparison](#comparison) and [arithmetic](#math-1) operations on quantities with units where the units are the same value, case-sensitively.§
 
-Implementations that do NOT support UCUM unit conversion may return empty (`{ }`) for calculations involving quantities with different units.
+§q2:Implementations that do NOT support UCUM unit conversion MAY return empty (`{ }`) for calculations involving quantities with different units, except for [equivalence](#quantity-equivalence), which returns `false` when a required conversion is not supported.§
 
-Implementations that DO support UCUM conversions SHALL support implicit conversions where operations between quantities with different units are performed, and also explicitly through [toQuantity(unit)](#fn-toquantity).
+§q3:Implementations that DO support UCUM conversions SHALL support implicit conversions where operations between quantities with different units are performed, and also explicitly through [toQuantity(unit)](#fn-toquantity).§
 
-For Implementations that DO support UCUM conversion, if an operation is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
+For Implementations that DO support UCUM conversion, if an operation other than [equivalence](#quantity-equivalence) is performed with conflicting units (for example, adding meters and grams), the evaluation will end and signal an error to the calling environment.
 
 > **Note:** The UCUM specification defines what unit codes are valid, how units are composed/decomposed when performing multiplication and division, 
 > and, where applicable, scalar conversion factors between commensurable units (e.g. between a single dimension such as length).
@@ -653,7 +655,7 @@ Observation.value.where($this < 90 or $this > 110)
 | `%rootResource` | (Defined in FHIR) The top level fhir resource. Usually a Bundle, or resource that has contained resources (or Parameters resource).<br/> Though processing on regular fhir resources this is also the same as %resource.<br/> *(Does not change during execution)* |
 {:.list}
 
-> **Note:** Other specifications MAY introduce their own variables
+> **Note:** §v1:Other specifications MAY introduce their own variables§
 
 ### Existence
 
@@ -874,14 +876,15 @@ used to convert the input collection into a different output collection. Its sub
 {:.stu}
 
 > ```
-> «typename» { element : value, element : value, ...  } : «typename»
+> [«typename»] { element : value, element : value, ...  } : «typename»
 > ```
-> `«typename»` is the name of the type to create (optionally prefixed with a namespace)<br/>
+> `«typename»` is the optional name of the type to create (optionally prefixed with a namespace)<br/>
 > `element` is the name *(identifier)* of an element of the type being created<br/>
-> `value` is any fhirpath expression (including literals) to set to the associated `element`
+> `value` is any fhirpath expression (including literals) to set to the associated `element`<br/>
 {:.stu}
 
-Creates a new object of type `«typename»` and returns that to the output collection. 
+Creates a new object of type `«typename»` and returns that to the output collection.
+§ic1:If the `«typename»` is omitted, an implementation MAY use a type appropriate to the context, or an anonymous type.§<br/> 
 Any elements listed within the parentheses are set as children on the newly created object.
 {:.stu}
 
@@ -891,9 +894,9 @@ If any of child element's `value` is evaluated to an empty collection, then that
 To create an empty object requires the use of `{ : }` to differentiate it from the empty set.
 {:.stu}
 
-If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
+§ic2:If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 However element selectors can return multiples where the object's structure supports it for that element. 
-If not the engine MAY throw an error.
+If not the engine MAY throw an error.§
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -909,11 +912,12 @@ Coding { system : 'http://example.org/demo', code : 'c1' }
 FHIR.Identifier { system : 'http://example.org/demo', value : 'N0001231' }
 
 // create an MRN identifier similar to the one in the patient example at https://hl7.org/fhir/patient-example.json.html
+// (no explicit types on the child properties in the creation, there's only 1 valid type for each context here - so can be derived)
 Identifier { 
-  type : CodeableConcept { coding: Coding { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' } },
+  type : { coding: { system: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' } },
   system : 'urn:oid:1.2.36.146.595.217.0.1',
   value : '12345',
-  period : Period { start: @2001-05-06 }
+  period : { start: @2001-05-06 }
 }
 
 // create an empty Period
@@ -932,6 +936,9 @@ Patient.select(
 
 // Convert a set of concepts from a code system into Codings
 CodeSystem.concept.select(Coding { system: %resource.url, code: code, display: display })
+
+// Create an anonymous type with 2 properties
+{ foo: 'bar', mol: 42 }
 ```
 {:.stu}
 
@@ -1041,8 +1048,8 @@ which would find *any* descendants called `item`, not just the ones nested insid
 
 The order of items returned by the `repeat()` function is undefined.
 
-> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it navigates to child elements within the hierarchical structure.
-> If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.
+> §r1:Implementations SHOULD include safety mechanisms to prevent infinite loops.§ §r2:An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it navigates to child elements within the hierarchical structure.§
+> §r3:If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.§
 {:.dragon}
 
 
@@ -1067,8 +1074,8 @@ This function provides better performance than `repeat` by eliminating the equal
 The order of items returned by the `repeatAll()` function is undefined.
 {:.stu}
 
-> Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it navigates to child elements within the hierarchical structure.
-> If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.
+> §r4:Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it navigates to child elements within the hierarchical structure.§
+> §r5:If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.§
 {:.stu .dragon}
 
 Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference children of the input collection's items will naturally terminate when no more child elements are found.
@@ -1329,14 +1336,14 @@ Unlike most other functions it can be called with no context (using the expressi
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-The `criterion` expression SHALL evaluate to a Boolean, consistent with [singleton evaluation of collections](#singleton-evaluation-of-collections).
+§if1:The `criterion` expression SHALL evaluate to a Boolean, consistent with [singleton evaluation of collections](#singleton-evaluation-of-collections).§
 
 If `criterion` evaluates to `true`, the function returns the value of the `true-result` argument, even if the input collection is empty.
 
 If `criterion` evaluates to either `false` or an empty collection, the function returns `otherwise-result`, unless the optional `otherwise-result` is not given, in which case the function returns an empty collection.
 
 Note that short-circuit behavior is expected in this function. 
-In other words, `true-result` should only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` should only be evaluated otherwise.
+§if2:In other words, `true-result` SHOULD only be evaluated if the `criterion` evaluates to `true`, and `otherwise-result` SHOULD only be evaluated otherwise.§
 The `criterion` is always evaluated, even when the input collection is empty.
 For implementations, this means delaying evaluation of the output arguments (specifically true-result and otherwise-result) to remove the chance that their evaluation throws an error and terminates the expression early.
 
@@ -1572,7 +1579,7 @@ Note that:
 | mm   | required	| 2-digit minute of hour (00 through 59)
 | s    | optional	| 1- or 2-digit second of minute (0 through 59)
 | ss   | required	| 2-digit second of minute (00 through 59)
-| S[+] | required	| 1-digit fraction of second (0 through 9)<br/>Note that consecutive fractional seconds are grouped together, e.g. SSS for milliseconds.<br/>Implementations MUST support at least 3 digits (milliseconds); support for additional digits is optional.
+| S[+] | required	| 1-digit fraction of second (0 through 9)<br/>Note that consecutive fractional seconds are grouped together, e.g. SSS for milliseconds.<br/>§fmt1:Implementations SHALL support at least 3 digits (milliseconds); support for additional digits is optional.§
 | a    | required	| 1- or 2-letter localized AM/PM specifier.<br/>e.g., en-US: A, AM, P, etc.<br/>e.g., ja-JP: 午, 午前, etc.
 | z    | optional	| Time zone literal (name or id). E.g., America/Los_Angeles, Pacific Standard Time, or PST.
 | Z    | required	| Time zone offset from UTC (e.g., +0200, -0500) or Z literal for UTC
@@ -1765,7 +1772,7 @@ For example, the following are valid quantity strings used with toQuantity:
 '10 \'mm[Hg]\''.toQuantity()
 ```
 
-If the `unit` argument is provided, it must be the string representation of a UCUM code (or a FHIRPath calendar duration keyword).
+§q4:If the `unit` argument is provided, it SHALL be the string representation of a UCUM code (or a FHIRPath calendar duration keyword).§
 
 If the `unit` argument is provided and the input can be [**converted**](#unit-conversions), the result is the converted quantity, otherwise the result is empty.
 
@@ -1789,7 +1796,7 @@ This is often a simple fixed conversion factor applied to convert between specif
 If units are not commensurable, the result of conversion is empty (`{ }`).
 
 > ***Most/Least Granular Unit:***<br/>
-> When an operation requires one of its arguments to be converted to the "most granular" unit, implementations SHALL select the smaller unit of measurement.
+> §uc1:When an operation requires one of its arguments to be converted to the "most granular" unit, implementations SHALL select the smaller unit of measurement.§
 > For example if selecting between `mm` and `cm`, then `mm` is the most granular unit.<br/>
 > This can be generically evaluated by selecting the conversion factor that is less than 1 when converting from one unit to the other.
 > If the conversion factor is greater than 1, then the other unit is more granular.<br/>
@@ -1807,7 +1814,7 @@ There is no expectation to perform rounding on the result of applying the UCUM c
 Applying rounding too early can result in un-intended inaccuracies and should be explicitly applied when desired.
 {:.stu}
 
-> **Note:** Implementations are not required to support a UCUM implementation, and may return empty (`{ }`) when the units are different, or not handled.
+> **Note:** Implementations are not required to support a UCUM implementation, and may return empty (`{ }`) when the units are different, or not handled. For [equivalence](#quantity-equivalence), an empty conversion result instead produces `false`.
 {:.stu}
 
 ###### Time-valued unit conversions
@@ -1840,8 +1847,8 @@ then change the unit to the corresponding target unit:
 182.5 'd'.toQuantity('a') // 0.4996577686516085 'a' ; UCUM conversion result
 ```
 {:.stu}
-If converting to/from years or months you shall use the shortest conversion chain possible (i.e. don't convert from days to months to years when you can go from direct days to years).
-Implementers SHOULD produce a warning if this type of conversion is performed. 
+§uc2:If converting to/from years or months you SHALL use the shortest conversion chain possible (i.e. don't convert from days to months to years when you can go from direct days to years).§
+§uc3:Implementers SHOULD produce a warning if this type of conversion is performed.§ 
 {:.stu}
 
 When implicitly converting quantities across UCUM definite duration and calendar units, convert the UCUM value to the UCUM unit that matches the calendar unit.
@@ -1869,7 +1876,7 @@ If the item is not one of the above, the result is `false`.
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
-If the `unit` argument is provided, it should be handled in the same way it is in the [toQuantity()](#fn-toquantity) function above, except that where an empty result would result, false is returned.
+§q5:If the `unit` argument is provided, it SHOULD be handled in the same way it is in the [toQuantity()](#fn-toquantity) function above, except that where an empty result would result, false is returned.§
 
 For example:
 ``` fhirpath
@@ -2171,7 +2178,7 @@ For example:
 <a name="fn-matches"></a>
 #### matches(regex : String, [flags : String]) : Boolean
 
-Returns `true` when the value matches the given regular expression. Regular expressions should function consistently, regardless of any culture- and locale-specific settings in the environment, should be case-sensitive, use 'single line' mode and allow Unicode characters.
+Returns `true` when the value matches the given regular expression. §mch1:Regular expressions SHOULD function consistently, regardless of any culture- and locale-specific settings in the environment, SHOULD be case-sensitive, use 'single line' mode and allow Unicode characters.§
 The start/end of line markers `^`, `$` can be used to match the entire string.
 
 If the input collection or `regex` are empty, the result is empty (`{ }`).
@@ -2203,7 +2210,7 @@ For example:
 
 Returns `true` when the value completely matches the given regular expression (implying that the start/end of line markers `^`, `$` are always surrounding the regex expression provided).
 {:.stu}
-Regular expressions should function consistently, regardless of any culture- and locale-specific settings in the environment, should be case-sensitive, use 'single line' mode and allow Unicode characters.
+§mch2:Regular expressions SHOULD function consistently, regardless of any culture- and locale-specific settings in the environment, SHOULD be case-sensitive, use 'single line' mode and allow Unicode characters.§
 {:.stu}
 
 If the input collection or `regex` are empty, the result is empty (`{ }`).
@@ -2333,7 +2340,7 @@ If no format is specified, the result is empty.
 {:.stu}
 
 If the content being decoded is not a valid UTF-8 value, the result will be empty.
-*It should not replace with the unicode replacement character or allow ill formed UTF-8 content.*
+*§dcd1:It SHOULD NOT replace with the unicode replacement character or allow ill formed UTF-8 content.§*
 {:.stu}
 
 For example:
@@ -2796,7 +2803,7 @@ QuestionnaireResponse.descendants().answer.value.ofType(Coding)
 > This is a [scoped function](#scoped-functions): If no `projection` argument is provided, the input collection is logged without the need for scoping. If the `projection` argument is provided, it is evaluated for each item (setting `$this` and `$index` before each iteration) and the result logged. The input collection is returned as the result of the function.<br/>
 > The `name` parameter is evaluated before the function is executed and is not re-evaluated for each iteration of the projection.
 
-Adds a String representation of the input collection to the diagnostic log, using the `name` argument as the name in the log. This log should be made available to the user in some appropriate fashion. Does not change the input, so returns the input collection as output.
+Adds a String representation of the input collection to the diagnostic log, using the `name` argument as the name in the log. §trc1:This log SHOULD be made available to the user in some appropriate fashion.§ Does not change the input, so returns the input collection as output.
 
 If the `projection` argument is used, the trace would log the result of evaluating the project expression on the input, but still return the input to the trace function unchanged.
 
@@ -2864,9 +2871,9 @@ would return the following strings: (simplifying finding the specific component(
 
 #### Current date and time functions
 
-The following functions return the current date and time. The timestamp that these functions use is an implementation decision, and implementations should consider providing options appropriate for their environment. In the simplest case, the local server time is used as the timestamp for these function.
+The following functions return the current date and time. The timestamp that these functions use is an implementation decision, and §n1:implementations SHOULD consider providing options appropriate for their environment.§ In the simplest case, the local server time is used as the timestamp for these function.
 
-To ensure deterministic evaluation, these operators should return the same value regardless of how many times they are evaluated within any given expression (i.e. now() should always return the same DateTime in a given expression, timeOfDay() should always return the same Time in a given expression, and today() should always return the same Date in a given expression.)
+§n2:To ensure deterministic evaluation, these operators SHOULD return the same value regardless of how many times they are evaluated within any given expression (i.e. now() SHOULD always return the same DateTime in a given expression, timeOfDay() SHOULD always return the same Time in a given expression, and today() SHOULD always return the same Date in a given expression.)§
 
 ##### now() : DateTime
 
@@ -2936,13 +2943,16 @@ group.select(
 > **Note:** this could be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
 {:.stu}
 
-#### lowBoundary([precision: Integer]): Decimal | Date | DateTime | Time
+#### lowBoundary([precision: Integer]): Decimal | Quantity | Date | DateTime | Time
 {:.stu}
 
 The least possible value of the input to the specified precision.
 {:.stu}
 
-The function can only be used with Decimal, Date, DateTime, and Time values, and returns the same type as the value in the input collection.
+The function can be used with Decimal, Quantity, Date, DateTime, and Time values, and returns the same type as the value in the input collection. For a Quantity, the function applies the Decimal boundary operation to the numeric value and returns a Quantity with the resulting value and the original unit.
+{:.stu}
+
+Integer or Long inputs are implicitly converted to Decimal with zero fractional digits of input precision, and the result is Decimal.
 {:.stu}
 
 If no precision is specified, the greatest precision of the type of the input value is used (i.e. at least 8 for Decimal, 4 for Date, at least 17 for DateTime, and at least 9 for Time).
@@ -2964,6 +2974,8 @@ For example:
 1.587.lowBoundary(6) // 1.586500
 1.587.lowBoundary(2) // 1.58
 1.587.lowBoundary(0) // 1
+1.lowBoundary(2) // 0.50
+2.1 'cm'.lowBoundary(2) // 2.05 'cm'
 (-1.587).lowBoundary() // -1.58750000
 (-1.587).lowBoundary(6) // -1.587500
 (-1.587).lowBoundary(2) // -1.59
@@ -2974,13 +2986,16 @@ For example:
 ```
 {:.stu}
 
-#### highBoundary([precision: Integer]): Decimal | Date | DateTime | Time
+#### highBoundary([precision: Integer]): Decimal | Quantity | Date | DateTime | Time
 {:.stu}
 
 The greatest possible value of the input to the specified precision.
 {:.stu}
 
-The function can only be used with Decimal, Date, DateTime, and Time values, and returns the same type as the value in the input collection.
+The function can be used with Decimal, Quantity, Date, DateTime, and Time values, and returns the same type as the value in the input collection. For a Quantity, the function applies the Decimal boundary operation to the numeric value and returns a Quantity with the resulting value and the original unit.
+{:.stu}
+
+Integer or Long inputs are implicitly converted to Decimal with zero fractional digits of input precision, and the result is Decimal.
 {:.stu}
 
 If no precision is specified, the greatest precision of the type of the input value is used (i.e. at least 8 for Decimal, 4 for Date, at least 17 for DateTime, and at least 9 for Time).
@@ -3002,6 +3017,8 @@ For example:
 1.587.highBoundary(6) // 1.587500
 1.587.highBoundary(2) // 1.59
 1.587.highBoundary(0) // 2
+1.highBoundary(2) // 1.50
+2.1 'cm'.highBoundary(2) // 2.15 'cm'
 (-1.587).highBoundary() // -1.58650000
 (-1.587).highBoundary(6) // -1.586500
 (-1.587).highBoundary(2) // -1.58
@@ -3018,7 +3035,7 @@ For example:
 If the input collection contains a single item, this function will return the number of digits of precision.
 {:.stu}
 
-The function can only be used with Decimal, Date, DateTime, and Time values.
+The function can be used with Decimal, Quantity, Date, DateTime, and Time values. For a Quantity, it returns the number of digits of precision in the numeric value, including trailing fractional zeroes.
 {:.stu}
 
 If the input collection is empty, the result is empty.
@@ -3035,6 +3052,7 @@ For example with decimal values:
 ``` fhirpath
 1.58700.precision() // 5
 100.precision() // 0 ; no digits after the decimal place (integer implicitly converted to a decimal for processing)
+(1.00 'mg').precision() // 2
 ```
 {:.stu}
 
@@ -3277,7 +3295,7 @@ For input and value types of `time` values, the `precision` argument must be one
 If the input value or `value` argument are of less precision than the specified `precision`, the result is empty.
 {:.stu}
 
-When computing the duration between DateTime values with different timezone offsets, implementations should normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.
+§dur1:When computing the duration between DateTime values with different timezone offsets, implementations SHOULD normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.§
 {:.stu}
 
 If either the input or `value` argument is empty, the result is empty.
@@ -3314,7 +3332,7 @@ If the input value or `value` argument are of less precision than the specified 
 For calculations involving weeks, Sunday is considered to be the first day of the week for the purposes of determining the number of boundaries crossed.
 {:.stu}
 
-When computing the difference between `datetime` values with different timezone offsets, implementations should normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.
+§df1:When computing the difference between `datetime` values with different timezone offsets, implementations SHOULD normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.§
 {:.stu}
 
 If either the input or `value` argument is empty, the result is empty.
@@ -3402,7 +3420,7 @@ When the units are different the quantity values must be [**converted**](#unit-c
 Any commensurable target unit may be chosen, since trailing zeroes after the decimal point are ignored when comparing the resulting decimal values *(see [Quantity Equivalence](#quantity-equivalence) for the contrasting rule, where the choice of unit affects the rounded comparison)*.
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equality comparison is empty (`{ }`).
 
-Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+§q6:Implementations are not required to fully support operations on units, but they SHALL at least respect units, recognizing when units differ.§
 
 Attempting to operate on quantities with invalid units will result in empty (`{ }`).
 
@@ -3484,6 +3502,8 @@ Additional functions to support more sophisticated timezone offset comparison (s
 
 Returns `true` if the collections are the same. In particular, comparing empty collections for equivalence `{ } ~ { }`{:.fhirpath} will result in `true`.
 
+The equivalence operator returns either `true` or `false`, never an empty collection.
+
 If both operands are collections with a single item, they must be of the same type (or [implicitly convertible](#conversion) to the same type), and:
 
 * For primitives
@@ -3525,12 +3545,12 @@ For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and
 
 When the units are different the quantity values must be [**converted**](#unit-conversions) to the least granular unit before comparison.<br/>
 *(using the least granular unit ensures that the precision of the converted value is not artificially increased by the conversion, and thus doesn't impact the rounded decimal comparison)*<br/>
-If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the equivalence comparison is empty (`{ }`).
+If this process returns empty (e.g. because the units are not valid, not commensurable, or conversion is not supported), then the result of the equivalence comparison is `false`.
 {:.stu}
 
-Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+§q7:Implementations are not required to fully support operations on units, but they SHALL at least respect units, recognizing when units differ.§
 
-Attempting to operate on quantities with invalid units will result in empty (`{ }`).
+Attempting to operate on quantities with invalid units will result in `false`.
 
 Once the units are the same, the values can be compared using decimal equivalence: values must be equal, comparison is done on values rounded to the precision of the least precise operand. Trailing zeroes after the decimal are ignored in determining precision (as described above).
 
@@ -3542,6 +3562,8 @@ For example:
 4 'g' ~ 4040 'mg'   // true ; convert to least granular 'g' (4 ~ 4.040), round to least precise and compare (4 = 4)
 1 '[in_i]' ~ 2.5 'cm' // true ; convert to least granular '[in_i]' (1 ~ 0.98..), round to least precise and compare (1 = 1)
 23 'Cel' ~ 73.4 '[degF]' // true ; comparison of UCUM "special" units on non-ratio scales (23 'Cel' = 73.4 '[degF]' exactly)
+1 'cm' ~ 1 's' // false ; incompatible dimensions (length vs time), so quantities are not equivalent
+(1 'cm' | 2 'g') ~ (1 's' | 2 'g') // false ; collections require equivalent items regardless of order; 2 'g' matches, but 1 'cm' and 1 's' are not equivalent
 ```
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, all units are considered either equal or equivalent across UCUM definite durations and calendar units.
@@ -3620,7 +3642,7 @@ When quantity units are different the quantities must be [**converted**](#unit-c
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the comparison is empty (`{ }`).
 {:.stu}
 
-Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+§cmp1:Implementations are not required to fully support operations on units, but they SHALL at least respect units, recognizing when units differ.§
 
 Attempting to compare quantities with invalid units will result in empty (`{ }`).
 
@@ -3857,7 +3879,7 @@ Patient.name.given contains 'Joe'
 ### Boolean logic
 For all boolean operators, the collections passed as operands are first evaluated as Booleans (as described in [Singleton Evaluation of Collections](#singleton-evaluation-of-collections)). The operators then use three-valued logic to propagate empty operands.
 
-> **Note:** To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, implementations may use short-circuit evaluation to reduce computation, but authors should not rely on such behavior, and implementations must not change semantics with short-circuit evaluation. If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the [`iif()`](#iif) function.
+> **Note:** To ensure that FHIRPath expressions can be freely rewritten by underlying implementations, there is no expectation that an implementation respect short-circuit evaluation. With regard to performance, §b1:implementations MAY use short-circuit evaluation to reduce computation§, but authors should not rely on such behavior, and §b2:implementations SHALL NOT change semantics with short-circuit evaluation.§ If short-circuit evaluation is needed to avoid effects (e.g. runtime exceptions), use the [`iif()`](#iif) function.
 
 #### and
 
@@ -3937,7 +3959,7 @@ Medication.status = 'active' implies form.exists() // bad constraint expression
 wasNotGiven ~ true implies reasonNotGiven.exists()
 ```
 
-Note that implies may use short-circuit evaluation in the case that the first operand evaluates to `false`.
+§imp1:Note that implies MAY use short-circuit evaluation in the case that the first operand evaluates to `false`.§
 
 ### Math
 
@@ -3949,15 +3971,15 @@ If there is more than one item, or incompatible items, the evaluation of the exp
 
 As with the other operators, the math operators will return an empty collection if one or both of the operands are empty.
 
-Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+§m1:Implementations are not required to fully support operations on units, but they SHALL at least respect units, recognizing when units differ.§
 
-Implementations that do support units shall do so as specified by the [\[UCUM\]](#UCUM) specification.
+§m2:Implementations that do support units SHALL do so as specified by the [\[UCUM\]](#UCUM) specification.§
 
 UCUM does not support math operations with ["special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
 Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
 {:.stu}
 
-Implementations that to not support processing UCUM units shall return empty when unable to correctly handle the units.
+§m3:Implementations that to not support processing UCUM units SHALL return empty when unable to correctly handle the units.§
 {:.stu}
 
 Operations that cause arithmetic overflow or underflow will result in empty (`{ }`).
@@ -4036,7 +4058,7 @@ If this process returns empty (e.g. because the units are not valid, or not comm
 > **Note:** Performing addition with mixed type parameters of either Integer, Long or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Numeric argument to a Quantity (with the UCUM default unit `'1'`).
 This means that unless the unit of the quantity was `'1'` too, the addition will return empty as the units are not commensurate.
 
-Implementations are not required to fully support operations on units, but they must at least respect units, recognizing when units differ.
+§ad1:Implementations are not required to fully support operations on units, but they SHALL at least respect units, recognizing when units differ.§
 
 Attempting to operate on quantities with invalid units will result in empty (`{ }`).
 
@@ -4138,7 +4160,7 @@ Date and time arithmetic operators are used to add time-valued quantities to dat
 
 The decimal portion of the time-valued quantity is only applied for second or millisecond precisions; for all other precisions, the decimal portion is ignored, since date/time arithmetic is performed with calendar duration semantics.
 
-Within FHIRPath, calculations involving date/times and calendar durations shall use calendar semantics as specified in [\[ISO8601\]](#ISO8601). Specifically:
+Within FHIRPath, §dta1:calculations involving date/times and calendar durations SHALL use calendar semantics as specified in [\[ISO8601\]](#ISO8601).§ Specifically:
 
 | Datatype(s) | Quantity Unit(s) | Description |
 | ----------- | ------- | ----- |
@@ -4165,8 +4187,8 @@ For all other partial precisions, convert as required chaining conversions where
 Examples of this are in the operations below.
 {:.stu}
 
-Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.<br/>
-Authors SHOULD consider applying appropriate rounding functions ([`round()`](#fn-round), [`floor()`](#fn-floor), [`truncate()`](#fn-truncate), or [`ceiling()`](#fn-ceiling)) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.
+§dta2:Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.§<br/>
+§dta3:Authors SHOULD consider applying appropriate rounding functions ([`round()`](#fn-round), [`floor()`](#fn-floor), [`truncate()`](#fn-truncate), or [`ceiling()`](#fn-ceiling)) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.§
 {:.stu}
 
 As `Time` is cyclic, using arithmetic operations `+` or `-` on `Time` types can result in overflowing the time value, which will wrap around the beginning of the day.
@@ -4354,7 +4376,7 @@ Returns the sum of all items in the input collection (in the same type).
 Accepts input collections with items of type: Integer, Long, Decimal or Quantity.
 {:.stu}
 
-All items in the input collection SHALL be the same type, otherwise an exception is thrown.
+§sum1:All items in the input collection SHALL be the same type, otherwise an exception is thrown.§
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -4376,7 +4398,7 @@ Returns the minimum item in the input collection. Comparison semantics are defin
 Accepts input collections with items of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
 {:.stu}
 
-All items in the input collection SHALL be the same type, otherwise an exception is thrown.
+§min1:All items in the input collection SHALL be the same type, otherwise an exception is thrown.§
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -4399,7 +4421,7 @@ Returns the maximum item in the input collection. Comparison semantics are defin
 Accepts input collections with items of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
 {:.stu}
 
-All items in the input collection SHALL be the same type, otherwise an exception is thrown.
+§max1:All items in the input collection SHALL be the same type, otherwise an exception is thrown.§
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -4425,7 +4447,7 @@ Accepts input collections with items of type: Decimal or Quantity.
 When used with Integer or Long, the arguments will be implicitly converted to Decimal before evaluation.
 {:.stu}
 
-All items in the input collection SHALL be the same type, otherwise an exception is thrown.
+§avg1:All items in the input collection SHALL be the same type, otherwise an exception is thrown.§
 {:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
@@ -4750,7 +4772,7 @@ In the absence of strongly-typed compile-time checks, the implementation may sti
 The difference between strongly typed compile-time checks and strongly-typed run-time checks is that the latter will only throw errors when the data does not conform to type requirements, where the former checks that any data is guaranteed to be conformant due to the construction of the expression.
 {:.stu}
 
-However, the default run-time behavior of a compliant FHIRPath implementation should be weakly typed. This means:
+However, §rt1:the default run-time behavior of a compliant FHIRPath implementation SHOULD be weakly typed.§ This means:
 {:.stu}
 
 return an empty collection ({ }) when a path references an element that does not exist on the context node
@@ -4774,7 +4796,7 @@ The model information returned by the reflection function `type()`  is specified
 
 > **Note:** The model information file included here is not a normative aspect of the FHIRPath specification. It is the same model information file used by the [Clinical Quality Framework Tooling](http://github.com/cqframework/clinical_quality_language) and is included for reference as a simple formalism that meets the requirements described in the [Reflection](#reflection) section above.
 
-As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and tooling should respect the case-sensitive settings for each model.
+As discussed in the section on case-sensitivity, each model used within FHIRPath determines whether or not identifiers in the model are case-sensitive. This information is provided as part of the model information and §mdl1:tooling SHOULD respect the case-sensitive settings for each model.§
 
 ### URI and Media Types
 To uniquely identify the FHIRPath language, the following URI is defined:

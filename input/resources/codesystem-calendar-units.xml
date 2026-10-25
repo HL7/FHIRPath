@@ -1,5 +1,8 @@
 <CodeSystem xmlns="http://hl7.org/fhir">
 	<id value="calendar-units"/>
+	<extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+		<valueCode value="normative"/>
+	</extension>
 	<url value="http://hl7.org/fhirpath/CodeSystem/calendar-units"/>
 	<version value="5.0.0"/>
 	<name value="CalendarUnits"/>
