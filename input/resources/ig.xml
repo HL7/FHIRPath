@@ -6,7 +6,7 @@
     <valueCode value="normative"/>
   </extension>
   <url value="http://hl7.org/fhirpath/ImplementationGuide/hl7.fhirpath"/>
-  <version value="3.1.0"/>
+  <version value="3.1.0-ballot"/>
   <name value="FHIRPath"/>
   <title value="FHIRPath Specification"/>
   <status value="active"/>
@@ -126,7 +126,7 @@
     </parameter>
     <parameter>
       <code value="releaselabel"/>
-      <value value="STU 3"/>
+      <value value="Normative 3 Ballot"/>
     </parameter>
     <parameter>
       <code value="copyrightyear"/>
