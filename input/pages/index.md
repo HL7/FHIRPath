@@ -602,7 +602,9 @@ The following sections describe the functions supported in FHIRPath, detailing t
 
 Note that although all functions return collections, if a given function is defined to return a single item, the return type is simplified to just the type of the single item, rather than the list type.
 
-#### Scoped Functions
+<a name="scoped-functions"></a>
+**Scoped Functions**
+
 Some functions are marked as **scoped** functions. This type of function creates special variables (such as `$this`) that are available when evaluating arguments to the function.
 Most of these functions iterate through the items in the input collection, allowing the current item to be accessed.
 
@@ -643,7 +645,8 @@ Observation.value.where($this < 90 or $this > 110)
 > **Note:** Scoped functions are similar to lambda functions, closures, or callbacks in other languages.
 > They allow passing expressions as parameters that are evaluated in a specific context with special variables like `$this` and `$index`.
 
-#### Special variables
+<a name="special-variables"></a>
+**Special variables**
 
 | Variable | Description |
 | - | - |
