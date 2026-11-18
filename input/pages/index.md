@@ -250,7 +250,6 @@ The `String` type represents string values up to 2<sup>31</sup>-1 characters in 
 When parsing string literals, `\uXXXX` escape sequences represent [UTF-16](https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G31699) code units; valid surrogate pairs are combined to form a single Unicode scalar value.
 After processing escapes, a FHIRPath string is defined as a sequence of Unicode scalar values, which are referred to elsewhere in this specification as `characters` (for example, in [toChars()](#tochars--collection)).<br/>
 This behaviour is consistent with the Unicode Standard and with the string literal processing rules used by most modern programming languages.
-{:.stu}
 
 String literals are surrounded by single-quotes and may use `\`-escapes to escape quotes and represent Unicode characters:
 
@@ -264,7 +263,7 @@ String literals are surrounded by single-quotes and may use `\`-escapes to escap
 | `\t` | Tab |
 | `\f` | Form Feed |
 | `\\` | Backslash |
-| `\uXXXX` | Unicode character escape, where XXXX is a four‑digit hexadecimal value representing a 16‑bit Unicode code unit.<br/><span class="stu">If the escape sequence represents a surrogate code unit, it must be paired with a corresponding high or low surrogate to form a valid Unicode scalar value.</span> |
+| `\uXXXX` | Unicode character escape, where XXXX is a four‑digit hexadecimal value representing a 16‑bit Unicode code unit.<br/>If the escape sequence represents a surrogate code unit, it must be paired with a corresponding high or low surrogate to form a valid Unicode scalar value. |
 {: .grid}
 
 No other escape sequences besides those listed above are recognized.
@@ -287,10 +286,8 @@ If a `\` is used at the beginning of a non-escape sequence, it will be ignored a
 ```
 
 ##### Unicode and String Operations
-{:.stu}
 
 String functions such as [`length()`](#length--integer), [`indexOf()`](#indexofsubstring--string--integer), [`substring()`](#substringstart--integer--length--integer--string), and [`toChars()`](#tochars--collection) operate on characters (Unicode scalar values), not on visual characters (grapheme clusters). This distinction matters when strings contain combining characters:
-{:.stu}
 
 | Visual Representation | Encoded String Literal | Unicode Scalar Value(s) | length() | Description |
 | - | - | - | - | - |
@@ -298,10 +295,8 @@ String functions such as [`length()`](#length--integer), [`indexOf()`](#indexofs
 | `é` (combining) | `'\u0065\u0301'` | U+0065 U+0301 | 2 | Two characters: 'e' + combining acute accent |
 | `🔥` (flame emoji) | `'\uD83D\uDD25'` | U+1F525 | 1 | Single character: A scalar value encoded using a UTF‑16 surrogate pair |
 {: .grid}
-{:.stu}
 
 Both precomposed and combining representations are valid and may appear in data. Authors should be aware that the same visual character may have different lengths depending on its Unicode representation. When consistent string length behavior is required, data should be normalized (e.g., to NFC or NFD form) before processing, though such normalization is outside the scope of FHIRPath.
-{:.stu}
 
 
 #### Integer
@@ -317,18 +312,13 @@ The `Integer` type represents whole numbers in the range -2<sup>31</sup> to 2<su
 > Note that the minus sign (`-`) in the representation of a negative integer is not part of the literal, it is the unary negation operator defined as part of FHIRPath syntax.
 
 ##### Long
-{:.stu}
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 The `Long` type represents whole numbers in the range -2<sup>63</sup> to 2<sup>63</sup>-1.
-{:.stu}
 ``` fhirpath
 0L
 45L
 -5L
 ```
-{:.stu}
 
 #### Decimal
 
@@ -481,7 +471,6 @@ Whereas the following quantities are _definite duration_ quantities:
 > **Note:** UCUM is represented with the system `http://unitsofmeasure.org` and Calendar Units with the system [http://hl7.org/fhirpath/CodeSystem/calendar-units](CodeSystem-calendar-units.html).
 > These systems may be used in contexts that interact with FHIRPath Quantities, such as the FHIR `Quantity` datatype. 
 > Note that the FHIR [`Duration`](http://hl7.org/fhir/datatypes.html#Duration) datatype is an exception; it only supports UCUM units.
-{:.stu}
 
 ### Operators
 
@@ -870,13 +859,9 @@ Patient.name.where(use = 'usual').select(given.first() & ' ' & family)
 
 <a name="instance-selector"></a>
 #### Instance Selector/Object Creation
-{:.stu}
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 *Although the instance selector is not a function, it is closely related to the `select` function in that this statement is
 used to convert the input collection into a different output collection. Its sub-expression format is:*
-{:.stu}
 
 > ```
 > [«typename»] { element : value, element : value, ...  } : «typename»
@@ -884,29 +869,22 @@ used to convert the input collection into a different output collection. Its sub
 > `«typename»` is the optional name of the type to create (optionally prefixed with a namespace)<br/>
 > `element` is the name *(identifier)* of an element of the type being created<br/>
 > `value` is any fhirpath expression (including literals) to set to the associated `element`<br/>
-{:.stu}
 
 Creates a new object of type `«typename»` and returns that to the output collection.
 §ic1:If the `«typename»` is omitted, an implementation MAY use a type appropriate to the context, or an anonymous type.§<br/> 
 Any elements listed within the parentheses are set as children on the newly created object.
-{:.stu}
 
 If any of child element's `value` is evaluated to an empty collection, then that element will not be added to the object.
-{:.stu}
 
 To create an empty object requires the use of `{ : }` to differentiate it from the empty set.
-{:.stu}
 
 §ic2:If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 However element selectors can return multiples where the object's structure supports it for that element. 
 If not the engine MAY throw an error.§
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 Some examples of creating data using static instance selectors:
-{:.stu}
 ``` fhirpath
 // create a static coding
 Coding { system : 'http://example.org/demo', code : 'c1' }
@@ -926,10 +904,8 @@ Identifier {
 // create an empty Period
 Period {:}
 ```
-{:.stu}
 
 Instance Selectors are usually used to manipulate existing elements into another datatype:
-{:.stu}
 
 ``` fhirpath
 // Convert the patient gender from a code into a coding
@@ -943,18 +919,14 @@ CodeSystem.concept.select(Coding { system: %resource.url, code: code, display: d
 // Create an anonymous type with 2 properties
 { foo: 'bar', mol: 42 }
 ```
-{:.stu}
 
 **Note:** Primitive types can be created and set using a special element name `value` if specifically required.
 The evaluating fhirpath engine is responsible for performing any type conversions from fhirpath primitives to the target object/type system as required.
-{:.stu}
 ``` fhirpath
 code { value: 'final' }
 ```
-{:.stu}
 
 Collection elements can be populated with multiple values using `|`, `combine` or an expression that results in multiple items:
-{:.stu}
 ```fhirpath
 // Set the codings via an expression that returns multiple codings (using |)
 CodeableConcept {
@@ -971,40 +943,27 @@ QuestionnaireResponse.item.where(linkId='coded-q')
 
 <a name="fn-sort"></a>
 #### sort([keySelector: ($this) => any [asc | desc] [, keySelector: ($this) => any [asc | desc], ...]]) : collection
-{:.stu}
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 > This is a [scoped function](#scoped-functions): Each `keySelector` argument is evaluated for each item being compared (setting `$this` to the item for each evaluation). The results are compared to determine sort order. If there are multiple `keySelector` arguments, subsequent selectors are only evaluated for items where the previous `keySelector` comparison resulted in equality (i.e., the sort order hasn't been determined yet). This allows for multi-level sorting with minimal evaluations. <br/>As this function is used to modify the order of the collection the `$index` variable is undefined in this context, it could be anywhere during any evaluation depending on algorithms selected.
-{:.stu}
 
 Returns a collection containing the items in the input collection, sorted according to the specified key selector expressions. The function takes a variable number of key selector parameters, each of which can be optionally qualified with `asc` (ascending) or `desc` (descending). If no qualifier is provided, `asc` is the default.
-{:.stu}
 
 If no key selector parameters are provided, the sort uses the default ordering for the type of data in the input collection, using the same comparison semantics as defined for the equals (`=`) and comparison operators (`>`, `>=`, `<`, `<=`).
-{:.stu}
 
 Each key selector expression is evaluated for each item in the input collection using singleton evaluation semantics. If the key selector expression evaluates to a collection with more than one item, the evaluation will end and signal an error to the calling environment.
-{:.stu}
 
 comparing values returned by the no key selector using the same comparison semantics as defined for the equals (`=`) and comparison operators (`>`, `>=`, `<`, `<=`).
-{:.stu}
 
 An empty value is considered lower than all other values, meaning they will appear before others when sorted ascending.
-{:.stu}
 
 When comparing two items, if the values for the first key selector are equal, the comparison proceeds to the next key selector, and so on until all key selectors have been evaluated or a difference is found.
 Items are considered equal if and only if the [equals](#equals) (`=`) operator returns `true`. *(i.e. `false` and empty both indicate that the items are not equal).*
-{:.stu}
 
 Attempting to sort items with incompatible types will result in an error. Values that would result in comparison errors must be filtered from the collection prior to sorting.
-{:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
-{:.stu}
 
 The following examples illustrate the use of the `sort()` function:
-{:.stu}
 
 ``` fhirpath
 (3 | 1 | 2).sort() // 1, 2, 3 ; natural numeric ordering
@@ -1016,7 +975,6 @@ The following examples illustrate the use of the `sort()` function:
 Patient.name.sort(family desc, given.first()) // sort by family name descending, then by first given name ascending
 Patient.telecom.sort(system, use desc) // sort by system ascending, then by use descending
 ```
-{:.stu}
 
 <a name="fn-repeat"></a>
 #### repeat(projection: ($this) => collection) : collection
@@ -1058,47 +1016,34 @@ The order of items returned by the `repeat()` function is undefined.
 
 <a name="fn-repeatall"></a>
 #### repeatAll(projection: ($this) => collection) : collection
-{:.stu}
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 > This is a [scoped function](#scoped-functions): The `projection` argument is evaluated for each item (setting `$this` before each iteration); and the results are included in the output collection. The function is then evaluated on the new items from the previous iteration, repeating until no new items are added.<br/>Note: As the function iterates on itself, the meaning of `$index` is undefined and not set here.
-{:.stu}
 
 A version of `repeat` that allows duplicate items in the output collection. Unlike `repeat`, this function does not check whether items are already present in the output collection before adding them.
-{:.stu}
 
 This can be evaluated by adding all items in the input collection to an input queue, then for each item in the input queue evaluate the expression. The results are added to the output collection and also to a new iteration queue, regardless of whether they already exist in either collection. The input queue is then replaced by the new iteration queue and processing continues until there are no more items in the input queue to process.
-{:.stu}
 
 This function provides better performance than `repeat` by eliminating the equality comparisons required to check for duplicates, while still providing more targeted traversal than `descendants()`.
-{:.stu}
 
 The order of items returned by the `repeatAll()` function is undefined.
-{:.stu}
 
 > §r4:Implementations SHOULD include safety mechanisms to prevent infinite loops. An implementation MAY impose a limit on the number of iterations, or MAY statically analyze the expression to ensure it navigates to child elements within the hierarchical structure.§
 > §r5:If an infinite loop is detected, or considered likely, the evaluation MAY end and signal an error to the calling environment.§
-{:.stu .dragon}
+{:.dragon}
 
 Safe usage typically relies on the hierarchical structure of the input data. Expressions that reference children of the input collection's items will naturally terminate when no more child elements are found.
-{:.stu}
 
 Some safe expressions:
-{:.stu}
 ``` fhirpath
 ValueSet.expansion.repeatAll(contains)
 Questionnaire.repeatAll(item)
 ```
-{:.stu}
 
 Some unsafe expressions:
-{:.stu}
 ``` fhirpath
 Questionnaire.repeatAll('item') // this is a common mistake where the element name is accidentally provided as a string, not an identifier, so each iteration re-evaluates the same string constant and the function never terminates.
 'abc'.repeatAll(replace('a', 'A')) // the projection always returns a value (after the first iteration it produces 'Abc'), and since repeatAll does not remove duplicates, the same item keeps being re-added and the function never terminates.
 ```
-{:.stu}
 
 <a name="fn-oftype"></a>
 #### ofType(type : _type specifier_) : collection
@@ -1114,27 +1059,19 @@ Bundle.entry.resource.ofType(Patient)
 
 <a name="coalesce"></a>
 #### coalesce(value : collection, [value : collection, ...]) : collection
-{:.stu}
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 The `coalesce` function takes a variable number of arguments, each of which is a collection. It returns the first non-empty collection from the arguments. If all arguments are empty collections, the result is an empty collection.
-{:.stu}
 
 Note that short-circuit behaviour is expected in this function. In other words, arguments after the first non-empty argument are not evaluated. For implementations, this means delaying evaluation of the arguments (as is done with `iif`).
-{:.stu}
 
 ```fhirpath
 Patient.coalesce(name.where(use='official'), name.where(use='usual'), name.first()).text // preferentially select name via use
 Patient.name.select(coalesce(family & ' ' & given.join(', '), text, 'unknown')) // select is required to process each name separately
 coalesce(Patient.identifier.where(system = 'http://example.org/identifier').value.first(), 'unknown')
 ```
-{:.stu}
 
 Note that this function is useful for providing fallback options, and is more concise than using `iif` to check each collection in turn.
-{:.stu}
 
 Such as selecting specific telecom elements based on their use, and falling back to the first available telecom element if none of the specific uses are present:
-{:.stu}
 ```fhirpath
 iif( telecom.where(use='mobile').exists(), telecom.where(use='mobile'),
     iif( telecom.where(use='home').exists(), telecom.where(use='home'),
@@ -1143,10 +1080,8 @@ iif( telecom.where(use='mobile').exists(), telecom.where(use='mobile'),
 // could equivalently be written as:
 coalesce(telecom.where(use='mobile'), telecom.where(use='home'), telecom.where(use='work'), telecom).first()
 ```
-{:.stu}
 
 Another common case is to select a specific coding in a CodeableConcept if it is available, otherwise whatever coding is available.
-{:.stu}
 ``` fhirpath
 iif( code.coding.where(system='http://snomed.info/sct').exists(),
         code.coding.where(system='http://snomed.info/sct'),
@@ -1155,7 +1090,6 @@ iif( code.coding.where(system='http://snomed.info/sct').exists(),
 // could equivalently be written as:
 coalesce(code.coding.where(system='http://snomed.info/sct'), code.coding).first().code
 ```
-{:.stu}
 
 
 ### Subsetting
@@ -1274,21 +1208,15 @@ e.g. `name.select(use.union(given))`{:.fhirpath} is the same as `name.select(use
 
 Merge the input and other collections into a single collection without eliminating duplicate values. Combining an empty collection with a non-empty collection will return the non-empty collection.
 
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 When `preserveOrder` is `false`, or not supplied, there is no expectation of order. When `preserveOrder` is `true`, the items of the other collection are appended to the items of the input collection, preserving the order of items in both collections.
-{: .stu}
 
 For example, considering the same two lists of integers used in the union example `A: 1, 1, 2, 3` and `B: 2, 3`:
-{: .stu}
 ```fhirpath
 A.combine(B)       // 1, 1, 2, 2, 3, 3 ; order is not guaranteed to be preserved (could be in any order)
 A.combine(B, true) // 1, 1, 2, 3, 2, 3 ; The order is preserved using the `preserveOrder` argument
 A.combine( {} )    // 1, 1, 2, 3       ; combining an empty collection with a non-empty collection returns the non-empty collection
 ```
-{: .stu}
 Note that the duplicate `1`s are not removed from the collection using combine, where using `union` or `|` they would have been.
-{: .stu}
 
 ### Conversion
 
@@ -1303,17 +1231,17 @@ In the above expression, the addition operator expects either two Integers, or t
 
 The following table lists the possible conversions supported, and whether the conversion is implicit or explicit:
 
-|From\To |Boolean |Integer |Long *(STU)*{:.stu-bg} |Decimal |Quantity |String |Date |DateTime |Time |
+|From\To |Boolean |Integer |Long |Decimal |Quantity |String |Date |DateTime |Time |
 |- |- |- |- |- |- |- |- |- | - |
-|**Boolean** |N/A |Explicit | *Explicit*{:.stu-bg} |Explicit |*Explicit*{:.stu-bg} |Explicit |- |- |- |
-|**Integer** |Explicit |N/A | *Implicit*{:.stu-bg} |Implicit |Implicit |Explicit |- |- |- |
-|**Long** *(STU)*{:.stu-bg} |*Explicit*{:.stu-bg} |*Explicit*{:.stu-bg} | *N/A*{:.stu-bg} |*Implicit*{:.stu-bg} |*Implicit*{:.stu-bg} |*Explicit*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |*-*{:.stu-bg} |
-|**Decimal** |Explicit |- | *-*{:.stu-bg} |N/A |Implicit |Explicit |- |- |- |
-|**Quantity** |- |- | *-*{:.stu-bg} |- |N/A |Explicit |- |- |- |
-|**String** |Explicit |Explicit | *Explicit*{:.stu-bg} |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
-|**Date** |- |- | *-*{:.stu-bg} |- |- |Explicit |N/A |Implicit |- |
-|**DateTime** |- |- | *-*{:.stu-bg} |- |- |Explicit |Explicit |N/A |- |
-|**Time** |- |- | *-*{:.stu-bg} |- |- |Explicit |- |- |N/A |
+|**Boolean** |N/A |Explicit | *Explicit* |Explicit |*Explicit* |Explicit |- |- |- |
+|**Integer** |Explicit |N/A | *Implicit* |Implicit |Implicit |Explicit |- |- |- |
+|**Long** |*Explicit* |*Explicit* | *N/A* |*Implicit* |*Implicit* |*Explicit* |*-* |*-* |*-* |
+|**Decimal** |Explicit |- | *-* |N/A |Implicit |Explicit |- |- |- |
+|**Quantity** |- |- | *-* |- |N/A |Explicit |- |- |- |
+|**String** |Explicit |Explicit | *Explicit* |Explicit |Explicit |N/A |Explicit |Explicit |Explicit |
+|**Date** |- |- | *-* |- |- |Explicit |N/A |Implicit |- |
+|**DateTime** |- |- | *-* |- |- |Explicit |Explicit |N/A |- |
+|**Time** |- |- | *-* |- |- |Explicit |- |- |N/A |
 {: .grid}
 
 * Implicit - Values of the type in the From column will be implicitly converted to values of the type in the To column when necessary
@@ -1491,78 +1419,55 @@ For example:
 ```
 
 ##### toLong() : Long
-{:.stu}
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 If the input collection contains a single item, this function will return a single integer if:
-{:.stu}
 * the item is an Integer or Long
 * the item is a String and is convertible to a 64 bit integer
 * the item is a Boolean, where `true` results in a 1 and `false` results in a 0.
-{:.stu}
 
 If the item is not one the above types, the result is empty.
-{:.stu}
 
 If the item is a String, but the string is not convertible to a 64 bit integer (using the regex format `(\+|-)?\d+`), the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 42.toLong()    // 42
 '123'.toLong() // 123
 'abc'.toLong() // empty ({ }) ; not convertible to a long
 ```
-{:.stu}
 
 ##### convertsToLong() : Boolean
-{:.stu}
 
 If the input collection contains a single item, this function will return `true` if:
-{:.stu}
 
 * the item is an Integer or Long
 * the item is a String and is convertible to a Long
 * the item is a Boolean
-{:.stu}
 
 If the item is not one of the above types, or the item is a String, but is not convertible to a 64 bit  integer (using the regex format `(\+|-)?\d+`), the result is `false`.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 '123'.convertsToLong() // true
 'abc'.convertsToLong() // false
 ```
-{:.stu}
 
 #### Date Conversion Functions
 <a name="format-codes"></a>
 ##### Date/DateTime String Format Codes
-{:.stu}
 Parsing textual content into date/time values is a complex task, given the wide variety of formats in use in the real world. The `toDate()` and `toDateTime()` functions defined below provide a way to parse a wide variety of date/time formats into FHIRPath date and datetime types. Unfortunately, there is no single standard for date/time formats across the contexts where FHIRPath is used (e.g., most programming languages have their own date/time formats), so the this specification defines the following format codes below.
-{:.stu}
 Note that:
-{:.stu}
 * Format codes are case-sensitive.
 * Any character in the format string parameter not represented by a format code is treated as a literal and must match exactly in the input string.
 * Only a subset of the codes are required, implementations may vary.
-{:.stu}
 
 | Format Code	| Support	| Description |
 | ----------- | ------- | ----------- |
@@ -1587,7 +1492,6 @@ Note that:
 | z    | optional	| Time zone literal (name or id). E.g., America/Los_Angeles, Pacific Standard Time, or PST.
 | Z    | required	| Time zone offset from UTC (e.g., +0200, -0500) or Z literal for UTC
 {:.grid}
-{:.stu}
 
 ##### toDate([format : string]) : Date
 
@@ -1604,7 +1508,6 @@ If the item is a String, but the string is not convertible to a Date (using the 
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
 If the input is not a string, the format parameter it ignored.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1631,7 +1534,6 @@ If the item is not one of the above types, or is not convertible to a Date (usin
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
 If the input is not a string, the format parameter it ignored.
-{:.stu}
 
 If the item contains a partial date (e.g. `'2012-01'`), the result is a partial date.
 
@@ -1661,7 +1563,6 @@ If the item is a String, but the string is not convertible to a DateTime (using 
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
 If the input is not a string, the format parameter it ignored.
-{:.stu}
 
 If the item contains a partial datetime (e.g. `'2012-01-01T10:00'`), the result is a partial datetime.
 
@@ -1687,7 +1588,6 @@ If the item is not one of the above types, or is not convertible to a DateTime (
 
 When the optional format parameter is provided, it is used as a [template](#format-codes) instead of the default format.
 If the input is not a string, the format parameter it ignored.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
@@ -1811,18 +1711,14 @@ If units are not commensurable, the result of conversion is empty (`{ }`).
 > *This is required for both [quantity addition](#-addition) (most granular) and [quantity equivalence](#quantity-equivalence) (least granular)*.
 >
 > ***Note:*** *Implementers should refer to the [UCUM specification](https://ucum.org/ucum#baseunits) for guidance, and also to the [NLM Unit Conversion](https://ucum.nlm.nih.gov/ucum-service.html#toBaseUnits) service for more information.*
-{:.stu}
 
 There is no expectation to perform rounding on the result of applying the UCUM conversion factor to the input value, and thus the output value may have more significant figures that then input value.
 Applying rounding too early can result in un-intended inaccuracies and should be explicitly applied when desired.
-{:.stu}
 
 > **Note:** Implementations are not required to support a UCUM implementation, and may return empty (`{ }`) when the units are different, or not handled. For [equivalence](#quantity-equivalence), an empty conversion result instead produces `false`.
-{:.stu}
 
 ###### Time-valued unit conversions
 The relationship between Calendar units and the Definite Duration UCUM Units is documented in the [Time-valued Quantities](#time-valued-quantities) section, which can be used to match a UCUM definite duration unit to/from a calendar unit, noting that the ucum `a` and `mo` units are not equal to their calendar unit counterparts.
-{:.stu}
 
 <a name="fn-toquantity-conversion-factors"></a>
 FHIRPath defines the following conversion factors for calendar durations. For comparison the associated UCUM definite duration conversion factors are also included in the table:
@@ -1839,28 +1735,22 @@ FHIRPath defines the following conversion factors for calendar durations. For co
 {: .grid}
 
 These conversion factors (apart from years/months) are the same as UCUM, so can be used interchangeably.
-{:.stu}
 
 When explicitly converting between UCUM definite durations and calendar units of differing magnitudes (e.g. days and weeks), perform the conversion within the unit system of the source,
 then change the unit to the corresponding target unit:
-{:.stu}
 ```fhirpath
 7 days.toQuantity('wk')  // 7 days → 1 week → 1 'wk'
 182.5 days.toQuantity('a') // 182.5 days → 0.5 year → 0.5 'a'
 182.5 'd'.toQuantity('a') // 0.4996577686516085 'a' ; UCUM conversion result
 ```
-{:.stu}
 §uc2:If converting to/from years or months you SHALL use the shortest conversion chain possible (i.e. don't convert from days to months to years when you can go from direct days to years).§
 §uc3:Implementers SHOULD produce a warning if this type of conversion is performed.§ 
-{:.stu}
 
 When implicitly converting quantities across UCUM definite duration and calendar units, convert the UCUM value to the UCUM unit that matches the calendar unit.
 The operation that is processing the result of the implicit conversion will define the appropriate behavior (e.g. 'a' != year, 'a' ~ year, 1 day > 23 'h', 1 year + 12 'mo' )
-{:.stu}
 
 > **Note:** Unit conversion is not required for [Date/Time arithmetic](#datetime-arithmetic) except when adding/subtracting from partial dates and the 
 > level of granularity is not present in the value. e.g. `@2026 + 24 months`.
-{:.stu}
 
 ##### convertsToQuantity([unit : String]) : Boolean
 
@@ -2020,26 +1910,17 @@ For example:
 ```
 
 #### lastIndexOf(substring : String) : Integer
-{:.stu}
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 Returns the 0-based index of the last position `substring` is found in the input string, or -1 if it is not found.
 The returned index is measured in characters (Unicode scalar values).
-{:.stu}
 
 If `substring` is an empty string (`''`), the function returns the length of the string.
-{:.stu}
 
 If the input or `substring` is empty (`{ }`), the result is empty (`{ }`).
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 'abcdefg'.lastIndexOf('bc') // 1
 'abcdefg'.lastIndexOf('x') // -1
@@ -2049,7 +1930,6 @@ For example:
 '0'.lastIndexOf('') // 1
 ''.lastIndexOf('') // 0
 ```
-{:.stu}
 
 #### substring(start : Integer [, length : Integer]) : String
 
@@ -2189,10 +2069,8 @@ If the input collection or `regex` are empty, the result is empty (`{ }`).
 If the input collection contains multiple items, or the flags parameter contains invalid values, the evaluation of the expression will end and signal an error to the calling environment.
 
 The optional `flags` parameter can be set to:
-{:.stu}
 * `i` to perform a case-insensitive search (otherwise is case-sensitive)
 * `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
-{:.stu}
 
 For example:
 ``` fhirpath
@@ -2206,36 +2084,24 @@ For example:
 ```
 
 #### matchesFull(regex : String, [flags : String]) : Boolean
-{:.stu}
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 Returns `true` when the value completely matches the given regular expression (implying that the start/end of line markers `^`, `$` are always surrounding the regex expression provided).
-{:.stu}
 §mch2:Regular expressions SHOULD function consistently, regardless of any culture- and locale-specific settings in the environment, SHOULD be case-sensitive, use 'single line' mode and allow Unicode characters.§
-{:.stu}
 
 If the input collection or `regex` are empty, the result is empty (`{ }`).
-{:.stu}
 
 If the input collection contains multiple items, or the flags parameter contains invalid values, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 The optional `flags` parameter can be set to:
-{:.stu}
 * `i` to perform a case-insensitive search (otherwise is case-sensitive)
 * `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 'http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1'.matchesFull('Library') // returns false
 'N8000123123'.matchesFull('N[0-9]{8}') // returns false as the string is not an 8 char number (it has 10)
 'N8000123123'.matchesFull('N[0-9]{10}') // returns true as the string has an 10 number sequence in it starting with `N`
 ```
-{:.stu}
 
 #### replaceMatches(regex : String, substitution: String, [flags : String]) : String
 
@@ -2246,10 +2112,8 @@ If the input collection, `regex`, or `substitution` are empty, the result is emp
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 The optional `flags` parameter can be set to:
-{:.stu}
 * `i` to perform a case-insensitive search (otherwise is case-sensitive)
 * `m` - Matches the start and end of each line using ^ and $ (multi-line)<br/>(not only begin/end of string)
-{:.stu}
 
 This example of `replaceMatches()` will convert a string with a date formatted as MM/dd/yy to dd-MM-yy:
 ``` fhirpath
@@ -2271,7 +2135,6 @@ Returns the number of characters (Unicode scalar values) in the input string. If
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
 
 Note that `length()` counts characters (Unicode scalar values), not visual characters (grapheme clusters). For example, the string `'é'` encoded as U+0065 + U+0301 (combining form) has a length of 2, while `'é'` encoded as U+00E9 (precomposed form) has a length of 1.
-{:.stu}
 
 For example:
 ``` fhirpath
@@ -2294,16 +2157,10 @@ If the input collection contains multiple items, the evaluation of the expressio
 ```
 
 ### Additional String Functions
-{:.stu}
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 #### encode(format : String) : String
-{:.stu}
 
 The encode function takes a singleton string and returns the result of encoding that string in the given format. The format parameter defines the encoding format. Available formats are:
-{:.stu}
 
 |hex |The string is encoded using hexadecimal characters (base 16) in lowercase |
 |=|=|
@@ -2311,466 +2168,332 @@ The encode function takes a singleton string and returns the result of encoding 
 |urlbase64 |The string is encoded using url base 64 encoding, using A-Z, a-z, 0-9, -, and _, output padded with = |
 |ascii | The string has any character above character code 127 replaced with `?`. *This is a lossy encoding, and not reversible via `decode`*
 {:.grid}
-{:.stu}
 
 Base64 encodings are described in [RFC4648](https://tools.ietf.org/html/rfc4648#section-4).
-{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu}
 
 If no format is specified, the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 'test'.encode('base64') // returns 'dGVzdA==' (testEncodeBase64A)
 'test'.encode('hex') // returns '74657374' (testEncodeHex)
 ```
-{:.stu}
 
 #### decode(format : String) : String
-{:.stu}
 
 The decode function takes a singleton encoded string and returns the result of decoding that string according to the given format. The format parameter defines the encoding format. Available formats are listed in the encode function (excluding 'ascii').
-{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu}
 
 If no format is specified, the result is empty.
-{:.stu}
 
 If the content being decoded is not a valid UTF-8 value, the result will be empty.
 *§dcd1:It SHOULD NOT replace with the unicode replacement character or allow ill formed UTF-8 content.§*
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 'dGVzdA=='.decode('base64') // returns 'test' (testDecodeBase64A)
 '74657374'.decode('hex') // returns 'test' (testDecodeHex)
 ```
-{:.stu}
 
 #### escape(target : String) : String
-{:.stu}
 
 The escape function takes a singleton string and escapes it for a given target, as specified in the following table:
-{:.stu}
 
 |html |The string is escaped such that it can appear as valid HTML content (at least open bracket (`<`), ampersand (`&`), and quotes (`"`), but ideally anything with a character encoding above 127) |
 |=|=|
 |json |The string is escaped such that it can appear as a valid JSON string (quotes (`"`) are escaped as (`\"`)); additional escape characters are described in the [String](#string) escape section|
 {:.grid}
-{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu}
 
 If no target is specified, the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 'A&B'.escape('html') // returns 'A&amp;B' (testEscapeHtmlAmpersand)
 '"1<2"'.escape('json') // returns '\"1<2\"' (testEscapeJson)
 ```
-{:.stu}
 
 #### unescape(target : String) : String
-{:.stu}
 
 The unescape function takes a singleton string and unescapes it for a given target. The available targets are specified in the escape function description.
-{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu}
 
 If no target is specified, the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 '&quot;1&lt;2&quot;'.unescape('html') // returns '"1<2"' (testUnescapeHtml)
 ```
-{:.stu}
 
 #### trim() : String
-{: .stu }
 
 The trim function trims whitespace characters from the beginning and ending of the input string, with whitespace characters as defined in the [Whitespace](#whitespace) lexical category.
-{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 ' 123456 '.trim() // '123456'
 '  '.trim() // ''
 ```
-{:.stu}
 
 #### split(separator: String) : collection
-{:.stu}
 
 The split function splits a singleton input string into a list of strings, using the given separator.
-{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu}
 
 If the input string does not contain any appearances of the separator, the result is the input string.
-{:.stu}
 
 The following example illustrates the behavior of the `.split` operator:
-{:.stu}
 
 ``` fhirpath
 ('A,B,C').split(',') // { 'A', 'B', 'C' }
 ('ABC').split(',') // { 'ABC' }
 'A,,C'.split(',') // { 'A', '', 'C' }
 ```
-{:.stu}
 
 #### join([separator: String]) : String
-{:.stu}
 
 The join function takes a collection of strings and _joins_ them into a single string, optionally using the given separator.
-{:.stu}
 
 If the input is empty, the result is empty.
-{:.stu}
 
 If no separator is specified, the strings are directly concatenated.
-{:.stu}
 
 The following example illustrates the behavior of the `.join` operator:
-{:.stu}
 
 ``` fhirpath
 ('A' | 'B' | 'C').join() // 'ABC'
 ('A' | 'B' | 'C').join(',') // 'A,B,C'
 ```
-{:.stu}
 
 ### Math
-{:.stu}
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 The functions in this section accept input collections with a single item. Unless otherwise noted, if there is more than one item, or the item is not compatible with the expected type, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 Note also that although all functions return collections, if a given function is defined to return a single item, the return type in the description of the function is simplified to just the type of the single item, rather than the list type.
-{:.stu}
 
 The math functions in this section enable FHIRPath to be used not only for path selection, but for providing a platform-independent representation of calculation logic in artifacts such as questionnaires and documentation templates. For example:
-{:.stu}
 
 ``` fhirpath
 (%weight/(%height.power(2))).round(1) // note that these variables are decimal values not quantities
 ```
-{:.stu}
 
 This example from a questionnaire calculates the Body Mass Index (BMI) based on the responses to the weight and height elements. For more information on the use of FHIRPath in questionnaires, see the [Structured Data Capture](http://hl7.org/fhir/uv/sdc/) (SDC) implementation guide.
-{:.stu}
 
 #### abs() : Integer | Long | Decimal | Quantity
-{:.stu}
 
 Returns the absolute value of the input (in the same type). When taking the absolute value of a quantity, the unit is unchanged.
-{:.stu}
 
 Accepts input types of Integer, Long, Decimal or Quantity.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 (-5).abs() // 5
 (-5.5).abs() // 5.5
 (-5.5 'mg').abs() // 5.5 'mg'
 ```
-{:.stu}
 
 <a name="fn-ceiling"></a>
 #### ceiling() : Integer | Quantity
-{:.stu}
 
 Returns the first integer greater than or equal to the input.
-{:.stu}
 
 Accepts input types of Decimal or Quantity.
-{:.stu}
 
 When used with a Decimal input type, the result is an Integer.<br/>
 When used with a Quantity, the result is a Quantity with the same units and the value *(Decimal)* set to the integer result calculated.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 1.ceiling() // 1
 1.1.ceiling() // 2
 (-1.1).ceiling() // -1
 ```
-{:.stu}
 
 > Note: We may consider a CeilingLong() function to handle Long output types.
 {: .stu-note }
 
 #### exp() : Decimal
-{:.stu}
 
 Returns _e_ raised to the power of the input.
-{:.stu}
 
 Accepts Decimal input types. Integer and Long types are also accepted via [implicit conversion](#conversion) to Decimal. 
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 0.exp() // 1.0
 (-0.0).exp() // 1.0
 ```
-{:.stu}
 
 <a name="fn-floor"></a>
 #### floor() : Integer | Quantity
-{:.stu}
 
 Returns the first integer less than or equal to the input.
-{:.stu}
 
 Accepts input types of Decimal or Quantity.
-{:.stu}
 
 When used with a Decimal input type, the result is an Integer.<br/>
 When used with a Quantity, the result is a Quantity with the same units and the value *(Decimal)* set to the integer result calculated.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 1.floor() // 1
 2.1.floor() // 2
 (-2.1).floor() // -3
 ```
-{:.stu}
 
 > Note: We may consider a FloorLong() function to handle Long output types.
 {: .stu-note }
 
 #### ln() : Decimal
-{:.stu}
 
 Returns the natural logarithm of the input (i.e. the logarithm base _e_).
-{:.stu}
 
 Accepts Decimal input types. Integer and Long types are also accepted via [implicit conversion](#conversion) to Decimal. 
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 1.ln() // 0.0
 1.0.ln() // 0.0
 ```
-{:.stu}
 
 #### log(base : Decimal) : Decimal
-{:.stu}
 
 Returns the logarithm base `base` of the input number.
-{:.stu}
 
 Accepts Decimal input types. Integer and Long types are also accepted via [implicit conversion](#conversion) to Decimal. 
-{:.stu}
 
 If the input is 0 or negative, the evaluation will end and signal an error to the calling environment.
 If the base argument is 0 or negative, the evaluation will end and signal an error to the calling environment.
-{:.stu}
 
 If `base` is empty, the result is empty.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 16.log(2) // 4.0
 100.0.log(10.0) // 2.0
 ```
-{:.stu}
 
 #### power(exponent : Integer | Decimal) : Decimal
-{:.stu}
 
 Raises a number to the `exponent` power.
-{:.stu}
 
 Accepts input types of Decimal, Integer or Long.
-{:.stu}
 
 The result is always a Decimal, because raising an Integer to a negative power (such as -1) produces a Decimal result.
-{:.stu}
 
 If the power cannot be represented (such as -1 raised to the 0.5), the result is empty.
-{:.stu}
 
 If the input is empty, or exponent is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 2.power(3) // 8 (as a decimal)
 2.5.power(2) // 6.25
 2.power(-1) // 0.5
 (-1).power(0.5) // empty ({ })
 ```
-{:.stu}
 
 <a name="fn-round"></a>
 #### round([precision : Integer]) : Decimal | Quantity
-{:.stu}
 
 > [Discussion on this topic](https://chat.fhir.org/#narrow/stream/179266-fhirpath/topic/round.28.29.20for.20negative.20numbers) If you have specific proposals or feedback please log a change request.
 {: .stu-note }
 
 Rounds the input to the nearest whole number using a traditional round (i.e. to the nearest whole number), meaning that a decimal value greater than or equal to 0.5 and less than 1.0 will round to 1, and a decimal value less than or equal to -0.5 and greater than -1.0 will round to -1. If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
-{:.stu}
 
 If specified, the number of digits of precision must be >= 0 or the evaluation will end and signal an error to the calling environment.
-{:.stu}
 
 Accepts input types of Decimal, or Quantity.
-{:.stu}
 
 When used with a Decimal input type, the result is an Decimal.<br/>
 When used with a Quantity, the result is a Quantity with the same units.
-{:.stu}
 
 When used with Integer or Long, the arguments will be implicitly converted to Decimal before evaluation.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 1.round() // 1 (as a decimal)
 3.14159.round(3) // 3.142
 ```
-{:.stu}
 
 #### sqrt() : Decimal
-{:.stu}
 
 Returns the square root of the input number.
-{:.stu}
 
 Accepts Decimal input types. Integer and Long types are also accepted via [implicit conversion](#conversion) to Decimal. 
-{:.stu}
 
 If the square root cannot be represented (such as the square root of -1), the result is empty.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 Note that this function is equivalent to raising a number of the power of 0.5 using the power() function.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 81.sqrt() // 9.0
 (-1).sqrt() // empty
 ```
-{:.stu}
 
 <a name="fn-truncate"></a>
 #### truncate() : Integer | Quantity
-{:.stu}
 
 Returns the integer portion of the input.
-{:.stu}
 
 Accepts input types of Decimal or Quantity.
-{:.stu}
 
 When used with a Decimal input type, the result is an Integer.<br/>
 When used with a Quantity, the result is a Quantity with the same units and the value *(Decimal)* set to the integer result calculated.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 101.truncate() // 101
 1.00000001.truncate() // 1
 (-1.56).truncate() // -1
 ```
-{:.stu}
 
 > Note: We may consider a TruncateLong() function to handle Long output types.
 {: .stu-note }
@@ -2817,60 +2540,42 @@ contained.where(criteria).trace('unmatched', id).empty()
 
 <a name="fn-pathname"></a>
 #### pathname([short : Boolean]) : collection
-{:.stu}
-<!-- FHIR-45314 -->
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 Returns the direct path of each item of the input collection within the input resource (`%rootResource` in FHIR implementations),
 using only element names and indexers. *Such that if you used that result on the input resource, you would get that node, and only that node.*
-{:.stu}
 
 If an item in the input collection was derived from computation (e.g. via `substring(..)`, `&`, or mathematical operations) rather than navigation it is excluded from the result.
 Items that are outside the input resource, such as those navigated to via FHIR's resolve() are also excluded from the result, however if resolve()
 references a resource contained within the input Resource then it is included (such as with FHIR bundles, or contained resources).
-{:.stu}
 
 The optional `short` parameter permits excluding array indexers if an element is known to not be an array, either in the model, or in the specific instance at runtime.
-{:.stu}
 
 If the input collection is empty `({ })`, the result is empty.
-{:.stu}
 
 This function could be used to populate fields in a FHIR OperationOutcome.issue.expression field, or assist in debugging complex expressions using it in conjunction with trace.
-{:.stu}
 
 For example, validating a FHIR QuestionnaireResponse (against a Questionnaire) could use the following expression to calculate the location of an invalid answer:
-{:.stu}
 ``` fhirpath
 item.item.item.where(linkId = 'i508').item.where(linkId='i534').answer.value.pathname()
 ```
-{:.stu}
 
 would return the following string *(which is also a valid fhirpath expression)* if only 1 node was at that location in the input QuestionnaireResponse:
-{:.stu}
 
 ``` fhirpath
 'QuestionnaireResponse.item[2].item[8].item[1].item[1].answer[0].value[0]'
 ```
-{:.stu}
 
 Another example could be the FHIR Observation invariant `obs-7` that roughly checks if components are duplicating codings captured at the top level:
 *(not an exact copy of the invariant, but a part of it)*
-{:.stu}
 ``` fhirpath
 // trace out the pathname of the components that have duplicated codings
 component.code.where(coding.intersect(%resource.code.coding).trace('component', pathname()).exists()).empty()
 ```
-{:.stu}
 would return the following strings: (simplifying finding the specific component(s) that were duplicated)
-{:.stu}
 ``` fhirpath
 'Observation.component[0].code[0].coding[0]'
 'Observation.component[23].code[0].coding[0]'
 ```
-{:.stu}
 
 #### Current date and time functions
 
@@ -2908,24 +2613,17 @@ today() // @2026-02-25 ; equivalent to now().toDate()
 
 <a name="definevariable"></a>
 #### defineVariable(name: String [, projection: collection])
-{:.stu}
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 Defines a variable named `name` that is accessible in subsequent expressions on the output collection and has the value of `projection` if present, otherwise the value of the input collection. In either case the function does not change the input and the output is the same as the input collection.
-{:.stu}
 
 > **Note:** This is not a scoped function, it does not change any variables such as `$this` or `$index`.<br/>
 >
 > This function is the only function that changes the state of the context for processing on the output collection.<br/>
 > Whereas [scoped functions](#scoped-functions) only impact the context while evaluating the function, and it's parameters, and the context is restored to the same as before the function was called.
-{:.stu}
 
 If the name already exists in the current expression scope, the evaluation will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 group.select(
   defineVariable('grp')
@@ -2941,37 +2639,26 @@ group.select(
   )
 )
 ```
-{:.stu}
 
 > **Note:** this could be implemented using expression scoping on the variable stack and after expression completion the temporary variable would be popped off the stack.
-{:.stu}
 
 #### lowBoundary([precision: Integer]): Decimal | Quantity | Date | DateTime | Time
-{:.stu}
 
 The least possible value of the input to the specified precision.
-{:.stu}
 
 The function can be used with Decimal, Quantity, Date, DateTime, and Time values, and returns the same type as the value in the input collection. For a Quantity, the function applies the Decimal boundary operation to the numeric value and returns a Quantity with the resulting value and the original unit.
-{:.stu}
 
 Integer or Long inputs are implicitly converted to Decimal with zero fractional digits of input precision, and the result is Decimal.
-{:.stu}
 
 If no precision is specified, the greatest precision of the type of the input value is used (i.e. at least 8 for Decimal, 4 for Date, at least 17 for DateTime, and at least 9 for Time).
-{:.stu}
 
 If the precision is greater than the maximum possible precision of the implementation, the result is empty *(CQL returns null)*.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 1.587.lowBoundary() // 1.58650000
 1.587.lowBoundary(6) // 1.586500
@@ -2987,34 +2674,24 @@ For example:
 @2014-01-01T08.lowBoundary(17) // @2014-01-01T08:00:00.000
 @T10:30.lowBoundary(9) // @T10:30:00.000
 ```
-{:.stu}
 
 #### highBoundary([precision: Integer]): Decimal | Quantity | Date | DateTime | Time
-{:.stu}
 
 The greatest possible value of the input to the specified precision.
-{:.stu}
 
 The function can be used with Decimal, Quantity, Date, DateTime, and Time values, and returns the same type as the value in the input collection. For a Quantity, the function applies the Decimal boundary operation to the numeric value and returns a Quantity with the resulting value and the original unit.
-{:.stu}
 
 Integer or Long inputs are implicitly converted to Decimal with zero fractional digits of input precision, and the result is Decimal.
-{:.stu}
 
 If no precision is specified, the greatest precision of the type of the input value is used (i.e. at least 8 for Decimal, 4 for Date, at least 17 for DateTime, and at least 9 for Time).
-{:.stu}
 
 If the precision is greater than the maximum possible precision of the implementation, the result is empty *(CQL returns null)*.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 1.587.highBoundary() // 1.58750000
 1.587.highBoundary(6) // 1.587500
@@ -3030,37 +2707,27 @@ For example:
 @2014-01-01T08.highBoundary(17) // @2014-01-01T08:59:59.999
 @T10:30.highBoundary(9) // @T10:30:59.999
 ```
-{:.stu}
 
 #### precision() : Integer
-{:.stu}
 
 If the input collection contains a single item, this function will return the number of digits of precision.
-{:.stu}
 
 The function can be used with Decimal, Quantity, Date, DateTime, and Time values. For a Quantity, it returns the number of digits of precision in the numeric value, including trailing fractional zeroes.
-{:.stu}
 
 If the input collection is empty, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For Decimal values, the function returns the number of digits of precision after the decimal place in the input value.
-{:.stu}
 
 For example with decimal values:
-{:.stu}
 ``` fhirpath
 1.58700.precision() // 5
 100.precision() // 0 ; no digits after the decimal place (integer implicitly converted to a decimal for processing)
 (1.00 'mg').precision() // 2
 ```
-{:.stu}
 
 For Date and DateTime values, the function returns the number of digits of precision in the input value:
-{:.stu}
 
 ``` fhirpath
 @2014.precision() // 4
@@ -3068,287 +2735,197 @@ For Date and DateTime values, the function returns the number of digits of preci
 @T10:30.precision() // 4
 @T10:30:00.000.precision() // 9
 ```
-{:.stu}
 
 #### Extract Date/DateTime/Time components
-{:.stu}
 
 ##### yearOf(): Integer
-{:.stu}
 If the input collection contains a single Date or DateTime, this function will return the year component.
-{:.stu}
 
 If the input collection is empty, or the value is not a Date or DateTime, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2014-01-05T10:30:00.000.yearOf() // 2014
 ```
-{:.stu}
 
 ##### monthOf(): Integer
-{:.stu}
 
 If the input collection contains a single Date or DateTime, this function will return the month component.
-{:.stu}
 
 If the input collection is empty, the month is not present in the value, or the value is not a Date or DateTime, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2014-01-05T10:30:00.000.monthOf() // 1
 ```
-{:.stu}
 
 If the component isn't present in the value, then the result is empty:
-{:.stu}
 ``` fhirpath
 @2012.monthOf() // {} an empty collection
 ```
-{:.stu}
 
 ##### dayOf(): Integer
-{:.stu}
 
 If the input collection contains a single Date or DateTime, this function will return the day component.
-{:.stu}
 
 If the input collection is empty, the day is not present in the value, or the value is not a Date or DateTime, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2014-01-05T10:30:00.000.dayOf() // 5
 ```
-{:.stu}
 
 ##### hourOf(): Integer
-{:.stu}
 
 If the input collection contains a single DateTime or Time, this function will return the hour component.
-{:.stu}
 
 If the input collection is empty, the hour is not present in the value, or the value is not a DateTime or Time, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2012-01-01T03:30:40.002-07:00.hourOf() // 3
 @2012-01-01T16:30:40.002-07:00.hourOf() // 16
 ```
-{:.stu}
 
 ##### minuteOf(): Integer
-{:.stu}
 
 If the input collection contains a single DateTime or Time, this function will return the minute component.
-{:.stu}
 
 If the input collection is empty, the minute is not present in the value, or the value is not a DateTime or Time, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:40.002-07:00.minuteOf() // 30
 ```
-{:.stu}
 
 ##### secondOf(): Integer
-{:.stu}
 
 If the input collection contains a single DateTime or Time, this function will return the second component.
-{:.stu}
 
 If the input collection is empty, the second is not present in the value, or the value is not a DateTime or Time, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:40.002-07:00.secondOf() // 40
 ```
-{:.stu}
 
 ##### millisecondOf(): Integer
-{:.stu}
 
 If the input collection contains a single DateTime or Time, this function will return the millisecond component.
-{:.stu}
 
 If the input collection is empty, the millisecond is not present in the value, or the value is not a DateTime or Time, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:00.002-07:00.millisecondOf() // 2
 ```
-{:.stu}
 
 ##### timezoneOffsetOf(): Decimal
-{:.stu}
 
 If the input collection contains a single DateTime, this function will return the timezone offset component. It is expressed as the number of hours difference from UTC, with fractional hours expressed as decimal values (e.g. -7.5 for UTC-7:30).
-{:.stu}
 
 If the input collection is empty, the timezone offset is not present in the value, or the value is not a DateTime, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:00.000-07:00.timezoneOffsetOf() // -7.0
 @2012-01-01T12:30:00.000+08:45.timezoneOffsetOf() // 8.75 Eucla, Western Australia
 ```
-{:.stu}
 
 ##### dateOf(): Date
-{:.stu}
 
 If the input collection contains a single Date or DateTime, this function will return the date component (up to the precision present in the input value).
-{:.stu}
 
 If the input collection is empty, or the value is not a Date or DateTime, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:00.000-07:00.dateOf() // @2012-01-01
 ```
-{:.stu}
 
 ##### timeOf(): Time
-{:.stu}
 
 If the input collection contains a single DateTime, this function will return the time component.
-{:.stu}
 
 If the input collection is empty, the time is not present in the value, or the value is not a DateTime, the result is empty.
-{:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 @2012-01-01T12:30:00.000-07:00.timeOf() // @T12:30:00.000
 ```
-{:.stu}
 
 ### Date and Time Interval Functions
-{:.stu}
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 If there is more than one input item, or an incompatible item, the evaluation of the expression will end and signal an error to the calling environment.
-{:.stu}
 
 #### duration(value: Date | DateTime | Time, precision: String): Integer
-{:.stu}
 
 Returns the number of whole calendar periods at the specified `precision` between the given input value and the `value` argument. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional periods are dropped.
-{:.stu}
 
 For input and value types of `date` values, the `precision` argument must be one of: `year`, `month`, `week`, or `day`.
-{:.stu}
 
 For input and value types of `datetime` values, the `precision` argument must be one of: `year`, `month`, `week`, `day`, `hour`, `minute`, `second`, or `millisecond`.
-{:.stu}
 
 For input and value types of `time` values, the `precision` argument must be one of: `hour`, `minute`, `second`, or `millisecond`.
-{:.stu}
 
 If the input value or `value` argument are of less precision than the specified `precision`, the result is empty.
-{:.stu}
 
 §dur1:When computing the duration between DateTime values with different timezone offsets, implementations SHOULD normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.§
-{:.stu}
 
 If either the input or `value` argument is empty, the result is empty.
-{:.stu}
 
 The following examples illustrate the behavior of the duration function:
-{:.stu}
 ```fhirpath
 @2025-01-02.duration(@2025-01-07, 'week') // 0 ; hasn't passed 7 days duration
 @2025-01-01.duration(@2025-09-01, 'year') // 0 ; baby is 9 months old
 @2024-12-01.duration(@2025-09-01, 'year') // 0 ; baby is 10 months old
 ```
-{:.stu}
 
 
 #### difference(value: Date | DateTime | Time, precision: String): Integer
-{:.stu}
 
 Returns the number of boundaries crossed for the specified `precision` between the input value and the `value` arguments. If the input value is after the `value` argument, the result is negative. The result of this operation is always an integer; any fractional boundaries are dropped.
-{:.stu}
 
 For input and value types of `date` values, the `precision` argument must be one of: `year`, `month`, `week`, or `day`.
-{:.stu}
 
 For input and value types of `datetime` values, the `precision` argument must be one of: `year`, `month`, `week`, `day`, `hour`, `minute`, `second`, or `millisecond`.
-{:.stu}
 
 For input and value types of `time` values, the `precision` argument must be one of: `hour`, `minute`, `second`, or `millisecond`.
-{:.stu}
 
 If the input value or `value` argument are of less precision than the specified `precision`, the result is empty.
-{:.stu}
 
 For calculations involving weeks, Sunday is considered to be the first day of the week for the purposes of determining the number of boundaries crossed.
-{:.stu}
 
 §df1:When computing the difference between `datetime` values with different timezone offsets, implementations SHOULD normalize the timezone when a `precision` of `hour`, `minute`, `second`, or `millisecond` is requested.§
-{:.stu}
 
 If either the input or `value` argument is empty, the result is empty.
-{:.stu}
 
 The following examples illustrate the behavior of the difference function:
-{:.stu}
 ```fhirpath
 @2025-01-02.difference(@2025-01-07, 'week') // 1 ; crossed a week boundary (Sunday)
 @2025-01-01.difference(@2025-09-01, 'year') // 0 ; baby is 9 months old, but born this year
 @2024-12-01.difference(@2025-09-01, 'year') // 1 ; baby is 10 months old, but born last year
 ```
-{:.stu}
 
 
 ## Operations
@@ -3442,14 +3019,11 @@ When comparing time-valued quantities the quantity values must be converted to t
 This is particularly important when the time-valued quantities involve calendar units to ensure consistency across implementations,
 as calendar conversions are not transitive 
 (e.g. 1 year ~ 12 months and 1 month = 30 days, but 1 year ≠ 360 days).
-{:.stu}
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, years and months are not equal across UCUM definite durations and calendar units. Hence when the arguments are a mix of these, the result is empty as they are not comparable.<br/>
 Note that explicit conversion using [`toQuantity()`](#fn-toquantity) will change code-systems to intentionally perform this equality.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 1 'h' = 3600 's'  // true ; ucum conversion
 1 hour = 3600 's' // true ; 3600 's' → 1 'h' (ucum), and 1 'h' = 1 hour (calendar)
@@ -3460,15 +3034,12 @@ For example:
 1 week = 1 'wk'  // true ; week and 'wk' are equal by definition
 1 second = 1 's' // true ; second and 's' are equal by definition
 ```
-{:.stu}
 
 Where the time-valued quantities are being compared, convert to the least granular unit (the one appearing higher in the [time-valued unit conversion table](#fn-toquantity-conversion-factors), matching across code systems):
-{:.stu}
 ``` fhirpath
 7 days = 1 'wk'  // true ; convert to week: 7 days → 1 week (calendar), and 1 week = 1 'wk'
 1 week = 7 'd'   // true ; convert to 'wk': 7 'd' → 1 'wk' (UCUM); 1 'wk' = 1 week
 ```
-{:.stu}
 
 ##### Date/Time Equality
 
@@ -3549,7 +3120,6 @@ For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and
 When the units are different the quantity values must be [**converted**](#unit-conversions) to the least granular unit before comparison.<br/>
 *(using the least granular unit ensures that the precision of the converted value is not artificially increased by the conversion, and thus doesn't impact the rounded decimal comparison)*<br/>
 If this process returns empty (e.g. because the units are not valid, not commensurable, or conversion is not supported), then the result of the equivalence comparison is `false`.
-{:.stu}
 
 §q7:Implementations are not required to fully support operations on units, but they SHALL at least respect units, recognizing when units differ.§
 
@@ -3571,17 +3141,14 @@ For example:
 
 As noted in the [Time-valued Quantities](#time-valued-quantities) section, all units are considered either equal or equivalent across UCUM definite durations and calendar units.
 Hence when the arguments are a mix of these, the results can be compared.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 1 year ~ 1 'a' // true ; year and 'a' are equivalent by definition
 1 year ~ 12 'mo' // true ; convert to least granular 'a': 12 'mo' → 1 'a' (UCUM), and 'a' ~ year by definition
 1 year ~ 11 months // true ; convert to least granular year (1 ~ 0.9166666), round to least precise and compare (1 = 1)
 1 second ~ 1 's' // true ; second and 's' are equal by definition (thus equivalent)
 ```
-{:.stu}
 
 ##### Date/Time Equivalence
 
@@ -3605,7 +3172,6 @@ For strings, equivalence returns `true` if the strings are the same value while 
 
 Normalizing whitespace means treating as equivalent all characters in the Unicode White_Space character class (as defined in https://www.unicode.org/Public/UCD/latest/ucd/PropList.txt) -
 *this set includes the characters in the whitespace lexical category*.
-{:.stu}
 
 > **Note:** Multiple whitespace characters in sequence are not collapsed to a single character. 
 > This could be done by using `replaceMatches('\\s+', ' ')` on both sides, which would normalize the whitespace to a single space.
@@ -3643,7 +3209,6 @@ For example, units of `'cm'` and `'m'` can be compared, but units of `'cm2'` and
 
 When quantity units are different the quantities must be [**converted**](#unit-conversions) to the same unit, or a common unit before comparison.
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the comparison is empty (`{ }`).
-{:.stu}
 
 §cmp1:Implementations are not required to fully support operations on units, but they SHALL at least respect units, recognizing when units differ.§
 
@@ -3765,48 +3330,37 @@ For example:
 
 <a name="fn-comparable"></a>
 #### comparable(other : Quantity) : Boolean
-{:.stu}
 
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 Returns `true` if the input Quantity can be compared with the `other` Quantity and their relationship to each other determined.
 Comparable means that both have values, and the units are the same (irrespective of the system), or both have `code` and `system` values,
 and the `system` is recognized by the FHIRPath implementation, and the codes are comparable within that system
 (e.g. `'d'` (days) and `'h'` (hours), or `'[in_i]'` (inches) and `'cm'` (centimeters)). 
 This is referred to as the units being commensurable in UCUM.
-{:.stu}
 
 If either or both inputs are empty, or either input is not a single Quantity value, the result is empty (`{ }`).
-{:.stu}
 
 > Returning true from this function indicates that a result from [equality](#equality) or [comparison](#comparison) functions will succeed, and not return empty.<br/>
 > These functions consider [**unit conversion**](#unit-conversions) where required.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 1 'mg'.comparable(2 'mg') // true ; these types are comparable
 1 'm'.comparable(20 'cm') // true ; these types are both metric distance measures
 2 '1'.comparable(3) // true ; the integer will implicitly convert to a Quantity with unit `'1'` which is the same system/code so is comparable
 1.comparable(2) // true ; these will both convert to quantities with the same system/code, hence are comparable
 ```
-{:.stu}
 ``` fhirpath
 1 'in_i'.comparable(1 'cm') // true ; these UCUM units can be compared/converted
 1 year.comparable(1 'a') // false ; these units are equivalent, not equal hence not comparable
 1 'Cel'.comparable(1 '[degF]') // true ; these ucum "special" units are comparable
 ```
-{:.stu}
 
 This function can be used to guard [comparison operations](#comparison) to prevent returning empty results when the quantities are not comparable:
-{:.stu}
 
 ``` fhirpath
 iif(Observation.value.comparable(2 'mg'), Observation.value < 2 'mg', false)
 ```
-{:.stu}
 
 ### Types
 
@@ -3980,10 +3534,8 @@ As with the other operators, the math operators will return an empty collection 
 
 UCUM does not support math operations with ["special"](#UCUM-special) units on non-ratio scales in UCUM (e.g. Fahrenheit (degF) or Celsius (Cel)) where a function is required to transform the value. 
 Attempting to operate on quantities with invalid or "special" units will result in empty (`{ }`).
-{:.stu}
 
 §m3:Implementations that to not support processing UCUM units SHALL return empty when unable to correctly handle the units.§
-{:.stu}
 
 Operations that cause arithmetic overflow or underflow will result in empty (`{ }`).
 
@@ -4056,7 +3608,6 @@ For example, units of 'cm' and 'm' can be added, but units of 'kg' and 'cm' cann
 
 When the units of quantity arguments are different, the quantity values must be [**converted**](#unit-conversions) to the most granular unit, then simple addition on the values can be performed.
 If this process returns empty (e.g. because the units are not valid, or not commensurable), then the result of the addition is empty (`{ }`).
-{:.stu}
 
 > **Note:** Performing addition with mixed type parameters of either Integer, Long or Decimal and Quantity will result in an [Implicit conversion](#conversion) of the Numeric argument to a Quantity (with the UCUM default unit `'1'`).
 This means that unless the unit of the quantity was `'1'` too, the addition will return empty as the units are not commensurate.
@@ -4082,12 +3633,10 @@ For example:
 > (e.g. `1 year = 12 months` returns `true`), quantity addition and subtraction require the author to convert explicitly
 > using [`toQuantity()`](#fn-toquantity), since the calendar conversion factors are approximate ([equivalent](#quantity-equivalence))
 > and the author should be intentional about accepting that approximation in a computed result.
-{:.stu}
 
 When both operands are time-valued quantities, the [most granular](#unit-conversions) rule applies as with other quantities,
 where the most granular of the two units is the one appearing lower in the [time-valued unit conversion table](#fn-toquantity-conversion-factors).<br/>
 When the operands come from different time-valued unit systems, the result is expressed in calendar units.
-{:.stu}
 
 Quantity addition examples with time based units:
 ``` fhirpath
@@ -4188,15 +3737,12 @@ Partial input values may require [unit conversion](#fn-toquantity-conversion-fac
 If the date/time value only has years present then when adding month quantities; use the direct conversion from months to years, otherwise convert the quantity to days, then to years (chaining as needed).
 For all other partial precisions, convert as required chaining conversions where required.
 Examples of this are in the operations below.
-{:.stu}
 
 §dta2:Implementers SHOULD produce a warning when decimal fractions are ignored in date/time arithmetic operations.§<br/>
 §dta3:Authors SHOULD consider applying appropriate rounding functions ([`round()`](#fn-round), [`floor()`](#fn-floor), [`truncate()`](#fn-truncate), or [`ceiling()`](#fn-ceiling)) to quantity-valued inputs with decimal values before using them in date/time arithmetic expressions where quantity values might not be whole numbers.§
-{:.stu}
 
 As `Time` is cyclic, using arithmetic operations `+` or `-` on `Time` types can result in overflowing the time value, which will wrap around the beginning of the day.
 So adding 1 hour to `@T23:30:00` will wrap around to `@T00:30:00`, which is consistent with the behaviour of `DateTime` values.
-{:.stu}
 
 #### + (addition)
 
@@ -4238,7 +3784,6 @@ For example:
 ```
 
 For partial date/time values where the time-valued quantity is more precise than the partial date/time, the operation is performed by converting the time-valued quantity to the highest precision in the partial (truncating any decimal fraction) and then subtracting from the date/time value.
-{:.stu}
 
 For example:
 ``` fhirpath
@@ -4250,37 +3795,25 @@ For example:
 
 <a name="unary-operators"></a>
 ### Unary operators (`+` and `-`)
-{:.stu}
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 The unary operators support a single item input operand of type Integer, Long, Decimal, or Quantity. The output type is the same as the input type.
 Using with any incompatible type will end and signal an error to the calling environment.
-{:.stu}
 
 The `+` operator returns the value of its operand unchanged.
-{:.stu}
 
 The `-` operator will negate the numeric value. If the value is a Quantity, the unit remains unchanged.
-{:.stu}
 > **Note:** The CQL language describes the `-` operator as unary negation.
-{:.stu}
 
 If the result of negating the number cannot be represented, the result is empty (`{ }`).
-{:.stu}
 
 If the input collection is empty, the result is empty (`{ }`).
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 +5 // a simple literal 5 numeric value
 -4 // a simple negative value
 -Account.balance.amount // The negated account balance
 ```
-{:.stu}
 
 ### Operator precedence
 
@@ -4324,145 +3857,101 @@ Use parentheses to ensure the unary negation applies to the `7`:
 
 ## Aggregates
 
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
-
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed:
-{:.stu}
 
 > **Note:** While the `aggregate()` function is powerful and flexible, authors are encouraged to use the built-in aggregate functions for sum, min, max, and avg described below where possible.
 They are more concise, easier to read, and handle input types more effectively, unless you need to handle specific edge cases.
-{:.stu}
 
 <a name="aggregate"></a>
 ### aggregate(aggregator : ($total, $this, $index) => collection [, init : collection]) : collection
-{:.stu}
 Performs general-purpose aggregation by evaluating the aggregator expression for each item of the input collection. Within this expression, the standard iteration variables of `$this` and `$index` can be accessed, but also a `$total` aggregation variable.
-{:.stu}
 
 > This is a [scoped function](#scoped-functions): The `init` argument is evaluated once at the start to initialize the `$total` variable.<br/> The `aggregator` argument is then evaluated for each item (setting `$this`and `$index` for each), and has access to the current value of `$total` available. The result of the evaluation is then assigned to `$total`.<br/> The final value of `$total` is returned as the result of the function.<br/>  The `init` argument is evaluated once before setting `$this` and `$index`, so will be evaluated on the outer context, and will have access to outer `$this` values.
-{:.stu}
 
 The value of the `$total` variable is set to `init`, or empty (`{ }`) if no `init` value is supplied, and is set to the result of the aggregator expression after every iteration.<br/>
 The result of the aggregate function is the value of `$total` after the last iteration.
-{:.stu}
 
 Using this function, sum can be expressed as:
-{:.stu}
 
 ``` fhirpath
 value.aggregate($this + $total, 0)
 ```
-{:.stu}
 
 Min could be expressed as:
-{:.stu}
 
 ``` fhirpath
 value.aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))
 ```
-{:.stu}
 
 and average could be expressed as:
-{:.stu}
 
 ``` fhirpath
 value.aggregate($total + $this, 0) / value.count()
 ```
-{:.stu}
 
 ### sum() : Integer | Long | Decimal | Quantity
-{:.stu}
 Returns the sum of all items in the input collection (in the same type).
-{:.stu}
 
 Accepts input collections with items of type: Integer, Long, Decimal or Quantity.
-{:.stu}
 
 §sum1:All items in the input collection SHALL be the same type, otherwise an exception is thrown.§
-{:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 ( 1.0 | 2.0 | 3.0 | 4.0 | 5.0 ).sum() // 15.0
 ( 1.0 'mg' | 2.0 'mg' | 3.0 'mg' | 4.0 'mg' | 5.0 'mg' ).sum() // 15.0 'mg'
 ```
-{:.stu}
 
 ### min() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
-{:.stu}
 Returns the minimum item in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
-{:.stu}
 
 Accepts input collections with items of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
-{:.stu}
 
 §min1:All items in the input collection SHALL be the same type, otherwise an exception is thrown.§
-{:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 ( 2 | 4 | 8 | 6 ).min() // 2
 ( 2L | 4L | 8L | 6L ).min() // 2L
 ( @2012-12-31 | @2013-01-01 | @2012-01-01 ).min() // @2012-01-01
 ```
-{:.stu}
 
 ### max() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
-{:.stu}
 Returns the maximum item in the input collection. Comparison semantics are defined by the [Comparison Operators](#comparison) for the type of value being aggregated.
-{:.stu}
 
 Accepts input collections with items of type: Integer, Long, Decimal, Quantity, Date, DateTime, Time, or String.
-{:.stu}
 
 §max1:All items in the input collection SHALL be the same type, otherwise an exception is thrown.§
-{:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 ( 2 | 4 | 8 | 6 ).max() // 8
 ( 2L | 4L | 8L | 6L ).max() // 8L
 ( @2012-12-31 | @2013-01-01 | @2012-01-01 ).max() // @2013-01-01
 ```
-{:.stu}
 
 ### avg() : Decimal | Quantity
-{:.stu}
 Returns the average of all items in the input collection (in the same type).
-{:.stu}
 
 Accepts input collections with items of type: Decimal or Quantity.
-{:.stu}
 
 When used with Integer or Long, the arguments will be implicitly converted to Decimal before evaluation.
-{:.stu}
 
 §avg1:All items in the input collection SHALL be the same type, otherwise an exception is thrown.§
-{:.stu}
 
 If the input collection is empty (`{ }`), the result is empty.
-{:.stu}
 
 For example:
-{:.stu}
 ``` fhirpath
 ( 5.5 | 4.7 | 4.8 ).avg() // 5.0
 ( 5.5 'cm' | 4.7 'cm' | 4.8 'cm' ).avg() // 5.0 'cm'
 ```
-{:.stu}
 
 ## Lexical Elements
 FHIRPath defines the following lexical elements:
@@ -4621,79 +4110,56 @@ To allow type names to be referenced in expressions such as the `is` and `as` op
 When resolving a type name, the context-specific model is searched first. If no match is found, the `System` model (containing only the built-in types defined in the [Literals](#literals) section) is searched.
 
 ### Reflection
-{:.stu}
-
-> **Note:** The contents of this section are Standard for Trial Use (STU)
-{: .stu-note }
 
 FHIRPath supports limited reflection to provide the ability for expressions to access basic type information of values. 
 The ability to access child elements or walk type trees to parent definitions using this mechanism is outside the scope of this specification.
 The [`ofType()`](#fn-oftype) function can be used with type-names or their subtypes to filter content.
-{:.stu}
 
 #### Structures
-{:.stu}
 ``` typescript
 TypeInfo { baseType: string }
 SimpleTypeInfo extends TypeInfo { namespace: string, name: string }
 ClassInfo extends TypeInfo { namespace: string, name: string }
 ```
-{:.stu}
 
 > **Note:** These structures are a subset of the abstract metamodel used by the [Clinical Quality Language Tooling](https://github.com/cqframework/clinical_quality_language).
 > Although the SimpleTypeInfo and ClassInfo appear the same here, implementations may have additional information (as is the case in the referenced CQL structures).
-{:.stu}
 
 
 #### type() : collection
-{:.stu}
+
 The `type` function returns the type information for each item of the input collection, using concrete subtypes of `TypeInfo`.
-{:.stu}
 
 > Note: using `X.ofType(Y)` or `X as Y` to filter content is better supported than using `X.type().name = 'Y'`.
-{:.stu}
 
 If the input collection is empty (`{ }`), or access to type information is unavailable, the result is empty.
-{:.stu}
 
 For primitive types such as `String` and `Integer`, the result is a `SimpleTypeInfo`:
-{:.stu}
-
 ``` fhirpath
 ('John' | 'Mary').type()
 ```
-{:.stu}
 
 Results in:
-{:.stu}
 ``` typescript
 [
   SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' },
   SimpleTypeInfo { namespace: 'System', name: 'String', baseType: 'System.Any' }
 ]
 ```
-{:.stu}
 *Note: The base type for primitives is defined as `System.Any`.*
-{:.stu}
 
 
 For complex types such as a FHIR CodeableConcept, the result is a `ClassInfo`:
-{:.stu}
-
 ``` fhirpath
 Patient.maritalStatus.type()
 ```
-{:.stu}
 
 Results in:
-{:.stu}
-
 ``` typescript
 {
   ClassInfo { namespace: 'FHIR', name: 'CodeableConcept', baseType: 'FHIR.Element' }
 }
 ```
-{:.stu}
 
 
 ## Type safety and strict evaluation
@@ -4770,16 +4236,13 @@ In cases where a compiler finds places where a collection of multiple items can 
 * Use `select()` and `where()` to turn the expression into one that evaluates each of the repeating items individually (as in the examples above)
 
 ### Run-time behavior
-{:.stu}
+
 In the absence of strongly-typed compile-time checks, the implementation may still provide strong type-checks at run-time.
 The difference between strongly typed compile-time checks and strongly-typed run-time checks is that the latter will only throw errors when the data does not conform to type requirements, where the former checks that any data is guaranteed to be conformant due to the construction of the expression.
-{:.stu}
 
 However, §rt1:the default run-time behavior of a compliant FHIRPath implementation SHOULD be weakly typed.§ This means:
-{:.stu}
 
 return an empty collection ({ }) when a path references an element that does not exist on the context node
-{:.stu}
 
 ## Formal Specifications
 
