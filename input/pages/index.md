@@ -8,42 +8,11 @@ FHIRPath is a path based navigation and extraction language, somewhat like XPath
 
 Looking for implementations? See [FHIRPath Implementations on the HL7 confluence](https://confluence.hl7.org/display/FHIRI/FHIRPath+Implementations){:target="_blank"}
 
+{: .note-to-balloters}
+> This normative ballot of the FHIRPath specification proposes to advance the trial use content in version 3.0 to normative status and includes a few minor clarifications. Refer to the [Change Log](changes.html) for a complete list of changes.
+>
+> **All content is proposed for normative status; no content is intended to remain trial use.**
 
-> **Note:** The following sections of this specification have not received significant implementation experience and are marked for Standard for Trial Use (STU):
-> 
-> * [Aggregates](#aggregates)
-> * [Literals - Long](#long)
-> * [Conversions - toLong](#tolong--long)
-> * [Functions - repeatAll](#fn-repeatall)
-> * [Functions - sort](#fn-sort)
-> * [Functions - coalesce](#coalesce)
-> * [Functions - String (lastIndexOf)](#lastindexofsubstring--string--integer)
-> * [Functions - String (matchesFull)](#matchesfullregex--string-flags--string--boolean)
-> * [Functions - String (trim, split, join)](#trim--string)
-> * [Functions - String (encode, decode, escape, unescape)](#additional-string-functions)
-> * [Functions - Math](#math)
-> * [Functions - Utility (defineVariable, lowBoundary, highBoundary)](#definevariable)
-> * [Functions - Utility (precision)](#precision--integer)
-> * [Functions - pathname](#fn-pathname)
-> * [Functions - Extract Date/DateTime/Time components](#extract-datedatetimetime-components)
-> * [Functions - Date and Time Interval Functions (duration, difference)](#date-and-time-interval-functions)
-> * [Operations - Comparison (comparable)](#fn-comparable)
-> * [Instance Selector/Object Creation](#instance-selector)
-> * [Types - Reflection](#reflection)
-> 
-> These sections have undergone extensive clarification:
-> * [Functions - documentation of functions with scoped arguments](#scoped-functions)
-> * [Functions - combine](#fn-combine) - additional optional parameter `preserveOrder`
-> * [Date Conversion Functions](#date-conversion-functions) - inclusion of string format codes and `format` parameter
-> * [Functions - String (matches)](#fn-matches) - additional optional parameter `flags`
-> * [Operations - Quantity Equality / Equivalence (time-valued)](#quantity-equality) - refined cross-system calendar/UCUM comparisons
-> * [Operations - Math](#math-1) - refined handling of quantity operations - particularly with time based quanties
-> * [Unary Operators](#unary-operators) - this is a new section, however they have been implied as defined since the normative version via other parts of the specification and grammar
->
-> In addition, the appendices are included as additional documentation and are informative content.
->
-> All content that appears with this pink stripe to the left is marked as Standard for Trial Use (STU) 
-{: .stu-note }
 
 
 ## Background
@@ -225,7 +194,7 @@ Examples of the supported FHIRPath literals:
 Boolean: true, false
 String: 'test string', 'urn:oid:3.4.5.6.7.8'
 Integer: 0, 45
-Long: 0L, 45L    // Long is defined as STU
+Long: 0L, 45L
 Decimal: 0.0, 3.14159265
 Date: @2015-02-04 (@ followed by ISO8601 compliant date)
 DateTime: @2015-02-04T14:34:28+09:00 (@ followed by ISO8601 compliant date/time)
@@ -2325,9 +2294,6 @@ For example:
 (-1.1).ceiling() // -1
 ```
 
-> Note: We may consider a CeilingLong() function to handle Long output types.
-{: .stu-note }
-
 #### exp() : Decimal
 
 Returns _e_ raised to the power of the input.
@@ -2364,9 +2330,6 @@ For example:
 2.1.floor() // 2
 (-2.1).floor() // -3
 ```
-
-> Note: We may consider a FloorLong() function to handle Long output types.
-{: .stu-note }
 
 #### ln() : Decimal
 
@@ -2430,9 +2393,6 @@ For example:
 <a name="fn-round"></a>
 #### round([precision : Integer]) : Decimal | Quantity
 
-> [Discussion on this topic](https://chat.fhir.org/#narrow/stream/179266-fhirpath/topic/round.28.29.20for.20negative.20numbers) If you have specific proposals or feedback please log a change request.
-{: .stu-note }
-
 Rounds the input to the nearest whole number using a traditional round (i.e. to the nearest whole number), meaning that a decimal value greater than or equal to 0.5 and less than 1.0 will round to 1, and a decimal value less than or equal to -0.5 and greater than -1.0 will round to -1. If specified, the precision argument determines the decimal place at which the rounding will occur. If not specified, the rounding will default to 0 decimal places.
 
 If specified, the number of digits of precision must be >= 0 or the evaluation will end and signal an error to the calling environment.
@@ -2494,10 +2454,6 @@ For example:
 1.00000001.truncate() // 1
 (-1.56).truncate() // -1
 ```
-
-> Note: We may consider a TruncateLong() function to handle Long output types.
-{: .stu-note }
-
 
 ### Tree navigation
 
