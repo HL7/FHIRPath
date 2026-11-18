@@ -3048,7 +3048,7 @@ If both operands are collections with a single item, they must be of the same ty
 If both operands are collections with multiple items:
 
 * Each item must be equivalent
-* Comparison is not order dependent
+* Comparison is order dependent
 
 Note that this implies that if the collections have a different number of items to compare, or if one input is a value and the other is empty (`{ }`), the result will be `false`.
 
@@ -3060,7 +3060,7 @@ For example:
 0.0 ~ 0     // true ; implicit conversion to decimals, then rounding to the least precise operand (0) results in both sides being 0
 {} ~ {}     // true ; as explicitly defined above
 name ~ name // true ; its the same object, and thus will have all the same properties recursively
-(1 | 2 | 3) ~ (3 | 2 | 1) // true ; all items are in both collections irrespective of order
+(1 | 2 | 3) ~ (3 | 2 | 1) // false ; all items are in both collections, but order doesn't match
 'a' ~ 'A'   // true ; case is ignored for equivalence
 23 ~ 23 '1' // true ; integer implicitly converts to Quantity with unit '1', thus compares exactly here
 ```

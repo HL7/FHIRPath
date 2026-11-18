@@ -13,6 +13,7 @@
 * [FHIR-49510](https://jira.hl7.org/browse/FHIR-49510):  Conformance language is not consistently used
 * [FHIR-59626](https://jira.hl7.org/browse/FHIR-59626):  Quantity equivalence returns false rather than empty for invalid or incomparable units
 * [FHIR-59890](https://jira.hl7.org/browse/FHIR-59890):  convertsToLong typo - convertible to an integer, not 64 bit integer
+* [FHIR-59883](https://jira.hl7.org/browse/FHIR-59883):  Correct description of equivalent for lists
 
 
 ---
