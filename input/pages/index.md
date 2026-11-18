@@ -4086,7 +4086,7 @@ ClassInfo extends TypeInfo { namespace: string, name: string }
 
 The `type` function returns the type information for each item of the input collection, using concrete subtypes of `TypeInfo`.
 
-> Note: using `X.ofType(Y)` or `X as Y` to filter content is better supported than using `X.type().name = 'Y'`.
+> **Note:** using `X.ofType(Y)` or `X as Y` to filter content is better supported than using `X.type().name = 'Y'`.
 
 If the input collection is empty (`{ }`), or access to type information is unavailable, the result is empty.
 
