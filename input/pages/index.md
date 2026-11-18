@@ -1531,7 +1531,7 @@ If the input collection contains a single item, this function will return `true`
 * the item is a Boolean
 {:.stu}
 
-If the item is not one of the above types, or the item is a String, but is not convertible to an Integer (using the regex format `(\+|-)?\d+`), the result is `false`.
+If the item is not one of the above types, or the item is a String, but is not convertible to a 64 bit  integer (using the regex format `(\+|-)?\d+`), the result is `false`.
 {:.stu}
 
 If the input collection contains multiple items, the evaluation of the expression will end and signal an error to the calling environment.
