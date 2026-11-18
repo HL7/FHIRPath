@@ -166,10 +166,16 @@
 * [FHIR-57251](https://jira.hl7.org/browse/FHIR-57251):  Definition of repeatAll incorrectly describes evaluation
 * [FHIR-57256](https://jira.hl7.org/browse/FHIR-57256):  Clarify behavior of Date addition
 
-#### Issues Included since 3.0.0 (targetting 3.1)
-* [FHIR-57822](https://jira.hl7.org/browse/FHIR-57822):  Typo in page title
+#### Issues Included since 3.0.0 (targetting normative 3.1)
+##### Non-Compatible
+* (none)
+
+##### Compatible, Substantive
 * [FHIR-58739](https://jira.hl7.org/browse/FHIR-58739):  Include support for anonymous types in the instance selector
+* [FHIR-59620](https://jira.hl7.org/browse/FHIR-59620):  Clarify Quantity and Integer support for FHIRPath boundary functions
+
+##### Non-Substantive
+* [FHIR-57822](https://jira.hl7.org/browse/FHIR-57822):  Typo in page title
 * [FHIR-49510](https://jira.hl7.org/browse/FHIR-49510):  Conformance language is not consistently used
 * [FHIR-59626](https://jira.hl7.org/browse/FHIR-59626):  Quantity equivalence returns false rather than empty for invalid or incomparable units
-* [FHIR-59620](https://jira.hl7.org/browse/FHIR-59620):  Clarify Quantity and Integer support for FHIRPath boundary functions
 * [FHIR-59890](https://jira.hl7.org/browse/FHIR-59890):  convertsToLong typo - convertible to an integer, not 64 bit integer
