@@ -908,7 +908,6 @@ CodeableConcept {
 QuestionnaireResponse.item.where(linkId='coded-q')
 .select( CodeableConcept { coding: answer.value.ofType(Coding) } )
 ```
-{:.stu}
 
 <a name="fn-sort"></a>
 #### sort([keySelector: ($this) => any [asc | desc] [, keySelector: ($this) => any [asc | desc], ...]]) : collection
