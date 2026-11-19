@@ -3538,16 +3538,12 @@ Operations that cause arithmetic overflow or underflow will result in empty (`{ 
 **Quantity multiplication and division**
 
 For multiplication and division involving quantities, determine the result value and unit as follows:
-{:.fhir-highlight}
 
 1. If the complete operand units are commensurable, [convert](#unit-conversions) the quantity values to the most granular of those units before combining them. Compare the complete units, including any exponents and denominators, rather than comparing individual unit atoms. If the conversion factor is 1, use the unit of the left operand.
 2. Compose the units by adding the exponents of matching unit atoms for multiplication, or subtracting the denominator's exponents from the numerator's exponents for division. Remove atoms whose resulting exponent is zero. If no atoms remain, use the UCUM default unit `'1'`.
 3. Multiply or divide the values after any conversion to obtain the result value.
-{:.fhir-highlight}
 
 Preserve the operand units, after any required conversion, when composing the result unit; do not replace them with UCUM base units merely to canonicalize the result. For example, dividing `'mg'` by `'d'` produces `'mg/d'`, not `'g/s'`. The operands need not have commensurable units: different dimensions can be composed, such as length divided by time.
-{:.fhir-highlight}
-
 
 #### * (multiplication)
 
@@ -3557,7 +3553,6 @@ For multiplication involving quantities, determine the result using the [quantit
 After any required unit conversion, the resulting unit is determined by adding each unit atom's exponent in the left operand to its exponent in the right operand, according to the [\[UCUM\]](#UCUM) specification.
 Treat an atom absent from either operand as having exponent 0.
 For example, `'cm'` multiplied by `'cm'` produces `'cm2'`.
-{:.fhir-highlight}
 
 Multiplication involving calendar units (apart from the UCUM default unit `'1'`) will return empty.
 
@@ -3578,7 +3573,6 @@ For example:
 ```
 
 Examples involving conversion between commensurable units:
-{:.fhir-highlight}
 ``` fhirpath
 2 'm' * 3 'cm'       // 600 'cm2' ; convert 2 m to 200 cm, multiply 200 by 3, and add exponents: 1 + 1 = 2.
 1 '/m' * 1 '/cm'     // 100 '/m2' ; '/m' is the smaller whole unit, so convert 1 /cm to 100 /m; -1 + -1 = -2.
@@ -3586,7 +3580,6 @@ Examples involving conversion between commensurable units:
 1 'km/g' * 1 'm/mg'  // 1 'km2/g2' ; the complete units have conversion factor 1, so keep the left unit 'km/g' and square it.
 1 'm/mg' * 1 'km/g'  // 1 'm2/mg2' ; the same tie preserves the left unit 'm/mg', not the individual atoms m and g.
 ```
-{:.fhir-highlight}
 
 #### / (division)
 
@@ -3598,7 +3591,6 @@ For division involving quantities, determine the result using the [quantity mult
 After any required unit conversion, the resulting unit is determined by subtracting each unit atom's exponent in the denominator from its exponent in the numerator, according to the [\[UCUM\]](#UCUM) specification.
 Treat an atom absent from either the numerator or denominator as having exponent 0.
 For example, `'km'` divided by `'h'` produces `'km/h'`.
-{:.fhir-highlight}
 
 Division involving calendar units (apart from the UCUM default unit `'1'`) will return empty
 
@@ -3624,7 +3616,6 @@ Division examples involving quantities:
 ```
 
 Examples involving conversion between commensurable units:
-{:.fhir-highlight}
 ``` fhirpath
 4 'm' / 2 'cm'       // 200 '1' ; convert 4 m to 400 cm, divide 400 by 2, and cancel cm: 1 - 1 = 0.
 1 '/m' / 1 '/cm'     // 0.01 '1' ; convert 1 /cm to 100 /m, divide 1 by 100, and cancel the reciprocal units.
@@ -3632,7 +3623,6 @@ Examples involving conversion between commensurable units:
 1 'km/g' / 1 'm/mg'  // 1 '1' ; conversion factor 1 preserves the left unit 'km/g', then matching units cancel.
 1 'm/mg' / 1 'km/g'  // 1 '1' ; conversion factor 1 preserves the left unit 'm/mg', then matching units cancel.
 ```
-{:.fhir-highlight}
 
 #### + (addition)
 
