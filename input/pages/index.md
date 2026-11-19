@@ -568,7 +568,7 @@ Most of these functions iterate through the items in the input collection, allow
 
 For example:
 ``` fhirpath
-(1 | 2 | 3 | 4 | 5).where($this > 3) // filter the input collection to values that are greater than 3
+list(1, 2, 3, 4, 5).where($this > 3) // filter the input collection to values that are greater than 3
 ```
 The documentation for each scoped function defines what variables are available and how/when they are used as part of evaluating the function arguments.
 
@@ -909,6 +909,46 @@ QuestionnaireResponse.item.where(linkId='coded-q')
 .select( CodeableConcept { coding: answer.value.ofType(Coding) } )
 ```
 
+<a name="fn-list"></a>
+#### list(item: collection, ...) : collection
+
+The `list` function appends the items from each argument into a single collection, preserving argument order and item order within each argument.
+Single items are treated as one-item collections. 
+Duplicates are retained.
+The input collection is not used by this function.
+
+All of the following examples will produce the same resulting collection:
+```fhirpath
+list(1, 2, 3, 4) // create a simple list of numbers {1, 2, 3, 4}
+list(1, list(2, 3), 4) // the nested list is no different than a flat list
+list({}, list(1, 2), list(3, 4)) // The empty list contributes no items
+```
+
+Other examples:
+```fhirpath
+list(list(2, 1), list(2, 3)) // {2, 1, 2, 3} ; duplicates are retained
+list({}) // {} empty ; an empty argument contributes no items
+
+// Patient's contact details followed by their contacts' contact details
+list(Patient.telecom, Patient.contact.telecom)
+
+// Document authors followed by attesting parties
+list(Composition.author, Composition.attester.party)
+```
+
+The list function can simplify a chain of [combine function](#fn-combine) calls with the optional `preserveOrder` set to `true`.
+For example, these two expressions produce the same collection:
+```fhirpath
+list( A, B, C )
+A.combine(B, true).combine(C, true)
+```
+
+This is different to the list creation shorthand syntax defined in CQL { a, b, c } as this can create lists of lists which we are not adding to FHIRPath.
+In FHIRPath, everything is a flat list.
+
+> **Note:** `list()` cannot be invoked as a fluent function, i.e. `a.list(b,c)` is not valid as the input collection is not used. To use this style of invocation, use `a.combine(list(b,c),true)`
+
+
 <a name="fn-sort"></a>
 #### sort([keySelector: ($this) => any [asc | desc] [, keySelector: ($this) => any [asc | desc], ...]]) : collection
 
@@ -934,12 +974,12 @@ If the input collection is empty (`{ }`), the result is empty.
 The following examples illustrate the use of the `sort()` function:
 
 ``` fhirpath
-(3 | 1 | 2).sort() // 1, 2, 3 ; natural numeric ordering
-(3 | 1 | 2).sort($this) // 1, 2, 3 ; explicit ascending
-(3 | 1 | 2).sort($this desc) // 3, 2, 1 ; descending
-('c' | 'a' | 'b').sort() // 'a', 'b', 'c' ; default string ordering
-('c' | 'a' | 'b').sort($this desc) // 'c', 'b', 'a' ; descending
-('3' | '1' | '10').sort() // '1', '10', '3' ; default string ordering (not numeric)
+list(3, 1, 2).sort() // 1, 2, 3 ; natural numeric ordering
+list(3, 1, 2).sort($this) // 1, 2, 3 ; explicit ascending
+list(3, 1, 2).sort($this desc) // 3, 2, 1 ; descending
+list('c', 'a', 'b').sort() // 'a', 'b', 'c' ; default string ordering
+list('c', 'a', 'b').sort($this desc) // 'c', 'b', 'a' ; descending
+list('3', '1', '10').sort() // '1', '10', '3' ; default string ordering (not numeric)
 Patient.name.sort(family desc, given.first()) // sort by family name descending, then by first given name ascending
 Patient.telecom.sort(system, use desc) // sort by system ascending, then by use descending
 ```
@@ -1108,7 +1148,7 @@ Returns a collection containing all but the first item in the input collection. 
 
 For example:
 ``` fhirpath
-(0 | 1 | 2).tail() // 1, 2
+list(0, 1, 2).tail() // 1, 2
 ```
 
 #### skip(num : Integer) : collection
@@ -1117,8 +1157,8 @@ Returns a collection containing all but the first `num` items in the input colle
 
 For example:
 ``` fhirpath
-(0 | 1 | 2).skip(1) // 1, 2
-(0 | 1 | 2).skip(2) // 2
+list(0, 1, 2).skip(1) // 1, 2
+list(0, 1, 2).skip(2) // 2
 ```
 
 #### take(num : Integer) : collection
@@ -1127,8 +1167,8 @@ Returns a collection containing the first `num` items in the input collection, o
 
 For example:
 ``` fhirpath
-(0 | 1 | 2).take(2) // 0, 1
-(0 | 1 | 2).take(5) // 0, 1, 2
+list(0, 1, 2).take(2) // 0, 1
+list(0, 1, 2).take(5) // 0, 1, 2
 ```
 
 #### intersect(other: collection) : collection
@@ -1137,7 +1177,7 @@ Returns the set of items that are in both collections. Duplicate items will be e
 
 For example:
 ``` fhirpath
-(1 | 2 | 3).intersect(2 | 4) // 2
+list(1, 2, 3).intersect(list(2, 4)) // 2
 ```
 
 #### exclude(other: collection) : collection
@@ -1146,7 +1186,7 @@ Returns the set of items that are not in the `other` collection. Duplicate items
 
 For example:
 ``` fhirpath
-(1 | 2 | 3).exclude(2) // 1, 3
+list(1, 2, 3).exclude(2) // 1, 3
 ```
 
 ### Combining
@@ -2054,6 +2094,7 @@ For example:
 #### matchesFull(regex : String, [flags : String]) : Boolean
 
 Returns `true` when the value completely matches the given regular expression (implying that the start/end of line markers `^`, `$` are always surrounding the regex expression provided).
+
 §mch2:Regular expressions SHOULD function consistently, regardless of any culture- and locale-specific settings in the environment, SHOULD be case-sensitive, use 'single line' mode and allow Unicode characters.§
 
 If the input collection or `regex` are empty, the result is empty (`{ }`).
@@ -2237,8 +2278,8 @@ If no separator is specified, the strings are directly concatenated.
 The following example illustrates the behavior of the `.join` operator:
 
 ``` fhirpath
-('A' | 'B' | 'C').join() // 'ABC'
-('A' | 'B' | 'C').join(',') // 'A,B,C'
+list('A', 'B', 'C').join() // 'ABC'
+list('A', 'B', 'C').join(',') // 'A,B,C'
 ```
 
 ### Math
@@ -2938,12 +2979,11 @@ For example:
 0.0 = 0 // true ; zeros after the decimal place are ignored
 {} = {} // empty ; as explicitly defined above
 name = name // true ; its the same object, and thus will have all the same properties recursively
-(1 | 2 | 3) = (3 | 2 | 1) // false ; all items are in both collections, but order doesn't match
-(1 | 2 | 3) = (1 | 2 | 3) // true ; all items are in both collections, and order matches
+list(1, 2, 3) = list(3, 2, 1) // false ; all items are in both collections, but order doesn't match
+list(1, 2, 3) = list(1, 2, 3) // true ; all items are in both collections, and order matches
 'a' = 'A' // false ; case is NOT ignored for equality
 23 = 23 '1' // true ; integer implicitly converts to Quantity with unit '1', thus compares exactly here
 ```
-***Note:** The collection examples above are illustrative only. The `|` operator does not guarantee the order of its result, so engines may legitimately return these items in a different order. In practice, many engines preserve the construction order for simple collections like these.*
 
 ##### Quantity Equality
 
@@ -3060,11 +3100,10 @@ For example:
 0.0 ~ 0     // true ; implicit conversion to decimals, then rounding to the least precise operand (0) results in both sides being 0
 {} ~ {}     // true ; as explicitly defined above
 name ~ name // true ; its the same object, and thus will have all the same properties recursively
-(1 | 2 | 3) ~ (3 | 2 | 1) // false ; all items are in both collections, but order doesn't match
+list(1, 2, 3) ~ list(3, 2, 1) // false ; all items are in both collections, but order doesn't match
 'a' ~ 'A'   // true ; case is ignored for equivalence
 23 ~ 23 '1' // true ; integer implicitly converts to Quantity with unit '1', thus compares exactly here
 ```
-***Note:** The collection examples above are illustrative only. The `|` operator does not guarantee the order of its result, so engines may legitimately return these items in a different order. In practice, many engines preserve the construction order for simple collections like these.*
 
 ##### Quantity Equivalence
 
@@ -3855,8 +3894,8 @@ If the input collection is empty (`{ }`), the result is empty.
 
 For example:
 ``` fhirpath
-( 1.0 | 2.0 | 3.0 | 4.0 | 5.0 ).sum() // 15.0
-( 1.0 'mg' | 2.0 'mg' | 3.0 'mg' | 4.0 'mg' | 5.0 'mg' ).sum() // 15.0 'mg'
+list( 1.0, 2.0, 3.0, 4.0, 5.0 ).sum() // 15.0
+list( 1.0 'mg', 2.0 'mg', 3.0 'mg', 4.0 'mg', 5.0 'mg' ).sum() // 15.0 'mg'
 ```
 
 ### min() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
@@ -3870,9 +3909,9 @@ If the input collection is empty (`{ }`), the result is empty.
 
 For example:
 ``` fhirpath
-( 2 | 4 | 8 | 6 ).min() // 2
-( 2L | 4L | 8L | 6L ).min() // 2L
-( @2012-12-31 | @2013-01-01 | @2012-01-01 ).min() // @2012-01-01
+list( 2, 4, 8, 6 ).min() // 2
+list( 2L, 4L, 8L, 6L ).min() // 2L
+list( @2012-12-31, @2013-01-01, @2012-01-01 ).min() // @2012-01-01
 ```
 
 ### max() : Integer | Long | Decimal | Quantity | Date | DateTime | Time | String
@@ -3886,9 +3925,9 @@ If the input collection is empty (`{ }`), the result is empty.
 
 For example:
 ``` fhirpath
-( 2 | 4 | 8 | 6 ).max() // 8
-( 2L | 4L | 8L | 6L ).max() // 8L
-( @2012-12-31 | @2013-01-01 | @2012-01-01 ).max() // @2013-01-01
+list( 2, 4, 8, 6 ).max() // 8
+list( 2L, 4L, 8L, 6L ).max() // 8L
+list( @2012-12-31, @2013-01-01, @2012-01-01 ).max() // @2013-01-01
 ```
 
 ### avg() : Decimal | Quantity
@@ -3904,8 +3943,8 @@ If the input collection is empty (`{ }`), the result is empty.
 
 For example:
 ``` fhirpath
-( 5.5 | 4.7 | 4.8 ).avg() // 5.0
-( 5.5 'cm' | 4.7 'cm' | 4.8 'cm' ).avg() // 5.0 'cm'
+list( 5.5, 4.7, 4.8 ).avg() // 5.0
+list( 5.5 'cm', 4.7 'cm', 4.8 'cm' ).avg() // 5.0 'cm'
 ```
 
 ## Lexical Elements
@@ -4091,7 +4130,7 @@ If the input collection is empty (`{ }`), or access to type information is unava
 
 For primitive types such as `String` and `Integer`, the result is a `SimpleTypeInfo`:
 ``` fhirpath
-('John' | 'Mary').type()
+list('John', 'Mary').type()
 ```
 
 Results in:

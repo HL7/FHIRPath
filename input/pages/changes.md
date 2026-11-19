@@ -7,6 +7,7 @@
 **Compatible, Substantive**
 * [FHIR-58739](https://jira.hl7.org/browse/FHIR-58739):  Include support for anonymous types in the instance selector
 * [FHIR-59620](https://jira.hl7.org/browse/FHIR-59620):  Clarify Quantity and Integer support for FHIRPath boundary functions
+* [FHIR-57835](https://jira.hl7.org/browse/FHIR-57835):  Include a collection creation function "list"
 
 **Non-Substantive**
 * [FHIR-57822](https://jira.hl7.org/browse/FHIR-57822):  Typo in page title
