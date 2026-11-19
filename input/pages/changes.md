@@ -1,5 +1,25 @@
 
-### Release 3 STU3 Change Summary
+### Release 3.1 Changes
+#### Issues Included since 3.0.0
+**Non-Compatible**
+* (none)
+
+**Compatible, Substantive**
+* [FHIR-58739](https://jira.hl7.org/browse/FHIR-58739):  Include support for anonymous types in the instance selector
+* [FHIR-59620](https://jira.hl7.org/browse/FHIR-59620):  Clarify Quantity and Integer support for FHIRPath boundary functions
+* [FHIR-57835](https://jira.hl7.org/browse/FHIR-57835):  Include a collection creation function "list"
+
+**Non-Substantive**
+* [FHIR-57822](https://jira.hl7.org/browse/FHIR-57822):  Typo in page title
+* [FHIR-49510](https://jira.hl7.org/browse/FHIR-49510):  Conformance language is not consistently used
+* [FHIR-59626](https://jira.hl7.org/browse/FHIR-59626):  Quantity equivalence returns false rather than empty for invalid or incomparable units
+* [FHIR-59890](https://jira.hl7.org/browse/FHIR-59890):  convertsToLong typo - convertible to an integer, not 64 bit integer
+* [FHIR-59883](https://jira.hl7.org/browse/FHIR-59883):  Correct description of equivalent for lists
+
+
+---
+
+### Release 3 STU3 Changes
 **Summary of Changes:**
 * Added new functions: `coalesce()`, `sort()`, `repeatAll()`, `defineVariable()`, `matchesFull()`, `indexOf()`, `lastIndexOf()`, `comparable()`, `pathname()`
 * Added aggregate functions: `sum()`, `min()`, `max()`, `avg()`
@@ -166,9 +186,4 @@
 * [FHIR-57251](https://jira.hl7.org/browse/FHIR-57251):  Definition of repeatAll incorrectly describes evaluation
 * [FHIR-57256](https://jira.hl7.org/browse/FHIR-57256):  Clarify behavior of Date addition
 
-#### Issues Included since 3.0.0 (targetting 3.1)
-* [FHIR-57822](https://jira.hl7.org/browse/FHIR-57822):  Typo in page title
-* [FHIR-58739](https://jira.hl7.org/browse/FHIR-58739):  Include support for anonymous types in the instance selector
-* [FHIR-49510](https://jira.hl7.org/browse/FHIR-49510):  Conformance language is not consistently used
-* [FHIR-59626](https://jira.hl7.org/browse/FHIR-59626):  Quantity equivalence returns false rather than empty for invalid or incomparable units
-* [FHIR-59620](https://jira.hl7.org/browse/FHIR-59620):  Clarify Quantity and Integer support for FHIRPath boundary functions
+
