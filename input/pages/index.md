@@ -910,9 +910,10 @@ QuestionnaireResponse.item.where(linkId='coded-q')
 ```
 
 <a name="fn-list"></a>
-#### list(item: collection, ...) : collection
+#### list(item: collection, [item: collection, ...]) : collection
 
-The `list` function appends the items from each argument into a single collection, preserving argument order and item order within each argument.
+The `list` function takes one or more arguments, each of which is a collection.
+It returns a single collection formed by appending the items from each argument in order, preserving item order within each argument.
 Single items are treated as one-item collections. 
 Duplicates are retained.
 The input collection is not used by this function.
