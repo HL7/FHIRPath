@@ -15,6 +15,7 @@
 * [FHIR-59626](https://jira.hl7.org/browse/FHIR-59626):  Quantity equivalence returns false rather than empty for invalid or incomparable units
 * [FHIR-59890](https://jira.hl7.org/browse/FHIR-59890):  convertsToLong typo - convertible to an integer, not 64 bit integer
 * [FHIR-59883](https://jira.hl7.org/browse/FHIR-59883):  Correct description of equivalent for lists
+* [FHIR-58137](https://jira.hl7.org/browse/FHIR-58137):  Specify the resulting unit for Quantity multiplication and division
 
 
 ---
