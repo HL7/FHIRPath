@@ -3573,8 +3573,8 @@ If an attempt is made to divide by zero, the result is empty.
 For example:
 ```fhirpath
 4 / 2  // 2 ; as a decimal value
-2 / 4  // 0.5
-12 / 0 // empty ({ })
+2 / 4  // 0.5 ; division returns a Decimal, even for Integer operands
+12 / 0 // empty ({ }) ; division by zero returns empty
 0 / 0  // empty ({ }) ; div by zero error result reported as empty (not reporting an error)
 ```
 
