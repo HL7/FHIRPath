@@ -3534,11 +3534,25 @@ Attempting to operate on quantities with invalid or "special" units will result 
 
 Operations that cause arithmetic overflow or underflow will result in empty (`{ }`).
 
+<a name="quantity-multiplication-and-division"></a>
+**Quantity multiplication and division**
+
+For multiplication and division involving quantities, determine the result value and unit as follows:
+
+1. If the complete operand units are commensurable, [convert](#unit-conversions) the quantity values to the most granular of those units before combining them. Compare the complete units, including any exponents and denominators, rather than comparing individual unit atoms. If the conversion factor is 1, use the unit of the left operand.
+2. Compose the units by adding the exponents of matching unit atoms for multiplication, or subtracting the denominator's exponents from the numerator's exponents for division. Remove atoms whose resulting exponent is zero. If no atoms remain, use the UCUM default unit `'1'`.
+3. Multiply or divide the values after any conversion to obtain the result value.
+
+Preserve the operand units, after any required conversion, when composing the result unit; do not replace them with UCUM base units merely to canonicalize the result. For example, dividing `'mg'` by `'d'` produces `'mg/d'`, not `'g/s'`. The operands need not have commensurable units: different dimensions can be composed, such as length divided by time.
+
 #### * (multiplication)
 
 Multiplies both arguments (supported for Integer, Long, Decimal, and Quantity) with the result being the same as the input type *(after any [implicit conversions](#conversion) to make both operands the same type)*.
 
-For multiplication involving quantities, the resulting quantity will have an appropriate unit as determined by application of the [\[UCUM\]](#UCUM) specification.
+For multiplication involving quantities, determine the result using the [quantity multiplication and division rules](#quantity-multiplication-and-division).
+After any required unit conversion, the resulting unit is determined by adding each unit atom's exponent in the left operand to its exponent in the right operand, according to the [\[UCUM\]](#UCUM) specification.
+Treat an atom absent from either operand as having exponent 0.
+For example, `'cm'` multiplied by `'cm'` produces `'cm2'`.
 
 Multiplication involving calendar units (apart from the UCUM default unit `'1'`) will return empty.
 
@@ -3558,14 +3572,25 @@ For example:
 12 day * 45 'm'   // empty ( { } ) ; multiplication with calendar units is not supported
 ```
 
+Examples involving conversion between commensurable units:
+``` fhirpath
+2 'm' * 3 'cm'       // 600 'cm2' ; convert 2 m to 200 cm, multiply 200 by 3, and add exponents: 1 + 1 = 2.
+1 '/m' * 1 '/cm'     // 100 '/m2' ; '/m' is the smaller whole unit, so convert 1 /cm to 100 /m; -1 + -1 = -2.
+1 '/cm' * 1 '/m'     // 100 '/m2' ; convert the left value to 100 /m; the smaller whole unit is still '/m'.
+1 'km/g' * 1 'm/mg'  // 1 'km2/g2' ; the complete units have conversion factor 1, so keep the left unit 'km/g' and square it.
+1 'm/mg' * 1 'km/g'  // 1 'm2/mg2' ; the same tie preserves the left unit 'm/mg', not the individual atoms m and g.
+```
+
 #### / (division)
 
 Divides the left operand *(numerator)* by the right operand *(denominator)* (supported for Integer, Long, Decimal, and Quantity).
 The result of a division is always either Decimal *(Numeric inputs)* or Quantity *(for Quantity inputs)*.
 For integer division, use the `div` operator.
 
-For division involving quantities, the resulting quantity will have an appropriate unit as determined by application of the [\[UCUM\]](#UCUM) specification.
-e.g. `km` / `h` => `km/h`
+For division involving quantities, determine the result using the [quantity multiplication and division rules](#quantity-multiplication-and-division). 
+After any required unit conversion, the resulting unit is determined by subtracting each unit atom's exponent in the denominator from its exponent in the numerator, according to the [\[UCUM\]](#UCUM) specification.
+Treat an atom absent from either the numerator or denominator as having exponent 0.
+For example, `'km'` divided by `'h'` produces `'km/h'`.
 
 Division involving calendar units (apart from the UCUM default unit `'1'`) will return empty
 
@@ -3583,10 +3608,20 @@ For example:
 
 Division examples involving quantities:
 ``` fhirpath
-12 'cm2' / 3 'cm' // 4.0 'cm'
-120 'm' / 60 's'  // 2 'm/s'
-60 / 1 's'        // 60 '/s' ; note the unit here is not "seconds", it is "per second", as the seconds are on the denominator as determined by the UCUM specification.
+12 'cm2' / 3 'cm' // 4.0 'cm' ; divide 12 by 3 and subtract the cm exponents: 2 - 1 = 1
+120 'm' / 60 's'  // 2 'm/s' ; divide 120 by 60 and compose the different dimensions without changing their units
+60 / 1 's'        // 60 '/s' ; note the unit here is not "seconds", it is "per second", as the seconds are on the denominator as determined by the UCUM specification
 60 's' / 2        // 30 's' ; simple division of the integer value
+5 'mg' / 1 'd'       // 5 'mg/d' ; divide 5 by 1 and preserve mg and d, rather than converting to g and s.
+```
+
+Examples involving conversion between commensurable units:
+``` fhirpath
+4 'm' / 2 'cm'       // 200 '1' ; convert 4 m to 400 cm, divide 400 by 2, and cancel cm: 1 - 1 = 0.
+1 '/m' / 1 '/cm'     // 0.01 '1' ; convert 1 /cm to 100 /m, divide 1 by 100, and cancel the reciprocal units.
+1 '/cm' / 1 '/m'     // 100 '1' ; convert 1 /cm to 100 /m, divide 100 by 1, and cancel the reciprocal units.
+1 'km/g' / 1 'm/mg'  // 1 '1' ; conversion factor 1 preserves the left unit 'km/g', then matching units cancel.
+1 'm/mg' / 1 'km/g'  // 1 '1' ; conversion factor 1 preserves the left unit 'm/mg', then matching units cancel.
 ```
 
 #### + (addition)
